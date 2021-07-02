@@ -37,11 +37,14 @@ describe('AVClient#authenticateWithCodes', function() {
   context('invalid election codes', function() {
     it('returns error', async function() {
       const invalidCodes = ['no', 'no'];
+      let result;
       try {
-        const result = await client.authenticateWithCodes(invalidCodes);
+        result = await client.authenticateWithCodes(invalidCodes);
       } catch(error) {
-        console.log("This never gets run")
         expect(error).to.equal('THIS NEVER GETS ASSERTED');
+      }
+      if (result) {
+        throw 'Test failed, this should have returned an error instead';
       }
     });
   });
