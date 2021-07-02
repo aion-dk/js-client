@@ -26,85 +26,23 @@ describe('AVClient#authenticateWithCodes', function() {
     client = new AVClient(storage);
   });
 
-  // Seems fine
-  context('ASYNC valid election codes', function() {
+  context('valid election codes', function() {
     it('returns success', async function() {
-      const validCode = 'abc';
-      const result = await client.authenticateWithCodes(validCode);
+      const validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
+      const result = await client.authenticateWithCodes(validCodes);
       expect(result).to.equal('Success');
     });
   });
 
-  // Seems fine
-  context('CHAI_AS_PROMISED valid election codes', function() {
-    it('returns success', function() {
-      const validCode = 'abc';
-      expect(
-        client.authenticateWithCodes(validCode)
-      ).to.eventually.equal('Success');
-    });
-  });
-
-  // Seems fine
-  context('ASYNC valid election codes, bad expectation', function() {
-    it('returns success', async function() {
-      const validCode = 'abc';
-      const result = await client.authenticateWithCodes(validCode);
-      expect(result).to.equal('Unexpected success');
-    });
-  });
-
-  // Seems fine
-  context('CHAI_AS_PROMISED valid election codes', function() {
-    it('returns success', function() {
-      const validCode = 'abc';
-      expect(
-        client.authenticateWithCodes(validCode)
-      ).to.eventually.equal('Unexpected success');
-    });
-  });
-
-  // Seems fine
-  context('ASYNC invalid election codes', function() {
+  context('invalid election codes', function() {
     it('returns error', async function() {
-      const invalidCode = 'nonsense';
+      const invalidCodes = ['no', 'no'];
       try {
-        const result = await client.authenticateWithCodes(invalidCode);
+        const result = await client.authenticateWithCodes(invalidCodes);
       } catch(error) {
-        expect(error).to.equal('Failure');
+        console.log("This never gets run")
+        expect(error).to.equal('THIS NEVER GETS ASSERTED');
       }
-    });
-  });
-
-  // Seems fine
-  context('CHAI_AS_PROMISED invalid election codes', function() {
-    it('returns error', function() {
-      const invalidCode = 'nonsense';
-      expect(
-        client.authenticateWithCodes(invalidCode)
-      ).to.eventually.equal('Failure');
-    });
-  });
-
-  // This fails correctly
-  context('ASYNC bad code, bad expectation', function() {
-    it('returns error', async function() {
-      const invalidCode = 'nonsense';
-      try {
-        const result = await client.authenticateWithCodes(invalidCode);
-      } catch(error) {
-        expect(error).to.equal('Really not this result');
-      }
-    });
-  });
-
-  // This test passes and returns false positive
-  context('CHAI_AS_PROMISED bad code, bad expectation', function() {
-    it('returns error', function() {
-      const invalidCode = 'nonsense';
-      expect(
-        client.authenticateWithCodes(invalidCode)
-      ).to.be.rejectedWith('Really not this result')
     });
   });
 });
