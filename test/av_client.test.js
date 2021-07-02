@@ -39,7 +39,7 @@ describe('AVClient#authenticateWithCodes', function() {
       try {
         result = await client.authenticateWithCodes(invalidCodes);
       } catch(error) {
-        expect(error).to.equal('Failure');
+        expect(error).to.equal('No ballots found for the submitted election codes');
       }
       if (result) {
         throw 'Test failed, this should have returned an error instead';
