@@ -41,7 +41,7 @@ describe('AVClient#authenticateWithCodes', function() {
       try {
         result = await client.authenticateWithCodes(invalidCodes);
       } catch(error) {
-        expect(error).to.equal('THIS NEVER GETS ASSERTED');
+        expect(error).to.equal('Failure');
       }
       if (result) {
         throw 'Test failed, this should have returned an error instead';
