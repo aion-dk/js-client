@@ -1,0 +1,15 @@
+{
+  "name": "Assembly Voting JS Client",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Assembly Voting JS client",
+  "scripts": {
+    "test": "mocha",
+    "tdd": "mocha --watch"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^9.0.1"
+  }
+}
