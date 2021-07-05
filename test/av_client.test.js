@@ -35,15 +35,10 @@ describe('AVClient#authenticateWithCodes', function() {
   context('invalid election codes', function() {
     it('returns error', async function() {
       const invalidCodes = ['no', 'no'];
-      let result;
-      try {
-        result = await client.authenticateWithCodes(invalidCodes);
-      } catch(error) {
-        expect(error).to.equal('No ballots found for the submitted election codes');
-      }
-      if (result) {
-        throw 'Test failed, this should have returned an error instead';
-      }
+      return client.authenticateWithCodes(invalidCodes).then(
+        () => expect.fail('Expected promise to be rejected'),
+        (error) => expect(error).to.equal('No ballots found for the submitted election codes')
+      )
     });
   });
 });
