@@ -2,7 +2,16 @@
   "source": "./lib",
   "destination": "./docs",
   "plugins": [
-    { "name": "esdoc-standard-plugin" },
+    {
+      "name": "esdoc-standard-plugin",
+      "option": {
+        "test": {
+          "source": "./test/",
+          "interfaces": ["describe", "it", "context"],
+          "includes": ["\\.test\\.js$"]
+        }
+      }
+    },
     { "name": "esdoc-node" }
   ]
 }

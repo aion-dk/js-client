@@ -18,6 +18,7 @@ class StorageAdapter {
   }
 }
 
+/** @test {AVClient} */
 describe('AVClient#authenticateWithCodes', function() {
   let client;
 
@@ -26,7 +27,7 @@ describe('AVClient#authenticateWithCodes', function() {
     client = new AVClient(storage, 'http://localhost:3000/test/app');
   });
 
-  context('valid election codes', function() {
+  context('given valid election codes', function() {
     beforeEach(function() {
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/config.valid.json');
@@ -36,6 +37,7 @@ describe('AVClient#authenticateWithCodes', function() {
         .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
     });
 
+    /** @test {AVClient#authenticateWithCodes} */
     it('returns success', async function() {
       const validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
       const result = await client.authenticateWithCodes(validCodes);
@@ -43,7 +45,8 @@ describe('AVClient#authenticateWithCodes', function() {
     });
   });
 
-  context('invalid election codes', function() {
+
+  context('given invalid election codes', function() {
     beforeEach(function() {
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/config.valid.json');
@@ -51,7 +54,8 @@ describe('AVClient#authenticateWithCodes', function() {
         .replyWithFile(200, __dirname + '/replies/sign_in.invalid.json');
     });
 
-    it('returns error', async function() {
+    /** @test {AVClient#authenticateWithCodes} */
+    it('returns an error', async function() {
       const invalidCodes = ['no', 'no'];
       return client.authenticateWithCodes(invalidCodes).then(
         () => expect.fail('Expected promise to be rejected'),

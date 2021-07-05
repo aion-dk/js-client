@@ -5,7 +5,8 @@
   "description": "Assembly Voting JS client",
   "scripts": {
     "test": "mocha",
-    "tdd": "mocha --watch"
+    "tdd": "mocha --watch",
+    "docs": "esdoc"
   },
   "dependencies": {
     "axios": "^0.21.1"
