@@ -1,6 +1,8 @@
 const AVClient = require('../lib/av_client.js');
 const chai = require('chai');
 const expect = require('chai').expect;
+const nock = require('nock');
+globalThis.TEST_MODE = true;
 
 class StorageAdapter {
   constructor() {
@@ -25,6 +27,15 @@ describe('AVClient#authenticateWithCodes', function() {
   });
 
   context('valid election codes', function() {
+    beforeEach(function() {
+      nock('http://localhost:3000/').get('/test/app/config')
+        .replyWithFile(200, __dirname + '/replies/config.valid.json');
+      nock('http://localhost:3000/').post('/test/app/sign_in')
+        .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
+      nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
+        .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
+    });
+
     it('returns success', async function() {
       const validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
       const result = await client.authenticateWithCodes(validCodes);
@@ -33,6 +44,13 @@ describe('AVClient#authenticateWithCodes', function() {
   });
 
   context('invalid election codes', function() {
+    beforeEach(function() {
+      nock('http://localhost:3000/').get('/test/app/config')
+        .replyWithFile(200, __dirname + '/replies/config.valid.json');
+      nock('http://localhost:3000/').post('/test/app/sign_in')
+        .replyWithFile(200, __dirname + '/replies/sign_in.invalid.json');
+    });
+
     it('returns error', async function() {
       const invalidCodes = ['no', 'no'];
       return client.authenticateWithCodes(invalidCodes).then(
