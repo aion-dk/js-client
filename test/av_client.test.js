@@ -21,7 +21,7 @@ describe('AVClient#authenticateWithCodes', function() {
 
   beforeEach(function() {
     const storage = new StorageAdapter();
-    client = new AVClient(storage);
+    client = new AVClient(storage, 'http://localhost:3000/test/app');
   });
 
   context('valid election codes', function() {
