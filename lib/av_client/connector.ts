@@ -1,6 +1,10 @@
 const axios = require('axios')
 
-class Connector {
+export default class Connector {
+  votingServiceURL: string;
+  timeout: number;
+  backend: any;
+
   constructor(votingServiceURL, timeout=1000) {
     this.votingServiceURL = votingServiceURL;
     this.timeout = timeout;
@@ -28,7 +32,6 @@ class Connector {
       });
   }
 
-
   createBackendClient() {
     this.backend = axios.create({
       baseURL: this.votingServiceURL,
@@ -41,5 +44,3 @@ class Connector {
     });
   }
 }
-
-module.exports = Connector

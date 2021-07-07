@@ -1,12 +1,16 @@
-const Connector = require('../lib/av_client/connector.js');
-const BackendElectionConfig = require('../lib/av_client/backend_election_config.js')
-const AuthenticateWithCodes = require('../lib/av_client/authenticate_with_codes.js')
+import Connector from '../lib/av_client/connector';
+import BackendElectionConfig from '../lib/av_client/backend_election_config';
+import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
 
 /**
  * @class
  * @desc Assembly Voting Client
  */
-class AVClient {
+export default class AVClient {
+  _storage: any;
+  _connector: any;
+  _electionConfig: object;
+
   /**
    * @constructor
    * @param storage App developers' storage interface that implements generic `get` and `set` methods.
@@ -27,7 +31,7 @@ class AVClient {
   async authenticateWithCodes(codes) {
     await this._updateElectionConfig();
     const authenticationResponse = await new AuthenticateWithCodes(this._connector)
-      .authenticate(codes, this._electionConfig.election.id, this._electionConfig.encryptionKey);
+      .authenticate(codes, this._electionConfig['election']['id'], this._electionConfig['encryptionKey']);
     this._storage.set('precinctId', authenticationResponse.precinctId);
     this._storage.set('keyPair', authenticationResponse.keyPair);
     this._storage.set('emptyCryptograms', authenticationResponse.emptyCryptograms);
@@ -85,5 +89,3 @@ class AVClient {
     }
   }
 }
-
-module.exports = AVClient

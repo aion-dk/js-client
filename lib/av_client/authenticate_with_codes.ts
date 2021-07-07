@@ -1,6 +1,8 @@
 const Crypto = require('./aion_crypto.js')()
 
-class AuthenticateWithCodes {
+export default class AuthenticateWithCodes {
+  connector: any;
+
   constructor(connector) {
     this.connector = connector;
   }
@@ -86,5 +88,3 @@ const createSession = async function(keyPair, electionId, connector) {
       return voterSession;
     });
 }
-
-module.exports = AuthenticateWithCodes
