@@ -1,8 +1,9 @@
+globalThis.TEST_MODE = true;
+
 const AVClient = require('../lib/av_client.js');
 const chai = require('chai');
 const expect = require('chai').expect;
 const nock = require('nock');
-globalThis.TEST_MODE = true;
 
 class StorageAdapter {
   constructor() {
