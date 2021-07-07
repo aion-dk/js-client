@@ -1,19 +1,21 @@
-const AVClient = require('../lib/av_client.js');
-const chai = require('chai');
-const expect = require('chai').expect;
-const nock = require('nock');
 globalThis.TEST_MODE = true;
 
+import AVClient from '../lib/av_client';
+import { expect } from 'chai';
+import nock = require('nock');
+
 class StorageAdapter {
+  db: object;
+
   constructor() {
     this.db = {}
   }
 
-  get(key) {
+  get(key: string) {
     return this.db[key];
   }
 
-  set(key, value) {
+  set(key: string, value: any) {
     this.db[key] = value;
   }
 }
@@ -44,7 +46,6 @@ describe('AVClient#authenticateWithCodes', function() {
       expect(result).to.equal('Success');
     });
   });
-
 
   context('given invalid election codes', function() {
     beforeEach(function() {
