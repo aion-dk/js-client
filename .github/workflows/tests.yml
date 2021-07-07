@@ -6,6 +6,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+            node-version: '14.x'
       - name: Cache node modules
         uses: actions/cache@v2
         env:
