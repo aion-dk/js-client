@@ -19,5 +19,7 @@ jobs:
           key: npm-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             npm-${{ hashFiles('package-lock.json') }}
+      - name: Install NPM packages
+        run: npm ci
       - name: Run tests
         run: npm run test
