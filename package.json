@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha --require ts-node/register ./test/*.test.ts",
     "tdd": "mocha --require ts-node/register ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
-    "docs": "typedoc lib"
+    "docs": "typedoc"
   },
   "dependencies": {
     "axios": "^0.21.1"

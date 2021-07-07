@@ -1,0 +1,4 @@
+{
+  "entryPoints": ["lib/av_client.ts"],
+  "out": "docs"
+}
