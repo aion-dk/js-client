@@ -20,7 +20,6 @@ class StorageAdapter {
   }
 }
 
-/** @test {AVClient} */
 describe('AVClient#authenticateWithCodes', function() {
   let client;
 
@@ -39,7 +38,6 @@ describe('AVClient#authenticateWithCodes', function() {
         .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
     });
 
-    /** @test {AVClient#authenticateWithCodes} */
     it('returns success', async function() {
       const validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
       const result = await client.authenticateWithCodes(validCodes);
@@ -55,7 +53,6 @@ describe('AVClient#authenticateWithCodes', function() {
         .replyWithFile(200, __dirname + '/replies/sign_in.invalid.json');
     });
 
-    /** @test {AVClient#authenticateWithCodes} */
     it('returns an error', async function() {
       const invalidCodes = ['no', 'no'];
       return client.authenticateWithCodes(invalidCodes).then(
