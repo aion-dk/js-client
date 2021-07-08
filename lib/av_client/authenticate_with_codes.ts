@@ -7,7 +7,7 @@ export default class AuthenticateWithCodes {
     this.connector = connector;
   }
 
-  async authenticate(electionCodes, electionId, encryptionKey) {
+  async authenticate(electionCodes: string[], electionId: string, encryptionKey: string) {
     const keyPair = this.electionCodesToKeyPair(electionCodes);
     const voterSession = await createSession(keyPair, electionId, this.connector);
     await this.verifyEmptyCryptograms(voterSession, encryptionKey);
@@ -18,18 +18,18 @@ export default class AuthenticateWithCodes {
     }
   }
 
-  electionCodesToKeyPair(electionCodes) {
+  private electionCodesToKeyPair(electionCodes: string[]): KeyPair {
     const privateKeys = electionCodes.map(Crypto.electionCodeToPrivateKey);
     const privateKey = privateKeys.reduce(Crypto.addBigNums);
     const { public_key: publicKey } = Crypto.generateKeyPair(privateKey);
 
-    return {
+    return <KeyPair>{
       privateKey: privateKey,
       publicKey: publicKey
     }
   }
 
-  async verifyEmptyCryptograms(voterSession, encryptionKey) {
+  private async verifyEmptyCryptograms(voterSession, encryptionKey: string) {
     const { contestIds, voterSessionGuid, baseCryptograms } = voterSession;
 
     const challenges = Object.fromEntries(contestIds.map(contestId => {
@@ -56,11 +56,10 @@ export default class AuthenticateWithCodes {
       }
     })
   }
-
 }
 
-const createSession = async function(keyPair, electionId, connector) {
-  const signature = Crypto.generateSchnorrSignature('', keyPair.privateKey);
+const createSession = async function(keyPair: KeyPair, electionId: string, connector: Connector) {
+  const signature = <Signature>Crypto.generateSchnorrSignature('', keyPair.privateKey);
   return connector.createSession(keyPair.publicKey, signature)
     .then(({ data }) => {
       if (!data.ballotIds || data.ballotIds.length == 0) {
@@ -88,3 +87,16 @@ const createSession = async function(keyPair, electionId, connector) {
       return voterSession;
     });
 }
+
+interface Connector {
+  challengeEmptyCryptograms: (string, array) => Promise<boolean | string>,
+  createSession: (PublicKey, Signature) => any
+}
+
+type KeyPair = {
+  privateKey: string;
+  publicKey: string;
+}
+
+type Signature = string;
+type PublicKey = string;
