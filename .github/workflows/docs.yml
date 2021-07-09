@@ -1,5 +1,8 @@
 name: Documentation
-on: [push]
+on:
+  push:
+    branches:
+      - main
 jobs:
   generate-documentation:
     runs-on: ubuntu-20.04
