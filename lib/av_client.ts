@@ -1,6 +1,7 @@
 import Connector from '../lib/av_client/connector';
 import BackendElectionConfig from '../lib/av_client/backend_election_config';
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
+import EncryptVotes from '../lib/av_client/encrypt_votes';
 
 /**
  * Assembly Voting Client API.
@@ -79,6 +80,30 @@ export class AVClient {
     return Promise.resolve(true);
   }
 
+  encryptContestSelections(contestSelections: ContestIndexed<string>) {
+    // election config has been loaded in #authenticateWithCodes
+    // await this.updateElectionConfig();
+
+    const emptyCryptograms = this.storage.get('emptyCryptograms')
+    const contests = {};
+    this.contestIds().forEach(function (id) {
+      contests[id] = {
+        vote: contestSelections[id],
+        emptyCryptogram: emptyCryptograms[id]['emptyCryptogram']
+      }
+    })
+
+    const encryptionResponse = new EncryptVotes().encrypt(contests, this.electionEncryptionKey());
+    const cryptograms = {}
+    this.contestIds().forEach(function (id) {
+      cryptograms[id] = encryptionResponse[id]['cryptogram']
+    })
+
+    this.storage.set('vote encryptions', encryptionResponse);
+
+    return cryptograms;
+  }
+
   cryptogramsForConfirmation() {
     return [];
   }
@@ -100,6 +125,10 @@ export class AVClient {
     return this.electionConfig['election']['id'];
   }
 
+  private contestIds() {
+    return this.electionConfig['ballots'].map(ballot => ballot['id'])
+  }
+
   private electionEncryptionKey() {
     return this.electionConfig['encryptionKey']
   }
@@ -113,4 +142,8 @@ export interface Storage {
   get: (key: string) => any;
   /** Persists `value` at `key`. **/
   set: (key: string, value: any) => any;
+}
+
+interface ContestIndexed<Type> {
+  [index: string]: Type;
 }
