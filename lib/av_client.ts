@@ -81,9 +81,6 @@ export class AVClient {
   }
 
   encryptContestSelections(contestSelections: ContestIndexed<string>) {
-    // election config has been loaded in #authenticateWithCodes
-    // await this.updateElectionConfig();
-
     const contestsData = this.prepareDataForEncryption(contestSelections);
     const encryptionResponse = new EncryptVotes().encrypt(contestsData, this.electionEncryptionKey());
 
