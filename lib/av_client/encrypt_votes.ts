@@ -6,7 +6,7 @@ export default class EncryptVotes {
       const cryptograms: ContestIndexed<Cryptogram> = {}
       for (let contestId in contests) {
           cryptograms[contestId] = Crypto.encryptVote(
-              Crypto.VOTE_ENCODING_TYPE.TEXT_UTF8,
+              contests[contestId].voteEncodingType,
               contests[contestId].vote,
               contests[contestId].emptyCryptogram,
               encryptionKey
@@ -24,5 +24,6 @@ interface ContestIndexed<Type> {
 }
 type EncryptionData = {
     vote: string;
+    voteEncodingType: Number;
     emptyCryptogram: Cryptogram;
 }

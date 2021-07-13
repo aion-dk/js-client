@@ -124,8 +124,10 @@ export class AVClient {
     const contests = this.electionConfig['ballots']
     const contestsData = {};
     this.contestIds().forEach(function (id) {
+      const contest = contests.find( b => b['id'] == id)
       contestsData[id] = {
         vote: contestSelections[id],
+        voteEncodingType: contest['vote_encoding_type'],
         emptyCryptogram: emptyCryptograms[id]['emptyCryptogram']
       }
     })
