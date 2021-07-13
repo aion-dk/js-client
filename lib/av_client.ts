@@ -84,28 +84,26 @@ export class AVClient {
     // election config has been loaded in #authenticateWithCodes
     // await this.updateElectionConfig();
 
-    const emptyCryptograms = this.storage.get('emptyCryptograms')
-    const contests = {};
-    this.contestIds().forEach(function (id) {
-      contests[id] = {
-        vote: contestSelections[id],
-        emptyCryptogram: emptyCryptograms[id]['emptyCryptogram']
-      }
-    })
+    const contestsData = this.prepareDataForEncryption(contestSelections);
+    const encryptionResponse = new EncryptVotes().encrypt(contestsData, this.electionEncryptionKey());
 
-    const encryptionResponse = new EncryptVotes().encrypt(contests, this.electionEncryptionKey());
-    const cryptograms = {}
-    this.contestIds().forEach(function (id) {
-      cryptograms[id] = encryptionResponse[id]['cryptogram']
-    })
+    this.storage.set('voteEncryptions', encryptionResponse);
 
-    this.storage.set('vote encryptions', encryptionResponse);
-
-    return cryptograms;
+    return 'Success';
   }
 
   cryptogramsForConfirmation() {
     return [];
+  }
+
+  voteCryptograms() {
+    const cryptograms = {}
+    const voteEncryptions = this.storage.get('voteEncryptions')
+    this.contestIds().forEach(function (id) {
+      cryptograms[id] = voteEncryptions[id]['cryptogram']
+    })
+
+    return cryptograms
   }
 
   submissionReceipt() {
@@ -119,6 +117,20 @@ export class AVClient {
     if (Object.entries(this.electionConfig).length === 0) {
       this.electionConfig = await new BackendElectionConfig(this.connector).get();
     }
+  }
+
+  private prepareDataForEncryption(contestSelections: ContestIndexed<string>) {
+    const emptyCryptograms = this.storage.get('emptyCryptograms')
+    const contests = this.electionConfig['ballots']
+    const contestsData = {};
+    this.contestIds().forEach(function (id) {
+      contestsData[id] = {
+        vote: contestSelections[id],
+        emptyCryptogram: emptyCryptograms[id]['emptyCryptogram']
+      }
+    })
+
+    return contestsData
   }
 
   private electionId() {
