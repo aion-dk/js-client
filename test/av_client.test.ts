@@ -1,8 +1,9 @@
-globalThis.TEST_MODE = true;
-
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
+import { deterministicRandomWords, deterministicMathRandom } from "./av_client_test_helpers";
+import sinon = require('sinon');
+const sjcl = require('../lib/av_client/sjcl')
 
 class StorageAdapter {
   private db: object;
@@ -22,11 +23,20 @@ class StorageAdapter {
 
 describe('AVClient#authenticateWithCodes', function() {
   let client;
+  let sandbox;
 
   beforeEach(function() {
     const storage = new StorageAdapter();
     client = new AVClient(storage, 'http://localhost:3000/test/app');
+
+    sandbox = sinon.createSandbox();
+    sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
+    sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
   });
+
+  afterEach( function() {
+    sandbox.restore();
+  })
 
   context('given valid election codes', function() {
     beforeEach(function() {
