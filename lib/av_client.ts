@@ -93,10 +93,6 @@ export class AVClient {
   }
 
   cryptogramsForConfirmation() {
-    return [];
-  }
-
-  voteCryptograms() {
     const cryptograms = {}
     const voteEncryptions = this.storage.get('voteEncryptions')
     this.contestIds().forEach(function (id) {

@@ -58,7 +58,7 @@ describe('AVClient#encryptVotes', function() {
 
       await client.authenticateWithCodes(validCodes);
       const encryptResponse = client.encryptContestSelections(contestSelections);
-      const cryptograms = client.voteCryptograms();
+      const cryptograms = client.cryptogramsForConfirmation();
 
       expect(encryptResponse).to.equal('Success');
       expect(cryptograms).to.deep.equal(contestCryptograms);
