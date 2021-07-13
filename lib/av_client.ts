@@ -12,6 +12,7 @@ import EncryptVotes from '../lib/av_client/encrypt_votes';
  * * {@link AVClient.getBallot | getBallot }
  * * {@link AVClient.submitBallotChoices | submitBallotChoices }
  * * {@link AVClient.submitAttestation | submitAttestation }
+ * * {@link AVClient.encryptContestSelections | encryptContestSelections }
  * * {@link AVClient.cryptogramsForConfirmation | cryptogramsForConfirmation }
  * * {@link AVClient.submissionReceipt | submissionReceipt }
  */
@@ -80,6 +81,11 @@ export class AVClient {
     return Promise.resolve(true);
   }
 
+  /**
+   * Encrypts all voter ballot choices.
+   * @param  contestSelections Object containing the selections for each contest
+   * @return {String}
+   */
   encryptContestSelections(contestSelections: ContestIndexed<string>) {
     const contestsData = this.prepareDataForEncryption(contestSelections);
     const encryptionResponse = new EncryptVotes().encrypt(contestsData, this.electionEncryptionKey());
@@ -89,6 +95,10 @@ export class AVClient {
     return 'Success';
   }
 
+  /**
+   * Returns data for rendering the list of cryptograms of the ballot
+   * @return Object containing a cryptogram for each contest
+   */
   cryptogramsForConfirmation() {
     const cryptograms = {}
     const voteEncryptions = this.storage.get('voteEncryptions')
@@ -112,6 +122,9 @@ export class AVClient {
     }
   }
 
+  /**
+   * Gathers all data needed for encrypting the vote selections.
+   */
   private prepareDataForEncryption(contestSelections: ContestIndexed<string>) {
     const emptyCryptograms = this.storage.get('emptyCryptograms')
     const contests = this.electionConfig['ballots']
@@ -151,6 +164,11 @@ export interface Storage {
   set: (key: string, value: any) => any;
 }
 
+/**
+ * Used for structuring data that is indexed under contests
+ * @template Type defines the data type
+ */
 interface ContestIndexed<Type> {
+  /** The contest 'id' **/
   [index: string]: Type;
 }
