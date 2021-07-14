@@ -21,7 +21,7 @@ class StorageAdapter {
   }
 }
 
-describe('AVClient#authenticateWithCodes', function() {
+describe('AVClient#encryptVotes', function() {
   let client;
   let sandbox;
 
@@ -38,37 +38,30 @@ describe('AVClient#authenticateWithCodes', function() {
     sandbox.restore();
   })
 
-  context('given valid election codes', function() {
+  context('encrypt vote', function() {
     beforeEach(function() {
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/config.valid.json');
       nock('http://localhost:3000/').post('/test/app/sign_in')
         .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
       nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
-        .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
+          .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
     });
 
-    it('returns success', async function() {
+    it('encrypts correctly', async function() {
       const validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
-      const result = await client.authenticateWithCodes(validCodes);
-      expect(result).to.equal('Success');
-    });
-  });
+      const contestSelections = { '1': 'option1', '2': 'optiona' };
+      const contestCryptograms = {
+        '1': '0244df49fde4a25cb25ccb03e5611b5f6301bf0eb804c8df5867cdc73f2ccc2ae3,029abf8fca845b2a6b57627e63adaf7f46d608ecb27393e5d68e37a17f38a646ad',
+        '2': '028168ab1e56f7cf8f7c652d7abeb3a8e1ede11f40d0faaee16d2e336328c813cf,02d85bfbb32b8140a99294c17adc719e42d960994b4fab70351fd8b6dc050b9676'
+      };
 
-  context('given invalid election codes', function() {
-    beforeEach(function() {
-      nock('http://localhost:3000/').get('/test/app/config')
-        .replyWithFile(200, __dirname + '/replies/config.valid.json');
-      nock('http://localhost:3000/').post('/test/app/sign_in')
-        .replyWithFile(200, __dirname + '/replies/sign_in.invalid.json');
-    });
+      await client.authenticateWithCodes(validCodes);
+      const encryptResponse = client.encryptContestSelections(contestSelections);
+      const cryptograms = client.cryptogramsForConfirmation();
 
-    it('returns an error', async function() {
-      const invalidCodes = ['no', 'no'];
-      return client.authenticateWithCodes(invalidCodes).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => expect(error).to.equal('No ballots found for the submitted election codes')
-      )
+      expect(encryptResponse).to.equal('Success');
+      expect(cryptograms).to.deep.equal(contestCryptograms);
     });
   });
 });

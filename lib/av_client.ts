@@ -1,6 +1,7 @@
 import Connector from '../lib/av_client/connector';
 import BackendElectionConfig from '../lib/av_client/backend_election_config';
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
+import EncryptVotes from '../lib/av_client/encrypt_votes';
 
 /**
  * Assembly Voting Client API.
@@ -11,6 +12,7 @@ import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
  * * {@link AVClient.getBallot | getBallot }
  * * {@link AVClient.submitBallotChoices | submitBallotChoices }
  * * {@link AVClient.submitAttestation | submitAttestation }
+ * * {@link AVClient.encryptContestSelections | encryptContestSelections }
  * * {@link AVClient.cryptogramsForConfirmation | cryptogramsForConfirmation }
  * * {@link AVClient.submissionReceipt | submissionReceipt }
  */
@@ -79,8 +81,32 @@ export class AVClient {
     return Promise.resolve(true);
   }
 
+  /**
+   * Encrypts all voter ballot choices.
+   * @param  contestSelections Object containing the selections for each contest
+   * @return {String}
+   */
+  encryptContestSelections(contestSelections: ContestIndexed<string>) {
+    const contestsData = this.prepareDataForEncryption(contestSelections);
+    const encryptionResponse = new EncryptVotes().encrypt(contestsData, this.electionEncryptionKey());
+
+    this.storage.set('voteEncryptions', encryptionResponse);
+
+    return 'Success';
+  }
+
+  /**
+   * Returns data for rendering the list of cryptograms of the ballot
+   * @return Object containing a cryptogram for each contest
+   */
   cryptogramsForConfirmation() {
-    return [];
+    const cryptograms = {}
+    const voteEncryptions = this.storage.get('voteEncryptions')
+    this.contestIds().forEach(function (id) {
+      cryptograms[id] = voteEncryptions[id]['cryptogram']
+    })
+
+    return cryptograms
   }
 
   submissionReceipt() {
@@ -96,8 +122,31 @@ export class AVClient {
     }
   }
 
+  /**
+   * Gathers all data needed for encrypting the vote selections.
+   */
+  private prepareDataForEncryption(contestSelections: ContestIndexed<string>) {
+    const emptyCryptograms = this.storage.get('emptyCryptograms')
+    const contests = this.electionConfig['ballots']
+    const contestsData = {};
+    this.contestIds().forEach(function (id) {
+      const contest = contests.find( b => b['id'] == id)
+      contestsData[id] = {
+        vote: contestSelections[id],
+        voteEncodingType: contest['vote_encoding_type'],
+        emptyCryptogram: emptyCryptograms[id]['emptyCryptogram']
+      }
+    })
+
+    return contestsData
+  }
+
   private electionId() {
     return this.electionConfig['election']['id'];
+  }
+
+  private contestIds() {
+    return this.electionConfig['ballots'].map(ballot => ballot['id'])
   }
 
   private electionEncryptionKey() {
@@ -113,4 +162,13 @@ export interface Storage {
   get: (key: string) => any;
   /** Persists `value` at `key`. **/
   set: (key: string, value: any) => any;
+}
+
+/**
+ * Used for structuring data that is indexed under contests
+ * @template Type defines the data type
+ */
+interface ContestIndexed<Type> {
+  /** The contest 'id' **/
+  [index: string]: Type;
 }
