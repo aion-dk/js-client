@@ -12,6 +12,8 @@ export default class AuthenticateWithCodes {
     const voterSession = await createSession(keyPair, electionId, this.connector);
     await this.verifyEmptyCryptograms(voterSession, encryptionKey);
     return {
+      voterSessionGuid: voterSession.voterSessionGuid,
+      voterIdentifier: voterSession.voterIdentifier,
       precinctId: voterSession.precinctId,
       keyPair: keyPair,
       emptyCryptograms: voterSession.baseCryptograms

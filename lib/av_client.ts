@@ -40,6 +40,8 @@ export class AVClient {
     const authenticationResponse = await new AuthenticateWithCodes(this.connector)
       .authenticate(codes, this.electionId(), this.electionEncryptionKey());
 
+    this.storage.set('voterSessionGuid', authenticationResponse.voterSessionGuid);
+    this.storage.set('voterIdentifier', authenticationResponse.voterIdentifier);
     this.storage.set('precinctId', authenticationResponse.precinctId);
     this.storage.set('keyPair', authenticationResponse.keyPair);
     this.storage.set('emptyCryptograms', authenticationResponse.emptyCryptograms);
