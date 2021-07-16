@@ -32,6 +32,26 @@ export default class Connector {
       });
   }
 
+  getBoardHash(voterSessionUuid) {
+    return this.backend.get('get_latest_board_hash', {
+      headers: {
+        'X-Voter-Session': voterSessionUuid
+      }
+    });
+  }
+
+  submitVotes(voterSessionUuid, contentHash, signature, cryptogramsWithProofs) {
+    return this.backend.post('submit_votes', {
+      content_hash: contentHash,
+      signature: signature,
+      votes: cryptogramsWithProofs
+    }, {
+      headers: {
+        'X-Voter-Session': voterSessionUuid
+      }
+    });
+  }
+
   createBackendClient() {
     this.backend = axios.create({
       baseURL: this.votingServiceURL,

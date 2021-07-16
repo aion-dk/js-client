@@ -2,6 +2,7 @@ import Connector from '../lib/av_client/connector';
 import BackendElectionConfig from '../lib/av_client/backend_election_config';
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
 import EncryptVotes from '../lib/av_client/encrypt_votes';
+import SubmitVotes from "./av_client/submit_votes";
 
 /**
  * Assembly Voting Client API.
@@ -111,6 +112,28 @@ export class AVClient {
     return cryptograms
   }
 
+  async signAndSubmitEncryptedVotes() {
+    const voterSessionGuid = this.storage.get('voterSessionGuid')
+    const voterIdentifier = this.storage.get('voterIdentifier')
+    const electionId = this.electionId()
+    const voteEncryptions = this.storage.get('voteEncryptions')
+    const privateKey = this.privateKey();
+    const signatureKey = this.electionSigningPublicKey();
+
+    const voteReceipt = await new SubmitVotes(this.connector).signAndSubmitVotes(
+        voterSessionGuid,
+        voterIdentifier,
+        electionId,
+        voteEncryptions,
+        privateKey,
+        signatureKey
+    );
+
+    this.storage.set('voteReceipt', voteReceipt);
+
+    return 'Success';
+  }
+
   submissionReceipt() {
     return {};
   }
@@ -153,6 +176,16 @@ export class AVClient {
 
   private electionEncryptionKey() {
     return this.electionConfig['encryptionKey']
+  }
+
+  private electionSigningPublicKey() {
+    return this.electionConfig['signingPublicKey']
+  }
+
+  private privateKey() {
+    const keyPair = this.storage.get('keyPair')
+
+    return keyPair.privateKey
   }
 }
 
