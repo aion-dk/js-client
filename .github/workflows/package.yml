@@ -1,10 +1,12 @@
 name: Package
 on:
   workflow_run:
-    workflows:
-      - Tests
-    types:
-      - completed
+    workflows: [Tests]
+    types: [completed]
+#    workflows:
+#      - Tests
+#    types:
+#      - completed
 
 jobs:
   deploy-packages:
