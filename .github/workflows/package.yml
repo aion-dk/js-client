@@ -1,10 +1,6 @@
 name: Package
 on:
-  workflow_run:
-    workflows: ["Tests"]
-    types:
-      - completed
-      - requested
+  - push
 jobs:
   deploy-packages:
     # the 2nd condition
