@@ -16,6 +16,7 @@ import EncryptVotes from '../lib/av_client/encrypt_votes';
  * * {@link AVClient.cryptogramsForConfirmation | cryptogramsForConfirmation }
  * * {@link AVClient.submissionReceipt | submissionReceipt }
  */
+
 export class AVClient {
   private storage: Storage;
   private connector: any;
