@@ -5,7 +5,6 @@ on:
     types:
       - completed
       - requested
-
 jobs:
   deploy-packages:
     # the 2nd condition
