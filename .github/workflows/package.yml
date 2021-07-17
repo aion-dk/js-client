@@ -1,13 +1,11 @@
 name: Package
 on:
   workflow_run:
-    workflows: [Tests]
-    types: [completed]
-#    workflows:
-#      - Tests
-#    types:
-#      - completed
-
+    workflows:
+      - Tests
+    types:
+      - completed
+      - requested
 jobs:
   deploy-packages:
     # the 2nd condition
