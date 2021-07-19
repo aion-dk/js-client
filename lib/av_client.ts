@@ -17,6 +17,7 @@ import SubmitVotes from "./av_client/submit_votes";
  * * {@link AVClient.cryptogramsForConfirmation | cryptogramsForConfirmation }
  * * {@link AVClient.submissionReceipt | submissionReceipt }
  */
+
 export class AVClient {
   private storage: Storage;
   private connector: any;
