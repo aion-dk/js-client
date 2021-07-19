@@ -101,5 +101,25 @@ describe('AVClient#voteSubmission', function() {
       )
     });
 
+    it('fails when digital signature is corrupt', async function() {
+      nock('http://localhost:3000/').post('/test/app/submit_votes')
+          .replyWithFile(200, __dirname + '/replies/avx_error.invalid_5.json');
+
+      await client.authenticateWithCodes(validCodes);
+      client.encryptContestSelections(contestSelections);
+
+      // change voter's key pair
+      const keyPair = Crypto.generateKeyPair();
+      storage.set('keyPair', {
+        privateKey: keyPair['private_key'],
+        publicKey: keyPair['public_key']
+      })
+
+      return await client.signAndSubmitEncryptedVotes().then(
+          () => expect.fail('Expected promise to be rejected'),
+          (error) => expect(error).to.equal('Digital signature did not validate.')
+      )
+    });
+
   });
 });
