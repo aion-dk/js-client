@@ -137,5 +137,26 @@ describe('AVClient#voteSubmission', function() {
       )
     });
 
+    it('fails when proof of correct encryption is corrupt', async function() {
+      nock('http://localhost:3000/').post('/test/app/submit_votes')
+          .replyWithFile(200, __dirname + '/replies/avx_error.invalid_7.json');
+
+      await client.authenticateWithCodes(validCodes);
+      client.encryptContestSelections(contestSelections);
+
+      // change the proof of ballot 1
+      const voteEncryptions = storage.get('voteEncryptions')
+      const randomness = voteEncryptions['1'].randomness
+      const newRandomness = Crypto.addBigNums(randomness, randomness)
+      const proof = Crypto.generateDiscreteLogarithmProof(newRandomness)
+      voteEncryptions['1'].proof = proof
+      storage.set('voteEncryptions', voteEncryptions)
+
+      return await client.signAndSubmitEncryptedVotes().then(
+          () => expect.fail('Expected promise to be rejected'),
+          (error) => expect(error).to.equal('Proof of correct encryption failed for ballot #1.')
+      )
+    });
+
   });
 });
