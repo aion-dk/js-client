@@ -121,5 +121,21 @@ describe('AVClient#voteSubmission', function() {
       )
     });
 
+    it('fails when content is corrupt', async function() {
+      nock('http://localhost:3000/').post('/test/app/submit_votes')
+          .replyWithFile(200, __dirname + '/replies/avx_error.invalid_6.json');
+
+      await client.authenticateWithCodes(validCodes);
+      client.encryptContestSelections(contestSelections);
+
+      // change the voter identifier
+      storage.set('voterIdentifier', 'corrupt identifier');
+
+      return await client.signAndSubmitEncryptedVotes().then(
+          () => expect.fail('Expected promise to be rejected'),
+          (error) => expect(error).to.equal('Content hash does not correspond.')
+      )
+    });
+
   });
 });
