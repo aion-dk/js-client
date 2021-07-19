@@ -4,6 +4,7 @@ import nock = require('nock');
 import {deterministicMathRandom, deterministicRandomWords} from "./av_client_test_helpers";
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
+const Crypto = require('../lib/av_client/aion_crypto.js')()
 
 class StorageAdapter {
   private db: object;
@@ -24,9 +25,10 @@ class StorageAdapter {
 describe('AVClient#voteSubmission', function() {
   let client;
   let sandbox;
+  let storage;
 
   beforeEach(function() {
-    const storage = new StorageAdapter();
+    storage = new StorageAdapter();
     client = new AVClient(storage, 'http://localhost:3000/test/app');
 
     sandbox = sinon.createSandbox();
@@ -61,5 +63,43 @@ describe('AVClient#voteSubmission', function() {
       const result = await client.signAndSubmitEncryptedVotes();
       expect(result).to.equal('Success');
     });
+  });
+
+  context('given invalid values', function() {
+    let validCodes;
+    let contestSelections;
+
+    beforeEach(function() {
+      nock('http://localhost:3000/').get('/test/app/config')
+          .replyWithFile(200, __dirname + '/replies/config.valid.json');
+      nock('http://localhost:3000/').post('/test/app/sign_in')
+          .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
+      nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
+          .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
+      nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
+          .replyWithFile(200, __dirname + '/replies/get_latest_board_hash.valid.json');
+
+      validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
+      contestSelections = { '1': 'option1', '2': 'optiona' };
+    });
+
+    it('fails when not voting on all contests', async function() {
+      nock('http://localhost:3000/').post('/test/app/submit_votes')
+          .replyWithFile(200, __dirname + '/replies/avx_error.invalid_4.json');
+
+      await client.authenticateWithCodes(validCodes);
+      client.encryptContestSelections(contestSelections);
+
+      // vote only on ballot 1
+      const voteEncryptions = storage.get('voteEncryptions')
+      delete voteEncryptions['2']
+      storage.set('voteEncryptions', voteEncryptions)
+
+      return await client.signAndSubmitEncryptedVotes().then(
+          () => expect.fail('Expected promise to be rejected'),
+          (error) => expect(error).to.equal('Ballot ids do not correspond.')
+      )
+    });
+
   });
 });
