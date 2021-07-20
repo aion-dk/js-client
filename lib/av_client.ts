@@ -113,6 +113,12 @@ export class AVClient {
     return cryptograms
   }
 
+  /**
+   * Prepares the vote submission package.
+   * Submits encrypted voter ballot choices to backend server.
+   * Stores the vote receipt in the storage.
+   * @return {Promise}
+   */
   async signAndSubmitEncryptedVotes() {
     const voterSessionGuid = this.storage.get('voterSessionGuid')
     const voterIdentifier = this.storage.get('voterIdentifier')
@@ -132,7 +138,7 @@ export class AVClient {
 
     this.storage.set('voteReceipt', voteReceipt);
 
-    return 'Success';
+    return Promise.resolve('Success');
   }
 
   submissionReceipt() {
