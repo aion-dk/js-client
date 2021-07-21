@@ -48,7 +48,7 @@ export class AVClient {
     this.storage.set('keyPair', authenticationResponse.keyPair);
     this.storage.set('emptyCryptograms', authenticationResponse.emptyCryptograms);
 
-    return Promise.resolve('Success');
+    return 'Success';
   }
 
   /**
@@ -139,7 +139,7 @@ export class AVClient {
 
     this.storage.set('voteReceipt', voteReceipt);
 
-    return Promise.resolve('Success');
+    return 'Success';
   }
 
   submissionReceipt() {
