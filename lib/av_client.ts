@@ -21,7 +21,7 @@ import SubmitVotes from './av_client/submit_votes';
 export class AVClient {
   private storage: Storage;
   private connector: any;
-  private electionConfig: object;
+  private electionConfig: any;
 
   /**
    * @param storage App developers' persistence interface that implements `get` and `set` methods.
@@ -107,7 +107,7 @@ export class AVClient {
     const cryptograms = {}
     const voteEncryptions = this.storage.get('voteEncryptions')
     this.contestIds().forEach(function (id) {
-      cryptograms[id] = voteEncryptions[id]['cryptogram']
+      cryptograms[id] = voteEncryptions[id].cryptogram
     })
 
     return cryptograms
@@ -160,14 +160,14 @@ export class AVClient {
    */
   private prepareDataForEncryption(contestSelections: ContestIndexed<string>) {
     const emptyCryptograms = this.storage.get('emptyCryptograms')
-    const contests = this.electionConfig['ballots']
+    const contests = this.electionConfig.ballots
     const contestsData = {};
     this.contestIds().forEach(function (id) {
-      const contest = contests.find( b => b['id'] == id)
+      const contest = contests.find( b => b.id == id)
       contestsData[id] = {
         vote: contestSelections[id],
-        voteEncodingType: contest['vote_encoding_type'],
-        emptyCryptogram: emptyCryptograms[id]['emptyCryptogram']
+        voteEncodingType: contest.vote_encoding_type,
+        emptyCryptogram: emptyCryptograms[id].emptyCryptogram
       }
     })
 
@@ -175,19 +175,19 @@ export class AVClient {
   }
 
   private electionId() {
-    return this.electionConfig['election']['id'];
+    return this.electionConfig.election.id;
   }
 
   private contestIds() {
-    return this.electionConfig['ballots'].map(ballot => ballot['id'])
+    return this.electionConfig.ballots.map(ballot => ballot.id)
   }
 
   private electionEncryptionKey() {
-    return this.electionConfig['encryptionKey']
+    return this.electionConfig.encryptionKey
   }
 
   private electionSigningPublicKey() {
-    return this.electionConfig['signingPublicKey']
+    return this.electionConfig.signingPublicKey
   }
 
   private privateKey() {

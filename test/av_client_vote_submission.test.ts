@@ -111,8 +111,8 @@ describe('AVClient#voteSubmission', function() {
       // change voter's key pair
       const keyPair = Crypto.generateKeyPair();
       storage.set('keyPair', {
-        privateKey: keyPair['private_key'],
-        publicKey: keyPair['public_key']
+        privateKey: keyPair.private_key,
+        publicKey: keyPair.public_key
       })
 
       return await client.signAndSubmitEncryptedVotes().then(
