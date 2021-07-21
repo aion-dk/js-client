@@ -39,37 +39,35 @@ export default class SubmitVotes {
   }
 
   private async submit({ voterSessionGuid, contentHash, voterSignature, cryptogramsWithProofs }) {
-    return this.connector.submitVotes( voterSessionGuid, contentHash, voterSignature, cryptogramsWithProofs )
-      .then(({ data }) => {
-        if (data.error) {
-          return Promise.reject(data.error.description);
-        }
+    const { data } = await this.connector.submitVotes( voterSessionGuid, contentHash, voterSignature, cryptogramsWithProofs )
 
-        const receipt = {
-          previousBoardHash: data.previousBoardHash,
-          boardHash: data.boardHash,
-          registeredAt: data.registeredAt,
-          serverSignature: data.serverSignature,
-          voteSubmissionId: data.voteSubmissionId
-        }
+    if (data.error) {
+      return Promise.reject(data.error.description)
+    }
 
-        return Promise.resolve(receipt);
-      });
+    const receipt = {
+      previousBoardHash: data.previousBoardHash,
+      boardHash: data.boardHash,
+      registeredAt: data.registeredAt,
+      serverSignature: data.serverSignature,
+      voteSubmissionId: data.voteSubmissionId
+    }
+
+    return receipt
   }
 
   private async acknowledge(voterSessionGuid) {
-    return this.connector.getBoardHash(voterSessionGuid)
-      .then(({ data }) => {
-        if (!data.currentBoardHash || !data.currentTime) {
-          return Promise.reject('Could not get latest board hash');
-        }
+    const { data } = await this.connector.getBoardHash(voterSessionGuid)
 
-        const acknowledgedBoard = {
-          currentBoardHash: data.currentBoardHash,
-          currentTime: data.currentTime
-        }
-        return Promise.resolve(acknowledgedBoard);
-      });
+    if (!data.currentBoardHash || !data.currentTime) {
+      return Promise.reject('Could not get latest board hash');
+    }
+
+    const acknowledgedBoard = {
+      currentBoardHash: data.currentBoardHash,
+      currentTime: data.currentTime
+    }
+    return acknowledgedBoard
   }
 
   private sign(contentHash: HashValue, privateKey: PrivateKey) {
