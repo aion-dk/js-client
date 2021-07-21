@@ -39,35 +39,37 @@ export default class SubmitVotes {
   }
 
   private async submit({ voterSessionGuid, contentHash, voterSignature, cryptogramsWithProofs }) {
-    const { data } = await this.connector.submitVotes( voterSessionGuid, contentHash, voterSignature, cryptogramsWithProofs )
+    return this.connector.submitVotes( voterSessionGuid, contentHash, voterSignature, cryptogramsWithProofs )
+      .then(({ data }) => {
+        if (data.error) {
+          return Promise.reject(data.error.description);
+        }
 
-    if (data.error) {
-      return Promise.reject(data.error.description)
-    }
+        const receipt = {
+          previousBoardHash: data.previousBoardHash,
+          boardHash: data.boardHash,
+          registeredAt: data.registeredAt,
+          serverSignature: data.serverSignature,
+          voteSubmissionId: data.voteSubmissionId
+        }
 
-    const receipt = {
-      previousBoardHash: data.previousBoardHash,
-      boardHash: data.boardHash,
-      registeredAt: data.registeredAt,
-      serverSignature: data.serverSignature,
-      voteSubmissionId: data.voteSubmissionId
-    }
-
-    return receipt
+        return Promise.resolve(receipt);
+      });
   }
 
   private async acknowledge(voterSessionGuid) {
-    const { data } = await this.connector.getBoardHash(voterSessionGuid)
+    return this.connector.getBoardHash(voterSessionGuid)
+      .then(({ data }) => {
+        if (!data.currentBoardHash || !data.currentTime) {
+          return Promise.reject('Could not get latest board hash');
+        }
 
-    if (!data.currentBoardHash || !data.currentTime) {
-      return Promise.reject('Could not get latest board hash');
-    }
-
-    const acknowledgedBoard = {
-      currentBoardHash: data.currentBoardHash,
-      currentTime: data.currentTime
-    }
-    return acknowledgedBoard
+        const acknowledgedBoard = {
+          currentBoardHash: data.currentBoardHash,
+          currentTime: data.currentTime
+        }
+        return Promise.resolve(acknowledgedBoard);
+      });
   }
 
   private sign(contentHash: HashValue, privateKey: PrivateKey) {
@@ -75,8 +77,6 @@ export default class SubmitVotes {
       contentHash,
       privateKey
     )
-    const signature = Crypto.generateSchnorrSignature(contentHash, privateKey)
-    return signature
   }
 
   private async verifyReceipt({ contentHash, voterSignature, receipt, signatureKey }) {
@@ -91,7 +91,8 @@ export default class SubmitVotes {
     const boardHashString = JSON.stringify(boardHashObject)
     const computedBoardHash = Crypto.hashString(boardHashString)
 
-    if (computedBoardHash != receipt.boardHash) {
+    valid = computedBoardHash == receipt.boardHash
+    if (!valid) {
       return Promise.reject('Invalid vote receipt: corrupt board hash')
     }
 
@@ -103,11 +104,12 @@ export default class SubmitVotes {
     const receiptHashString = JSON.stringify(receiptHashObject)
     const receiptHash = Crypto.hashString(receiptHashString)
 
-    if (!Crypto.verifySchnorrSignature(receipt.serverSignature, receiptHash, signatureKey)) {
+    valid = Crypto.verifySchnorrSignature(receipt.serverSignature, receiptHash, signatureKey)
+    if (valid) {
+      return Promise.resolve('Valid vote receipt')
+    } else {
       return Promise.reject('Invalid vote receipt: corrupt server signature')
     }
-
-    return 'Valid vote receipt'
   }
 
 }
