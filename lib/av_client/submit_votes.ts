@@ -28,8 +28,8 @@ export default class SubmitVotes {
       votes: votes
     };
 
-    let contentString = JSON.stringify(content)
-    let contentHash = Crypto.hashString(contentString)
+    const contentString = JSON.stringify(content)
+    const contentHash = Crypto.hashString(contentString)
     const voterSignature = this.sign(contentHash, privateKey)
 
     const receipt = await this.submit({ voterSessionGuid, contentHash, voterSignature, cryptogramsWithProofs })
