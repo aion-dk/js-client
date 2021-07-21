@@ -10,9 +10,9 @@ export default class AuthenticateWithCodes {
   async authenticate(electionCodes: string[], electionId: string, encryptionKey: string) {
     const keyPair = this.electionCodesToKeyPair(electionCodes);
     const voterSession = await createSession(keyPair, electionId, this.connector);
+    this.connector.setVoterSessionUuid(voterSession.voterSessionUuid);
     await this.verifyEmptyCryptograms(voterSession, encryptionKey);
     return {
-      voterSessionGuid: voterSession.voterSessionGuid,
       voterIdentifier: voterSession.voterIdentifier,
       precinctId: voterSession.precinctId,
       keyPair: keyPair,
@@ -80,7 +80,7 @@ const createSession = async function(keyPair: KeyPair, electionId: string, conne
 
       const voterSession = {
         electionId: electionId,
-        voterSessionGuid: data.voterSessionUuid,
+        voterSessionUuid: data.voterSessionUuid,
         voterIdentifier: data.voterIdentifier,
         contestIds: contestIds,
         emptyCryptograms: emptyCryptograms,

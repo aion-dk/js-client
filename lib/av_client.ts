@@ -42,7 +42,6 @@ export class AVClient {
     const authenticationResponse = await new AuthenticateWithCodes(this.connector)
       .authenticate(codes, this.electionId(), this.electionEncryptionKey());
 
-    this.storage.set('voterSessionGuid', authenticationResponse.voterSessionGuid);
     this.storage.set('voterIdentifier', authenticationResponse.voterIdentifier);
     this.storage.set('precinctId', authenticationResponse.precinctId);
     this.storage.set('keyPair', authenticationResponse.keyPair);
@@ -120,7 +119,6 @@ export class AVClient {
    * @return {Promise}
    */
   async signAndSubmitEncryptedVotes() {
-    const voterSessionGuid = this.storage.get('voterSessionGuid')
     const voterIdentifier = this.storage.get('voterIdentifier')
     const electionId = this.electionId()
     const voteEncryptions = this.storage.get('voteEncryptions')
@@ -129,7 +127,6 @@ export class AVClient {
 
     const voteReceipt = await new SubmitVotes(this.connector)
       .signAndSubmitVotes({
-        voterSessionGuid,
         voterIdentifier,
         electionId,
         voteEncryptions,
