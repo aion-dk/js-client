@@ -78,8 +78,6 @@ export default class SubmitVotes {
   }
 
   private async verifyReceipt({ contentHash, voterSignature, receipt, signatureKey }) {
-    let valid = false;
-
     // verify board hash computation
     const boardHashObject = {
       content_hash: contentHash,
@@ -89,8 +87,7 @@ export default class SubmitVotes {
     const boardHashString = JSON.stringify(boardHashObject)
     const computedBoardHash = Crypto.hashString(boardHashString)
 
-    valid = computedBoardHash == receipt.boardHash
-    if (!valid) {
+    if (computedBoardHash != receipt.boardHash) {
       return Promise.reject('Invalid vote receipt: corrupt board hash')
     }
 
@@ -102,12 +99,11 @@ export default class SubmitVotes {
     const receiptHashString = JSON.stringify(receiptHashObject)
     const receiptHash = Crypto.hashString(receiptHashString)
 
-    valid = Crypto.verifySchnorrSignature(receipt.serverSignature, receiptHash, signatureKey)
-    if (valid) {
-      return Promise.resolve('Valid vote receipt')
-    } else {
+    if (!Crypto.verifySchnorrSignature(receipt.serverSignature, receiptHash, signatureKey)) {
       return Promise.reject('Invalid vote receipt: corrupt server signature')
     }
+
+    return 'Valid vote receipt'
   }
 
 }
