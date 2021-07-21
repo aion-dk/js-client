@@ -71,10 +71,8 @@ export default class SubmitVotes {
   }
 
   private sign(contentHash: HashValue, privateKey: PrivateKey) {
-    return Crypto.generateSchnorrSignature(
-      contentHash,
-      privateKey
-    )
+    const signature = Crypto.generateSchnorrSignature(contentHash, privateKey)
+    return signature
   }
 
   private async verifyReceipt({ contentHash, voterSignature, receipt, signatureKey }) {
