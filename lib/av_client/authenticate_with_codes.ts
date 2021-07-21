@@ -15,7 +15,7 @@ export default class AuthenticateWithCodes {
     return {
       voterIdentifier: voterSession.voterIdentifier,
       precinctId: voterSession.precinctId,
-      keyPair: keyPair,
+      keyPair,
       emptyCryptograms: voterSession.emptyCryptograms
     }
   }
@@ -25,10 +25,7 @@ export default class AuthenticateWithCodes {
     const privateKey = privateKeys.reduce(Crypto.addBigNums);
     const { public_key: publicKey } = Crypto.generateKeyPair(privateKey);
 
-    return <KeyPair>{
-      privateKey: privateKey,
-      publicKey: publicKey
-    }
+    return <KeyPair>{ privateKey, publicKey }
   }
 
   private async verifyEmptyCryptograms(voterSession, encryptionKey: string) {
@@ -79,11 +76,11 @@ const createSession = async function(keyPair: KeyPair, electionId: string, conne
       });
 
       const voterSession = {
-        electionId: electionId,
+        electionId,
         voterSessionUuid: data.voterSessionUuid,
         voterIdentifier: data.voterIdentifier,
-        contestIds: contestIds,
-        emptyCryptograms: emptyCryptograms,
+        contestIds,
+        emptyCryptograms,
         precinctId: '909'
       };
       return voterSession;

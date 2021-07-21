@@ -25,7 +25,7 @@ export default class SubmitVotes {
       acknowledged_board_hash: acknowledgeResponse.currentBoardHash,
       election_id: electionId,
       voter_identifier: voterIdentifier,
-      votes: votes
+      votes
     };
 
     const contentString = JSON.stringify(content)

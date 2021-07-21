@@ -29,7 +29,7 @@ export default class Connector {
 
   challengeEmptyCryptograms(challenges) {
     return this.backend.post('challenge_empty_cryptograms', {
-        challenges: challenges
+        challenges
       }, {
         headers: {
           'X-Voter-Session': this.voterSessionUuid
@@ -48,7 +48,7 @@ export default class Connector {
   submitVotes(contentHash, signature, cryptogramsWithProofs) {
     return this.backend.post('submit_votes', {
       content_hash: contentHash,
-      signature: signature,
+      signature,
       votes: cryptogramsWithProofs
     }, {
       headers: {

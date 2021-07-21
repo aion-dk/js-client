@@ -12,11 +12,7 @@ export default class EncryptVotes {
       );
       const proof = Crypto.generateDiscreteLogarithmProof(randomness)
 
-      response[contestId] = {
-        cryptogram: cryptogram,
-        randomness: randomness,
-        proof: proof
-      }
+      response[contestId] = { cryptogram, randomness, proof }
     }
 
     return response;
