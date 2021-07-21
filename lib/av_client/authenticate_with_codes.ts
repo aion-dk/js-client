@@ -10,6 +10,7 @@ export default class AuthenticateWithCodes {
   async authenticate(electionCodes: string[], electionId: string, encryptionKey: string) {
     const keyPair = this.electionCodesToKeyPair(electionCodes);
     const voterSession = await createSession(keyPair, electionId, this.connector);
+    this.connector.setVoterSessionUuid(voterSession.voterSessionUuid);
     await this.verifyEmptyCryptograms(voterSession, encryptionKey);
     return {
       precinctId: voterSession.precinctId,
@@ -30,13 +31,13 @@ export default class AuthenticateWithCodes {
   }
 
   private async verifyEmptyCryptograms(voterSession, encryptionKey: string) {
-    const { contestIds, voterSessionGuid, baseCryptograms } = voterSession;
+    const { contestIds, baseCryptograms } = voterSession;
 
     const challenges = Object.fromEntries(contestIds.map(contestId => {
       return [contestId, Crypto.generateRandomNumber()]
     }));
 
-    return this.connector.challengeEmptyCryptograms(voterSessionGuid, challenges).then(response => {
+    return this.connector.challengeEmptyCryptograms(challenges).then(response => {
       const responses = response.data.responses;
       const valid = contestIds.every((contestId) => {
         const baseCryptogram = baseCryptograms[contestId];
@@ -78,7 +79,7 @@ const createSession = async function(keyPair: KeyPair, electionId: string, conne
 
       const voterSession = {
         electionId: electionId,
-        voterSessionGuid: data.voterSessionUuid,
+        voterSessionUuid: data.voterSessionUuid,
         voterIdentifier: data.voterIdentifier,
         contestIds: contestIds,
         baseCryptograms: baseCryptograms,
@@ -89,7 +90,7 @@ const createSession = async function(keyPair: KeyPair, electionId: string, conne
 }
 
 interface Connector {
-  challengeEmptyCryptograms: (string, array) => Promise<boolean | string>,
+  challengeEmptyCryptograms: (array) => Promise<boolean | string>,
   createSession: (PublicKey, Signature) => any
 }
 
