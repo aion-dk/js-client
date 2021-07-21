@@ -7,7 +7,7 @@ export default class SubmitVotes {
     this.connector = connector;
   }
 
-  async signAndSubmitVotes(voterSessionGuid, voterIdentifier, electionId, voteEncryptions, privateKey, signatureKey) {
+  async signAndSubmitVotes({ voterSessionGuid, voterIdentifier, electionId, voteEncryptions, privateKey, signatureKey }) {
     const acknowledgeResponse = await this.acknowledge(voterSessionGuid)
 
     const votes = {}
@@ -30,16 +30,16 @@ export default class SubmitVotes {
 
     let contentString = JSON.stringify(content)
     let contentHash = Crypto.hashString(contentString)
-    const signature = this.sign(contentHash, privateKey)
+    const voterSignature = this.sign(contentHash, privateKey)
 
-    const voteReceipt = await this.submit(voterSessionGuid, contentHash, signature, cryptogramsWithProofs)
-    await this.verifyReceipt(contentHash, signature, voteReceipt, signatureKey);
+    const receipt = await this.submit({ voterSessionGuid, contentHash, voterSignature, cryptogramsWithProofs })
+    await this.verifyReceipt({ contentHash, voterSignature, receipt, signatureKey });
 
-    return voteReceipt
+    return receipt
   }
 
-  private async submit(voterSessionGuid, contentHash, signature, voteWrappers) {
-    return this.connector.submitVotes(voterSessionGuid, contentHash, signature, voteWrappers)
+  private async submit({ voterSessionGuid, contentHash, voterSignature, cryptogramsWithProofs }) {
+    return this.connector.submitVotes( voterSessionGuid, contentHash, voterSignature, cryptogramsWithProofs )
       .then(({ data }) => {
         if (data.error) {
           return Promise.reject(data.error.description);
@@ -79,7 +79,7 @@ export default class SubmitVotes {
     )
   }
 
-  private async verifyReceipt(contentHash, voterSignature, receipt, signatureKey) {
+  private async verifyReceipt({ contentHash, voterSignature, receipt, signatureKey }) {
     let valid = false;
 
     // verify board hash computation
@@ -115,8 +115,8 @@ export default class SubmitVotes {
 }
 
 interface Connector {
-  getBoardHash: (voterSessionGuid: string) => Promise<AcknowledgedBoard>;
-  submitVotes: (voterSessionGuid: string, contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestIndexed<CryptogramWithProof>) => Promise<VoteReceipt>
+  getBoardHash: (voterSessionGuid: string) => any;
+  submitVotes: (voterSessionGuid: string, contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestIndexed<CryptogramWithProof>) => any
 }
 
 interface ContestIndexed<Type> {

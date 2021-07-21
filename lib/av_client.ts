@@ -127,14 +127,15 @@ export class AVClient {
     const privateKey = this.privateKey();
     const signatureKey = this.electionSigningPublicKey();
 
-    const voteReceipt = await new SubmitVotes(this.connector).signAndSubmitVotes(
-      voterSessionGuid,
-      voterIdentifier,
-      electionId,
-      voteEncryptions,
-      privateKey,
-      signatureKey
-    );
+    const voteReceipt = await new SubmitVotes(this.connector)
+      .signAndSubmitVotes({
+        voterSessionGuid,
+        voterIdentifier,
+        electionId,
+        voteEncryptions,
+        privateKey,
+        signatureKey
+    });
 
     this.storage.set('voteReceipt', voteReceipt);
 
