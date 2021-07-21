@@ -191,9 +191,7 @@ export class AVClient {
   }
 
   private privateKey() {
-    const keyPair = this.storage.get('keyPair')
-
-    return keyPair.privateKey
+    return this.storage.get('keyPair').privateKey
   }
 }
 
