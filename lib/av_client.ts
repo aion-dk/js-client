@@ -167,7 +167,7 @@ export class AVClient {
       contestsData[id] = {
         vote: contestSelections[id],
         voteEncodingType: contest.vote_encoding_type,
-        emptyCryptogram: emptyCryptograms[id].emptyCryptogram
+        emptyCryptogram: emptyCryptograms[id].cryptogram
       }
     })
 

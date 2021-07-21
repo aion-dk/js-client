@@ -16,7 +16,7 @@ export default class AuthenticateWithCodes {
       voterIdentifier: voterSession.voterIdentifier,
       precinctId: voterSession.precinctId,
       keyPair: keyPair,
-      emptyCryptograms: voterSession.baseCryptograms
+      emptyCryptograms: voterSession.emptyCryptograms
     }
   }
 
@@ -32,7 +32,7 @@ export default class AuthenticateWithCodes {
   }
 
   private async verifyEmptyCryptograms(voterSession, encryptionKey: string) {
-    const { contestIds, voterSessionGuid, baseCryptograms } = voterSession;
+    const { contestIds, voterSessionGuid, emptyCryptograms } = voterSession;
 
     const challenges = Object.fromEntries(contestIds.map(contestId => {
       return [contestId, Crypto.generateRandomNumber()]
@@ -41,13 +41,13 @@ export default class AuthenticateWithCodes {
     return this.connector.challengeEmptyCryptograms(voterSessionGuid, challenges).then(response => {
       const responses = response.data.responses;
       const valid = contestIds.every((contestId) => {
-        const baseCryptogram = baseCryptograms[contestId];
+        const emptyCryptogram = emptyCryptograms[contestId];
         const proofString = [
-          baseCryptogram.commitmentPoint,
+          emptyCryptogram.commitment,
           challenges[contestId],
           responses[contestId],
         ].join(',');
-        const verified = Crypto.verifyEmptyCryptogramProof(proofString, baseCryptogram.emptyCryptogram, encryptionKey);
+        const verified = Crypto.verifyEmptyCryptogramProof(proofString, emptyCryptogram.cryptogram, encryptionKey);
         return verified;
       })
 
@@ -69,13 +69,13 @@ const createSession = async function(keyPair: KeyPair, electionId: string, conne
       }
 
       const contestIds = data.ballotIds;
-      const baseCryptograms = {};
+      const emptyCryptograms = {};
       contestIds.forEach(contestId => {
         const {
-          empty_cryptogram: emptyCryptogram,
-          commitment_point: commitmentPoint
+          empty_cryptogram: cryptogram,
+          commitment_point: commitment
         } = data.emptyCryptograms[contestId];
-        baseCryptograms[contestId] = { emptyCryptogram, commitmentPoint };
+        emptyCryptograms[contestId] = { cryptogram, commitment };
       });
 
       const voterSession = {
@@ -83,7 +83,7 @@ const createSession = async function(keyPair: KeyPair, electionId: string, conne
         voterSessionGuid: data.voterSessionUuid,
         voterIdentifier: data.voterIdentifier,
         contestIds: contestIds,
-        baseCryptograms: baseCryptograms,
+        emptyCryptograms: emptyCryptograms,
         precinctId: '909'
       };
       return voterSession;
