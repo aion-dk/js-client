@@ -1,7 +1,7 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom } from "./av_client_test_helpers";
+import { deterministicRandomWords, deterministicMathRandom } from './av_client_test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
@@ -45,7 +45,7 @@ describe('AVClient#encryptVotes', function() {
       nock('http://localhost:3000/').post('/test/app/sign_in')
         .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
       nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
-          .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
+        .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
     });
 
     it('encrypts correctly', async function() {

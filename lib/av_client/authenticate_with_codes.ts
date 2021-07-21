@@ -65,7 +65,7 @@ const createSession = async function(keyPair: KeyPair, electionId: string, conne
   return connector.createSession(keyPair.publicKey, signature)
     .then(({ data }) => {
       if (!data.ballotIds || data.ballotIds.length == 0) {
-        return Promise.reject("No ballots found for the submitted election codes");
+        return Promise.reject('No ballots found for the submitted election codes');
       }
 
       const contestIds = data.ballotIds;

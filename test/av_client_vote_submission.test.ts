@@ -1,7 +1,7 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import {deterministicMathRandom, deterministicRandomWords} from "./av_client_test_helpers";
+import {deterministicMathRandom, deterministicRandomWords} from './av_client_test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 const Crypto = require('../lib/av_client/aion_crypto.js')()
@@ -47,11 +47,11 @@ describe('AVClient#voteSubmission', function() {
       nock('http://localhost:3000/').post('/test/app/sign_in')
         .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
       nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
-          .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
+        .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
       nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
-          .replyWithFile(200, __dirname + '/replies/get_latest_board_hash.valid.json');
+        .replyWithFile(200, __dirname + '/replies/get_latest_board_hash.valid.json');
       nock('http://localhost:3000/').post('/test/app/submit_votes')
-          .replyWithFile(200, __dirname + '/replies/submit_votes.valid.json');
+        .replyWithFile(200, __dirname + '/replies/submit_votes.valid.json');
     });
 
     it('successfully submits encrypted votes', async function() {
@@ -71,13 +71,13 @@ describe('AVClient#voteSubmission', function() {
 
     beforeEach(function() {
       nock('http://localhost:3000/').get('/test/app/config')
-          .replyWithFile(200, __dirname + '/replies/config.valid.json');
+        .replyWithFile(200, __dirname + '/replies/config.valid.json');
       nock('http://localhost:3000/').post('/test/app/sign_in')
-          .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
+        .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
       nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
-          .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
+        .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
       nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
-          .replyWithFile(200, __dirname + '/replies/get_latest_board_hash.valid.json');
+        .replyWithFile(200, __dirname + '/replies/get_latest_board_hash.valid.json');
 
       validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
       contestSelections = { '1': 'option1', '2': 'optiona' };
@@ -85,7 +85,7 @@ describe('AVClient#voteSubmission', function() {
 
     it('fails when not voting on all contests', async function() {
       nock('http://localhost:3000/').post('/test/app/submit_votes')
-          .replyWithFile(200, __dirname + '/replies/avx_error.invalid_4.json');
+        .replyWithFile(200, __dirname + '/replies/avx_error.invalid_4.json');
 
       await client.authenticateWithCodes(validCodes);
       client.encryptContestSelections(contestSelections);
@@ -96,14 +96,14 @@ describe('AVClient#voteSubmission', function() {
       storage.set('voteEncryptions', voteEncryptions)
 
       return await client.signAndSubmitEncryptedVotes().then(
-          () => expect.fail('Expected promise to be rejected'),
-          (error) => expect(error).to.equal('Ballot ids do not correspond.')
+        () => expect.fail('Expected promise to be rejected'),
+        (error) => expect(error).to.equal('Ballot ids do not correspond.')
       )
     });
 
     it('fails when digital signature is corrupt', async function() {
       nock('http://localhost:3000/').post('/test/app/submit_votes')
-          .replyWithFile(200, __dirname + '/replies/avx_error.invalid_5.json');
+        .replyWithFile(200, __dirname + '/replies/avx_error.invalid_5.json');
 
       await client.authenticateWithCodes(validCodes);
       client.encryptContestSelections(contestSelections);
@@ -116,14 +116,14 @@ describe('AVClient#voteSubmission', function() {
       })
 
       return await client.signAndSubmitEncryptedVotes().then(
-          () => expect.fail('Expected promise to be rejected'),
-          (error) => expect(error).to.equal('Digital signature did not validate.')
+        () => expect.fail('Expected promise to be rejected'),
+        (error) => expect(error).to.equal('Digital signature did not validate.')
       )
     });
 
     it('fails when content is corrupt', async function() {
       nock('http://localhost:3000/').post('/test/app/submit_votes')
-          .replyWithFile(200, __dirname + '/replies/avx_error.invalid_6.json');
+        .replyWithFile(200, __dirname + '/replies/avx_error.invalid_6.json');
 
       await client.authenticateWithCodes(validCodes);
       client.encryptContestSelections(contestSelections);
@@ -132,14 +132,14 @@ describe('AVClient#voteSubmission', function() {
       storage.set('voterIdentifier', 'corrupt identifier');
 
       return await client.signAndSubmitEncryptedVotes().then(
-          () => expect.fail('Expected promise to be rejected'),
-          (error) => expect(error).to.equal('Content hash does not correspond.')
+        () => expect.fail('Expected promise to be rejected'),
+        (error) => expect(error).to.equal('Content hash does not correspond.')
       )
     });
 
     it('fails when proof of correct encryption is corrupt', async function() {
       nock('http://localhost:3000/').post('/test/app/submit_votes')
-          .replyWithFile(200, __dirname + '/replies/avx_error.invalid_7.json');
+        .replyWithFile(200, __dirname + '/replies/avx_error.invalid_7.json');
 
       await client.authenticateWithCodes(validCodes);
       client.encryptContestSelections(contestSelections);
@@ -153,8 +153,8 @@ describe('AVClient#voteSubmission', function() {
       storage.set('voteEncryptions', voteEncryptions)
 
       return await client.signAndSubmitEncryptedVotes().then(
-          () => expect.fail('Expected promise to be rejected'),
-          (error) => expect(error).to.equal('Proof of correct encryption failed for ballot #1.')
+        () => expect.fail('Expected promise to be rejected'),
+        (error) => expect(error).to.equal('Proof of correct encryption failed for ballot #1.')
       )
     });
 

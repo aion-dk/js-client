@@ -2,7 +2,7 @@ import Connector from '../lib/av_client/connector';
 import BackendElectionConfig from '../lib/av_client/backend_election_config';
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
 import EncryptVotes from '../lib/av_client/encrypt_votes';
-import SubmitVotes from "./av_client/submit_votes";
+import SubmitVotes from './av_client/submit_votes';
 
 /**
  * Assembly Voting Client API.
@@ -128,12 +128,12 @@ export class AVClient {
     const signatureKey = this.electionSigningPublicKey();
 
     const voteReceipt = await new SubmitVotes(this.connector).signAndSubmitVotes(
-        voterSessionGuid,
-        voterIdentifier,
-        electionId,
-        voteEncryptions,
-        privateKey,
-        signatureKey
+      voterSessionGuid,
+      voterIdentifier,
+      electionId,
+      voteEncryptions,
+      privateKey,
+      signatureKey
     );
 
     this.storage.set('voteReceipt', voteReceipt);
