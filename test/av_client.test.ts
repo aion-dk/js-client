@@ -1,7 +1,7 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom } from "./av_client_test_helpers";
+import { deterministicRandomWords, deterministicMathRandom } from './av_client_test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
@@ -60,7 +60,7 @@ describe('AVClient#authenticateWithCodes', function() {
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/config.valid.json');
       nock('http://localhost:3000/').post('/test/app/sign_in')
-        .replyWithFile(200, __dirname + '/replies/sign_in.invalid.json');
+        .replyWithFile(200, __dirname + '/replies/avx_error.invalid_3.json');
     });
 
     it('returns an error', async function() {

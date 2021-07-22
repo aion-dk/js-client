@@ -29,7 +29,7 @@ export default class Connector {
 
   challengeEmptyCryptograms(challenges) {
     return this.backend.post('challenge_empty_cryptograms', {
-        challenges: challenges
+        challenges
       }, {
         headers: {
           'X-Voter-Session': this.voterSessionUuid
@@ -39,6 +39,27 @@ export default class Connector {
 
   getRandomizers() {
     return this.backend.post('get_randomizers', {}, {
+    }, {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
+  }
+
+  getBoardHash() {
+    return this.backend.get('get_latest_board_hash', {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
+  }
+
+  submitVotes(contentHash, signature, cryptogramsWithProofs) {
+    return this.backend.post('submit_votes', {
+      content_hash: contentHash,
+      signature,
+      votes: cryptogramsWithProofs
+    }, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }
