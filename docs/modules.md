@@ -1,6 +1,6 @@
-[assembly-voting-client](README.md) / Exports
+[@aion-dk/js-client](README.md) / Exports
 
-# assembly-voting-client
+# @aion-dk/js-client
 
 ## Table of contents
 
