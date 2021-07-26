@@ -9,7 +9,7 @@ on:
       - completed
       - requested
 jobs:
-  deploy-packages:
+  publish-package:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
