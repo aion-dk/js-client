@@ -1,4 +1,4 @@
-assembly-voting-client / [Exports](modules.md)
+@aion-dk/js-client / [Exports](modules.md)
 
 # Assembly Voting JS Client
 
