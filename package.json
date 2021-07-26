@@ -5,7 +5,7 @@
   "main": "dist/lib/av_client.js",
   "types": "dist/lib/av_client.d.ts",
   "scripts": {
-    "test": "mocha --require ts-node/register ./test/*.test.ts",
+    "test": "mocha --require ts-node/register --extension ts ./test/*.test.ts",
     "tdd": "mocha --require ts-node/register ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
     "docs": "typedoc",
     "prepublish": "tsc && typedoc"
@@ -20,10 +20,10 @@
     "chai": "^4.3.4",
     "mocha": "^9.0.1",
     "nock": "^13.1.1",
+    "sinon": "^11.1.1",
     "ts-node": "^10.0.0",
     "typedoc": "^0.21.2",
     "typedoc-plugin-markdown": "^3.10.2",
-    "typescript": "^4.3.5",
-    "sinon": "^11.1.1"
+    "typescript": "^4.3.5"
   }
 }
