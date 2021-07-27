@@ -39,7 +39,6 @@ export default class Connector {
 
   getRandomizers() {
     return this.backend.post('get_randomizers', {}, {
-    }, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }
