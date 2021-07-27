@@ -1,4 +1,4 @@
-[assembly-voting-client](../README.md) / [Exports](../modules.md) / Storage
+[@aion-dk/js-client](../README.md) / [Exports](../modules.md) / Storage
 
 # Interface: Storage
 
@@ -35,7 +35,7 @@ Returns value that is persisted at `key`.
 
 #### Defined in
 
-[av_client.ts:163](https://github.com/aion-dk/js-client/blob/b1b3185/lib/av_client.ts#L163)
+[av_client.ts:200](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L200)
 
 ___
 
@@ -62,4 +62,4 @@ Persists `value` at `key`.
 
 #### Defined in
 
-[av_client.ts:165](https://github.com/aion-dk/js-client/blob/b1b3185/lib/av_client.ts#L165)
+[av_client.ts:202](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L202)

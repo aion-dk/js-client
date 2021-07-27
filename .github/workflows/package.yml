@@ -9,7 +9,7 @@ on:
       - completed
       - requested
 jobs:
-  deploy-packages:
+  publish-package:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -19,6 +19,9 @@ jobs:
         with:
           node-version: '14.x'
           cache: 'npm'
-          registry-url: 'hhttps://npm.pkg.github.com'
+          registry-url: 'https://npm.pkg.github.com'
       - run: npm ci
       - run: npm install
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
