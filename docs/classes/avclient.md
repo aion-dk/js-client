@@ -60,7 +60,7 @@ Expected sequence of methods being executed:
 
 #### Defined in
 
-[av_client.ts:24](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L24)
+[av_client.ts:24](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L24)
 
 ## Properties
 
@@ -70,7 +70,7 @@ Expected sequence of methods being executed:
 
 #### Defined in
 
-[av_client.ts:23](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L23)
+[av_client.ts:23](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L23)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:24](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L24)
+[av_client.ts:24](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L24)
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:22](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L22)
+[av_client.ts:22](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L22)
 
 ## Methods
 
@@ -112,7 +112,7 @@ Authenticates or rejects voter, based on their submitted election codes.
 
 #### Defined in
 
-[av_client.ts:40](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L40)
+[av_client.ts:40](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L40)
 
 ___
 
@@ -126,7 +126,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:178](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L178)
+[av_client.ts:178](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L178)
 
 ___
 
@@ -144,7 +144,7 @@ Object containing a cryptogram for each contest
 
 #### Defined in
 
-[av_client.ts:105](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L105)
+[av_client.ts:105](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L105)
 
 ___
 
@@ -158,7 +158,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:182](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L182)
+[av_client.ts:182](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L182)
 
 ___
 
@@ -172,7 +172,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:174](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L174)
+[av_client.ts:174](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L174)
 
 ___
 
@@ -186,7 +186,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:186](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L186)
+[av_client.ts:186](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L186)
 
 ___
 
@@ -208,7 +208,7 @@ Encrypts all voter ballot choices.
 
 #### Defined in
 
-[av_client.ts:92](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L92)
+[av_client.ts:92](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L92)
 
 ___
 
@@ -230,7 +230,7 @@ Returns data for rendering an entire ballot, for voter to make choices
 
 #### Defined in
 
-[av_client.ts:64](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L64)
+[av_client.ts:64](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L64)
 
 ___
 
@@ -248,7 +248,7 @@ Array of ballot information objects
 
 #### Defined in
 
-[av_client.ts:57](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L57)
+[av_client.ts:57](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L57)
 
 ___
 
@@ -270,7 +270,7 @@ Gathers all data needed for encrypting the vote selections.
 
 #### Defined in
 
-[av_client.ts:158](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L158)
+[av_client.ts:158](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L158)
 
 ___
 
@@ -284,7 +284,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:190](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L190)
+[av_client.ts:190](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L190)
 
 ___
 
@@ -302,7 +302,7 @@ Stores the vote receipt in the storage.
 
 #### Defined in
 
-[av_client.ts:121](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L121)
+[av_client.ts:121](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L121)
 
 ___
 
@@ -316,7 +316,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:142](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L142)
+[av_client.ts:142](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L142)
 
 ___
 
@@ -338,7 +338,7 @@ Submits attestation object to be manually reviewed later
 
 #### Defined in
 
-[av_client.ts:83](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L83)
+[av_client.ts:83](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L83)
 
 ___
 
@@ -361,7 +361,7 @@ Submits voter ballot choices to backend server.
 
 #### Defined in
 
-[av_client.ts:74](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L74)
+[av_client.ts:74](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L74)
 
 ___
 
@@ -377,4 +377,4 @@ Attempts to populate election configuration data from backend server, if it hasn
 
 #### Defined in
 
-[av_client.ts:149](https://github.com/aion-dk/js-client/blob/6f47fca/lib/av_client.ts#L149)
+[av_client.ts:149](https://github.com/aion-dk/js-client/blob/e750154/lib/av_client.ts#L149)
