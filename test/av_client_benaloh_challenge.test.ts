@@ -61,4 +61,38 @@ describe('AVClient#benalohChallenge', function() {
     });
 
   });
+
+  context('submitting after spoiling', function() {
+    let validCodes;
+    let contestSelections;
+    beforeEach(function() {
+      nock('http://localhost:3000/').get('/test/app/config')
+        .replyWithFile(200, __dirname + '/replies/config.valid.json');
+      nock('http://localhost:3000/').post('/test/app/sign_in')
+        .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
+      nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
+        .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
+      nock('http://localhost:3000/').post('/test/app/get_randomizers')
+        .replyWithFile(200, __dirname + '/replies/get_randomizers.valid.json');
+
+      validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
+      contestSelections = { '1': 'option1', '2': 'optiona' };
+    });
+
+    it('returns an error', async function() {
+      nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
+        .replyWithFile(200, __dirname + '/replies/avx_error.invalid_2.json');
+      // nock('http://localhost:3000/').post('/test/app/submit_votes')
+      //   .replyWithFile(200, __dirname + '/replies/avx_error.invalid_2.json');
+
+      await client.authenticateWithCodes(validCodes);
+      client.encryptContestSelections(contestSelections);
+      await client.startBenalohChallenge();
+
+      return await client.signAndSubmitEncryptedVotes().then(
+        () => expect.fail('Expected promise to be rejected'),
+        (error) => expect(error).to.equal('Could not get latest board hash')
+      )
+    });
+  });
 });
