@@ -51,8 +51,8 @@
       }
     }
   },
-  "encryptionKey": "02c046a63586c668907f984f9e57f46eda0405a6abecb933f98180ebab02f826f0",
-  "signingPublicKey": "02ff495d41b71d9e2d98a93c3c55545f4485dbb2445abf52b79853e9d89bd83aef",
+  "encryptionKey": "02d42cd8ad2e32aa23abba171b8b3a3e44c67ad559b4f74976bf9538ce04f9a2d7",
+  "signingPublicKey": "021cfae00341ec5630deb42dc24ddd5c932ebdd9da18bc516cfc15097ab5c0b501",
   "availableLocales": [
     "en"
   ],

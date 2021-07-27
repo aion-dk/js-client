@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": 5,
+    "description": "Digital signature did not validate."
+  }
+}

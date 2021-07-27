@@ -2,6 +2,7 @@ import Connector from '../lib/av_client/connector';
 import BackendElectionConfig from '../lib/av_client/backend_election_config';
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
 import EncryptVotes from '../lib/av_client/encrypt_votes';
+import SubmitVotes from './av_client/submit_votes';
 
 /**
  * Assembly Voting Client API.
@@ -20,7 +21,7 @@ import EncryptVotes from '../lib/av_client/encrypt_votes';
 export class AVClient {
   private storage: Storage;
   private connector: any;
-  private electionConfig: object;
+  private electionConfig: any;
 
   /**
    * @param storage App developers' persistence interface that implements `get` and `set` methods.
@@ -41,11 +42,12 @@ export class AVClient {
     const authenticationResponse = await new AuthenticateWithCodes(this.connector)
       .authenticate(codes, this.electionId(), this.electionEncryptionKey());
 
+    this.storage.set('voterIdentifier', authenticationResponse.voterIdentifier);
     this.storage.set('precinctId', authenticationResponse.precinctId);
     this.storage.set('keyPair', authenticationResponse.keyPair);
     this.storage.set('emptyCryptograms', authenticationResponse.emptyCryptograms);
 
-    return Promise.resolve('Success');
+    return 'Success';
   }
 
   /**
@@ -104,10 +106,37 @@ export class AVClient {
     const cryptograms = {}
     const voteEncryptions = this.storage.get('voteEncryptions')
     this.contestIds().forEach(function (id) {
-      cryptograms[id] = voteEncryptions[id]['cryptogram']
+      cryptograms[id] = voteEncryptions[id].cryptogram
     })
 
     return cryptograms
+  }
+
+  /**
+   * Prepares the vote submission package.
+   * Submits encrypted voter ballot choices to backend server.
+   * Stores the vote receipt in the storage.
+   * @return {Promise}
+   */
+  async signAndSubmitEncryptedVotes() {
+    const voterIdentifier = this.storage.get('voterIdentifier')
+    const electionId = this.electionId()
+    const voteEncryptions = this.storage.get('voteEncryptions')
+    const privateKey = this.privateKey();
+    const signatureKey = this.electionSigningPublicKey();
+
+    const voteReceipt = await new SubmitVotes(this.connector)
+      .signAndSubmitVotes({
+        voterIdentifier,
+        electionId,
+        voteEncryptions,
+        privateKey,
+        signatureKey
+    });
+
+    this.storage.set('voteReceipt', voteReceipt);
+
+    return 'Success';
   }
 
   submissionReceipt() {
@@ -128,14 +157,14 @@ export class AVClient {
    */
   private prepareDataForEncryption(contestSelections: ContestIndexed<string>) {
     const emptyCryptograms = this.storage.get('emptyCryptograms')
-    const contests = this.electionConfig['ballots']
+    const contests = this.electionConfig.ballots
     const contestsData = {};
     this.contestIds().forEach(function (id) {
-      const contest = contests.find( b => b['id'] == id)
+      const contest = contests.find( b => b.id == id)
       contestsData[id] = {
         vote: contestSelections[id],
-        voteEncodingType: contest['vote_encoding_type'],
-        emptyCryptogram: emptyCryptograms[id]['emptyCryptogram']
+        voteEncodingType: contest.vote_encoding_type,
+        emptyCryptogram: emptyCryptograms[id].cryptogram
       }
     })
 
@@ -143,15 +172,23 @@ export class AVClient {
   }
 
   private electionId() {
-    return this.electionConfig['election']['id'];
+    return this.electionConfig.election.id;
   }
 
   private contestIds() {
-    return this.electionConfig['ballots'].map(ballot => ballot['id'])
+    return this.electionConfig.ballots.map(ballot => ballot.id)
   }
 
   private electionEncryptionKey() {
-    return this.electionConfig['encryptionKey']
+    return this.electionConfig.encryptionKey
+  }
+
+  private electionSigningPublicKey() {
+    return this.electionConfig.signingPublicKey
+  }
+
+  private privateKey() {
+    return this.storage.get('keyPair').privateKey
   }
 }
 
