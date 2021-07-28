@@ -52,6 +52,23 @@ export class AVClient {
   }
 
   /**
+   * Takes PII, sends it to Voter Authorization Coordinator Service, for it
+   * to initiate Voter Authorizers to send out OTPs to the voter.
+   * @param {string} personalIdentificationInformation We don't know what this will be yet.
+   */
+  async requestOTPs(personalIdentificationInformation: string) {
+    if (typeof personalIdentificationInformation == 'undefined') {
+      throw new Error('Please provide personalIdentificationInformation');
+    }
+
+    await this.updateElectionConfig();
+
+    return await this.connector.requestOTPCodesToBeSent(personalIdentificationInformation).then(
+      (response) => { return response.data }
+    );
+  }
+
+  /**
    * Returns data for rendering a list of ballots
    * @return Array of ballot information objects
    */
@@ -158,6 +175,9 @@ export class AVClient {
   private async updateElectionConfig() {
     if (Object.entries(this.electionConfig).length === 0) {
       this.electionConfig = await new BackendElectionConfig(this.connector).get();
+
+      const voterAuthorizationCoordinatorURL = 'http://localhost:1234'; // TODO: this should come from config
+      this.connector.setVoterAuthorizationCoordinator(voterAuthorizationCoordinatorURL);
     }
   }
 
