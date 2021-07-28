@@ -36,6 +36,7 @@ describe('AVClient#benalohChallenge', function() {
 
   afterEach( function() {
     sandbox.restore();
+    nock.cleanAll();
   })
 
   context('given valid values', function() {
@@ -82,8 +83,6 @@ describe('AVClient#benalohChallenge', function() {
     it('returns an error', async function() {
       nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_2.json');
-      // nock('http://localhost:3000/').post('/test/app/submit_votes')
-      //   .replyWithFile(200, __dirname + '/replies/avx_error.invalid_2.json');
 
       await client.authenticateWithCodes(validCodes);
       client.encryptContestSelections(contestSelections);
