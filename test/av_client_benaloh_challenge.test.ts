@@ -94,12 +94,11 @@ describe('AVClient#benalohChallenge', function() {
       )
     });
 
-    it('returns an error when submitting a vote', async function () {
-      //  TODO: it should authenticate with codes
-      //  TODO: it should encrypt contest selections
-      //  TODO: it should get the latest board hash
-      //  TODO: it should start the benaloh challenge
-      //  TODO: it should sign and submit encrypted votes using the latest board hash that it got previously
-    })
+    it('returns an error when submitting a vote')
+    //  TODO: it should authenticate with codes
+    //  TODO: it should encrypt contest selections
+    //  TODO: it should get the latest board hash
+    //  TODO: it should start the benaloh challenge
+    //  TODO: it should sign and submit encrypted votes using the latest board hash that it got previously
   });
 });
