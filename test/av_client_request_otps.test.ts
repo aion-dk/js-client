@@ -7,7 +7,7 @@ describe('AVClient#requestOTPs', function() {
   const expectedNetworkRequests = [];
 
   beforeEach(function() {
-    client = new AVClient(null, 'http://localhost:3000/test/app');
+    client = new AVClient('http://localhost:3000/test/app');
     expectedNetworkRequests.push(
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/config.valid.json')

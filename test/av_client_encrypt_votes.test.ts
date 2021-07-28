@@ -5,29 +5,12 @@ import { deterministicRandomWords, deterministicMathRandom } from './av_client_t
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
-class StorageAdapter {
-  private db: object;
-
-  constructor() {
-    this.db = {}
-  }
-
-  get(key: string) {
-    return this.db[key];
-  }
-
-  set(key: string, value: any) {
-    this.db[key] = value;
-  }
-}
-
 describe('AVClient#encryptVotes', function() {
   let client;
   let sandbox;
 
   beforeEach(function() {
-    const storage = new StorageAdapter();
-    client = new AVClient(storage, 'http://localhost:3000/test/app');
+    client = new AVClient('http://localhost:3000/test/app');
 
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
