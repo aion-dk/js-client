@@ -47,7 +47,7 @@ describe('AVClient#requestOTPs', function() {
 
       return await client.requestOTPs(pii).then(
         () => expect.fail('Expected promise to be rejected'),
-        function (error) {
+        (error) => {
           expectedNetworkRequests.forEach((mock) => mock.done());
           expect(error.message).to.equal('Request failed with status code 404')
         }
