@@ -4,6 +4,7 @@ export default class Connector {
   votingServiceURL: string;
   timeout: number;
   backend: any;
+  voterAuthorizationCoordinator: any;
   voterSessionUuid: string;
 
   constructor(votingServiceURL, timeout=1000) {
@@ -16,8 +17,26 @@ export default class Connector {
     this.voterSessionUuid = voterSessionUuid
   }
 
+  setVoterAuthorizationCoordinator(url) {
+    this.voterAuthorizationCoordinator = axios.create({
+      baseURL: url,
+      withCredentials: false,
+      timeout: this.timeout,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+
   getElectionConfig() {
     return this.backend.get('config');
+  }
+
+  requestOTPCodesToBeSent(personalIdentificationInformation) {
+    return this.voterAuthorizationCoordinator.post('initiate', {
+      personal_identification_information: personalIdentificationInformation
+    });
   }
 
   createSession(publicKey, signature) {
