@@ -63,6 +63,38 @@ describe('AVClient#benalohChallenge', function() {
 
   });
 
+  context('remote errors', function() {
+    beforeEach(async function() {
+      nock('http://localhost:3000/').get('/test/app/config')
+        .replyWithFile(200, __dirname + '/replies/config.valid.json');
+      nock('http://localhost:3000/').post('/test/app/sign_in')
+        .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
+      nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
+          .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
+      const validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
+      const contestSelections = { '1': 'option1', '2': 'optiona' };
+
+      await client.authenticateWithCodes(validCodes);
+      client.encryptContestSelections(contestSelections);
+    });
+
+    it('returns an error message when there is a network error', async function() {
+      nock('http://localhost:3000/').post('/test/app/get_randomizers').reply(404);
+      return await client.startBenalohChallenge().then(
+        () => expect.fail('Expected a rejected promise'),
+        (error) => expect(error.message).to.equal('Request failed with status code 404')
+      );
+    });
+
+    it('returns an error message when there is a server error', async function() {
+      nock('http://localhost:3000/').post('/test/app/get_randomizers').reply(500, { nonsense: 'garbage' });
+      return await client.startBenalohChallenge().then(
+        () => expect.fail('Expected a rejected promise'),
+        (error) => expect(error.message).to.equal('Request failed with status code 500')
+      );
+    });
+  });
+
   context('submitting after spoiling', function() {
     let validCodes;
     let contestSelections;
