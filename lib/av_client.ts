@@ -2,6 +2,7 @@ import Connector from '../lib/av_client/connector';
 import BackendElectionConfig from '../lib/av_client/backend_election_config';
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
 import EncryptVotes from '../lib/av_client/encrypt_votes';
+import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
 
 /**
@@ -96,6 +97,14 @@ export class AVClient {
     this.storage.set('voteEncryptions', encryptionResponse);
 
     return 'Success';
+  }
+
+  async startBenalohChallenge() {
+    const serverRandomizers = await new BenalohChallenge(this.connector).getServerRandomizers()
+
+    this.storage.set('serverRandomizers', serverRandomizers)
+
+    return 'Success'
   }
 
   /**

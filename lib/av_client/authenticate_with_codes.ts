@@ -29,13 +29,13 @@ export default class AuthenticateWithCodes {
   }
 
   private async verifyEmptyCryptograms(voterSession, encryptionKey: string) {
-    const { contestIds, voterSessionGuid, emptyCryptograms } = voterSession;
+    const { contestIds, emptyCryptograms } = voterSession;
 
     const challenges = Object.fromEntries(contestIds.map(contestId => {
       return [contestId, Crypto.generateRandomNumber()]
     }));
 
-    return this.connector.challengeEmptyCryptograms(voterSessionGuid, challenges).then(response => {
+    return this.connector.challengeEmptyCryptograms(challenges).then(response => {
       const responses = response.data.responses;
       const valid = contestIds.every((contestId) => {
         const emptyCryptogram = emptyCryptograms[contestId];
@@ -88,7 +88,7 @@ const createSession = async function(keyPair: KeyPair, electionId: string, conne
 }
 
 interface Connector {
-  challengeEmptyCryptograms: (string, array) => Promise<boolean | string>,
+  challengeEmptyCryptograms: (array) => Promise<boolean | string>,
   createSession: (PublicKey, Signature) => any
 }
 
