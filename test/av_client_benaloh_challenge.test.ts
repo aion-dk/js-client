@@ -5,29 +5,12 @@ import { deterministicRandomWords, deterministicMathRandom } from "./av_client_t
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
-class StorageAdapter {
-  private db: object;
-
-  constructor() {
-    this.db = {}
-  }
-
-  get(key: string) {
-    return this.db[key];
-  }
-
-  set(key: string, value: any) {
-    this.db[key] = value;
-  }
-}
-
 describe('AVClient#benalohChallenge', function() {
   let client;
   let sandbox;
 
   beforeEach(function() {
-    const storage = new StorageAdapter();
-    client = new AVClient(storage, 'http://localhost:3000/test/app');
+    client = new AVClient('http://localhost:3000/test/app');
 
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
@@ -57,8 +40,11 @@ describe('AVClient#benalohChallenge', function() {
 
       await client.authenticateWithCodes(validCodes);
       client.encryptContestSelections(contestSelections);
-      const result = await client.startBenalohChallenge();
-      expect(result).to.equal('Success');
+      const serverRandomizers = await client.startBenalohChallenge();
+      expect(serverRandomizers).to.eql({
+        '1': 'e144b97ccb27c64ccb5c6caaa906a69c7f7b260ee59e4302fad5e7c15c90a244',
+        '2': 'b088d5464a6abef2269629cd273e911a8eca16bcf3aa0ebde26555b3c76ae2ea'
+      });
     });
 
   });

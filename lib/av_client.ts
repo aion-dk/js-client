@@ -20,16 +20,18 @@ import SubmitVotes from './av_client/submit_votes';
  */
 
 export class AVClient {
-  private storage: Storage;
   private connector: any;
   private electionConfig: any;
+  private voterIdentifier: string;
+  private keyPair: KeyPair;
+  private emptyCryptograms: any;
+  private voteEncryptions: any;
+  private voteReceipt: any;
 
   /**
-   * @param storage App developers' persistence interface that implements `get` and `set` methods.
    * @param backendUrl URL to the Assembly Voting backend server, specific for election.
    */
-  constructor(storage: Storage, backendUrl: string) {
-    this.storage = storage;
+  constructor(backendUrl: string) {
     this.connector = new Connector(backendUrl);
     this.electionConfig = {};
   }
@@ -43,10 +45,9 @@ export class AVClient {
     const authenticationResponse = await new AuthenticateWithCodes(this.connector)
       .authenticate(codes, this.electionId(), this.electionEncryptionKey());
 
-    this.storage.set('voterIdentifier', authenticationResponse.voterIdentifier);
-    this.storage.set('precinctId', authenticationResponse.precinctId);
-    this.storage.set('keyPair', authenticationResponse.keyPair);
-    this.storage.set('emptyCryptograms', authenticationResponse.emptyCryptograms);
+    this.voterIdentifier = authenticationResponse.voterIdentifier;
+    this.keyPair = authenticationResponse.keyPair;
+    this.emptyCryptograms = authenticationResponse.emptyCryptograms;
 
     return 'Success';
   }
@@ -111,17 +112,13 @@ export class AVClient {
     const contestsData = this.prepareDataForEncryption(contestSelections);
     const encryptionResponse = new EncryptVotes().encrypt(contestsData, this.electionEncryptionKey());
 
-    this.storage.set('voteEncryptions', encryptionResponse);
+    this.voteEncryptions = encryptionResponse
 
     return 'Success';
   }
 
   async startBenalohChallenge() {
-    const serverRandomizers = await new BenalohChallenge(this.connector).getServerRandomizers()
-
-    this.storage.set('serverRandomizers', serverRandomizers)
-
-    return 'Success'
+    return await new BenalohChallenge(this.connector).getServerRandomizers()
   }
 
   /**
@@ -130,7 +127,7 @@ export class AVClient {
    */
   cryptogramsForConfirmation() {
     const cryptograms = {}
-    const voteEncryptions = this.storage.get('voteEncryptions')
+    const voteEncryptions = this.voteEncryptions
     this.contestIds().forEach(function (id) {
       cryptograms[id] = voteEncryptions[id].cryptogram
     })
@@ -141,17 +138,17 @@ export class AVClient {
   /**
    * Prepares the vote submission package.
    * Submits encrypted voter ballot choices to backend server.
-   * Stores the vote receipt in the storage.
-   * @return {Promise}
+   * @return {Promise} Returns the vote receipt as a promise.
    */
   async signAndSubmitEncryptedVotes() {
-    const voterIdentifier = this.storage.get('voterIdentifier')
+    const voterIdentifier = this.voterIdentifier
     const electionId = this.electionId()
-    const voteEncryptions = this.storage.get('voteEncryptions')
+    const voteEncryptions = this.voteEncryptions
     const privateKey = this.privateKey();
     const signatureKey = this.electionSigningPublicKey();
 
-    const voteReceipt = await new SubmitVotes(this.connector)
+
+    return await new SubmitVotes(this.connector)
       .signAndSubmitVotes({
         voterIdentifier,
         electionId,
@@ -159,10 +156,6 @@ export class AVClient {
         privateKey,
         signatureKey
     });
-
-    this.storage.set('voteReceipt', voteReceipt);
-
-    return 'Success';
   }
 
   submissionReceipt() {
@@ -185,7 +178,7 @@ export class AVClient {
    * Gathers all data needed for encrypting the vote selections.
    */
   private prepareDataForEncryption(contestSelections: ContestIndexed<string>) {
-    const emptyCryptograms = this.storage.get('emptyCryptograms')
+    const emptyCryptograms = this.emptyCryptograms
     const contests = this.electionConfig.ballots
     const contestsData = {};
     this.contestIds().forEach(function (id) {
@@ -217,7 +210,7 @@ export class AVClient {
   }
 
   private privateKey() {
-    return this.storage.get('keyPair').privateKey
+    return this.keyPair.privateKey
   }
 }
 
@@ -239,3 +232,8 @@ interface ContestIndexed<Type> {
   /** The contest 'id' **/
   [index: string]: Type;
 }
+
+declare type KeyPair = {
+  privateKey: string;
+  publicKey: string;
+};
