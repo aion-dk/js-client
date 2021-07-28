@@ -33,6 +33,16 @@ export class AVClient {
     this.electionConfig = {};
   }
 
+  async sum(a: number, b: number) {
+    if (typeof a == 'undefined') {
+      throw new Error('Please provide first argument');
+    }
+    if (typeof b == 'undefined') {
+      throw new Error('Please provide second argument');
+    }
+    return a + b;
+  }
+
   /**
    * Authenticates or rejects voter, based on their submitted election codes.
    * @param codes Array of election code strings.
