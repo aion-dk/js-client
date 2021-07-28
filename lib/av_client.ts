@@ -63,8 +63,7 @@ export class AVClient {
     await this.updateElectionConfig();
 
     return await this.connector.requestOTPCodesToBeSent(personalIdentificationInformation).then(
-      (response) => { return response.data },
-      (error) => { return Promise.reject(error) }
+      (response) => { return response.data }
     );
   }
 
