@@ -19,7 +19,7 @@ export default class BenalohChallenge {
 }
 
 interface Connector {
-  getRandomizers: () => any,
+  getRandomizers: () => Promise<any>,
 }
 
 interface ContestIndexed<Type> {
