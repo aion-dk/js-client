@@ -35,7 +35,7 @@ Returns value that is persisted at `key`.
 
 #### Defined in
 
-[av_client.ts:229](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L229)
+[av_client.ts:222](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L222)
 
 ___
 
@@ -62,4 +62,4 @@ Persists `value` at `key`.
 
 #### Defined in
 
-[av_client.ts:231](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L231)
+[av_client.ts:224](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L224)

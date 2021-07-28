@@ -24,7 +24,11 @@ Expected sequence of methods being executed:
 
 - [connector](avclient.md#connector)
 - [electionConfig](avclient.md#electionconfig)
-- [storage](avclient.md#storage)
+- [emptyCryptograms](avclient.md#emptycryptograms)
+- [keyPair](avclient.md#keypair)
+- [voteEncryptions](avclient.md#voteencryptions)
+- [voteReceipt](avclient.md#votereceipt)
+- [voterIdentifier](avclient.md#voteridentifier)
 
 ### Methods
 
@@ -51,18 +55,17 @@ Expected sequence of methods being executed:
 
 ### constructor
 
-• **new AVClient**(`storage`, `backendUrl`)
+• **new AVClient**(`backendUrl`)
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `storage` | [`Storage`](../interfaces/storage.md) | App developers' persistence interface that implements `get` and `set` methods. |
 | `backendUrl` | `string` | URL to the Assembly Voting backend server, specific for election. |
 
 #### Defined in
 
-[av_client.ts:25](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L25)
+[av_client.ts:29](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L29)
 
 ## Properties
 
@@ -72,7 +75,7 @@ Expected sequence of methods being executed:
 
 #### Defined in
 
-[av_client.ts:24](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L24)
+[av_client.ts:23](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L23)
 
 ___
 
@@ -82,17 +85,57 @@ ___
 
 #### Defined in
 
-[av_client.ts:25](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L25)
+[av_client.ts:24](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L24)
 
 ___
 
-### storage
+### emptyCryptograms
 
-• `Private` **storage**: [`Storage`](../interfaces/storage.md)
+• `Private` **emptyCryptograms**: `any`
 
 #### Defined in
 
-[av_client.ts:23](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L23)
+[av_client.ts:27](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L27)
+
+___
+
+### keyPair
+
+• `Private` **keyPair**: `KeyPair`
+
+#### Defined in
+
+[av_client.ts:26](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L26)
+
+___
+
+### voteEncryptions
+
+• `Private` **voteEncryptions**: `any`
+
+#### Defined in
+
+[av_client.ts:28](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L28)
+
+___
+
+### voteReceipt
+
+• `Private` **voteReceipt**: `any`
+
+#### Defined in
+
+[av_client.ts:29](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L29)
+
+___
+
+### voterIdentifier
+
+• `Private` **voterIdentifier**: `string`
+
+#### Defined in
+
+[av_client.ts:25](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L25)
 
 ## Methods
 
@@ -114,7 +157,7 @@ Authenticates or rejects voter, based on their submitted election codes.
 
 #### Defined in
 
-[av_client.ts:41](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L41)
+[av_client.ts:43](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L43)
 
 ___
 
@@ -128,7 +171,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:207](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L207)
+[av_client.ts:200](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L200)
 
 ___
 
@@ -146,7 +189,7 @@ Object containing a cryptogram for each contest
 
 #### Defined in
 
-[av_client.ts:131](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L131)
+[av_client.ts:128](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L128)
 
 ___
 
@@ -160,7 +203,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:211](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L211)
+[av_client.ts:204](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L204)
 
 ___
 
@@ -174,7 +217,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:203](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L203)
+[av_client.ts:196](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L196)
 
 ___
 
@@ -188,7 +231,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:215](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L215)
+[av_client.ts:208](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L208)
 
 ___
 
@@ -210,7 +253,7 @@ Encrypts all voter ballot choices.
 
 #### Defined in
 
-[av_client.ts:110](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L110)
+[av_client.ts:111](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L111)
 
 ___
 
@@ -232,7 +275,7 @@ Returns data for rendering an entire ballot, for voter to make choices
 
 #### Defined in
 
-[av_client.ts:82](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L82)
+[av_client.ts:83](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L83)
 
 ___
 
@@ -250,7 +293,7 @@ Array of ballot information objects
 
 #### Defined in
 
-[av_client.ts:75](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L75)
+[av_client.ts:76](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L76)
 
 ___
 
@@ -272,21 +315,21 @@ Gathers all data needed for encrypting the vote selections.
 
 #### Defined in
 
-[av_client.ts:187](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L187)
+[av_client.ts:180](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L180)
 
 ___
 
 ### privateKey
 
-▸ `Private` **privateKey**(): `any`
+▸ `Private` **privateKey**(): `string`
 
 #### Returns
 
-`any`
+`string`
 
 #### Defined in
 
-[av_client.ts:219](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L219)
+[av_client.ts:212](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L212)
 
 ___
 
@@ -309,39 +352,40 @@ to initiate Voter Authorizers to send out OTPs to the voter.
 
 #### Defined in
 
-[av_client.ts:59](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L59)
+[av_client.ts:60](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L60)
 
 ___
 
 ### signAndSubmitEncryptedVotes
 
-▸ **signAndSubmitEncryptedVotes**(): `Promise`<`string`\>
+▸ **signAndSubmitEncryptedVotes**(): `Promise`<`Object`\>
 
 Prepares the vote submission package.
 Submits encrypted voter ballot choices to backend server.
-Stores the vote receipt in the storage.
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<`Object`\>
+
+Returns the vote receipt as a promise.
 
 #### Defined in
 
-[av_client.ts:147](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L147)
+[av_client.ts:143](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L143)
 
 ___
 
 ### startBenalohChallenge
 
-▸ **startBenalohChallenge**(): `Promise`<`string`\>
+▸ **startBenalohChallenge**(): `Promise`<`any`\>
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<`any`\>
 
 #### Defined in
 
-[av_client.ts:119](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L119)
+[av_client.ts:120](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L120)
 
 ___
 
@@ -355,7 +399,7 @@ ___
 
 #### Defined in
 
-[av_client.ts:168](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L168)
+[av_client.ts:161](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L161)
 
 ___
 
@@ -377,7 +421,7 @@ Submits attestation object to be manually reviewed later
 
 #### Defined in
 
-[av_client.ts:101](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L101)
+[av_client.ts:102](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L102)
 
 ___
 
@@ -400,7 +444,7 @@ Submits voter ballot choices to backend server.
 
 #### Defined in
 
-[av_client.ts:92](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L92)
+[av_client.ts:93](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L93)
 
 ___
 
@@ -416,4 +460,4 @@ Attempts to populate election configuration data from backend server, if it hasn
 
 #### Defined in
 
-[av_client.ts:175](https://github.com/aion-dk/js-client/blob/cf140d0/lib/av_client.ts#L175)
+[av_client.ts:168](https://github.com/aion-dk/js-client/blob/15f2019/lib/av_client.ts#L168)
