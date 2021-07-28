@@ -80,7 +80,7 @@ describe('AVClient#benalohChallenge', function() {
       contestSelections = { '1': 'option1', '2': 'optiona' };
     });
 
-    it('returns an error', async function() {
+    it('returns an error when getting latest board hash', async function() {
       nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_2.json');
 
@@ -93,5 +93,13 @@ describe('AVClient#benalohChallenge', function() {
         (error) => expect(error).to.equal('Could not get latest board hash')
       )
     });
+
+    it('returns an error when submitting a vote', async function () {
+      //  TODO: it should authenticate with codes
+      //  TODO: it should encrypt contest selections
+      //  TODO: it should get the latest board hash
+      //  TODO: it should start the benaloh challenge
+      //  TODO: it should sign and submit encrypted votes using the latest board hash that it got previously
+    })
   });
 });
