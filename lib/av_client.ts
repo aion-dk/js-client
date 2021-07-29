@@ -1,9 +1,10 @@
-import Connector from '../lib/av_client/connector';
-import BackendElectionConfig from '../lib/av_client/backend_election_config';
+import BulletinBoard from '../lib/av_client/bulletin_board';
+import ElectionConfig from '../lib/av_client/election_config';
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
 import EncryptVotes from '../lib/av_client/encrypt_votes';
 import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
+import VoterAuthorizationCoordinator from './av_client/voter_authorization_coordinator';
 
 /**
  * Assembly Voting Client API.
@@ -20,19 +21,20 @@ import SubmitVotes from './av_client/submit_votes';
  */
 
 export class AVClient {
-  private connector: any;
+  private bulletinBoard: any;
   private electionConfig: any;
-  private voterIdentifier: string;
-  private keyPair: KeyPair;
   private emptyCryptograms: any;
+  private keyPair: KeyPair;
   private voteEncryptions: any;
+  private voterAuthorizationCoordinator: any;
   private voteReceipt: any;
+  private voterIdentifier: string;
 
   /**
-   * @param backendUrl URL to the Assembly Voting backend server, specific for election.
+   * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
    */
-  constructor(backendUrl: string) {
-    this.connector = new Connector(backendUrl);
+  constructor(bulletinBoardURL: string) {
+    this.bulletinBoard = new BulletinBoard(bulletinBoardURL);
     this.electionConfig = {};
   }
 
@@ -42,7 +44,7 @@ export class AVClient {
    */
   async authenticateWithCodes(codes: string[]) {
     await this.updateElectionConfig();
-    const authenticationResponse = await new AuthenticateWithCodes(this.connector)
+    const authenticationResponse = await new AuthenticateWithCodes(this.bulletinBoard)
       .authenticate(codes, this.electionId(), this.electionEncryptionKey());
 
     this.voterIdentifier = authenticationResponse.voterIdentifier;
@@ -64,7 +66,7 @@ export class AVClient {
 
     await this.updateElectionConfig();
 
-    return await this.connector.requestOTPCodesToBeSent(personalIdentificationInformation).then(
+    return await this.voterAuthorizationCoordinator.requestOTPCodesToBeSent(personalIdentificationInformation).then(
       (response) => { return response.data }
     );
   }
@@ -118,7 +120,7 @@ export class AVClient {
   }
 
   async startBenalohChallenge() {
-    return await new BenalohChallenge(this.connector).getServerRandomizers()
+    return await new BenalohChallenge(this.bulletinBoard).getServerRandomizers()
   }
 
   /**
@@ -148,7 +150,7 @@ export class AVClient {
     const signatureKey = this.electionSigningPublicKey();
 
 
-    return await new SubmitVotes(this.connector)
+    return await new SubmitVotes(this.bulletinBoard)
       .signAndSubmitVotes({
         voterIdentifier,
         electionId,
@@ -167,10 +169,10 @@ export class AVClient {
    */
   private async updateElectionConfig() {
     if (Object.entries(this.electionConfig).length === 0) {
-      this.electionConfig = await new BackendElectionConfig(this.connector).get();
+      this.electionConfig = await new ElectionConfig(this.bulletinBoard).get();
 
       const voterAuthorizationCoordinatorURL = 'http://localhost:1234'; // TODO: this should come from config
-      this.connector.setVoterAuthorizationCoordinator(voterAuthorizationCoordinatorURL);
+      this.voterAuthorizationCoordinator = new VoterAuthorizationCoordinator(voterAuthorizationCoordinatorURL);
     }
   }
 

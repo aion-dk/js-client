@@ -1,10 +1,10 @@
 const Crypto = require('./aion_crypto.js')()
 
 export default class SubmitVotes {
-  connector: any;
+  bulletinBoard: any;
 
-  constructor(connector: Connector) {
-    this.connector = connector;
+  constructor(bulletinBoard: BulletinBoard) {
+    this.bulletinBoard = bulletinBoard;
   }
 
   async signAndSubmitVotes({ voterIdentifier, electionId, voteEncryptions, privateKey, signatureKey }) {
@@ -39,7 +39,7 @@ export default class SubmitVotes {
   }
 
   private async submit({ contentHash, voterSignature, cryptogramsWithProofs }) {
-    const { data } = await this.connector.submitVotes( contentHash, voterSignature, cryptogramsWithProofs )
+    const { data } = await this.bulletinBoard.submitVotes( contentHash, voterSignature, cryptogramsWithProofs )
 
     if (data.error) {
       return Promise.reject(data.error.description)
@@ -57,7 +57,7 @@ export default class SubmitVotes {
   }
 
   private async acknowledge() {
-    const { data } = await this.connector.getBoardHash()
+    const { data } = await this.bulletinBoard.getBoardHash()
 
     if (!data.currentBoardHash || !data.currentTime) {
       return Promise.reject('Could not get latest board hash');
@@ -106,7 +106,7 @@ export default class SubmitVotes {
 
 }
 
-interface Connector {
+interface BulletinBoard {
   getBoardHash: () => any;
   submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestIndexed<CryptogramWithProof>) => any
 }

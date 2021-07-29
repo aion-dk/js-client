@@ -1,42 +1,20 @@
 const axios = require('axios')
 
-export default class Connector {
-  votingServiceURL: string;
-  timeout: number;
-  backend: any;
+export default class BulletinBoard {
+  private backend: any;
   voterAuthorizationCoordinator: any;
   voterSessionUuid: string;
 
-  constructor(votingServiceURL, timeout=1000) {
-    this.votingServiceURL = votingServiceURL;
-    this.timeout = timeout;
-    this.createBackendClient();
+  constructor(baseURL: string, timeout: number = 1000) {
+    this.createBackendClient(baseURL, timeout);
   }
 
   setVoterSessionUuid(voterSessionUuid) {
     this.voterSessionUuid = voterSessionUuid
   }
 
-  setVoterAuthorizationCoordinator(url) {
-    this.voterAuthorizationCoordinator = axios.create({
-      baseURL: url,
-      withCredentials: false,
-      timeout: this.timeout,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      }
-    });
-  }
-
   getElectionConfig() {
     return this.backend.get('config');
-  }
-
-  requestOTPCodesToBeSent(personalIdentificationInformation) {
-    return this.voterAuthorizationCoordinator.post('initiate', {
-      personal_identification_information: personalIdentificationInformation
-    });
   }
 
   createSession(publicKey, signature) {
@@ -84,11 +62,11 @@ export default class Connector {
     });
   }
 
-  createBackendClient() {
+  private createBackendClient(baseURL: string, timeout: number) {
     this.backend = axios.create({
-      baseURL: this.votingServiceURL,
+      baseURL: baseURL,
       withCredentials: false,
-      timeout: this.timeout,
+      timeout: timeout,
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json'

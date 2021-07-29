@@ -1,14 +1,14 @@
 const Crypto = require('./aion_crypto.js')()
 
 export default class BenalohChallenge {
-  connector: any;
+  bulletinBoard: any;
 
-  constructor(connector) {
-    this.connector = connector;
+  constructor(bulletinBoard) {
+    this.bulletinBoard = bulletinBoard;
   }
 
   async getServerRandomizers() {
-    const { data } = await this.connector.getRandomizers()
+    const { data } = await this.bulletinBoard.getRandomizers()
 
     if (data.error) {
       return Promise.reject(data.error.description)
