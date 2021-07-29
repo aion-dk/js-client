@@ -19,6 +19,7 @@ describe('AVClient#encryptVotes', function() {
 
   afterEach( function() {
     sandbox.restore();
+    nock.cleanAll();
   })
 
   context('encrypt vote', function() {

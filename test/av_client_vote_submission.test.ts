@@ -20,6 +20,7 @@ describe('AVClient#voteSubmission', function() {
 
   afterEach( function() {
     sandbox.restore();
+    nock.cleanAll();
   })
 
   context('given valid values', function() {
@@ -140,6 +141,5 @@ describe('AVClient#voteSubmission', function() {
         (error) => expect(error).to.equal('Proof of correct encryption failed for ballot #1.')
       )
     });
-
   });
 });
