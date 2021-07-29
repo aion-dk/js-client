@@ -1,10 +1,10 @@
-import BulletinBoard from '../lib/av_client/bulletin_board';
+import BulletinBoard from '../lib/av_client/connectors/bulletin_board';
 import ElectionConfig from '../lib/av_client/election_config';
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
 import EncryptVotes from '../lib/av_client/encrypt_votes';
 import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
-import VoterAuthorizationCoordinator from './av_client/voter_authorization_coordinator';
+import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 
 /**
  * Assembly Voting Client API.
