@@ -19,6 +19,7 @@ describe('AVClient#authenticateWithCodes', function() {
 
   afterEach( function() {
     sandbox.restore();
+    nock.cleanAll();
   })
 
   context('given valid election codes', function() {
