@@ -1,16 +1,16 @@
 const Crypto = require('./aion_crypto.js')()
 
 export default class AuthenticateWithCodes {
-  connector: any;
+  bulletinBoard: any;
 
-  constructor(connector) {
-    this.connector = connector;
+  constructor(bulletinBoard) {
+    this.bulletinBoard = bulletinBoard;
   }
 
   async authenticate(electionCodes: string[], electionId: string, encryptionKey: string) {
     const keyPair = this.electionCodesToKeyPair(electionCodes);
-    const voterSession = await createSession(keyPair, electionId, this.connector);
-    this.connector.setVoterSessionUuid(voterSession.voterSessionUuid);
+    const voterSession = await createSession(keyPair, electionId, this.bulletinBoard);
+    this.bulletinBoard.setVoterSessionUuid(voterSession.voterSessionUuid);
     await this.verifyEmptyCryptograms(voterSession, encryptionKey);
     return {
       voterIdentifier: voterSession.voterIdentifier,
@@ -35,7 +35,7 @@ export default class AuthenticateWithCodes {
       return [contestId, Crypto.generateRandomNumber()]
     }));
 
-    return this.connector.challengeEmptyCryptograms(challenges).then(response => {
+    return this.bulletinBoard.challengeEmptyCryptograms(challenges).then(response => {
       const responses = response.data.responses;
       const valid = contestIds.every((contestId) => {
         const emptyCryptogram = emptyCryptograms[contestId];
@@ -57,9 +57,9 @@ export default class AuthenticateWithCodes {
   }
 }
 
-const createSession = async function(keyPair: KeyPair, electionId: string, connector: Connector) {
+const createSession = async function(keyPair: KeyPair, electionId: string, bulletinBoard: BulletinBoard) {
   const signature = <Signature>Crypto.generateSchnorrSignature('', keyPair.privateKey);
-  return connector.createSession(keyPair.publicKey, signature)
+  return bulletinBoard.createSession(keyPair.publicKey, signature)
     .then(({ data }) => {
       if (!data.ballotIds || data.ballotIds.length == 0) {
         return Promise.reject('No ballots found for the submitted election codes');
@@ -87,7 +87,7 @@ const createSession = async function(keyPair: KeyPair, electionId: string, conne
     });
 }
 
-interface Connector {
+interface BulletinBoard {
   challengeEmptyCryptograms: (array) => Promise<boolean | string>,
   createSession: (PublicKey, Signature) => any
 }
