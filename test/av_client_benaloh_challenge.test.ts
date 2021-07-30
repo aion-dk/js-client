@@ -1,7 +1,7 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom } from "./av_client_test_helpers";
+import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './av_client_test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
@@ -15,9 +15,10 @@ describe('AVClient#benalohChallenge', function() {
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
+    resetDeterministicOffset();
   });
 
-  afterEach( function() {
+  afterEach(function() {
     sandbox.restore();
     nock.cleanAll();
   })
@@ -35,15 +36,15 @@ describe('AVClient#benalohChallenge', function() {
     });
 
     it('returns success', async function() {
-      const validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
+      const validCodes = ['aAjEuD64Fo2143'];
       const contestSelections = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
       client.encryptContestSelections(contestSelections);
       const serverRandomizers = await client.startBenalohChallenge();
       expect(serverRandomizers).to.eql({
-        '1': 'e144b97ccb27c64ccb5c6caaa906a69c7f7b260ee59e4302fad5e7c15c90a244',
-        '2': 'b088d5464a6abef2269629cd273e911a8eca16bcf3aa0ebde26555b3c76ae2ea'
+        '1': '12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031',
+        '2': '1415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f30313233'
       });
     });
 
@@ -57,7 +58,7 @@ describe('AVClient#benalohChallenge', function() {
         .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
       nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
           .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
-      const validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
+      const validCodes = ['aAjEuD64Fo2143'];
       const contestSelections = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
@@ -94,7 +95,7 @@ describe('AVClient#benalohChallenge', function() {
       nock('http://localhost:3000/').post('/test/app/get_randomizers')
         .replyWithFile(200, __dirname + '/replies/get_randomizers.valid.json');
 
-      validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
+      validCodes = ['aAjEuD64Fo2143'];
       contestSelections = { '1': 'option1', '2': 'optiona' };
     });
 

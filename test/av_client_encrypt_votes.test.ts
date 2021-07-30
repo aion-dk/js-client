@@ -1,7 +1,7 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom } from './av_client_test_helpers';
+import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './av_client_test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
@@ -15,6 +15,7 @@ describe('AVClient#encryptVotes', function() {
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
+    resetDeterministicOffset();
   });
 
   afterEach( function() {
@@ -33,11 +34,11 @@ describe('AVClient#encryptVotes', function() {
     });
 
     it('encrypts correctly', async function() {
-      const validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
+      const validCodes = ['aAjEuD64Fo2143'];
       const contestSelections = { '1': 'option1', '2': 'optiona' };
-      const contestCryptograms = {
-        '1': '03774735c7f471d548151bfef183f37e8b58fb06ed311b0fda8d33dddf3a9c98cf,03c5316bf5f97097e1806d89a689048cdf324984683b6ad7f90a07cabdc4189d32',
-        '2': '03204cd76c47a8cca92342a438404808ec9f4ea83fb3713e889c79483c1a377023,0383166e9482a1a782f85f4b36a2ecec27ca64b629024e9cdf3ace339683974584'
+      const expectedContestCryptograms = {
+        '1': '029c74f51f76eb0c61ed15fafbc884f00119ac3576115d51de9089aa2599ffa9cf,02439e322e0fbf7b74a8911e670c024cfa1ff08cf415b461903ae87c169f58ec73',
+        '2': '025652715552f598cfc2214ec523318c93f26d5b5eca5f00ff501fb18377d12978,021062858fd9e1215ed6d1f264a36f76f6bd06f0e2363539629a417044e42af677'
       };
 
       await client.authenticateWithCodes(validCodes);
@@ -45,7 +46,7 @@ describe('AVClient#encryptVotes', function() {
       const cryptograms = client.cryptogramsForConfirmation();
 
       expect(encryptResponse).to.equal('Success');
-      expect(cryptograms).to.deep.equal(contestCryptograms);
+      expect(cryptograms).to.deep.equal(expectedContestCryptograms);
     });
   });
 });

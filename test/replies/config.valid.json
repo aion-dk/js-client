@@ -10,12 +10,9 @@
     "title": {
       "en": "Some election 2018"
     },
-    "subtitle": {
-    },
-    "description": {
-    },
-    "footer": {
-    },
+    "subtitle": {},
+    "description": {},
+    "footer": {},
     "verification": {
       "allow_voter_verification_mode": true,
       "allow_receipt_download": true,
@@ -24,29 +21,16 @@
     "redirect": {
       "redirect_method": "disabled",
       "redirect_timer": 15,
-      "redirect_url": {
-      }
+      "redirect_url": {}
     },
     "theme": {
       "logo": null
     },
     "factors": {
       "factor1": {
-        "name": {
-        },
-        "placeholder": {
-        },
-        "help": {
-        },
-        "visibility": "force_visible"
-      },
-      "factor2": {
-        "name": {
-        },
-        "placeholder": {
-        },
-        "help": {
-        },
+        "name": {},
+        "placeholder": {},
+        "help": {},
         "visibility": "force_visible"
       }
     }
@@ -67,8 +51,7 @@
       "title": {
         "en": "First ballot"
       },
-      "description": {
-      },
+      "description": {},
       "options": [
         {
           "id": 1,
@@ -76,14 +59,10 @@
           "title": {
             "en": "Option 1"
           },
-          "subtitle": {
-          },
-          "description": {
-          },
-          "url": {
-          },
-          "video_url": {
-          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
           "image": null
         },
         {
@@ -92,14 +71,10 @@
           "title": {
             "en": "Option 2"
           },
-          "subtitle": {
-          },
-          "description": {
-          },
-          "url": {
-          },
-          "video_url": {
-          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
           "image": null
         }
       ],
@@ -114,8 +89,7 @@
       "title": {
         "en": "Second ballot"
       },
-      "description": {
-      },
+      "description": {},
       "options": [
         {
           "id": 3,
@@ -123,14 +97,10 @@
           "title": {
             "en": "Option A"
           },
-          "subtitle": {
-          },
-          "description": {
-          },
-          "url": {
-          },
-          "video_url": {
-          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
           "image": null
         },
         {
@@ -139,14 +109,10 @@
           "title": {
             "en": "Option B"
           },
-          "subtitle": {
-          },
-          "description": {
-          },
-          "url": {
-          },
-          "video_url": {
-          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
           "image": null
         },
         {
@@ -155,14 +121,10 @@
           "title": {
             "en": "Option C"
           },
-          "subtitle": {
-          },
-          "description": {
-          },
-          "url": {
-          },
-          "video_url": {
-          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
           "image": null
         }
       ],
