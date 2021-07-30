@@ -9,6 +9,7 @@ const Crypto = require('../lib/av_client/aion_crypto.js')()
 describe('AVClient#voteSubmission', function() {
   let client;
   let sandbox;
+  let affidavit;
 
   beforeEach(function() {
     client = new AVClient('http://localhost:3000/test/app');
@@ -17,6 +18,8 @@ describe('AVClient#voteSubmission', function() {
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
     resetDeterministicOffset();
+
+    const affidavit = 'some bytes, most likely as binary PDF';
   });
 
   afterEach( function() {
@@ -44,8 +47,7 @@ describe('AVClient#voteSubmission', function() {
 
       await client.authenticateWithCodes(validCodes);
       await client.encryptCVR(cvr);
-      const voteReceipt = await client.signAndSubmitEncryptedVotes();
-      expect(voteReceipt.registeredAt).to.equal('2020-03-01T10:00:00.000+01:00');
+      const voteReceipt = await client.signAndSubmitEncryptedVotes(affidavit);
       expect(voteReceipt).to.eql({
         previousBoardHash: 'd8d9742271592d1b212bbd4cbbbe357aef8e00cdbdf312df95e9cf9a1a921465',
         boardHash: '5a9175c2b3617298d78be7d0244a68f34bc8b2a37061bb4d3fdf97edc1424098',
@@ -84,7 +86,7 @@ describe('AVClient#voteSubmission', function() {
       // vote only on ballot 1
       delete client.voteEncryptions['2']
 
-      return await client.signAndSubmitEncryptedVotes().then(
+      return await client.signAndSubmitEncryptedVotes(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Ballot ids do not correspond.')
       )
@@ -104,7 +106,7 @@ describe('AVClient#voteSubmission', function() {
         publicKey: keyPair.public_key
       }
 
-      return await client.signAndSubmitEncryptedVotes().then(
+      return await client.signAndSubmitEncryptedVotes(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Digital signature did not validate.')
       )
@@ -120,7 +122,7 @@ describe('AVClient#voteSubmission', function() {
       // change the voter identifier
       client.voterIdentifier = 'corrupt identifier';
 
-      return await client.signAndSubmitEncryptedVotes().then(
+      return await client.signAndSubmitEncryptedVotes(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Content hash does not correspond.')
       )
@@ -138,7 +140,7 @@ describe('AVClient#voteSubmission', function() {
       const newRandomness = Crypto.addBigNums(randomness, randomness)
       client.voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(newRandomness)
 
-      return await client.signAndSubmitEncryptedVotes().then(
+      return await client.signAndSubmitEncryptedVotes(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Proof of correct encryption failed for ballot #1.')
       )
