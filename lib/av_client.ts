@@ -5,6 +5,8 @@ import EncryptVotes from '../lib/av_client/encrypt_votes';
 import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
+import OTPProvider from "./av_client/connectors/otp_provider";
+import { randomKeyPair} from "./av_client/generate_key_pair";
 
 /**
  * Assembly Voting Client API.
@@ -21,6 +23,7 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
  */
 
 export class AVClient {
+  private authorizationTokens: any[];
   private bulletinBoard: any;
   private electionConfig: any;
   private emptyCryptograms: any;
@@ -70,6 +73,29 @@ export class AVClient {
     return await this.voterAuthorizationCoordinator.requestOTPCodesToBeSent(personalIdentificationInformation).then(
       (response) => { return { numberOfOTPs: this.electionConfig.OTPProviderCount } }
     );
+  }
+
+  /**
+   * Takes the OTP codes.
+   * Generates a new key pair.
+   * Calls each OTP provider to authorize the public key by sending the according OTP code.
+   */
+  async finalizeAuthorization(otpCodes: string[]) {
+    await this.updateElectionConfig();
+
+    if (otpCodes.length != this.electionConfig.OTPProviderCount) {
+      throw new Error('Wrong number of OTPs submitted');
+    }
+
+    const providers = this.electionConfig.OTPProviderURLs.map(function(providerURL) {
+      return new OTPProvider(providerURL)
+    })
+
+    this.generateKeyPair();
+    const tokens = await this.requestOTPAuthorizations(otpCodes, providers, this.publicKey())
+    this.authorizationTokens = tokens;
+
+    return 'Success'
   }
 
   /**
@@ -165,6 +191,22 @@ export class AVClient {
     return {};
   }
 
+  private generateKeyPair() {
+    this.keyPair = randomKeyPair();
+  }
+
+  private async requestOTPAuthorizations(otpCodes: string[], providers: any[], publicKey) {
+    const requests = [];
+    for (let i = 0; i < otpCodes.length; i++) {
+      requests.push(providers[i].requestOTPAuthorization(otpCodes[i], publicKey))
+    }
+
+    return Promise.all(requests).then(
+      (tokens) => { return tokens },
+      (error) => { return Promise.reject('OTP authorization failed') }
+    )
+  }
+
   /**
    * Attempts to populate election configuration data from backend server, if it hasn't been populated yet.
    */
@@ -217,6 +259,10 @@ export class AVClient {
 
   private privateKey() {
     return this.keyPair.privateKey
+  }
+
+  private publicKey() {
+    return this.keyPair.publicKey
   }
 }
 
