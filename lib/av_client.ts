@@ -87,13 +87,21 @@ export class AVClient {
       throw new Error('Wrong number of OTPs submitted');
     }
 
-    const providers = this.electionConfig.OTPProviderURLs.map(function(providerURL) {
-      return new OTPProvider(providerURL)
-    })
+    const providers = this.electionConfig.OTPProviderURLs.map(
+      (providerURL) => new OTPProvider(providerURL)
+    );
 
-    this.generateKeyPair();
-    const tokens = await this.requestOTPAuthorizations(otpCodes, providers, this.publicKey())
-    this.authorizationTokens = tokens;
+    this.keyPair = randomKeyPair();
+    const publicKey = this.publicKey();
+
+    const requests = providers.map(function(provider, index) {
+      return provider.requestOTPAuthorization(otpCodes[index], publicKey)
+    });
+
+    await Promise.all(requests).then(
+      (tokens) => this.authorizationTokens = tokens,
+      (error) => Promise.reject('OTP authorization failed')
+    );
 
     return 'Success'
   }
@@ -189,22 +197,6 @@ export class AVClient {
 
   submissionReceipt() {
     return {};
-  }
-
-  private generateKeyPair() {
-    this.keyPair = randomKeyPair();
-  }
-
-  private async requestOTPAuthorizations(otpCodes: string[], providers: any[], publicKey) {
-    const requests = [];
-    for (let i = 0; i < otpCodes.length; i++) {
-      requests.push(providers[i].requestOTPAuthorization(otpCodes[i], publicKey))
-    }
-
-    return Promise.all(requests).then(
-      (tokens) => { return tokens },
-      (error) => { return Promise.reject('OTP authorization failed') }
-    )
   }
 
   /**

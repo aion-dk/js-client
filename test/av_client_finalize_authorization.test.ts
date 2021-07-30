@@ -2,7 +2,7 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
 
-describe('AVClient#requestOTPs', function() {
+describe('AVClient#finalizeAuthorization', function() {
   let client;
   const expectedNetworkRequests = [];
 
