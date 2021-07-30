@@ -12,6 +12,10 @@ export default class ElectionConfig {
           let configData = response.data;
           configData.voterAuthorizationCoordinatorURL = 'http://localhost:1234';
           configData.OTPProviderCount = 2;
+          configData.OTPProviderURLs = [
+            'http://localhost:1111',
+            'http://localhost:2222'
+          ]
           return configData;
         },
         (error) => { return Promise.reject(error) }
