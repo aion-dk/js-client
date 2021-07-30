@@ -2,7 +2,7 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
 
-describe('AVClient#requestOTPs', function() {
+describe('AVClient#initiateDigitalReturn', function() {
   let client;
   const expectedNetworkRequests = [];
 
@@ -26,7 +26,7 @@ describe('AVClient#requestOTPs', function() {
       );
 
       const pii = 'pii';
-      const result = await client.requestOTPs(pii);
+      const result = await client.initiateDigitalReturn(pii);
 
       expect(result).to.eql({
         numberOfOTPs: 2
@@ -45,23 +45,13 @@ describe('AVClient#requestOTPs', function() {
 
       const pii = 'pii';
 
-      return await client.requestOTPs(pii).then(
+      return await client.initiateDigitalReturn(pii).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => {
           expectedNetworkRequests.forEach((mock) => mock.done());
           expect(error.message).to.equal('Request failed with status code 404')
         }
       );
-    });
-  });
-
-  context('no arguments provided', function() {
-    it('throws an error', async function() {
-      try {
-        await client.requestOTPs();
-      } catch(error) {
-        expect(error.message).to.equal('Please provide personalIdentificationInformation');
-      }
     });
   });
 });

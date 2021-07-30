@@ -26,7 +26,6 @@ export class AVClient {
   private emptyCryptograms: any;
   private keyPair: KeyPair;
   private voteEncryptions: any;
-  private voterAuthorizationCoordinator: any;
   private voteReceipt: any;
   private voterIdentifier: string;
 
@@ -55,21 +54,17 @@ export class AVClient {
   }
 
   /**
-   * Takes PII, sends it to Voter Authorization Coordinator Service, for it
+   * Takes PII, checks if an authorized public key already exists, and if so, returns true.
+   * If not, sends it to Voter Authorization Coordinator Service, for it
    * to initiate Voter Authorizers to send out OTPs to the voter.
    * @param {string} personalIdentificationInformation We don't know what this will be yet.
    */
-  async requestOTPs(personalIdentificationInformation: string) {
-    if (typeof personalIdentificationInformation == 'undefined') {
-      throw new Error('Please provide personalIdentificationInformation');
+  async initiateDigitalReturn(personalIdentificationInformation: string) {
+    if (this.hasAuthorizedPublicKey()) {
+      return true;
+    } else {
+      return await this.requestOTPs(personalIdentificationInformation);
     }
-
-    await this.updateElectionConfig();
-    this.setupVoterAuthorizationCoordinator();
-
-    return await this.voterAuthorizationCoordinator.requestOTPCodesToBeSent(personalIdentificationInformation).then(
-      (response) => { return { numberOfOTPs: this.electionConfig.OTPProviderCount } }
-    );
   }
 
   /**
@@ -174,10 +169,21 @@ export class AVClient {
     }
   }
 
-  private setupVoterAuthorizationCoordinator() {
-    this.voterAuthorizationCoordinator = new VoterAuthorizationCoordinator(
-      this.electionConfig.voterAuthorizationCoordinatorURL
-    );
+  /**
+   * Takes PII, sends it to Voter Authorization Coordinator Service, for it
+   * to initiate Voter Authorizers to send out OTPs to the voter.
+   * @param {string} personalIdentificationInformation We don't know what this will be yet.
+   */
+  private async requestOTPs(personalIdentificationInformation: string) {
+    await this.updateElectionConfig();
+
+    const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
+    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
+
+    return coordinator.requestOTPCodesToBeSent(personalIdentificationInformation)
+      .then((_success) => ({
+        numberOfOTPs: this.electionConfig.OTPProviderCount
+      }));
   }
 
   /**
@@ -217,6 +223,10 @@ export class AVClient {
 
   private privateKey() {
     return this.keyPair.privateKey
+  }
+
+  private hasAuthorizedPublicKey() {
+    return false;
   }
 }
 
