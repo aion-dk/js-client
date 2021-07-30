@@ -8,7 +8,12 @@ export default class ElectionConfig {
   get() {
     return this.bulletinBoard.getElectionConfig()
       .then(
-        (response) => { return Promise.resolve(response.data) },
+        (response) => {
+          let configData = response.data;
+          configData.voterAuthorizationCoordinatorURL = 'http://localhost:1234';
+          configData.OTPProviderCount = 2;
+          return Promise.resolve(configData);
+        },
         (error) => { return Promise.reject(error) }
       );
   }

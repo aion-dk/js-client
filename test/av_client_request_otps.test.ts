@@ -22,7 +22,7 @@ describe('AVClient#requestOTPs', function() {
     it('returns number of OTPs required', async function() {
       expectedNetworkRequests.push(
         nock('http://localhost:1234/').post('/initiate')
-          .reply(200, { numberOfOTPs: 2 })
+          .reply(200)
       );
 
       const pii = 'pii';

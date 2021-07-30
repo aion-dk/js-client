@@ -65,9 +65,10 @@ export class AVClient {
     }
 
     await this.updateElectionConfig();
+    this.setupVoterAuthorizationCoordinator();
 
     return await this.voterAuthorizationCoordinator.requestOTPCodesToBeSent(personalIdentificationInformation).then(
-      (response) => { return response.data }
+      (response) => { return { numberOfOTPs: this.electionConfig.OTPProviderCount } }
     );
   }
 
@@ -170,10 +171,13 @@ export class AVClient {
   private async updateElectionConfig() {
     if (Object.entries(this.electionConfig).length === 0) {
       this.electionConfig = await new ElectionConfig(this.bulletinBoard).get();
-
-      const voterAuthorizationCoordinatorURL = 'http://localhost:1234'; // TODO: this should come from config
-      this.voterAuthorizationCoordinator = new VoterAuthorizationCoordinator(voterAuthorizationCoordinatorURL);
     }
+  }
+
+  private setupVoterAuthorizationCoordinator() {
+    this.voterAuthorizationCoordinator = new VoterAuthorizationCoordinator(
+      this.electionConfig.voterAuthorizationCoordinatorURL
+    );
   }
 
   /**
