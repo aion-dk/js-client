@@ -91,13 +91,10 @@ export class AVClient {
 
     const requests = providers.map(function(provider, index) {
       return provider.requestOTPAuthorization(otpCodes[index], publicKey)
+        .then((response) => response.data);
     });
 
-    await Promise.all(requests).then(
-      (tokens) => this.authorizationTokens = tokens,
-      (error) => Promise.reject('OTP authorization failed')
-    );
-
+    this.authorizationTokens = await Promise.all(requests)
     return 'Success'
   }
 
@@ -260,7 +257,7 @@ export class AVClient {
   }
 
   private hasAuthorizedPublicKey() {
-    return false;
+    return (!!this.keyPair && this.authorizationTokens.every((t) => t.token == 'authorized'));
   }
 
   private publicKey() {

@@ -18,7 +18,34 @@ describe('AVClient#initiateDigitalReturn', function() {
     nock.cleanAll();
   });
 
-  context('OTP services work', function() {
+  context('authorized', function() {
+    it('returns true', async function() {
+      expectedNetworkRequests.push(
+        nock('http://localhost:1234/').post('/initiate')
+          .reply(200),
+        nock('http://localhost:1111/').post('/authorize')
+          .replyWithFile(200, __dirname + '/replies/otp_provider_authorize.valid.json'),
+        nock('http://localhost:2222/').post('/authorize')
+          .replyWithFile(200, __dirname + '/replies/otp_provider_authorize.valid.json')
+      );
+
+      // Initiate
+      const pii = 'pii';
+      await client.initiateDigitalReturn(pii);
+
+      // Finalize
+      const otps = ['1234', 'abc'];
+      await client.finalizeAuthorization(otps);
+
+      // Initiating again will just return `true`
+      const result = await client.initiateDigitalReturn(pii);
+      expect(result).to.equal(true);
+
+      expectedNetworkRequests.forEach((mock) => mock.done());
+    });
+  });
+
+  context('unauthorized, OTP services work', function() {
     it('returns number of OTPs required', async function() {
       expectedNetworkRequests.push(
         nock('http://localhost:1234/').post('/initiate')
@@ -36,7 +63,7 @@ describe('AVClient#initiateDigitalReturn', function() {
     });
   });
 
-  context('OTP service is unavailable', function() {
+  context('unauthorized, OTP service is unavailable', function() {
     it('returns number of OTPs required', async function() {
       expectedNetworkRequests.push(
         nock('http://localhost:1234/').post('/initiate')

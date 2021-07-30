@@ -46,7 +46,7 @@ describe('AVClient#finalizeAuthorization', function() {
 
       return client.finalizeAuthorization(otps).then(
         () => expect.fail('Expected promise to be rejected'),
-        (error) => expect(error).to.equal('OTP authorization failed')
+        (error) => expect(error.message).to.equal('Request failed with status code 401')
       )
       expectedNetworkRequests.forEach((mock) => mock.done());
     })
