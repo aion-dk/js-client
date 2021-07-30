@@ -46,7 +46,7 @@ describe('AVClient#initiateDigitalReturn', function() {
   });
 
   context('unauthorized, OTP services work', function() {
-    it('returns number of OTPs required', async function() {
+    it('returns false', async function() {
       expectedNetworkRequests.push(
         nock('http://localhost:1234/').post('/initiate')
           .reply(200)
@@ -55,16 +55,14 @@ describe('AVClient#initiateDigitalReturn', function() {
       const pii = 'pii';
       const result = await client.initiateDigitalReturn(pii);
 
-      expect(result).to.eql({
-        numberOfOTPs: 2
-      });
+      expect(result).to.equal(false)
 
       expectedNetworkRequests.forEach((mock) => mock.done());
     });
   });
 
   context('unauthorized, OTP service is unavailable', function() {
-    it('returns number of OTPs required', async function() {
+    it('returns an error', async function() {
       expectedNetworkRequests.push(
         nock('http://localhost:1234/').post('/initiate')
           .reply(404)

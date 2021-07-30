@@ -70,6 +70,15 @@ export class AVClient {
     }
   }
 
+  getNumberOfOTPs(): number|false {
+    if (this.hasAuthorizedPublicKey()) {
+      return this.electionConfig.OTPProviderCount;
+    }
+    else {
+      return false;
+    }
+  }
+
   /**
    * Takes the OTP codes.
    * Generates a new key pair.
@@ -212,9 +221,7 @@ export class AVClient {
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
     return coordinator.requestOTPCodesToBeSent(personalIdentificationInformation)
-      .then((_success) => ({
-        numberOfOTPs: this.electionConfig.OTPProviderCount
-      }));
+      .then((response) => { return response.code == 200 });
   }
 
   /**
