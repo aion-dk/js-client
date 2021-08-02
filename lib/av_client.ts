@@ -7,6 +7,7 @@ import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import OTPProvider from "./av_client/connectors/otp_provider";
 import { randomKeyPair} from "./av_client/generate_key_pair";
+import validateAuthorizationToken from "./av_client/validate_authorization_token";
 
 /**
  * Assembly Voting Client API.
@@ -29,7 +30,6 @@ export class AVClient {
   private emptyCryptograms: any;
   private keyPair: KeyPair;
   private voteEncryptions: any;
-  private voterAuthorizationCoordinator: any;
   private voteReceipt: any;
   private voterIdentifier: string;
 
@@ -58,21 +58,29 @@ export class AVClient {
   }
 
   /**
-   * Takes PII, sends it to Voter Authorization Coordinator Service, for it
+   * Takes PII, checks if an authorized public key already exists, and if so, returns true.
+   * If not, sends it to Voter Authorization Coordinator Service, for it
    * to initiate Voter Authorizers to send out OTPs to the voter.
    * @param {string} personalIdentificationInformation We don't know what this will be yet.
    */
-  async requestOTPs(personalIdentificationInformation: string) {
-    if (typeof personalIdentificationInformation == 'undefined') {
-      throw new Error('Please provide personalIdentificationInformation');
+  async initiateDigitalReturn(personalIdentificationInformation: string) {
+    if (await this.hasAuthorizedPublicKey()) {
+      return 'Authorized';
+    } else {
+      return await this.requestOTPs(personalIdentificationInformation)
+        .then((response) => 'Unauthorized');
     }
+  }
 
+  /**
+   * Returns number of OTPs (one time passwords), voter should enter to authorize.
+   * Number comes from election config on the bulletin board.
+   * @return Promise<Number>
+   */
+  async getNumberOfOTPs(): Promise<number> {
     await this.updateElectionConfig();
-    this.setupVoterAuthorizationCoordinator();
 
-    return await this.voterAuthorizationCoordinator.requestOTPCodesToBeSent(personalIdentificationInformation).then(
-      (response) => { return { numberOfOTPs: this.electionConfig.OTPProviderCount } }
-    );
+    return this.electionConfig.OTPProviderCount;
   }
 
   /**
@@ -96,14 +104,16 @@ export class AVClient {
 
     const requests = providers.map(function(provider, index) {
       return provider.requestOTPAuthorization(otpCodes[index], publicKey)
+        .then((response) => response.data);
     });
 
-    await Promise.all(requests).then(
-      (tokens) => this.authorizationTokens = tokens,
-      (error) => Promise.reject('OTP authorization failed')
-    );
-
-    return 'Success'
+    const tokens = await Promise.all(requests);
+    if (tokens.every(validateAuthorizationToken)) {
+      this.authorizationTokens = tokens;
+      return 'Success';
+    } else {
+      return Promise.reject('Failure, not all tokens were valid');
+    }
   }
 
   /**
@@ -208,10 +218,18 @@ export class AVClient {
     }
   }
 
-  private setupVoterAuthorizationCoordinator() {
-    this.voterAuthorizationCoordinator = new VoterAuthorizationCoordinator(
-      this.electionConfig.voterAuthorizationCoordinatorURL
-    );
+  /**
+   * Takes PII, sends it to Voter Authorization Coordinator Service, for it
+   * to initiate Voter Authorizers to send out OTPs to the voter.
+   * @param {string} personalIdentificationInformation We don't know what this will be yet.
+   */
+  private async requestOTPs(personalIdentificationInformation: string) {
+    await this.updateElectionConfig();
+
+    const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
+    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
+
+    return coordinator.requestOTPCodesToBeSent(personalIdentificationInformation);
   }
 
   /**
@@ -251,6 +269,12 @@ export class AVClient {
 
   private privateKey() {
     return this.keyPair.privateKey
+  }
+
+  private async hasAuthorizedPublicKey() {
+    if (!this.keyPair) return false;
+    const numberOfOTPs = await this.getNumberOfOTPs();
+    return this.authorizationTokens.length == numberOfOTPs;
   }
 
   private publicKey() {
