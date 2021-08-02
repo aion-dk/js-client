@@ -37,10 +37,10 @@ describe('AVClient#benalohChallenge', function() {
 
     it('returns success', async function() {
       const validCodes = ['aAjEuD64Fo2143'];
-      const contestSelections = { '1': 'option1', '2': 'optiona' };
+      const cvr = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
-      client.encryptContestSelections(contestSelections);
+      await client.encryptCVR(cvr);
       const serverRandomizers = await client.startBenalohChallenge();
       expect(serverRandomizers).to.eql({
         '1': '12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031',
@@ -59,10 +59,10 @@ describe('AVClient#benalohChallenge', function() {
       nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
           .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
       const validCodes = ['aAjEuD64Fo2143'];
-      const contestSelections = { '1': 'option1', '2': 'optiona' };
+      const cvr = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
-      client.encryptContestSelections(contestSelections);
+      await client.encryptCVR(cvr);
     });
 
     it('returns an error message when there is a network error', async function() {
@@ -84,7 +84,7 @@ describe('AVClient#benalohChallenge', function() {
 
   context('submitting after spoiling', function() {
     let validCodes;
-    let contestSelections;
+    let cvr;
     beforeEach(function() {
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/config.valid.json');
@@ -96,7 +96,7 @@ describe('AVClient#benalohChallenge', function() {
         .replyWithFile(200, __dirname + '/replies/get_randomizers.valid.json');
 
       validCodes = ['aAjEuD64Fo2143'];
-      contestSelections = { '1': 'option1', '2': 'optiona' };
+      cvr = { '1': 'option1', '2': 'optiona' };
     });
 
     it('returns an error when getting latest board hash', async function() {
@@ -104,7 +104,7 @@ describe('AVClient#benalohChallenge', function() {
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_2.json');
 
       await client.authenticateWithCodes(validCodes);
-      client.encryptContestSelections(contestSelections);
+      await client.encryptCVR(cvr);
       await client.startBenalohChallenge();
 
       return await client.signAndSubmitEncryptedVotes().then(
