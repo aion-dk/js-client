@@ -107,12 +107,12 @@ export class AVClient {
         .then((response) => response.data);
     });
 
-    const responses = await Promise.all(requests);
-    if (responses.every(validateAuthorizationToken)) {
-      this.authorizationTokens = responses;
+    const tokens = await Promise.all(requests);
+    if (tokens.every(validateAuthorizationToken)) {
+      this.authorizationTokens = tokens;
       return 'Success';
     } else {
-      return 'Failure, not all tokens were valid';
+      return Promise.reject('Failure, not all tokens were valid');
     }
   }
 
