@@ -70,13 +70,16 @@ export class AVClient {
     }
   }
 
-  getNumberOfOTPs(): number|false {
-    if (this.hasAuthorizedPublicKey()) {
-      return this.electionConfig.OTPProviderCount;
-    }
-    else {
-      return false;
-    }
+  /**
+   * Returns number of OTPs (one time passwords), voter should enter to authorize.
+   * Number comes from election config on the bulletin board.
+   * @return Promise<Number>
+   */
+
+  async getNumberOfOTPs(): Promise<number> {
+    await this.updateElectionConfig();
+
+    return this.electionConfig.OTPProviderCount;
   }
 
   /**
@@ -264,7 +267,10 @@ export class AVClient {
   }
 
   private hasAuthorizedPublicKey() {
-    return (!!this.keyPair && this.authorizationTokens.every((t) => t.token == 'authorized'));
+    return (
+      !!this.keyPair &&
+      this.authorizationTokens.every((t) => t.token == 'authorized')
+    );
   }
 
   private publicKey() {
