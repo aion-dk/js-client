@@ -273,7 +273,7 @@ export class AVClient {
 
   private async hasAuthorizedPublicKey() {
     if (!this.keyPair) return false;
-    const numberOfOTPs = await this.getNumberOfOTPs();;
+    const numberOfOTPs = await this.getNumberOfOTPs();
     return this.authorizationTokens.length == numberOfOTPs;
   }
 
