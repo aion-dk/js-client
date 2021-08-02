@@ -64,9 +64,10 @@ export class AVClient {
    */
   async initiateDigitalReturn(personalIdentificationInformation: string) {
     if (this.hasAuthorizedPublicKey()) {
-      return true;
+      return 'Authorized';
     } else {
-      return await this.requestOTPs(personalIdentificationInformation);
+      return await this.requestOTPs(personalIdentificationInformation)
+        .then((response) => 'Unauthorized');
     }
   }
 
@@ -75,7 +76,6 @@ export class AVClient {
    * Number comes from election config on the bulletin board.
    * @return Promise<Number>
    */
-
   async getNumberOfOTPs(): Promise<number> {
     await this.updateElectionConfig();
 
@@ -223,8 +223,7 @@ export class AVClient {
     const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
-    return coordinator.requestOTPCodesToBeSent(personalIdentificationInformation)
-      .then((response) => { return response.code == 200 });
+    return coordinator.requestOTPCodesToBeSent(personalIdentificationInformation);
   }
 
   /**

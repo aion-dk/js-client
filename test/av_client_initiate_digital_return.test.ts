@@ -19,7 +19,7 @@ describe('AVClient#initiateDigitalReturn', function() {
   });
 
   context('authorized', function() {
-    it('returns true', async function() {
+    it('returns "Authorized"', async function() {
       expectedNetworkRequests.push(
         nock('http://localhost:1234/').post('/initiate')
           .reply(200),
@@ -39,14 +39,14 @@ describe('AVClient#initiateDigitalReturn', function() {
 
       // Initiating again will just return `true`
       const result = await client.initiateDigitalReturn(pii);
-      expect(result).to.equal(true);
+      expect(result).to.equal('Authorized');
 
       expectedNetworkRequests.forEach((mock) => mock.done());
     });
   });
 
   context('unauthorized, OTP services work', function() {
-    it('returns false', async function() {
+    it('returns "Unauthorized"', async function() {
       expectedNetworkRequests.push(
         nock('http://localhost:1234/').post('/initiate')
           .reply(200)
@@ -55,7 +55,7 @@ describe('AVClient#initiateDigitalReturn', function() {
       const pii = 'pii';
       const result = await client.initiateDigitalReturn(pii);
 
-      expect(result).to.equal(false)
+      expect(result).to.equal('Unauthorized')
 
       expectedNetworkRequests.forEach((mock) => mock.done());
     });
