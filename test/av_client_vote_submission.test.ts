@@ -1,7 +1,7 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import {deterministicMathRandom, deterministicRandomWords} from './av_client_test_helpers';
+import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './av_client_test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 const Crypto = require('../lib/av_client/aion_crypto.js')()
@@ -16,6 +16,7 @@ describe('AVClient#voteSubmission', function() {
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
+    resetDeterministicOffset();
   });
 
   afterEach( function() {
@@ -38,17 +39,18 @@ describe('AVClient#voteSubmission', function() {
     });
 
     it('successfully submits encrypted votes', async function() {
-      const validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
+      const validCodes = ['aAjEuD64Fo2143'];
       const contestSelections = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
       client.encryptContestSelections(contestSelections);
       const voteReceipt = await client.signAndSubmitEncryptedVotes();
+      expect(voteReceipt.registeredAt).to.equal('2020-03-01T10:00:00.000+01:00');
       expect(voteReceipt).to.eql({
-        previousBoardHash: 'bac9d02bec373129ebd62cea013fa7ba2b7820006398f0fb1f652d88bf238c6f',
-        boardHash: 'b275396c9acdbf828e544f0d25bb0acd1a164934a0b693ad74791edce1b7e331',
-        registeredAt: '2021-07-22T14:11:08.064+02:00',
-        serverSignature: '64f5d7036505a0c5b4194092216e4671e7f8892b76ed426d8844f89ab3cb81b4,d336147a047773f6ee10311dbf6f5cd27a8b12bd59d598be9859fecd549c1084',
+        previousBoardHash: 'd8d9742271592d1b212bbd4cbbbe357aef8e00cdbdf312df95e9cf9a1a921465',
+        boardHash: '5a9175c2b3617298d78be7d0244a68f34bc8b2a37061bb4d3fdf97edc1424098',
+        registeredAt: '2020-03-01T10:00:00.000+01:00',
+        serverSignature: 'dbcce518142b8740a5c911f727f3c02829211a8ddfccabeb89297877e4198bc1,46826ddfccaac9ca105e39c8a2d015098479624c411b4783ca1a3600daf4e8fa',
         voteSubmissionId: 6
       });
     });
@@ -68,7 +70,7 @@ describe('AVClient#voteSubmission', function() {
       nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
         .replyWithFile(200, __dirname + '/replies/get_latest_board_hash.valid.json');
 
-      validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
+      validCodes = ['aAjEuD64Fo2143'];
       contestSelections = { '1': 'option1', '2': 'optiona' };
     });
 

@@ -3,7 +3,8 @@ import { recordResponses } from './test_helper'
 const fs = require('fs');
 const axios = require('axios')
 
-describe("record stuff", () => {
+// Skipping by default, as it messes with nock when running mocha in watch mode.
+describe.skip("record stuff", () => {
   async function getStuff() {
     const backend = axios.create({
       baseURL: "https://hub.dummyapis.com/",

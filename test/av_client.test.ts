@@ -1,7 +1,7 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom } from './av_client_test_helpers';
+import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './av_client_test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
@@ -15,6 +15,7 @@ describe('AVClient#authenticateWithCodes', function() {
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
+    resetDeterministicOffset();
   });
 
   afterEach( function() {
@@ -33,7 +34,7 @@ describe('AVClient#authenticateWithCodes', function() {
     });
 
     it('returns success', async function() {
-      const validCodes = ['aAjEuD64Fo2143', '8beoTmFH13DCV3'];
+      const validCodes = ['aAjEuD64Fo2143'];
       const result = await client.authenticateWithCodes(validCodes);
       expect(result).to.equal('Success');
     });
