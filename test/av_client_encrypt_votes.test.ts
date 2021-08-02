@@ -37,8 +37,8 @@ describe('AVClient#encryptVotes', function() {
       const validCodes = ['aAjEuD64Fo2143'];
       const contestSelections = { '1': 'option1', '2': 'optiona' };
       const expectedContestCryptograms = {
-        '1': '029c74f51f76eb0c61ed15fafbc884f00119ac3576115d51de9089aa2599ffa9cf,02439e322e0fbf7b74a8911e670c024cfa1ff08cf415b461903ae87c169f58ec73',
-        '2': '025652715552f598cfc2214ec523318c93f26d5b5eca5f00ff501fb18377d12978,021062858fd9e1215ed6d1f264a36f76f6bd06f0e2363539629a417044e42af677'
+        '1': '0211dd2017252b4c290a60faa84170e00098e8abccbfae557b5446be984eb7262a,02c56fc8f37c8d317b80e041e5f8e2072aac0a81fae0454cb750296ea70c7717e4',
+        '2': '0348cdf39918c92e080f0b8089a51706672ae86b545b4d46afc955c93a5d6af1b2,02944d1cebaa70e2e61e529bee2b338513b19e8bc0b6eac2a572a07ca1ea3b8f7f'
       };
 
       await client.authenticateWithCodes(validCodes);

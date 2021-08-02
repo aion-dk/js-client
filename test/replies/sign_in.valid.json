@@ -1,5 +1,5 @@
 {
-  "voterSessionUuid": "11121314-1516-4718-991a-1b1c1d1e1f20",
+  "voterSessionUuid": "0b0c0d0e-0f10-4112-9314-15161718191a",
   "voterIdentifier": "1",
   "ballotIds": [
     1,
@@ -7,12 +7,12 @@
   ],
   "emptyCryptograms": {
     "1": {
-      "empty_cryptogram": "0279a0ac5aa3a2efba0cfab8370816580ae3a561be7e4b47c59cf8c35e38beef08,02678826bf3333245df98ab98455dafb479ddfa13cf520b6de4d7738de2a41f0e9",
-      "commitment_point": "02c1046fcc4987b9e52fb62492d6326f6ca339e6751c585d19c14e19dbbcb95a5e"
+      "empty_cryptogram": "0312f677c72d770fb6b137fbd924001b01df46745940a279d3415f5f9c0c323f59,03125ec5752eba6c723b70fa957aa0e4a529b025d59dcb60177c74c0ecb47ebe79",
+      "commitment_point": "0237061066a2d33aa10331c085f7d66be78f87e897719c33379dcf190508423af4"
     },
     "2": {
-      "empty_cryptogram": "03f7b42bc84f964a1c7e96cf782acfa800ae9418706de85bc10c02c9abdeba5db3,0221f3647fe870f8871f9cb70856f51618a553f1ed506df40e3ebf514d26a23ce6",
-      "commitment_point": "0266587f24524ca4c969461653d38d1fc7de32ab7d240fc0fe2d4c699083a99b53"
+      "empty_cryptogram": "031c82cd80f96195a9f2ad8f72de92cb5e0edc72463805ab31ad678aaa77d7eee4,02015b078127485900af9c661d1ad167bc25830b91a7f6882e6ee343cd8b9a3d86",
+      "commitment_point": "030142deb975f1f884e115b3ef0a8f90147fba2a3187817811c44171a364e9eaf2"
     }
   },
   "signInWarning": null
