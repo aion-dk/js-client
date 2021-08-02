@@ -64,7 +64,7 @@ export class AVClient {
    * @param {string} personalIdentificationInformation We don't know what this will be yet.
    */
   async initiateDigitalReturn(personalIdentificationInformation: string) {
-    if (this.hasAuthorizedPublicKey()) {
+    if (await this.hasAuthorizedPublicKey()) {
       return 'Authorized';
     } else {
       return await this.requestOTPs(personalIdentificationInformation)
@@ -107,8 +107,13 @@ export class AVClient {
         .then((response) => response.data);
     });
 
-    this.authorizationTokens = await Promise.all(requests)
-    return 'Success'
+    const responses = await Promise.all(requests);
+    if (responses.every(validateAuthorizationToken)) {
+      this.authorizationTokens = responses;
+      return 'Success';
+    } else {
+      return 'Failure, not all tokens were valid';
+    }
   }
 
   /**
@@ -266,11 +271,10 @@ export class AVClient {
     return this.keyPair.privateKey
   }
 
-  private hasAuthorizedPublicKey() {
-    return (
-      !!this.keyPair &&
-      this.authorizationTokens.every(validateAuthorizationToken)
-    );
+  private async hasAuthorizedPublicKey() {
+    if (!this.keyPair) return false;
+    const numberOfOTPs = await this.getNumberOfOTPs();;
+    return this.authorizationTokens.length == numberOfOTPs;
   }
 
   private publicKey() {
