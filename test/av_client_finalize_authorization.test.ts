@@ -4,7 +4,7 @@ import nock = require('nock');
 
 describe('AVClient#finalizeAuthorization', function() {
   let client;
-  const expectedNetworkRequests = [];
+  const expectedNetworkRequests : any[] = [];
 
   beforeEach(function() {
     client = new AVClient('http://localhost:3000/test/app');

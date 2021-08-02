@@ -283,16 +283,6 @@ export class AVClient {
 }
 
 /**
- * Setter/getter for persistence layer of the application
- */
-export interface Storage {
-  /** Returns value that is persisted at `key`. **/
-  get: (key: string) => any;
-  /** Persists `value` at `key`. **/
-  set: (key: string, value: any) => any;
-}
-
-/**
  * Used for structuring data that is indexed under contests
  * @template Type defines the data type
  */
