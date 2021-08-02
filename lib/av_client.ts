@@ -7,6 +7,7 @@ import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import OTPProvider from "./av_client/connectors/otp_provider";
 import { randomKeyPair} from "./av_client/generate_key_pair";
+import validateAuthorizationToken from "./av_client/validate_authorization_token";
 
 /**
  * Assembly Voting Client API.
@@ -268,7 +269,7 @@ export class AVClient {
   private hasAuthorizedPublicKey() {
     return (
       !!this.keyPair &&
-      this.authorizationTokens.every((t) => t.token == 'authorized')
+      this.authorizationTokens.every(validateAuthorizationToken)
     );
   }
 
