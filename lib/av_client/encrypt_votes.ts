@@ -1,21 +1,28 @@
 const Crypto = require('./aion_crypto.js')()
 
 export default class EncryptVotes {
-  encrypt(contests: ContestIndexed<EncryptionData>, encryptionKey: PublicKey) {
+  encrypt(contestSelections, emptyCryptograms, contestEncodingTypes, encryptionKey: PublicKey) {
     const response: ContestIndexed<EncryptionResponse> = {}
-    for (let contestId in contests) {
+
+    Object.keys(contestSelections).forEach(function(contestId) {
       const { cryptogram, randomness } = Crypto.encryptVote(
-        contests[contestId].voteEncodingType,
-        contests[contestId].vote,
-        contests[contestId].emptyCryptogram,
+        contestEncodingTypes[contestId],
+        contestSelections[contestId],
+        emptyCryptograms[contestId],
         encryptionKey
       );
       const proof = Crypto.generateDiscreteLogarithmProof(randomness)
 
       response[contestId] = { cryptogram, randomness, proof }
-    }
+    })
 
     return response;
+  }
+
+  fingerprint(cryptograms: ContestIndexed<Cryptogram>) {
+    const string = JSON.stringify(cryptograms)
+
+    return Crypto.hashString(string)
   }
 }
 

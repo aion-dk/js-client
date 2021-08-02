@@ -18,7 +18,7 @@ import validateAuthorizationToken from "./av_client/validate_authorization_token
  * * {@link AVClient.getBallot | getBallot }
  * * {@link AVClient.submitBallotChoices | submitBallotChoices }
  * * {@link AVClient.submitAttestation | submitAttestation }
- * * {@link AVClient.encryptContestSelections | encryptContestSelections }
+ * * {@link AVClient.encryptCVR | encryptCVR }
  * * {@link AVClient.cryptogramsForConfirmation | cryptogramsForConfirmation }
  * * {@link AVClient.submissionReceipt | submissionReceipt }
  */
@@ -151,17 +151,44 @@ export class AVClient {
   }
 
   /**
-   * Encrypts all voter ballot choices.
-   * @param  contestSelections Object containing the selections for each contest
-   * @return {String}
+   * Encrypts a CVR and generates vote cryptograms.
+   * CVR format is expected to be an object with `contestId` as keys and `option_handle` as values.
+   * @param  cvr Object containing the selections for each contest
+   * @return {String} the cryptograms fingerprint
    */
-  encryptContestSelections(contestSelections: ContestIndexed<string>) {
-    const contestsData = this.prepareDataForEncryption(contestSelections);
-    const encryptionResponse = new EncryptVotes().encrypt(contestsData, this.electionEncryptionKey());
+  async encryptCVR(cvr: ContestIndexed<string>) {
+    await this.updateElectionConfig();
+
+    if (JSON.stringify(Object.keys(cvr)) !== JSON.stringify(this.contestIds())) {
+      throw new Error('Corrupt CVR: Contains invalid contest');
+    }
+
+    const contests = this.electionConfig.ballots
+    const valid_contest_selections = Object.keys(cvr).every(function(contestId) {
+      const contest = contests.find(b => b.id == contestId)
+      return contest.options.some(o => o.handle == cvr[contestId])
+    })
+    if (!valid_contest_selections) {
+      throw new Error('Corrupt CVR: Contains invalid option');
+    }
+
+
+    const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].cryptogram ]))
+    const contestEncodingTypes = Object.fromEntries(Object.keys(cvr).map((contestId) => {
+      const contest = contests.find(b => b.id == contestId)
+      return [contestId, contest.vote_encoding_type];
+    }))
+
+    const encryptionResponse = new EncryptVotes().encrypt(
+      cvr,
+      emptyCryptograms,
+      contestEncodingTypes,
+      this.electionEncryptionKey()
+    );
 
     this.voteEncryptions = encryptionResponse
 
-    return 'Success';
+    return new EncryptVotes().fingerprint(this.cryptogramsForConfirmation());
   }
 
   async startBenalohChallenge() {
@@ -232,31 +259,12 @@ export class AVClient {
     return coordinator.requestOTPCodesToBeSent(personalIdentificationInformation);
   }
 
-  /**
-   * Gathers all data needed for encrypting the vote selections.
-   */
-  private prepareDataForEncryption(contestSelections: ContestIndexed<string>) {
-    const emptyCryptograms = this.emptyCryptograms
-    const contests = this.electionConfig.ballots
-    const contestsData = {};
-    this.contestIds().forEach(function (id) {
-      const contest = contests.find( b => b.id == id)
-      contestsData[id] = {
-        vote: contestSelections[id],
-        voteEncodingType: contest.vote_encoding_type,
-        emptyCryptogram: emptyCryptograms[id].cryptogram
-      }
-    })
-
-    return contestsData
-  }
-
   private electionId() {
     return this.electionConfig.election.id;
   }
 
   private contestIds() {
-    return this.electionConfig.ballots.map(ballot => ballot.id)
+    return this.electionConfig.ballots.map(ballot => ballot.id.toString())
   }
 
   private electionEncryptionKey() {

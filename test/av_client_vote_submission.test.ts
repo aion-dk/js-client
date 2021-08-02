@@ -40,10 +40,10 @@ describe('AVClient#voteSubmission', function() {
 
     it('successfully submits encrypted votes', async function() {
       const validCodes = ['aAjEuD64Fo2143'];
-      const contestSelections = { '1': 'option1', '2': 'optiona' };
+      const cvr = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
-      client.encryptContestSelections(contestSelections);
+      await client.encryptCVR(cvr);
       const voteReceipt = await client.signAndSubmitEncryptedVotes();
       expect(voteReceipt.registeredAt).to.equal('2020-03-01T10:00:00.000+01:00');
       expect(voteReceipt).to.eql({
@@ -58,7 +58,7 @@ describe('AVClient#voteSubmission', function() {
 
   context('given invalid values', function() {
     let validCodes;
-    let contestSelections;
+    let cvr;
 
     beforeEach(function() {
       nock('http://localhost:3000/').get('/test/app/config')
@@ -71,7 +71,7 @@ describe('AVClient#voteSubmission', function() {
         .replyWithFile(200, __dirname + '/replies/get_latest_board_hash.valid.json');
 
       validCodes = ['aAjEuD64Fo2143'];
-      contestSelections = { '1': 'option1', '2': 'optiona' };
+      cvr = { '1': 'option1', '2': 'optiona' };
     });
 
     it('fails when not voting on all contests', async function() {
@@ -79,7 +79,7 @@ describe('AVClient#voteSubmission', function() {
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_4.json');
 
       await client.authenticateWithCodes(validCodes);
-      client.encryptContestSelections(contestSelections);
+      await client.encryptCVR(cvr);
 
       // vote only on ballot 1
       delete client.voteEncryptions['2']
@@ -95,7 +95,7 @@ describe('AVClient#voteSubmission', function() {
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_5.json');
 
       await client.authenticateWithCodes(validCodes);
-      client.encryptContestSelections(contestSelections);
+      await client.encryptCVR(cvr);
 
       // change voter's key pair
       const keyPair = Crypto.generateKeyPair();
@@ -115,7 +115,7 @@ describe('AVClient#voteSubmission', function() {
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_6.json');
 
       await client.authenticateWithCodes(validCodes);
-      client.encryptContestSelections(contestSelections);
+      await client.encryptCVR(cvr);
 
       // change the voter identifier
       client.voterIdentifier = 'corrupt identifier';
@@ -131,7 +131,7 @@ describe('AVClient#voteSubmission', function() {
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_7.json');
 
       await client.authenticateWithCodes(validCodes);
-      client.encryptContestSelections(contestSelections);
+      await client.encryptCVR(cvr);
 
       // change the proof of ballot 1
       const randomness = client.voteEncryptions['1'].randomness
