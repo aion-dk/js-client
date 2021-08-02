@@ -25,7 +25,7 @@ import { randomKeyPair} from "./av_client/generate_key_pair";
 export class AVClient {
   private authorizationTokens: any[];
   private bulletinBoard: any;
-  private electionConfig: any;
+  private electionConfig: ElectionConfig;
   private emptyCryptograms: any;
   private keyPair: KeyPair;
   private voteEncryptions: any;
@@ -38,7 +38,7 @@ export class AVClient {
    */
   constructor(bulletinBoardURL: string) {
     this.bulletinBoard = new BulletinBoard(bulletinBoardURL);
-    this.electionConfig = {};
+    this.electionConfig = new ElectionConfig(this.bulletinBoard);
   }
 
   /**
@@ -46,9 +46,9 @@ export class AVClient {
    * @param codes Array of election code strings.
    */
   async authenticateWithCodes(codes: string[]) {
-    await this.updateElectionConfig();
+    await this.electionConfig.fetch();
     const authenticationResponse = await new AuthenticateWithCodes(this.bulletinBoard)
-      .authenticate(codes, this.electionId(), this.electionEncryptionKey());
+      .authenticate(codes, this.electionConfig.electionId(), this.electionConfig.encryptionKey());
 
     this.voterIdentifier = authenticationResponse.voterIdentifier;
     this.keyPair = authenticationResponse.keyPair;
@@ -67,11 +67,11 @@ export class AVClient {
       throw new Error('Please provide personalIdentificationInformation');
     }
 
-    await this.updateElectionConfig();
+    await this.electionConfig.fetch();
     this.setupVoterAuthorizationCoordinator();
 
     return await this.voterAuthorizationCoordinator.requestOTPCodesToBeSent(personalIdentificationInformation).then(
-      (response) => { return { numberOfOTPs: this.electionConfig.OTPProviderCount } }
+      (response) => { return { numberOfOTPs: this.electionConfig.OTPProviderCount() } }
     );
   }
 
@@ -81,13 +81,13 @@ export class AVClient {
    * Calls each OTP provider to authorize the public key by sending the according OTP code.
    */
   async finalizeAuthorization(otpCodes: string[]) {
-    await this.updateElectionConfig();
+    await this.electionConfig.fetch();
 
-    if (otpCodes.length != this.electionConfig.OTPProviderCount) {
+    if (otpCodes.length != this.electionConfig.OTPProviderCount()) {
       throw new Error('Wrong number of OTPs submitted');
     }
 
-    const providers = this.electionConfig.OTPProviderURLs.map(
+    const providers = this.electionConfig.OTPProviderURLs().map(
       (providerURL) => new OTPProvider(providerURL)
     );
 
@@ -147,7 +147,7 @@ export class AVClient {
    */
   encryptContestSelections(contestSelections: ContestIndexed<string>) {
     const contestsData = this.prepareDataForEncryption(contestSelections);
-    const encryptionResponse = new EncryptVotes().encrypt(contestsData, this.electionEncryptionKey());
+    const encryptionResponse = new EncryptVotes().encrypt(contestsData, this.electionConfig.encryptionKey());
 
     this.voteEncryptions = encryptionResponse
 
@@ -179,11 +179,10 @@ export class AVClient {
    */
   async signAndSubmitEncryptedVotes() {
     const voterIdentifier = this.voterIdentifier
-    const electionId = this.electionId()
+    const electionId = this.electionConfig.electionId()
     const voteEncryptions = this.voteEncryptions
     const privateKey = this.privateKey();
-    const signatureKey = this.electionSigningPublicKey();
-
+    const signatureKey = this.electionConfig.signingPublicKey();
 
     return await new SubmitVotes(this.bulletinBoard)
       .signAndSubmitVotes({
@@ -199,18 +198,9 @@ export class AVClient {
     return {};
   }
 
-  /**
-   * Attempts to populate election configuration data from backend server, if it hasn't been populated yet.
-   */
-  private async updateElectionConfig() {
-    if (Object.entries(this.electionConfig).length === 0) {
-      this.electionConfig = await new ElectionConfig(this.bulletinBoard).get();
-    }
-  }
-
   private setupVoterAuthorizationCoordinator() {
     this.voterAuthorizationCoordinator = new VoterAuthorizationCoordinator(
-      this.electionConfig.voterAuthorizationCoordinatorURL
+      this.electionConfig.voterAuthorizationCoordinatorURL()
     );
   }
 
@@ -219,7 +209,7 @@ export class AVClient {
    */
   private prepareDataForEncryption(contestSelections: ContestIndexed<string>) {
     const emptyCryptograms = this.emptyCryptograms
-    const contests = this.electionConfig.ballots
+    const contests = this.electionConfig.ballots()
     const contestsData = {};
     this.contestIds().forEach(function (id) {
       const contest = contests.find( b => b.id == id)
@@ -233,20 +223,8 @@ export class AVClient {
     return contestsData
   }
 
-  private electionId() {
-    return this.electionConfig.election.id;
-  }
-
   private contestIds() {
-    return this.electionConfig.ballots.map(ballot => ballot.id)
-  }
-
-  private electionEncryptionKey() {
-    return this.electionConfig.encryptionKey
-  }
-
-  private electionSigningPublicKey() {
-    return this.electionConfig.signingPublicKey
+    return this.electionConfig.ballots().map(ballot => ballot.id)
   }
 
   private privateKey() {
