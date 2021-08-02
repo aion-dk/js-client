@@ -7,7 +7,7 @@ export function deterministicRandomWords(nwords, _paranoia) {
   }
 
   let nextRandomInt = global.deterministicOffset;
-  let output = []
+  let output : number[] = []
   for (let i = 0; i < nwords; i++) {
     if (nextRandomInt > highestValidNumber) {
       nextRandomInt = lowestValidNumber
