@@ -41,6 +41,29 @@ export class AVClient {
     this.electionConfig = {};
   }
 
+  authorizationMethod(): { methodName: string; method: Function } {
+    if (!this.electionConfig) {
+      throw new Error('Please fetch election config first');
+    }
+
+    switch(this.electionConfig.authorizationMode) {
+      case 'election codes':
+        return {
+          methodName: 'authenticateWithCodes',
+          method: this.authenticateWithCodes
+        }
+        break;
+      case 'otps':
+        return {
+          methodName: 'initiateDigitalReturn',
+          method: this.initiateDigitalReturn
+        }
+        break;
+      default:
+        throw new Error('Authorization method not found in election config')
+    }
+  }
+
   /**
    * Authenticates or rejects voter, based on their submitted election codes.
    * @param codes Array of election code strings.
