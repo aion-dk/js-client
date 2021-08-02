@@ -7,7 +7,3 @@
 ### Classes
 
 - [AVClient](classes/avclient.md)
-
-### Interfaces
-
-- [Storage](interfaces/storage.md)
