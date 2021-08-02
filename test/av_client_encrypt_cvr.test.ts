@@ -67,6 +67,7 @@ describe('AVClient#encryptCVR', function() {
 
       try {
         await client.encryptCVR(cvr);
+        expect.fail('Expected error to be thrown');
       } catch(error) {
         expect(error.message).to.equal('Corrupt CVR: Contains invalid contest');
       }
@@ -80,6 +81,7 @@ describe('AVClient#encryptCVR', function() {
 
       try {
         await client.encryptCVR(cvr);
+        expect.fail('Expected error to be thrown');
       } catch(error) {
         expect(error.message).to.equal('Corrupt CVR: Contains invalid option');
       }

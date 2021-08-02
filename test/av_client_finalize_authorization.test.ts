@@ -57,7 +57,8 @@ describe('AVClient#finalizeAuthorization', function() {
       const otps = ['1234'];
 
       try {
-        await client.finalizeAuthorization(otps)
+        await client.finalizeAuthorization(otps);
+        expect.fail('Expected error to be thrown');
       } catch(error) {
         expect(error.message).to.equal('Wrong number of OTPs submitted');
       }
