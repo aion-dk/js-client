@@ -7,7 +7,7 @@ export default class AuthenticateWithCodes {
     this.bulletinBoard = bulletinBoard;
   }
 
-  async authenticate(electionCodes: string[], electionId: string, encryptionKey: string) {
+  async authenticate(electionCodes: string[], electionId: number, encryptionKey: string) {
     const keyPair = this.electionCodesToKeyPair(electionCodes);
     const voterSession = await createSession(keyPair, electionId, this.bulletinBoard);
     this.bulletinBoard.setVoterSessionUuid(voterSession.voterSessionUuid);
@@ -57,7 +57,7 @@ export default class AuthenticateWithCodes {
   }
 }
 
-const createSession = async function(keyPair: KeyPair, electionId: string, bulletinBoard: BulletinBoard) {
+const createSession = async function(keyPair: KeyPair, electionId: number, bulletinBoard: BulletinBoard) {
   const signature = <Signature>Crypto.generateSchnorrSignature('', keyPair.privateKey);
   return bulletinBoard.createSession(keyPair.publicKey, signature)
     .then(({ data }) => {

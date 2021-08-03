@@ -39,13 +39,8 @@ describe('AVClient#encryptCVR', function() {
 
       await client.authenticateWithCodes(validCodes);
       const fingerprint = await client.encryptCVR(cvr);
-      const cryptograms = client.cryptogramsForConfirmation();
 
       expect(fingerprint).to.equal('5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7');
-      expect(cryptograms).to.eql({
-        '1': '0211dd2017252b4c290a60faa84170e00098e8abccbfae557b5446be984eb7262a,02c56fc8f37c8d317b80e041e5f8e2072aac0a81fae0454cb750296ea70c7717e4',
-        '2': '0348cdf39918c92e080f0b8089a51706672ae86b545b4d46afc955c93a5d6af1b2,02944d1cebaa70e2e61e529bee2b338513b19e8bc0b6eac2a572a07ca1ea3b8f7f'
-      });
     });
   });
 
