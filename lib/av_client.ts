@@ -27,9 +27,9 @@ export class AVClient {
   private authorizationTokens: any[];
   private bulletinBoard: any;
   private electionConfig: any;
-  private emptyCryptograms: any;
+  private emptyCryptograms: ContestIndexed<EmptyCryptogram>;
   private keyPair: KeyPair;
-  private voteEncryptions: any;
+  private voteEncryptions: ContestIndexed<Encryption>;
   private voterIdentifier: string;
 
   /**
@@ -44,7 +44,7 @@ export class AVClient {
    * Authenticates or rejects voter, based on their submitted election codes.
    * @param codes Array of election code strings.
    */
-  async authenticateWithCodes(codes: string[]) {
+  async authenticateWithCodes(codes: string[]): Promise<string> {
     await this.updateElectionConfig();
     const authenticationResponse = await new AuthenticateWithCodes(this.bulletinBoard)
       .authenticate(codes, this.electionId(), this.electionEncryptionKey());
@@ -62,7 +62,7 @@ export class AVClient {
    * to initiate Voter Authorizers to send out OTPs to the voter.
    * @param {string} personalIdentificationInformation We don't know what this will be yet.
    */
-  async initiateDigitalReturn(personalIdentificationInformation: string) {
+  async initiateDigitalReturn(personalIdentificationInformation: string): Promise<string> {
     if (await this.hasAuthorizedPublicKey()) {
       return 'Authorized';
     } else {
@@ -87,7 +87,7 @@ export class AVClient {
    * Generates a new key pair.
    * Calls each OTP provider to authorize the public key by sending the according OTP code.
    */
-  async finalizeAuthorization(otpCodes: string[]) {
+  async finalizeAuthorization(otpCodes: string[]): Promise<string> {
     await this.updateElectionConfig();
 
     if (otpCodes.length != this.electionConfig.OTPProviderCount) {
@@ -121,7 +121,7 @@ export class AVClient {
    * @param  cvr Object containing the selections for each contest
    * @return {String} the cryptograms fingerprint
    */
-  async encryptCVR(cvr: ContestIndexed<string>) {
+  async encryptCVR(cvr: ContestIndexed<string>): Promise<HashValue> {
     await this.updateElectionConfig();
 
     if (JSON.stringify(Object.keys(cvr)) !== JSON.stringify(this.contestIds())) {
@@ -156,7 +156,7 @@ export class AVClient {
     return new EncryptVotes().fingerprint(this.cryptogramsForConfirmation());
   }
 
-  async startBenalohChallenge() {
+  async startBenalohChallenge(): Promise<ContestIndexed<BigNum>> {
     return await new BenalohChallenge(this.bulletinBoard).getServerRandomizers()
   }
 
@@ -165,7 +165,7 @@ export class AVClient {
    * Submits encrypted voter ballot choices to backend server.
    * @return {Promise} Returns the vote receipt as a promise.
    */
-  async signAndSubmitEncryptedVotes(affidavit: string) {
+  async signAndSubmitEncryptedVotes(affidavit: string): Promise<Receipt> {
     const voterIdentifier = this.voterIdentifier
     const electionId = this.electionId()
     const voteEncryptions = this.voteEncryptions
@@ -211,7 +211,7 @@ export class AVClient {
    * to initiate Voter Authorizers to send out OTPs to the voter.
    * @param {string} personalIdentificationInformation We don't know what this will be yet.
    */
-  private async requestOTPs(personalIdentificationInformation: string) {
+  private async requestOTPs(personalIdentificationInformation: string): Promise<any> {
     await this.updateElectionConfig();
 
     const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
@@ -220,31 +220,31 @@ export class AVClient {
     return coordinator.requestOTPCodesToBeSent(personalIdentificationInformation);
   }
 
-  private electionId() {
+  private electionId(): number {
     return this.electionConfig.election.id;
   }
 
-  private contestIds() {
+  private contestIds(): string[] {
     return this.electionConfig.ballots.map(ballot => ballot.id.toString())
   }
 
-  private electionEncryptionKey() {
+  private electionEncryptionKey(): ECPoint {
     return this.electionConfig.encryptionKey
   }
 
-  private electionSigningPublicKey() {
+  private electionSigningPublicKey(): ECPoint {
     return this.electionConfig.signingPublicKey
   }
 
-  private privateKey() {
+  private privateKey(): BigNum {
     return this.keyPair.privateKey
   }
 
-  private publicKey() {
+  private publicKey(): ECPoint {
     return this.keyPair.publicKey
   }
 
-  private async hasAuthorizedPublicKey() {
+  private async hasAuthorizedPublicKey(): Promise<boolean> {
     if (!this.keyPair) return false;
     const numberOfOTPs = await this.getNumberOfOTPs();
     return this.authorizationTokens.length == numberOfOTPs;
@@ -260,7 +260,29 @@ interface ContestIndexed<Type> {
   [index: string]: Type;
 }
 
-declare type KeyPair = {
-  privateKey: string;
-  publicKey: string;
+type HashValue = string;
+type BigNum = string;
+type ECPoint = string;
+type Cryptogram = string;
+type Signature = string;
+type DateTimeStamp = string;
+type Proof = string;
+type Receipt = {
+  previousBoardHash: HashValue;
+  boardHash: HashValue;
+  registeredAt: DateTimeStamp;
+  serverSignature: Signature;
 };
+type KeyPair = {
+  privateKey: BigNum;
+  publicKey: ECPoint;
+};
+type Encryption = {
+  cryptogram: Cryptogram;
+  randomness: BigNum;
+  proof: Proof;
+}
+type EmptyCryptogram = {
+  cryptogram: Cryptogram;
+  commitment: ECPoint;
+}
