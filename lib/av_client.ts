@@ -30,7 +30,6 @@ export class AVClient {
   private emptyCryptograms: any;
   private keyPair: KeyPair;
   private voteEncryptions: any;
-  private voteReceipt: any;
   private voterIdentifier: string;
 
   /**
