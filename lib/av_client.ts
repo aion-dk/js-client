@@ -161,20 +161,6 @@ export class AVClient {
   }
 
   /**
-   * Returns data for rendering the list of cryptograms of the ballot
-   * @return Object containing a cryptogram for each contest
-   */
-  cryptogramsForConfirmation() {
-    const cryptograms = {}
-    const voteEncryptions = this.voteEncryptions
-    this.contestIds().forEach(function (id) {
-      cryptograms[id] = voteEncryptions[id].cryptogram
-    })
-
-    return cryptograms
-  }
-
-  /**
    * Prepares the vote submission package.
    * Submits encrypted voter ballot choices to backend server.
    * @return {Promise} Returns the vote receipt as a promise.
@@ -195,6 +181,20 @@ export class AVClient {
         signatureKey,
         affidavit
     });
+  }
+
+  /**
+   * Returns data for rendering the list of cryptograms of the ballot
+   * @return Object containing a cryptogram for each contest
+   */
+  private cryptogramsForConfirmation(): ContestIndexed<Cryptogram> {
+    const cryptograms = {}
+    const voteEncryptions = this.voteEncryptions
+    this.contestIds().forEach(function (id) {
+      cryptograms[id] = voteEncryptions[id].cryptogram
+    })
+
+    return cryptograms
   }
 
   /**
