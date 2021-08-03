@@ -107,7 +107,9 @@ describe('AVClient#benalohChallenge', function() {
       await client.encryptCVR(cvr);
       await client.startBenalohChallenge();
 
-      return await client.signAndSubmitEncryptedVotes('fake affidavit data').then(
+      const affidavit = 'fake affidavit data';
+
+      return await client.signAndSubmitEncryptedVotes(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Could not get latest board hash')
       )

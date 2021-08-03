@@ -19,7 +19,7 @@ describe('AVClient#voteSubmission', function() {
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
     resetDeterministicOffset();
 
-    const affidavit = 'some bytes, most likely as binary PDF';
+    affidavit = 'some bytes, most likely as binary PDF';
   });
 
   afterEach( function() {
