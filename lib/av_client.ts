@@ -117,40 +117,6 @@ export class AVClient {
   }
 
   /**
-   * Returns data for rendering a list of ballots
-   * @return Array of ballot information objects
-   */
-  getBallotList() {
-    return [];
-  }
-
-  /**
-   * Returns data for rendering an entire ballot, for voter to make choices
-   */
-  getBallot(id) {
-    return {};
-  }
-
-  /**
-   * Submits voter ballot choices to backend server.
-   * @param  ballotId ID of the ballot being submitted
-   * @param  choices Voter choices for the ballot
-   * @return {Promise}
-   */
-  async submitBallotChoices(ballotId, choices) {
-    return Promise.resolve(true);
-  }
-
-  /**
-   * Submits attestation object to be manually reviewed later
-   * @param  attestation Attestation object to be submitted
-   * @return {Promise}
-   */
-  async submitAttestation(attestation) {
-    return Promise.resolve(true);
-  }
-
-  /**
    * Encrypts a CVR and generates vote cryptograms.
    * CVR format is expected to be an object with `contestId` as keys and `option_handle` as values.
    * @param  cvr Object containing the selections for each contest
@@ -232,10 +198,6 @@ export class AVClient {
     });
   }
 
-  submissionReceipt() {
-    return {};
-  }
-
   /**
    * Attempts to populate election configuration data from backend server, if it hasn't been populated yet.
    */
@@ -279,14 +241,14 @@ export class AVClient {
     return this.keyPair.privateKey
   }
 
+  private publicKey() {
+    return this.keyPair.publicKey
+  }
+
   private async hasAuthorizedPublicKey() {
     if (!this.keyPair) return false;
     const numberOfOTPs = await this.getNumberOfOTPs();
     return this.authorizationTokens.length == numberOfOTPs;
-  }
-
-  private publicKey() {
-    return this.keyPair.publicKey
   }
 }
 
