@@ -7,7 +7,7 @@ export default class SubmitVotes {
     this.bulletinBoard = bulletinBoard;
   }
 
-  async signAndSubmitVotes({ voterIdentifier, electionId, voteEncryptions, privateKey, signatureKey }) {
+  async signAndSubmitVotes({ voterIdentifier, electionId, voteEncryptions, privateKey, signatureKey, affidavit }) {
     const acknowledgeResponse = await this.acknowledge()
 
     const votes = {}
@@ -39,7 +39,7 @@ export default class SubmitVotes {
   }
 
   private async submit({ contentHash, voterSignature, cryptogramsWithProofs }) {
-    const { data } = await this.bulletinBoard.submitVotes( contentHash, voterSignature, cryptogramsWithProofs )
+    const { data } = await this.bulletinBoard.submitVotes(contentHash, voterSignature, cryptogramsWithProofs)
 
     if (data.error) {
       return Promise.reject(data.error.description)
