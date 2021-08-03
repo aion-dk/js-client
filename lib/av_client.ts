@@ -214,13 +214,12 @@ export class AVClient {
    * Submits encrypted voter ballot choices to backend server.
    * @return {Promise} Returns the vote receipt as a promise.
    */
-  async signAndSubmitEncryptedVotes() {
+  async signAndSubmitEncryptedVotes(affidavit: string) {
     const voterIdentifier = this.voterIdentifier
     const electionId = this.electionId()
     const voteEncryptions = this.voteEncryptions
     const privateKey = this.privateKey();
     const signatureKey = this.electionSigningPublicKey();
-
 
     return await new SubmitVotes(this.bulletinBoard)
       .signAndSubmitVotes({
@@ -228,7 +227,8 @@ export class AVClient {
         electionId,
         voteEncryptions,
         privateKey,
-        signatureKey
+        signatureKey,
+        affidavit
     });
   }
 
