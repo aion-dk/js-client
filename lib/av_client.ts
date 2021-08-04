@@ -13,7 +13,7 @@ import validateAuthorizationToken from "./av_client/validate_authorization_token
  * Assembly Voting Client API.
  *
  * Expected sequence of methods being executed, when authorization happens through OTPs:
- * * {@link AVClient.authorizationMethod | authorizationMethod}
+ * * {@link AVClient.getAuthorizationMethod | getAuthorizationMethod}
  * * {@link AVClient.initiateDigitalReturn | initiateDigitalReturn}
  * * {@link AVClient.getNumberOfOTPs | getNumberOfOTPs}
  * * {@link AVClient.finalizeAuthorization | finalizeAuthorization}
@@ -54,7 +54,7 @@ export class AVClient {
    * * {@link AVClient.authenticateWithCodes | authenticateWithCodes} for authorization via OTPs.
    * * {@link AVClient.initiateDigitalReturn | initiateDigitalReturn} for authentication via election codes.
    */
-  authorizationMethod(): { methodName: string; method: Function } {
+  getAuthorizationMethod(): { methodName: string; method: Function } {
     if (!this.electionConfig) {
       throw new Error('Please fetch election config first');
     }
