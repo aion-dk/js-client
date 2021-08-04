@@ -172,7 +172,7 @@ export class AVClient {
   }
 
   /**
-   * Encrypts a CVR and generates vote cryptograms.
+   * Encrypts a cast-vote-record (CVR) and generates vote cryptograms.
    *
    * Example:
    * ```javascript
@@ -187,7 +187,7 @@ export class AVClient {
    * @param  cvr Object containing the selections for each contest.
    * @returns Returns fingerprint of the cryptograms.
    */
-  async encryptBallot(cvr: ContestIndexed<string>): Promise<string> {
+  async encryptBallot(cvr: CastVoteRecord): Promise<string> {
     await this.updateElectionConfig();
 
     if (JSON.stringify(Object.keys(cvr)) !== JSON.stringify(this.contestIds())) {
@@ -389,6 +389,18 @@ export type Receipt = {
   registeredAt: DateTimeStamp;
   serverSignature: Signature;
 };
+
+/**
+ * Example of a cvr:
+ * ```javascript
+ * {
+ *    '1': 'option1',
+ *    '2': 'optiona'
+ * }
+ * ```
+ */
+export type CastVoteRecord = ContestIndexed<string>
+
 type KeyPair = {
   privateKey: BigNum;
   publicKey: ECPoint;
