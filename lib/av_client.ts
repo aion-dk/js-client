@@ -17,7 +17,7 @@ import validateAuthorizationToken from "./av_client/validate_authorization_token
  * * {@link AVClient.ensureAuthorization | ensureAuthorization}
  * * {@link AVClient.getNumberOfOTPs | getNumberOfOTPs}
  * * {@link AVClient.finalizeAuthorization | finalizeAuthorization}
- * * {@link AVClient.encryptCVR | encryptCVR}
+ * * {@link AVClient.encryptBallot | encryptBallot}
  * * {@link AVClient.startBenalohChallenge | startBenalohChallenge}
  * * {@link AVClient.signAndSubmitEncryptedVotes | signAndSubmitEncryptedVotes}
  */
@@ -178,7 +178,7 @@ export class AVClient {
    * ```javascript
    * const client = new AVClient(url);
    * const cvr = { '1': 'option1', '2': 'optiona' };
-   * const fingerprint = await client.encryptCVR(cvr);
+   * const fingerprint = await client.encryptBallot(cvr);
    * ```
    *
    * Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
@@ -187,7 +187,7 @@ export class AVClient {
    * @param  cvr Object containing the selections for each contest.
    * @returns Returns fingerprint of the cryptograms.
    */
-  async encryptCVR(cvr: ContestIndexed<string>): Promise<string> {
+  async encryptBallot(cvr: ContestIndexed<string>): Promise<string> {
     await this.updateElectionConfig();
 
     if (JSON.stringify(Object.keys(cvr)) !== JSON.stringify(this.contestIds())) {

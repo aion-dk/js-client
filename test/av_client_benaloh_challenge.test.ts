@@ -40,7 +40,7 @@ describe('AVClient#benalohChallenge', function() {
       const cvr = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptCVR(cvr);
+      await client.encryptBallot(cvr);
       const serverRandomizers = await client.startBenalohChallenge();
       expect(serverRandomizers).to.eql({
         '1': '12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031',
@@ -62,7 +62,7 @@ describe('AVClient#benalohChallenge', function() {
       const cvr = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptCVR(cvr);
+      await client.encryptBallot(cvr);
     });
 
     it('returns an error message when there is a network error', async function() {
@@ -104,7 +104,7 @@ describe('AVClient#benalohChallenge', function() {
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_2.json');
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptCVR(cvr);
+      await client.encryptBallot(cvr);
       await client.startBenalohChallenge();
 
       const affidavit = 'fake affidavit data';
