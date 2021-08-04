@@ -240,6 +240,7 @@ export class AVClient {
    *
    * Submits encrypted ballot and the affidavit to the digital ballot box.
    *
+   * @param affidavit The affidavit document. Clarification of the affidavit format is still needed.
    * @return Returns the vote receipt. Example of a receipt:
    * ```javascript
    * {
@@ -251,7 +252,7 @@ export class AVClient {
       }
    * ```
    */
-  async submitEncryptedBallot(affidavit: string): Promise<Receipt> {
+  async submitEncryptedBallot(affidavit: Affidavit): Promise<Receipt> {
     const voterIdentifier = this.voterIdentifier
     const electionId = this.electionId()
     const voteEncryptions = this.voteEncryptions
@@ -392,6 +393,11 @@ export type Receipt = {
  * ```
  */
 export type CastVoteRecord = ContestIndexed<string>
+
+/**
+ * For now, we assume it is just a string.
+ */
+export type Affidavit = string;
 
 type KeyPair = {
   privateKey: BigNum;
