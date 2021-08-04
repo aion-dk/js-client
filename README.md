@@ -13,5 +13,11 @@ npm run test
 To run the tests in watch mode:
 
 ```
-npm run test -- --watch
+npm run tdd
+```
+
+To generate HTML documentation for external usage:
+
+```
+npx typedoc --excludeInternal --plugin none --out html_docs
 ```
