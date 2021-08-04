@@ -2,7 +2,7 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
 
-describe('AVClient#initiateDigitalReturn', function() {
+describe('AVClient#ensureAuthorization', function() {
   let client;
   const expectedNetworkRequests : any[] = [];
 
@@ -31,14 +31,14 @@ describe('AVClient#initiateDigitalReturn', function() {
 
       // Initiate
       const pii = 'pii';
-      await client.initiateDigitalReturn(pii);
+      await client.ensureAuthorization(pii);
 
       // Finalize
       const otps = ['1234', 'abc'];
       await client.finalizeAuthorization(otps);
 
       // Initiating again will just return `true`
-      const result = await client.initiateDigitalReturn(pii);
+      const result = await client.ensureAuthorization(pii);
       expect(result).to.equal('Authorized');
 
       expectedNetworkRequests.forEach((mock) => mock.done());
@@ -53,7 +53,7 @@ describe('AVClient#initiateDigitalReturn', function() {
       );
 
       const pii = 'pii';
-      const result = await client.initiateDigitalReturn(pii);
+      const result = await client.ensureAuthorization(pii);
 
       expect(result).to.equal('Unauthorized')
 
@@ -70,7 +70,7 @@ describe('AVClient#initiateDigitalReturn', function() {
 
       const pii = 'pii';
 
-      return await client.initiateDigitalReturn(pii).then(
+      return await client.ensureAuthorization(pii).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => {
           expectedNetworkRequests.forEach((mock) => mock.done());

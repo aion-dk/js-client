@@ -1,4 +1,7 @@
 {
   "entryPoints": ["lib/av_client.ts"],
-  "out": "docs"
+  "out": "docs",
+  "excludePrivate": true,
+  "disableSources": true,
+  "hideGenerator": true
 }

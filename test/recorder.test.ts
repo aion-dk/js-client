@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { recordResponses } from './test_helper'
+import { recordResponses } from './test_helpers'
 const fs = require('fs');
 const axios = require('axios')
 

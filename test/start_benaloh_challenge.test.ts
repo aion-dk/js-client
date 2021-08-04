@@ -1,11 +1,11 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './av_client_test_helpers';
+import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
-describe('AVClient#benalohChallenge', function() {
+describe('AVClient#startBenalohChallenge', function() {
   let client;
   let sandbox;
 
@@ -40,7 +40,7 @@ describe('AVClient#benalohChallenge', function() {
       const cvr = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptCVR(cvr);
+      await client.encryptBallot(cvr);
       const serverRandomizers = await client.startBenalohChallenge();
       expect(serverRandomizers).to.eql({
         '1': '12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031',
@@ -62,7 +62,7 @@ describe('AVClient#benalohChallenge', function() {
       const cvr = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptCVR(cvr);
+      await client.encryptBallot(cvr);
     });
 
     it('returns an error message when there is a network error', async function() {
@@ -104,12 +104,12 @@ describe('AVClient#benalohChallenge', function() {
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_2.json');
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptCVR(cvr);
+      await client.encryptBallot(cvr);
       await client.startBenalohChallenge();
 
       const affidavit = 'fake affidavit data';
 
-      return await client.signAndSubmitEncryptedVotes(affidavit).then(
+      return await client.submitEncryptedBallot(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Could not get latest board hash')
       )

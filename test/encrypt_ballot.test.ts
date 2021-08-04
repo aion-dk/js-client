@@ -1,11 +1,11 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './av_client_test_helpers';
+import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
-describe('AVClient#encryptCVR', function() {
+describe('AVClient#encryptBallot', function() {
   let client;
   let sandbox;
 
@@ -38,7 +38,7 @@ describe('AVClient#encryptCVR', function() {
       const cvr = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
-      const fingerprint = await client.encryptCVR(cvr);
+      const fingerprint = await client.encryptBallot(cvr);
 
       expect(fingerprint).to.equal('5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7');
     });
@@ -61,7 +61,7 @@ describe('AVClient#encryptCVR', function() {
       await client.authenticateWithCodes(validCodes);
 
       try {
-        await client.encryptCVR(cvr);
+        await client.encryptBallot(cvr);
         expect.fail('Expected error to be thrown');
       } catch(error) {
         expect(error.message).to.equal('Corrupt CVR: Contains invalid contest');
@@ -75,7 +75,7 @@ describe('AVClient#encryptCVR', function() {
       await client.authenticateWithCodes(validCodes);
 
       try {
-        await client.encryptCVR(cvr);
+        await client.encryptBallot(cvr);
         expect.fail('Expected error to be thrown');
       } catch(error) {
         expect(error.message).to.equal('Corrupt CVR: Contains invalid option');
