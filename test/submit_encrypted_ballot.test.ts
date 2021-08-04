@@ -6,7 +6,7 @@ import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 const Crypto = require('../lib/av_client/aion_crypto.js')()
 
-describe('AVClient#voteSubmission', function() {
+describe('AVClient#submitEncryptedBallot', function() {
   let client;
   let sandbox;
   let affidavit;
