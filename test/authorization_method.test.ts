@@ -23,8 +23,8 @@ describe('AVClient#getAuthorizationMethod', function() {
     it('returns the appropriate method name', function() {
       client.electionConfig.authorizationMode = 'otps';
       const result = client.getAuthorizationMethod();
-      expect(result.methodName).to.equal('initiateDigitalReturn');
-      expect(result.method).to.equal(client.initiateDigitalReturn);
+      expect(result.methodName).to.equal('ensureAuthorization');
+      expect(result.method).to.equal(client.ensureAuthorization);
     })
   });
 

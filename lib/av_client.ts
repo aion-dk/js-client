@@ -14,7 +14,7 @@ import validateAuthorizationToken from "./av_client/validate_authorization_token
  *
  * Expected sequence of methods being executed, when authorization happens through OTPs:
  * * {@link AVClient.getAuthorizationMethod | getAuthorizationMethod}
- * * {@link AVClient.initiateDigitalReturn | initiateDigitalReturn}
+ * * {@link AVClient.ensureAuthorization | ensureAuthorization}
  * * {@link AVClient.getNumberOfOTPs | getNumberOfOTPs}
  * * {@link AVClient.finalizeAuthorization | finalizeAuthorization}
  * * {@link AVClient.encryptCVR | encryptCVR}
@@ -51,8 +51,8 @@ export class AVClient {
    *
    * @returns Returns an object with the method name, and the reference to the function.
    * Available method names are
-   * * {@link AVClient.authenticateWithCodes | authenticateWithCodes} for authorization via OTPs.
-   * * {@link AVClient.initiateDigitalReturn | initiateDigitalReturn} for authentication via election codes.
+   * * {@link AVClient.authenticateWithCodes | authenticateWithCodes} for authentication via election codes.
+   * * {@link AVClient.ensureAuthorization | ensureAuthorization} for authorization via OTPs.
    */
   getAuthorizationMethod(): { methodName: string; method: Function } {
     if (!this.electionConfig) {
@@ -68,8 +68,8 @@ export class AVClient {
         break;
       case 'otps':
         return {
-          methodName: 'initiateDigitalReturn',
-          method: this.initiateDigitalReturn
+          methodName: 'ensureAuthorization',
+          method: this.ensureAuthorization
         }
         break;
       default:
@@ -112,7 +112,7 @@ export class AVClient {
    * @returns If voter has not yet authorized with OTPs, it will return 'Unauthorized'.<br>
    * If voter has already authorized, then returns 'Authorized'.
    */
-  async initiateDigitalReturn(personalIdentificationInformation: string): Promise<string> {
+  async ensureAuthorization(personalIdentificationInformation: string): Promise<string> {
     if (await this.hasAuthorizedPublicKey()) {
       return 'Authorized';
     } else {
@@ -134,7 +134,7 @@ export class AVClient {
   }
 
   /**
-   * This should be called after {@link AVClient.initiateDigitalReturn | initiateDigitalReturn}.
+   * This should be called after {@link AVClient.ensureAuthorization | ensureAuthorization}.
    * Takes the OTPs that voter received, uses them to authorize to submit votes.
    *
    * Internally, generates a private/public key pair, then attempts to authorize the public
