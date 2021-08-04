@@ -14,10 +14,19 @@
 
 ### Type aliases
 
+- [Affidavit](modules.md#affidavit)
 - [CastVoteRecord](modules.md#castvoterecord)
 - [Receipt](modules.md#receipt)
 
 ## Type aliases
+
+### Affidavit
+
+Ƭ **Affidavit**: `string`
+
+For now, we assume it is just a string.
+
+___
 
 ### CastVoteRecord
 

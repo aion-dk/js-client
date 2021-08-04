@@ -221,9 +221,9 @@ Submits encrypted ballot and the affidavit to the digital ballot box.
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `affidavit` | `string` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `affidavit` | `string` | The affidavit document. Clarification of the affidavit format is still needed. |
 
 #### Returns
 
