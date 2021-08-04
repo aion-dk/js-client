@@ -379,15 +379,15 @@ type Proof = string;
  *    registeredAt: '2020-03-01T10:00:00.000+01:00',
  *    serverSignature: 'dbcce518142b8740a5c911f727f3c02829211a8ddfccabeb89297877e4198bc1,46826ddfccaac9ca105e39c8a2d015098479624c411b4783ca1a3600daf4e8fa',
  *    voteSubmissionId: 6
-    }
+ * }
  * ```
-
  */
 export type Receipt = {
-  previousBoardHash: HashValue;
-  boardHash: HashValue;
-  registeredAt: DateTimeStamp;
-  serverSignature: Signature;
+  previousBoardHash: string;
+  boardHash: string;
+  registeredAt: string;
+  serverSignature: string;
+  voteSubmissionId: number;
 };
 
 /**
