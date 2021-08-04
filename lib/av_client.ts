@@ -19,7 +19,7 @@ import validateAuthorizationToken from "./av_client/validate_authorization_token
  * * {@link AVClient.finalizeAuthorization | finalizeAuthorization}
  * * {@link AVClient.encryptBallot | encryptBallot}
  * * {@link AVClient.startBenalohChallenge | startBenalohChallenge}
- * * {@link AVClient.signAndSubmitEncryptedVotes | signAndSubmitEncryptedVotes}
+ * * {@link AVClient.submitEncryptedBallot | submitEncryptedBallot}
  */
 
 export class AVClient {
@@ -249,7 +249,7 @@ export class AVClient {
       }
    * ```
    */
-  async signAndSubmitEncryptedVotes(affidavit: string): Promise<Receipt> {
+  async submitEncryptedBallot(affidavit: string): Promise<Receipt> {
     const voterIdentifier = this.voterIdentifier
     const electionId = this.electionId()
     const voteEncryptions = this.voteEncryptions

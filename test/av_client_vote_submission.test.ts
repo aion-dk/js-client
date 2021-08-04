@@ -47,7 +47,7 @@ describe('AVClient#voteSubmission', function() {
 
       await client.authenticateWithCodes(validCodes);
       await client.encryptBallot(cvr);
-      const voteReceipt = await client.signAndSubmitEncryptedVotes(affidavit);
+      const voteReceipt = await client.submitEncryptedBallot(affidavit);
       expect(voteReceipt).to.eql({
         previousBoardHash: 'd8d9742271592d1b212bbd4cbbbe357aef8e00cdbdf312df95e9cf9a1a921465',
         boardHash: '5a9175c2b3617298d78be7d0244a68f34bc8b2a37061bb4d3fdf97edc1424098',
@@ -86,7 +86,7 @@ describe('AVClient#voteSubmission', function() {
       // vote only on ballot 1
       delete client.voteEncryptions['2']
 
-      return await client.signAndSubmitEncryptedVotes(affidavit).then(
+      return await client.submitEncryptedBallot(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Ballot ids do not correspond.')
       )
@@ -106,7 +106,7 @@ describe('AVClient#voteSubmission', function() {
         publicKey: keyPair.public_key
       }
 
-      return await client.signAndSubmitEncryptedVotes(affidavit).then(
+      return await client.submitEncryptedBallot(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Digital signature did not validate.')
       )
@@ -122,7 +122,7 @@ describe('AVClient#voteSubmission', function() {
       // change the voter identifier
       client.voterIdentifier = 'corrupt identifier';
 
-      return await client.signAndSubmitEncryptedVotes(affidavit).then(
+      return await client.submitEncryptedBallot(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Content hash does not correspond.')
       )
@@ -140,7 +140,7 @@ describe('AVClient#voteSubmission', function() {
       const newRandomness = Crypto.addBigNums(randomness, randomness)
       client.voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(newRandomness)
 
-      return await client.signAndSubmitEncryptedVotes(affidavit).then(
+      return await client.submitEncryptedBallot(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Proof of correct encryption failed for ballot #1.')
       )
