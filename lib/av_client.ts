@@ -10,16 +10,25 @@ import { randomKeyPair} from "./av_client/generate_key_pair";
 import validateAuthorizationToken from "./av_client/validate_authorization_token";
 
 /**
- * Assembly Voting Client API.
+ * # Assembly Voting Client API.
  *
- * Expected sequence of methods being executed, when authorization happens through OTPs:
- * * {@link AVClient.getAuthorizationMethod | getAuthorizationMethod}
- * * {@link AVClient.ensureAuthorization | ensureAuthorization}
- * * {@link AVClient.getNumberOfOTPs | getNumberOfOTPs}
- * * {@link AVClient.finalizeAuthorization | finalizeAuthorization}
- * * {@link AVClient.encryptBallot | encryptBallot}
- * * {@link AVClient.startBenalohChallenge | startBenalohChallenge}
- * * {@link AVClient.submitEncryptedBallot | submitEncryptedBallot}
+ * The API is responsible for handling all the cryptographic operations and all network communication with:
+ * * the Digital Ballot Box
+ * * the Voter Authorization Coordinator service
+ * * the OTP providers
+ *
+ * Expected sequence of methods being executed, when authorization happens successfully through OTPs:
+ * * {@link AVClient.getAuthorizationMethod | getAuthorizationMethod}, that returns the next step needed to get
+ * the voter authorized to vote.
+ * * {@link AVClient.ensureAuthorization | ensureAuthorization}, that initiates the authorization process, in
+ * case voter has not authorized yet.
+ * * {@link AVClient.getNumberOfOTPs | getNumberOfOTPs}, that returns the number of OTP codes required for
+ * authorization.
+ * * {@link AVClient.finalizeAuthorization | finalizeAuthorization}, that gets the voter authorized to vote.
+ * * {@link AVClient.encryptBallot | encryptBallot}, that encrypts the voter's ballot.
+ * * {@link AVClient.startBenalohChallenge | startBenalohChallenge}, that initiates the process of testing the
+ * ballot encryption. This is optional.
+ * * {@link AVClient.submitEncryptedBallot | submitEncryptedBallot}, that finalizes the voting process.
  */
 
 export class AVClient {
