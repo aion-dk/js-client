@@ -19,7 +19,7 @@ npm run tdd
 To generate HTML documentation for external usage:
 
 ```
-npx typedoc --excludeInternal --plugin none --out html_docs
+npx typedoc --plugin none --out html_docs
 ```
 
 ## Sequence, everything works, voter does not test encryption
