@@ -1,11 +1,11 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './av_client_test_helpers';
+import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
-describe('AVClient#benalohChallenge', function() {
+describe('AVClient#startBenalohChallenge', function() {
   let client;
   let sandbox;
 
