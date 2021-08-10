@@ -11,10 +11,9 @@ export default class ElectionConfig {
         (response) => {
           let configData = response.data;
           configData.voterAuthorizationCoordinatorURL = 'http://localhost:1234';
-          configData.OTPProviderCount = 2;
+          configData.OTPProviderCount = 1;
           configData.OTPProviderURLs = [
             'http://localhost:1111',
-            'http://localhost:2222'
           ]
           return configData;
         },

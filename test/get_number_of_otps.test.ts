@@ -20,7 +20,7 @@ describe('AVClient#getNumberOfOTPs', function() {
     });
 
     it('returns number of OTPs', async function() {
-      expect(await client.getNumberOfOTPs()).to.equal(2);
+      expect(await client.getNumberOfOTPs()).to.equal(1);
     });
   });
 
