@@ -2,6 +2,8 @@
   "entryPoints": ["lib/av_client.ts"],
   "out": "docs",
   "excludePrivate": true,
+  "excludeInternal": true,
   "disableSources": true,
-  "hideGenerator": true
+  "hideGenerator": true,
+  "sort": "source-order"
 }

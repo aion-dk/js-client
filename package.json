@@ -1,6 +1,6 @@
 {
   "name": "@aion-dk/js-client",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Assembly Voting JS client",
   "main": "dist/lib/av_client.js",
   "types": "dist/lib/av_client.d.ts",
@@ -8,6 +8,7 @@
     "test": "mocha --require ts-node/register --extension ts ./test/*.test.ts",
     "tdd": "mocha --require ts-node/register ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
     "docs": "typedoc",
+    "html_docs": "typedoc --plugin none --out html_docs",
     "prepublish": "tsc && typedoc"
   },
   "dependencies": {

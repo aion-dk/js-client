@@ -5,7 +5,7 @@ import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOf
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
-describe('AVClient#startBenalohChallenge', function() {
+describe('AVClient#spoilBallotCryptograms', function() {
   let client;
   let sandbox;
 
@@ -40,8 +40,8 @@ describe('AVClient#startBenalohChallenge', function() {
       const cvr = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptBallot(cvr);
-      const serverRandomizers = await client.startBenalohChallenge();
+      await client.constructBallotCryptograms(cvr);
+      const serverRandomizers = await client.spoilBallotCryptograms();
       expect(serverRandomizers).to.eql({
         '1': '12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031',
         '2': '1415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f30313233'
@@ -62,12 +62,12 @@ describe('AVClient#startBenalohChallenge', function() {
       const cvr = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptBallot(cvr);
+      await client.constructBallotCryptograms(cvr);
     });
 
     it('returns an error message when there is a network error', async function() {
       nock('http://localhost:3000/').post('/test/app/get_randomizers').reply(404);
-      return await client.startBenalohChallenge().then(
+      return await client.spoilBallotCryptograms().then(
         () => expect.fail('Expected a rejected promise'),
         (error) => expect(error.message).to.equal('Request failed with status code 404')
       );
@@ -75,7 +75,7 @@ describe('AVClient#startBenalohChallenge', function() {
 
     it('returns an error message when there is a server error', async function() {
       nock('http://localhost:3000/').post('/test/app/get_randomizers').reply(500, { nonsense: 'garbage' });
-      return await client.startBenalohChallenge().then(
+      return await client.spoilBallotCryptograms().then(
         () => expect.fail('Expected a rejected promise'),
         (error) => expect(error.message).to.equal('Request failed with status code 500')
       );
@@ -104,12 +104,12 @@ describe('AVClient#startBenalohChallenge', function() {
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_2.json');
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptBallot(cvr);
-      await client.startBenalohChallenge();
+      await client.constructBallotCryptograms(cvr);
+      await client.spoilBallotCryptograms();
 
       const affidavit = 'fake affidavit data';
 
-      return await client.submitEncryptedBallot(affidavit).then(
+      return await client.submitBallotCryptograms(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Could not get latest board hash')
       )
