@@ -14,33 +14,11 @@
 
 ### Type aliases
 
-- [Affidavit](modules.md#affidavit)
-- [CastVoteRecord](modules.md#castvoterecord)
 - [Receipt](modules.md#receipt)
+- [CastVoteRecord](modules.md#castvoterecord)
+- [Affidavit](modules.md#affidavit)
 
 ## Type aliases
-
-### Affidavit
-
-Ƭ **Affidavit**: `string`
-
-For now, we assume it is just a string.
-
-___
-
-### CastVoteRecord
-
-Ƭ **CastVoteRecord**: [`ContestIndexed`](interfaces/contestindexed.md)<`string`\>
-
-Example of a cvr:
-```javascript
-{
-   '1': 'option1',
-   '2': 'optiona'
-}
-```
-
-___
 
 ### Receipt
 
@@ -61,8 +39,30 @@ Example of a receipt:
 
 | Name | Type |
 | :------ | :------ |
-| `boardHash` | `string` |
 | `previousBoardHash` | `string` |
+| `boardHash` | `string` |
 | `registeredAt` | `string` |
 | `serverSignature` | `string` |
 | `voteSubmissionId` | `number` |
+
+___
+
+### CastVoteRecord
+
+Ƭ **CastVoteRecord**: [`ContestIndexed`](interfaces/contestindexed.md)<`string`\>
+
+Example of a cvr:
+```javascript
+{
+   '1': 'option1',
+   '2': 'optiona'
+}
+```
+
+___
+
+### Affidavit
+
+Ƭ **Affidavit**: `string`
+
+For now, we assume it is just a string.

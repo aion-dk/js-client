@@ -7,20 +7,18 @@
 The API is responsible for handling all the cryptographic operations and all network communication with:
 * the Digital Ballot Box
 * the Voter Authorization Coordinator service
-* the OTP providers
+* the OTP provider(s)
 
-Expected sequence of methods being executed, when authorization happens successfully through OTPs:
-* [getAuthorizationMethod](avclient.md#getauthorizationmethod), that returns the next step needed to get
-the voter authorized to vote.
-* [ensureAuthorization](avclient.md#ensureauthorization), that initiates the authorization process, in
-case voter has not authorized yet.
-* [getNumberOfOTPs](avclient.md#getnumberofotps), that returns the number of OTP codes required for
-authorization.
-* [finalizeAuthorization](avclient.md#finalizeauthorization), that gets the voter authorized to vote.
-* [encryptBallot](avclient.md#encryptballot), that encrypts the voter's ballot.
-* [startBenalohChallenge](avclient.md#startbenalohchallenge), that initiates the process of testing the
-ballot encryption. This is optional.
-* [submitEncryptedBallot](avclient.md#submitencryptedballot), that finalizes the voting process.
+### Expected sequence of methods being executed
+
+|Method                                                                    | Description |
+-------------------------------------------------------------------------- | ---
+|[requestAccessCode](avclient.md#requestaccesscode)                   | Initiates the authorization process, in case voter has not authorized yet. Requests access code to be sent to voter email |
+|[validateAccessCode](avclient.md#validateaccesscode)                 | Gets voter authorized to vote. |
+|[constructBallotCryptograms](avclient.md#constructballotcryptograms) | Constructs voter ballot cryptograms. |
+|[spoilBallotCryptograms](avclient.md#spoilballotcryptograms)         | Optional. Initiates process of testing the ballot encryption. |
+|[submitBallotCryptograms](avclient.md#submitballotcryptograms)       | Finalizes the voting process. |
+|[purgeData](avclient.md#purgedata)                                   | Optional. Explicitly purges internal data. |
 
 ## Table of contents
 
@@ -30,14 +28,12 @@ ballot encryption. This is optional.
 
 ### Methods
 
-- [authenticateWithCodes](avclient.md#authenticatewithcodes)
-- [encryptBallot](avclient.md#encryptballot)
-- [ensureAuthorization](avclient.md#ensureauthorization)
-- [finalizeAuthorization](avclient.md#finalizeauthorization)
-- [getAuthorizationMethod](avclient.md#getauthorizationmethod)
-- [getNumberOfOTPs](avclient.md#getnumberofotps)
-- [startBenalohChallenge](avclient.md#startbenalohchallenge)
-- [submitEncryptedBallot](avclient.md#submitencryptedballot)
+- [requestAccessCode](avclient.md#requestaccesscode)
+- [validateAccessCode](avclient.md#validateaccesscode)
+- [constructBallotCryptograms](avclient.md#constructballotcryptograms)
+- [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
+- [submitBallotCryptograms](avclient.md#submitballotcryptograms)
+- [purgeData](avclient.md#purgedata)
 
 ## Constructors
 
@@ -53,31 +49,63 @@ ballot encryption. This is optional.
 
 ## Methods
 
-### authenticateWithCodes
+### requestAccessCode
 
-▸ **authenticateWithCodes**(`codes`): `Promise`<`string`\>
+▸ **requestAccessCode**(`personalIdentificationInformation`): `Promise`<`string`\>
 
-Should only be used when election authorization mode is 'election codes'.
+Should be called when a voter chooses digital vote submission (instead of mail-in).
 
-Authenticates or rejects voter, based on their submitted election codes.
+Will attempt to get backend services to send an access code (one time password, OTP) to voter's email address.
+
+Should be followed by [validateAccessCode](avclient.md#validateaccesscode) to submit access code for validation.
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `codes` | `string`[] | Array of election code strings. |
+| `personalIdentificationInformation` | `string` | TODO: needs better specification. |
 
 #### Returns
 
 `Promise`<`string`\>
 
-Returns 'Success' if authentication succeeded.
+If voter has not yet authorized with an access code, it will return `'Unauthorized'`.<br>
+If voter has already authorized, then returns `'Authorized'`.
 
 ___
 
-### encryptBallot
+### validateAccessCode
 
-▸ **encryptBallot**(`cvr`): `Promise`<`string`\>
+▸ **validateAccessCode**(`code`): `Promise`<`string`\>
+
+Should be called after [requestAccessCode](avclient.md#requestaccesscode).
+
+Takes an access code (OTP) that voter received, uses it to authorize to submit votes.
+
+Internally, generates a private/public key pair, then attempts to authorize the public
+key with each OTP provider.
+
+Should be followed by [constructBallotCryptograms](avclient.md#constructballotcryptograms).
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `code` | `string` \| `string`[] |
+
+#### Returns
+
+`Promise`<`string`\>
+
+Returns `'Success'` if authorization succeeded.
+
+___
+
+### constructBallotCryptograms
+
+▸ **constructBallotCryptograms**(`cvr`): `Promise`<`string`\>
+
+Should be called after [validateAccessCode](avclient.md#validateaccesscode).
 
 Encrypts a cast-vote-record (CVR) and generates vote cryptograms.
 
@@ -85,137 +113,59 @@ Example:
 ```javascript
 const client = new AVClient(url);
 const cvr = { '1': 'option1', '2': 'optiona' };
-const fingerprint = await client.encryptBallot(cvr);
+const fingerprint = await client.constructBallotCryptograms(cvr);
 ```
 
 Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
-values internal to the AV election config. This needs further refinement 🧐.
+values internal to the AV election config.
+
+Should be followed by either [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
+or [submitBallotCryptograms](avclient.md#submitballotcryptograms).
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `cvr` | [`CastVoteRecord`](../modules.md#castvoterecord) | Object containing the selections for each contest. |
+| `cvr` | [`CastVoteRecord`](../modules.md#castvoterecord) | Object containing the selections for each contest.<br>TODO: needs better specification. |
 
 #### Returns
 
 `Promise`<`string`\>
 
-Returns fingerprint of the cryptograms.
+Returns fingerprint of the cryptograms. Example:
+```javascript
+'5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
+```
 
 ___
 
-### ensureAuthorization
+### spoilBallotCryptograms
 
-▸ **ensureAuthorization**(`personalIdentificationInformation`): `Promise`<`string`\>
+▸ **spoilBallotCryptograms**(): `Promise`<[`ContestIndexed`](../interfaces/contestindexed.md)<`string`\>\>
 
-This should be called when a voter chooses digital vote submission (instead of mail-in).
+Should be called when voter chooses to test the encryption of their ballot.
 
-This will send a pre-configured number of one time passwords (OTPs) to voter's email address,
-unless the voter has already successfully finished submitting OTPs.
-
-This should be followed by
-* [getNumberOfOTPs](avclient.md#getnumberofotps) to provide the required number of fields for
-the voter to submit OTPs.
-* [finalizeAuthorization](avclient.md#finalizeauthorization) to authorize with the submitted OTPs.
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `personalIdentificationInformation` | `string` | We don't know yet what this will be 😉. |
-
-#### Returns
-
-`Promise`<`string`\>
-
-If voter has not yet authorized with OTPs, it will return 'Unauthorized'.<br>
-If voter has already authorized, then returns 'Authorized'.
-
-___
-
-### finalizeAuthorization
-
-▸ **finalizeAuthorization**(`otpCodes`): `Promise`<`string`\>
-
-This should be called after [ensureAuthorization](avclient.md#ensureauthorization).
-Takes the OTPs that voter received, uses them to authorize to submit votes.
-
-Internally, generates a private/public key pair, then attempts to authorize the public
-key with each OTP provider.
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `otpCodes` | `string`[] |
-
-#### Returns
-
-`Promise`<`string`\>
-
-Returns 'Success' if authorization succeeded.
-
-___
-
-### getAuthorizationMethod
-
-▸ **getAuthorizationMethod**(): `Object`
-
-Returns voter authorization mode from the election configuration.
-
-#### Returns
-
-`Object`
-
-Returns an object with the method name, and the reference to the function.
-Available method names are
-* [authenticateWithCodes](avclient.md#authenticatewithcodes) for authentication via election codes.
-* [ensureAuthorization](avclient.md#ensureauthorization) for authorization via OTPs.
-
-| Name | Type |
-| :------ | :------ |
-| `method` | `Function` |
-| `methodName` | `string` |
-
-___
-
-### getNumberOfOTPs
-
-▸ **getNumberOfOTPs**(): `Promise`<`number`\>
-
-Returns number of one time passwords (OTPs) that voter should enter to authorize.
-Number comes from election config on the bulletin board.
-
-#### Returns
-
-`Promise`<`number`\>
-
-Number of OTPs.
-
-___
-
-### startBenalohChallenge
-
-▸ **startBenalohChallenge**(): `Promise`<[`ContestIndexed`](../interfaces/contestindexed.md)<`string`\>\>
-
-This should be called when the voter chooses to test the encryption of their ballot.
-
-The exact process is in development.
+TODO: exact process needs specification.
 
 #### Returns
 
 `Promise`<[`ContestIndexed`](../interfaces/contestindexed.md)<`string`\>\>
 
-Returns a list of randomizers, that the digital ballot box generates.
+Returns an index, where keys are contest ids, and values are randomizers, that the digital ballot box generates. Example:
+```javascript
+{
+  '1': '12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031',
+  '2': '1415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f30313233'
+}
+```
 
 ___
 
-### submitEncryptedBallot
+### submitBallotCryptograms
 
-▸ **submitEncryptedBallot**(`affidavit`): `Promise`<[`Receipt`](../modules.md#receipt)\>
+▸ **submitBallotCryptograms**(`affidavit`): `Promise`<[`Receipt`](../modules.md#receipt)\>
 
-This should be the last call in the entire voting process.
+Should be the last call in the entire voting process.
 
 Submits encrypted ballot and the affidavit to the digital ballot box.
 
@@ -223,7 +173,7 @@ Submits encrypted ballot and the affidavit to the digital ballot box.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `affidavit` | `string` | The affidavit document. Clarification of the affidavit format is still needed. |
+| `affidavit` | `string` | The affidavit document.<br>TODO: clarification of the affidavit format is still needed. |
 
 #### Returns
 
@@ -239,3 +189,15 @@ Returns the vote receipt. Example of a receipt:
    voteSubmissionId: 6
 }
 ```
+
+___
+
+### purgeData
+
+▸ **purgeData**(): `void`
+
+Purges internal data.
+
+#### Returns
+
+`void`
