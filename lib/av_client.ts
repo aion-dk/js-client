@@ -175,6 +175,13 @@ export class AVClient {
     const tokens = await Promise.all(requests);
     if (tokens.every(validateAuthorizationToken)) {
       this.authorizationTokens = tokens;
+
+      // TODO: properly authenticate with AVX.
+      // Expected side-effects:
+      // this.emptyCryptograms is set
+      // this.voterIdentifier is set
+      await this.authenticateWithCodes(['aAjEuD64Fo2143']);
+
       return 'Success';
     } else {
       return Promise.reject('Failure, not all tokens were valid');
@@ -220,7 +227,6 @@ export class AVClient {
     if (!valid_contest_selections) {
       throw new Error('Corrupt CVR: Contains invalid option');
     }
-
 
     const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].cryptogram ]))
     const contestEncodingTypes = Object.fromEntries(Object.keys(cvr).map((contestId) => {
