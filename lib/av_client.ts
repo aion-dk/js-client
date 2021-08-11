@@ -15,20 +15,18 @@ import validateAuthorizationToken from "./av_client/validate_authorization_token
  * The API is responsible for handling all the cryptographic operations and all network communication with:
  * * the Digital Ballot Box
  * * the Voter Authorization Coordinator service
- * * the OTP providers
+ * * the OTP provider(s)
  *
- * Expected sequence of methods being executed, when authorization happens successfully through OTPs:
- * * {@link AVClient.getAuthorizationMethod | getAuthorizationMethod}, that returns the next step needed to get
- * the voter authorized to vote.
- * * {@link AVClient.ensureAuthorization | ensureAuthorization}, that initiates the authorization process, in
- * case voter has not authorized yet.
- * * {@link AVClient.getNumberOfOTPs | getNumberOfOTPs}, that returns the number of OTP codes required for
- * authorization.
- * * {@link AVClient.finalizeAuthorization | finalizeAuthorization}, that gets the voter authorized to vote.
- * * {@link AVClient.encryptBallot | encryptBallot}, that encrypts the voter's ballot.
- * * {@link AVClient.startBenalohChallenge | startBenalohChallenge}, that initiates the process of testing the
- * ballot encryption. This is optional.
- * * {@link AVClient.submitEncryptedBallot | submitEncryptedBallot}, that finalizes the voting process.
+ * ### Expected sequence of methods being executed
+ *
+ * |Method                                                                    | Description |
+ * -------------------------------------------------------------------------- | ---
+ * |{@link AVClient.requestAccessCode | requestAccessCode}                   | Initiates the authorization process, in case voter has not authorized yet. Requests access code to be sent to voter email |
+ * |{@link AVClient.validateAccessCode | validateAccessCode}                 | Gets voter authorized to vote. |
+ * |{@link AVClient.constructBallotCryptograms | constructBallotCryptograms} | Constructs voter ballot cryptograms. |
+ * |{@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}         | Optional. Initiates process of testing the ballot encryption. |
+ * |{@link AVClient.submitBallotCryptograms | submitBallotCryptograms}       | Finalizes the voting process. |
+ * |{@link AVClient.purgeData | purgeData}                                   | Optional. Explicitly purges internal data. |
  */
 
 export class AVClient {
@@ -51,10 +49,11 @@ export class AVClient {
   /**
    * Returns voter authorization mode from the election configuration.
    *
+   * @internal
    * @returns Returns an object with the method name, and the reference to the function.
    * Available method names are
    * * {@link AVClient.authenticateWithCodes | authenticateWithCodes} for authentication via election codes.
-   * * {@link AVClient.ensureAuthorization | ensureAuthorization} for authorization via OTPs.
+   * * {@link AVClient.requestAccessCode | requestAccessCode} for authorization via OTPs.
    */
   getAuthorizationMethod(): { methodName: string; method: Function } {
     if (!this.electionConfig) {
@@ -70,8 +69,8 @@ export class AVClient {
         break;
       case 'otps':
         return {
-          methodName: 'ensureAuthorization',
-          method: this.ensureAuthorization
+          methodName: 'requestAccessCode',
+          method: this.requestAccessCode
         }
         break;
       default:
@@ -84,7 +83,8 @@ export class AVClient {
    *
    * Authenticates or rejects voter, based on their submitted election codes.
    *
-   * @param codes Array of election code strings.
+   * @internal
+   * @param   codes Array of election code strings.
    * @returns Returns 'Success' if authentication succeeded.
    */
   async authenticateWithCodes(codes: string[]): Promise<string> {
@@ -100,21 +100,17 @@ export class AVClient {
   }
 
   /**
-   * This should be called when a voter chooses digital vote submission (instead of mail-in).
+   * Should be called when a voter chooses digital vote submission (instead of mail-in).
    *
-   * This will send a pre-configured number of one time passwords (OTPs) to voter's email address,
-   * unless the voter has already successfully finished submitting OTPs.
+   * Will attempt to get backend services to send an access code (one time password, OTP) to voter's email address.
    *
-   * This should be followed by
-   * * {@link AVClient.getNumberOfOTPs | getNumberOfOTPs} to provide the required number of fields for
-   * the voter to submit OTPs.
-   * * {@link AVClient.finalizeAuthorization | finalizeAuthorization} to authorize with the submitted OTPs.
+   * Should be followed by {@link AVClient.validateAccessCode | validateAccessCode} to submit access code for validation.
    *
-   * @param {string} personalIdentificationInformation We don't know yet what this will be 😉.
-   * @returns If voter has not yet authorized with OTPs, it will return 'Unauthorized'.<br>
-   * If voter has already authorized, then returns 'Authorized'.
+   * @param   personalIdentificationInformation TODO: needs better specification.
+   * @returns If voter has not yet authorized with an access code, it will return `'Unauthorized'`.<br>
+   * If voter has already authorized, then returns `'Authorized'`.
    */
-  async ensureAuthorization(personalIdentificationInformation: string): Promise<string> {
+  async requestAccessCode(personalIdentificationInformation: string): Promise<string> {
     if (await this.hasAuthorizedPublicKey()) {
       return 'Authorized';
     } else {
@@ -127,6 +123,7 @@ export class AVClient {
    * Returns number of one time passwords (OTPs) that voter should enter to authorize.
    * Number comes from election config on the bulletin board.
    *
+   * @internal
    * @returns Number of OTPs.
    */
   async getNumberOfOTPs(): Promise<number> {
@@ -136,17 +133,28 @@ export class AVClient {
   }
 
   /**
-   * This should be called after {@link AVClient.ensureAuthorization | ensureAuthorization}.
-   * Takes the OTPs that voter received, uses them to authorize to submit votes.
+   * Should be called after {@link AVClient.requestAccessCode | requestAccessCode}.
+   *
+   * Takes an access code (OTP) that voter received, uses it to authorize to submit votes.
    *
    * Internally, generates a private/public key pair, then attempts to authorize the public
    * key with each OTP provider.
    *
-   * @param {string[]} An array of OTPs as strings.
-   * @returns Returns 'Success' if authorization succeeded.
+   * Should be followed by {@link AVClient.constructBallotCryptograms | constructBallotCryptograms}.
+   *
+   * @param   An access code string.
+   * @returns Returns `'Success'` if authorization succeeded.
    */
-  async finalizeAuthorization(otpCodes: string[]): Promise<string> {
+  async validateAccessCode(code: (string|string[])): Promise<string> {
     await this.updateElectionConfig();
+
+    let otpCodes;
+
+    if (typeof code === 'string') {
+      otpCodes = [code];
+    } else {
+      otpCodes = code;
+    }
 
     if (otpCodes.length != this.electionConfig.OTPProviderCount) {
       throw new Error('Wrong number of OTPs submitted');
@@ -174,22 +182,30 @@ export class AVClient {
   }
 
   /**
+   * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
+   *
    * Encrypts a cast-vote-record (CVR) and generates vote cryptograms.
    *
    * Example:
    * ```javascript
    * const client = new AVClient(url);
    * const cvr = { '1': 'option1', '2': 'optiona' };
-   * const fingerprint = await client.encryptBallot(cvr);
+   * const fingerprint = await client.constructBallotCryptograms(cvr);
    * ```
    *
    * Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
-   * values internal to the AV election config. This needs further refinement 🧐.
+   * values internal to the AV election config.
    *
-   * @param  cvr Object containing the selections for each contest.
-   * @returns Returns fingerprint of the cryptograms.
+   * Should be followed by either {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}
+   * or {@link AVClient.submitBallotCryptograms | submitBallotCryptograms}.
+   *
+   * @param   cvr Object containing the selections for each contest.<br>TODO: needs better specification.
+   * @returns Returns fingerprint of the cryptograms. Example:
+   * ```javascript
+   * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
+   * ```
    */
-  async encryptBallot(cvr: CastVoteRecord): Promise<string> {
+  async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
     await this.updateElectionConfig();
 
     if (JSON.stringify(Object.keys(cvr)) !== JSON.stringify(this.contestIds())) {
@@ -225,22 +241,30 @@ export class AVClient {
   }
 
   /**
-   * This should be called when the voter chooses to test the encryption of their ballot.
+   * Should be called when voter chooses to test the encryption of their ballot.
    *
-   * The exact process is in development.
+   * TODO: exact process needs specification.
    *
-   * @returns Returns a list of randomizers, that the digital ballot box generates.
+   * @returns Returns an index, where keys are contest ids, and values are randomizers, that the digital ballot box generates. Example:
+   * ```javascript
+   * {
+   *   '1': '12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031',
+   *   '2': '1415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f30313233'
+   * }
+   * ```
    */
-  async startBenalohChallenge(): Promise<ContestIndexed<string>> {
+  async spoilBallotCryptograms(): Promise<ContestIndexed<string>> {
     return await new BenalohChallenge(this.bulletinBoard).getServerRandomizers()
   }
 
   /**
-   * This should be the last call in the entire voting process.
+   * Should be the last call in the entire voting process.
    *
    * Submits encrypted ballot and the affidavit to the digital ballot box.
+
    *
-   * @param affidavit The affidavit document. Clarification of the affidavit format is still needed.
+   *
+   * @param  affidavit The affidavit document.<br>TODO: clarification of the affidavit format is still needed.
    * @return Returns the vote receipt. Example of a receipt:
    * ```javascript
    * {
@@ -252,7 +276,7 @@ export class AVClient {
       }
    * ```
    */
-  async submitEncryptedBallot(affidavit: Affidavit): Promise<Receipt> {
+  async submitBallotCryptograms(affidavit: Affidavit): Promise<Receipt> {
     const voterIdentifier = this.voterIdentifier
     const electionId = this.electionId()
     const voteEncryptions = this.voteEncryptions
@@ -268,6 +292,14 @@ export class AVClient {
         signatureKey,
         affidavit
     });
+  }
+
+  /**
+   * Purges internal data.
+   */
+  purgeData(): void {
+    // TODO: implement me
+    return
   }
 
   /**
@@ -296,7 +328,7 @@ export class AVClient {
   /**
    * Takes PII, sends it to Voter Authorization Coordinator Service, for it
    * to initiate Voter Authorizers to send out OTPs to the voter.
-   * @param {string} personalIdentificationInformation We don't know what this will be yet.
+   * @param personalIdentificationInformation We don't know what this will be yet.
    */
   private async requestOTPs(personalIdentificationInformation: string): Promise<any> {
     await this.updateElectionConfig();

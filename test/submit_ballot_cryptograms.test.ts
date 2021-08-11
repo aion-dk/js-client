@@ -6,7 +6,7 @@ import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 const Crypto = require('../lib/av_client/aion_crypto.js')()
 
-describe('AVClient#submitEncryptedBallot', function() {
+describe('AVClient#submitBallotCryptograms', function() {
   let client;
   let sandbox;
   let affidavit;
@@ -46,8 +46,8 @@ describe('AVClient#submitEncryptedBallot', function() {
       const cvr = { '1': 'option1', '2': 'optiona' };
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptBallot(cvr);
-      const voteReceipt = await client.submitEncryptedBallot(affidavit);
+      await client.constructBallotCryptograms(cvr);
+      const voteReceipt = await client.submitBallotCryptograms(affidavit);
       expect(voteReceipt).to.eql({
         previousBoardHash: 'd8d9742271592d1b212bbd4cbbbe357aef8e00cdbdf312df95e9cf9a1a921465',
         boardHash: '5a9175c2b3617298d78be7d0244a68f34bc8b2a37061bb4d3fdf97edc1424098',
@@ -81,12 +81,12 @@ describe('AVClient#submitEncryptedBallot', function() {
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_4.json');
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptBallot(cvr);
+      await client.constructBallotCryptograms(cvr);
 
       // vote only on ballot 1
       delete client.voteEncryptions['2']
 
-      return await client.submitEncryptedBallot(affidavit).then(
+      return await client.submitBallotCryptograms(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Ballot ids do not correspond.')
       )
@@ -97,7 +97,7 @@ describe('AVClient#submitEncryptedBallot', function() {
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_5.json');
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptBallot(cvr);
+      await client.constructBallotCryptograms(cvr);
 
       // change voter's key pair
       const keyPair = Crypto.generateKeyPair();
@@ -106,7 +106,7 @@ describe('AVClient#submitEncryptedBallot', function() {
         publicKey: keyPair.public_key
       }
 
-      return await client.submitEncryptedBallot(affidavit).then(
+      return await client.submitBallotCryptograms(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Digital signature did not validate.')
       )
@@ -117,12 +117,12 @@ describe('AVClient#submitEncryptedBallot', function() {
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_6.json');
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptBallot(cvr);
+      await client.constructBallotCryptograms(cvr);
 
       // change the voter identifier
       client.voterIdentifier = 'corrupt identifier';
 
-      return await client.submitEncryptedBallot(affidavit).then(
+      return await client.submitBallotCryptograms(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Content hash does not correspond.')
       )
@@ -133,14 +133,14 @@ describe('AVClient#submitEncryptedBallot', function() {
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_7.json');
 
       await client.authenticateWithCodes(validCodes);
-      await client.encryptBallot(cvr);
+      await client.constructBallotCryptograms(cvr);
 
       // change the proof of ballot 1
       const randomness = client.voteEncryptions['1'].randomness
       const newRandomness = Crypto.addBigNums(randomness, randomness)
       client.voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(newRandomness)
 
-      return await client.submitEncryptedBallot(affidavit).then(
+      return await client.submitBallotCryptograms(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error).to.equal('Proof of correct encryption failed for ballot #1.')
       )

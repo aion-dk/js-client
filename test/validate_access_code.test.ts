@@ -2,7 +2,7 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
 
-describe('AVClient#finalizeAuthorization', function() {
+describe('AVClient#validateAccessCode', function() {
   let client;
   const expectedNetworkRequests : any[] = [];
 
@@ -28,7 +28,7 @@ describe('AVClient#finalizeAuthorization', function() {
       );
 
       const otps = ['1234', 'abc'];
-      const result = await client.finalizeAuthorization(otps);
+      const result = await client.validateAccessCode(otps);
 
       expect(result).to.equal('Success');
       expectedNetworkRequests.forEach((mock) => mock.done());
@@ -44,7 +44,7 @@ describe('AVClient#finalizeAuthorization', function() {
 
       const otps = ['1234', 'wrong'];
 
-      return client.finalizeAuthorization(otps).then(
+      return client.validateAccessCode(otps).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => expect(error.message).to.equal('Request failed with status code 401')
       )
@@ -57,7 +57,7 @@ describe('AVClient#finalizeAuthorization', function() {
       const otps = ['1234'];
 
       try {
-        await client.finalizeAuthorization(otps);
+        await client.validateAccessCode(otps);
         expect.fail('Expected error to be thrown');
       } catch(error) {
         expect(error.message).to.equal('Wrong number of OTPs submitted');
