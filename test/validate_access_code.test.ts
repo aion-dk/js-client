@@ -23,12 +23,10 @@ describe('AVClient#validateAccessCode', function() {
       expectedNetworkRequests.push(
         nock('http://localhost:1111/').post('/authorize')
           .replyWithFile(200, __dirname + '/replies/otp_provider_authorize.valid.json'),
-        nock('http://localhost:2222/').post('/authorize')
-          .replyWithFile(200, __dirname + '/replies/otp_provider_authorize.valid.json')
       );
 
-      const otps = ['1234', 'abc'];
-      const result = await client.validateAccessCode(otps);
+      const otp = '1234';
+      const result = await client.validateAccessCode(otp);
 
       expect(result).to.equal('Success');
       expectedNetworkRequests.forEach((mock) => mock.done());
@@ -37,12 +35,10 @@ describe('AVClient#validateAccessCode', function() {
     it('fails given invalid otps', async function() {
       expectedNetworkRequests.push(
         nock('http://localhost:1111/').post('/authorize')
-          .replyWithFile(200, __dirname + '/replies/otp_provider_authorize.valid.json'),
-        nock('http://localhost:2222/').post('/authorize')
-          .reply(401)
+          .reply(401) // This is what decides that OTP is invalid
       );
 
-      const otps = ['1234', 'wrong'];
+      const otps = '1234';
 
       return client.validateAccessCode(otps).then(
         () => expect.fail('Expected promise to be rejected'),
@@ -54,7 +50,7 @@ describe('AVClient#validateAccessCode', function() {
 
   context('given wrong number of OTPs', function() {
     it('fails', async function() {
-      const otps = ['1234'];
+      const otps = ['1234', 'abcd'];
 
       try {
         await client.validateAccessCode(otps);

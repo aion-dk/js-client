@@ -25,8 +25,6 @@ describe('AVClient#requestAccessCode', function() {
           .reply(200),
         nock('http://localhost:1111/').post('/authorize')
           .replyWithFile(200, __dirname + '/replies/otp_provider_authorize.valid.json'),
-        nock('http://localhost:2222/').post('/authorize')
-          .replyWithFile(200, __dirname + '/replies/otp_provider_authorize.valid.json')
       );
 
       // Initiate
@@ -34,8 +32,8 @@ describe('AVClient#requestAccessCode', function() {
       await client.requestAccessCode(pii);
 
       // Finalize
-      const otps = ['1234', 'abc'];
-      await client.validateAccessCode(otps);
+      const otp = '1234';
+      await client.validateAccessCode(otp);
 
       // Initiating again will just return `true`
       const result = await client.requestAccessCode(pii);
