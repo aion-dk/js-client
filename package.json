@@ -5,8 +5,9 @@
   "main": "dist/lib/av_client.js",
   "types": "dist/lib/av_client.d.ts",
   "scripts": {
-    "test": "mocha --require ts-node/register --extension ts ./test/*.test.ts",
-    "tdd": "mocha --require ts-node/register ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
+    "test": "mocha --require ts-node/register/transpile-only --require source-map-support/register --recursive --extension ts ./test/*.test.ts",
+    "coverage": "tsc && nyc --reporter=text npm run test",
+    "tdd": "mocha --require ts-node/register/transpile-only --require source-map-support/register --extension ts ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
     "docs": "typedoc",
     "html_docs": "typedoc --plugin none --out html_docs",
     "prepublish": "tsc && typedoc"
@@ -15,6 +16,7 @@
     "axios": "^0.21.1"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.20",
     "@types/mocha": "^8.2.3",
     "@types/node": "^16.0.0",
@@ -23,6 +25,7 @@
     "nock": "^13.1.1",
     "nyc": "^15.1.0",
     "sinon": "^11.1.1",
+    "source-map-support": "^0.5.19",
     "ts-node": "^10.0.0",
     "typedoc": "^0.21.2",
     "typedoc-plugin-markdown": "^3.10.2",
