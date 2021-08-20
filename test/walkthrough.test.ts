@@ -28,6 +28,8 @@ describe('entire voter flow using OTP authorization', function() {
     expectedNetworkRequests.push(nock('http://localhost:1111/').post('/authorize')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json'));
 
+    expectedNetworkRequests.push(nock('http://localhost:3000/').post('/test/app/register')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_register.json'));
     expectedNetworkRequests.push(nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json'));
     expectedNetworkRequests.push(nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
