@@ -23,6 +23,7 @@ export default class RegisterVoter {
         this.client.bulletinBoard.setVoterSessionUuid(data.voterSessionUuid);
         this.client.voterIdentifier = data.voterIdentifier;
         this.client.emptyCryptograms = data.emptyCryptograms;
+        this.client.electionConfig.ballots = data.ballots;
       }
     )
     randomKeyPair(); // TODO: remove, this just increases deterministic randomness offset for tests

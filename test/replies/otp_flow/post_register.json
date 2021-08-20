@@ -15,5 +15,95 @@
       "commitment": "030142deb975f1f884e115b3ef0a8f90147fba2a3187817811c44171a364e9eaf2"
     }
   },
-  "signInWarning": null
+  "signInWarning": null,
+  "ballots": [
+    {
+      "id": 1,
+      "type": "BallotNormal",
+      "vote_encoding_type": 1,
+      "submission_helper": true,
+      "blank_option": "active_choice",
+      "title": {
+        "en": "First ballot"
+      },
+      "description": {},
+      "options": [
+        {
+          "id": 1,
+          "handle": "option1",
+          "title": {
+            "en": "Option 1"
+          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
+          "image": null
+        },
+        {
+          "id": 2,
+          "handle": "option2",
+          "title": {
+            "en": "Option 2"
+          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
+          "image": null
+        }
+      ],
+      "write_in": false
+    },
+    {
+      "id": 2,
+      "type": "BallotNormal",
+      "vote_encoding_type": 1,
+      "submission_helper": true,
+      "blank_option": "active_choice",
+      "title": {
+        "en": "Second ballot"
+      },
+      "description": {},
+      "options": [
+        {
+          "id": 3,
+          "handle": "optiona",
+          "title": {
+            "en": "Option A"
+          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
+          "image": null
+        },
+        {
+          "id": 4,
+          "handle": "optionb",
+          "title": {
+            "en": "Option B"
+          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
+          "image": null
+        },
+        {
+          "id": 5,
+          "handle": "optionc",
+          "title": {
+            "en": "Option C"
+          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
+          "image": null
+        }
+      ],
+      "write_in": false
+    }
+  ]
 }
