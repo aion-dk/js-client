@@ -7,9 +7,15 @@ export default class VoterAuthorizationCoordinator {
     this.createBackendClient(baseURL, timeout);
   }
 
-  requestOTPCodesToBeSent(personalIdentificationInformation): Promise<any> {
-    return this.backend.post('initiate', {
+  createSession(personalIdentificationInformation): Promise<any> {
+    return this.backend.post('create_session', {
       personal_identification_information: personalIdentificationInformation
+    });
+  }
+
+  startIdentification(sessionId): Promise<any> {
+    return this.backend.post('start_identification', {
+      session_id: sessionId
     });
   }
 

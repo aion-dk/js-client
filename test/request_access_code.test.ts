@@ -29,65 +29,44 @@ describe('AVClient#requestAccessCode', function() {
     nock.cleanAll();
   });
 
-  context('authorized', function() {
-    it('returns "Authorized"', async function() {
+  context('OTP services work', function() {
+    it('returns "OK"', async function() {
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/initiate')
-          .reply(200),
-        nock('http://localhost:1111/').post('/authorize')
-          .replyWithFile(200, __dirname + '/replies/otp_provider_authorize.valid.json'),
-        nock('http://localhost:3000/').post('/test/app/sign_in')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_sign_in.json'),
-        nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json')
+        nock('http://localhost:1234/').post('/create_session')
+          .reply(200)
       );
-
-      // Initiate
-      const pii = 'pii';
-      await client.requestAccessCode(pii);
-
-      // Finalize
-      const otp = '1234';
-      await client.validateAccessCode(otp);
-
-      // Initiating again will just return `true`
-      const result = await client.requestAccessCode(pii);
-      expect(result).to.equal('Authorized');
-
-      expectedNetworkRequests.forEach((mock) => mock.done());
-    });
-  });
-
-  context('unauthorized, OTP services work', function() {
-    it('returns "Unauthorized"', async function() {
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/initiate')
+        nock('http://localhost:1234/').post('/start_identification')
           .reply(200)
       );
 
       const pii = 'pii';
-      const result = await client.requestAccessCode(pii);
-
-      expect(result).to.equal('Unauthorized')
-
-      expectedNetworkRequests.forEach((mock) => mock.done());
+      return client.requestAccessCode(pii).then(
+        (result) => {
+          expect(result).to.eql('OK');
+          expectedNetworkRequests.forEach((mock) => mock.done());
+        },
+        (error) => {
+          console.error(error);
+          expect.fail('Expected a resolved promise');
+        }
+      );
     });
   });
 
-  context('unauthorized, OTP service is unavailable', function() {
+  context('OTP service is unavailable', function() {
     it('returns an error', async function() {
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/initiate')
+        nock('http://localhost:1234/').post('/create_session')
           .reply(404)
       );
 
       const pii = 'pii';
-
       return await client.requestAccessCode(pii).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => {
-          expectedNetworkRequests.forEach((mock) => mock.done());
           expect(error.message).to.equal('Request failed with status code 404')
+          expectedNetworkRequests.forEach((mock) => mock.done());
         }
       );
     });

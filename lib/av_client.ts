@@ -111,12 +111,19 @@ export class AVClient {
    * If voter has already authorized, then returns `'Authorized'`.
    */
   async requestAccessCode(personalIdentificationInformation: string): Promise<string> {
-    if (await this.hasAuthorizedPublicKey()) {
-      return 'Authorized';
-    } else {
-      return await this.requestOTPs(personalIdentificationInformation)
-        .then((response) => 'Unauthorized');
-    }
+    await this.updateElectionConfig();
+
+    const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
+    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
+
+    return coordinator.createSession(personalIdentificationInformation).then(
+      ({ data }) => {
+        const sessionId = data.sessionId;
+        return coordinator.startIdentification(sessionId).then(
+          (response) => 'OK',
+        );
+      }
+    );
   }
 
   /**
@@ -337,12 +344,7 @@ export class AVClient {
    * @param personalIdentificationInformation We don't know what this will be yet.
    */
   private async requestOTPs(personalIdentificationInformation: string): Promise<any> {
-    await this.updateElectionConfig();
 
-    const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
-    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
-
-    return coordinator.requestOTPCodesToBeSent(personalIdentificationInformation);
   }
 
   private electionId(): number {
