@@ -9,6 +9,7 @@ const Crypto = require('../lib/av_client/aion_crypto.js')()
 
 describe('entire voter flow using OTP authorization', function() {
   let sandbox;
+  let expectedNetworkRequests : any[] = [];
 
   beforeEach(function() {
     sandbox = sinon.createSandbox();
@@ -16,25 +17,23 @@ describe('entire voter flow using OTP authorization', function() {
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
     resetDeterministicOffset();
 
-    nock('http://localhost:3000/').get('/test/app/config')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json');
+    expectedNetworkRequests.push(nock('http://localhost:3000/').get('/test/app/config')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json'));
 
-    nock('http://localhost:1234/').post('/create_session')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
-    nock('http://localhost:1234/').post('/start_identification')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json');
+    expectedNetworkRequests.push(nock('http://localhost:1234/').post('/create_session')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json'));
+    expectedNetworkRequests.push(nock('http://localhost:1234/').post('/start_identification')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json'));
 
-    nock('http://localhost:1111/').post('/authorize')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
+    expectedNetworkRequests.push(nock('http://localhost:1111/').post('/authorize')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json'));
 
-    nock('http://localhost:3000/').post('/test/app/sign_in')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_sign_in.json');
-    nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json');
-    nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_get_latest_board_hash.json');
-    nock('http://localhost:3000/').post('/test/app/submit_votes')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_submit_votes.json');
+    expectedNetworkRequests.push(nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json'));
+    expectedNetworkRequests.push(nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/get_get_latest_board_hash.json'));
+    expectedNetworkRequests.push(nock('http://localhost:3000/').post('/test/app/submit_votes')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_submit_votes.json'));
   });
 
   afterEach(function() {
@@ -46,7 +45,8 @@ describe('entire voter flow using OTP authorization', function() {
     const client = new AVClient('http://localhost:3000/test/app');
 
     await client.requestAccessCode('some PII info').catch((e) => { expect.fail('AVClient#requestAccessCode failed.'); });
-    await client.validateAccessCode('1234').catch((e) => { expect.fail('AVClient#validateAccessCode failed'); });
+    const confirmationToken = await client.validateAccessCode('1234', 'voter@foo.bar').catch((e) => { expect.fail('AVClient#validateAccessCode failed'); });
+    await client.authenticated().catch((e) => { console.error(e); expect.fail('AVClient#authenticated failed'); });
 
     const fingerprint = await client.constructBallotCryptograms({
       '1': 'option1',
@@ -63,5 +63,6 @@ describe('entire voter flow using OTP authorization', function() {
       serverSignature: 'bfaffbaf8778abce29ea98ebc90ca91e091881480e18ef31da815d181cead1f6,8977ad08d4fc3b1d9be311d93cf8e98178142685c5fbbf703abf2188a8d1c862',
       voteSubmissionId: 6
     });
+    expectedNetworkRequests.forEach((mock) => mock.done());
   });
 });

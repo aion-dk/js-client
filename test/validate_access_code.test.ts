@@ -34,16 +34,12 @@ describe('AVClient#validateAccessCode', function() {
       expectedNetworkRequests.push(
         nock('http://localhost:1111/').post('/authorize')
           .replyWithFile(200, __dirname + '/replies/otp_provider_authorize.valid.json'),
-        nock('http://localhost:3000/').post('/test/app/sign_in')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_sign_in.json'),
-        nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json')
       );
 
       const otp = '1234';
       const result = await client.validateAccessCode(otp);
 
-      expect(result).to.equal('Success');
+      expect(result).to.equal('OK');
       expectedNetworkRequests.forEach((mock) => mock.done());
     })
 
