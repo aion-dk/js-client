@@ -333,15 +333,6 @@ export class AVClient {
     }
   }
 
-  /**
-   * Takes PII, sends it to Voter Authorization Coordinator Service, for it
-   * to initiate Voter Authorizers to send out OTPs to the voter.
-   * @param personalIdentificationInformation We don't know what this will be yet.
-   */
-  private async requestOTPs(personalIdentificationInformation: string): Promise<any> {
-
-  }
-
   private electionId(): number {
     return this.electionConfig.election.id;
   }
