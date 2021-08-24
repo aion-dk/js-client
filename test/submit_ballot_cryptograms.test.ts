@@ -6,12 +6,12 @@ import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 const Crypto = require('../lib/av_client/aion_crypto.js')()
 
-describe('AVClient#submitBallotCryptograms', function() {
+describe('AVClient#submitBallotCryptograms', () => {
   let client;
   let sandbox;
   let affidavit;
 
-  beforeEach(function() {
+  beforeEach(() => {
     client = new AVClient('http://localhost:3000/test/app');
 
     sandbox = sinon.createSandbox();
@@ -19,131 +19,89 @@ describe('AVClient#submitBallotCryptograms', function() {
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
     resetDeterministicOffset();
 
-    affidavit = 'some bytes, most likely as binary PDF';
+    nock('http://localhost:3000/').get('/test/app/config')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json');
+
+    nock('http://localhost:1234/').post('/create_session')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
+    nock('http://localhost:1234/').post('/start_identification')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json');
+
+    nock('http://localhost:1111/').post('/authorize')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
+
+    nock('http://localhost:3000/').post('/test/app/register')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_register.json');
+    nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json');
+    nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/get_get_latest_board_hash.json');
+    nock('http://localhost:3000/').post('/test/app/submit_votes')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_submit_votes.json');
   });
 
-  afterEach( function() {
+  afterEach( () => {
     sandbox.restore();
     nock.cleanAll();
   })
 
-  context('given valid values', function() {
-    beforeEach(function() {
-      nock('http://localhost:3000/').get('/test/app/config')
-        .replyWithFile(200, __dirname + '/replies/config.valid.json');
-      nock('http://localhost:3000/').post('/test/app/sign_in')
-        .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
-      nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
-        .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
-      nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
-        .replyWithFile(200, __dirname + '/replies/get_latest_board_hash.valid.json');
-      nock('http://localhost:3000/').post('/test/app/submit_votes')
-        .replyWithFile(200, __dirname + '/replies/submit_votes.valid.json');
-    });
+  context('given valid values', () => {
+    it('successfully submits encrypted votes', async () => {
+      await client.requestAccessCode('some PII info');
+      await client.validateAccessCode('1234', 'voter@foo.bar');
 
-    it('successfully submits encrypted votes', async function() {
-      const validCodes = ['aAjEuD64Fo2143'];
       const cvr = { '1': 'option1', '2': 'optiona' };
+      await client.constructBallotCryptograms(cvr)
 
-      await client.authenticateWithCodes(validCodes);
-      await client.constructBallotCryptograms(cvr);
+      const affidavit = 'some bytes, most likely as binary PDF';
       const voteReceipt = await client.submitBallotCryptograms(affidavit);
       expect(voteReceipt).to.eql({
         previousBoardHash: 'd8d9742271592d1b212bbd4cbbbe357aef8e00cdbdf312df95e9cf9a1a921465',
-        boardHash: '5a9175c2b3617298d78be7d0244a68f34bc8b2a37061bb4d3fdf97edc1424098',
+        boardHash: '87abbdea83326ba124a99f8f56ba4748f9df97022a869c297aad94c460804c03',
         registeredAt: '2020-03-01T10:00:00.000+01:00',
-        serverSignature: 'dbcce518142b8740a5c911f727f3c02829211a8ddfccabeb89297877e4198bc1,46826ddfccaac9ca105e39c8a2d015098479624c411b4783ca1a3600daf4e8fa',
+        serverSignature: 'bfaffbaf8778abce29ea98ebc90ca91e091881480e18ef31da815d181cead1f6,8977ad08d4fc3b1d9be311d93cf8e98178142685c5fbbf703abf2188a8d1c862',
         voteSubmissionId: 6
       });
     });
   });
 
-  context('given invalid values', function() {
-    let validCodes;
-    let cvr;
+  context('voter identifier is corrupted', () => {
+    it('fails with an error message', async () => {
+      await client.requestAccessCode('some PII info');
+      await client.validateAccessCode('1234', 'voter@foo.bar');
 
-    beforeEach(function() {
-      nock('http://localhost:3000/').get('/test/app/config')
-        .replyWithFile(200, __dirname + '/replies/config.valid.json');
-      nock('http://localhost:3000/').post('/test/app/sign_in')
-        .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
-      nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
-        .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
-      nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
-        .replyWithFile(200, __dirname + '/replies/get_latest_board_hash.valid.json');
-
-      validCodes = ['aAjEuD64Fo2143'];
-      cvr = { '1': 'option1', '2': 'optiona' };
-    });
-
-    it('fails when not voting on all contests', async function() {
-      nock('http://localhost:3000/').post('/test/app/submit_votes')
-        .replyWithFile(200, __dirname + '/replies/avx_error.invalid_4.json');
-
-      await client.authenticateWithCodes(validCodes);
-      await client.constructBallotCryptograms(cvr);
-
-      // vote only on ballot 1
-      delete client.voteEncryptions['2']
-
-      return await client.submitBallotCryptograms(affidavit).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => expect(error).to.equal('Ballot ids do not correspond.')
-      )
-    });
-
-    it.skip('fails when digital signature is corrupt', async function() {
-      nock('http://localhost:3000/').post('/test/app/submit_votes')
-        .replyWithFile(200, __dirname + '/replies/avx_error.invalid_5.json');
-
-      await client.authenticateWithCodes(validCodes);
-      await client.constructBallotCryptograms(cvr);
-
-      // change voter's key pair
-      const keyPair = Crypto.generateKeyPair();
-      client.keyPair = {
-        privateKey: keyPair.private_key,
-        publicKey: keyPair.public_key
-      }
-
-      return await client.submitBallotCryptograms(affidavit).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => expect(error).to.equal('Digital signature did not validate.')
-      )
-    });
-
-    it('fails when content is corrupt', async function() {
-      nock('http://localhost:3000/').post('/test/app/submit_votes')
-        .replyWithFile(200, __dirname + '/replies/avx_error.invalid_6.json');
-
-      await client.authenticateWithCodes(validCodes);
-      await client.constructBallotCryptograms(cvr);
+      const cvr = { '1': 'option1', '2': 'optiona' };
+      await client.constructBallotCryptograms(cvr)
 
       // change the voter identifier
       client.voterIdentifier = 'corrupt identifier';
 
+      const affidavit = 'some bytes, most likely as binary PDF';
       return await client.submitBallotCryptograms(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
-        (error) => expect(error).to.equal('Content hash does not correspond.')
-      )
+        (error) => expect(error).to.equal('Invalid vote receipt: corrupt board hash')
+      );
     });
+  });
 
-    it('fails when proof of correct encryption is corrupt', async function() {
-      nock('http://localhost:3000/').post('/test/app/submit_votes')
-        .replyWithFile(200, __dirname + '/replies/avx_error.invalid_7.json');
+  context('proof of correct encryption is corrupted', () => {
+    it('fails with an error message', async () => {
+      await client.requestAccessCode('some PII info');
+      await client.validateAccessCode('1234', 'voter@foo.bar');
 
-      await client.authenticateWithCodes(validCodes);
-      await client.constructBallotCryptograms(cvr);
+      const cvr = { '1': 'option1', '2': 'optiona' };
+      await client.constructBallotCryptograms(cvr)
 
       // change the proof of ballot 1
       const randomness = client.voteEncryptions['1'].randomness
       const newRandomness = Crypto.addBigNums(randomness, randomness)
       client.voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(newRandomness)
 
+      const affidavit = 'some bytes, most likely as binary PDF';
       return await client.submitBallotCryptograms(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
-        (error) => expect(error).to.equal('Proof of correct encryption failed for ballot #1.')
-      )
+        (error) => expect(error).to.equal('Invalid vote receipt: corrupt server signature')
+      );
     });
   });
 });
