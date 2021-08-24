@@ -30,6 +30,7 @@ The API is responsible for handling all the cryptographic operations and all net
 
 - [requestAccessCode](avclient.md#requestaccesscode)
 - [validateAccessCode](avclient.md#validateaccesscode)
+- [authenticated](avclient.md#authenticated)
 - [constructBallotCryptograms](avclient.md#constructballotcryptograms)
 - [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
 - [submitBallotCryptograms](avclient.md#submitballotcryptograms)
@@ -76,7 +77,7 @@ ___
 
 ### validateAccessCode
 
-▸ **validateAccessCode**(`code`): `Promise`<`string`\>
+▸ **validateAccessCode**(`code`, `email`): `Promise`<`string`\>
 
 Should be called after [requestAccessCode](avclient.md#requestaccesscode).
 
@@ -89,15 +90,26 @@ Should be followed by [constructBallotCryptograms](avclient.md#constructballotcr
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `code` | `string` \| `string`[] |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `code` | `string` \| `string`[] | An access code string. |
+| `email` | `string` | Voter email. |
 
 #### Returns
 
 `Promise`<`string`\>
 
-Returns `'Success'` if authorization succeeded.
+Returns `'OK'` if authorization succeeded.
+
+___
+
+### authenticated
+
+▸ **authenticated**(): `Promise`<`string`\>
+
+#### Returns
+
+`Promise`<`string`\>
 
 ___
 
