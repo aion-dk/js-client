@@ -24,6 +24,13 @@ export default class BulletinBoard {
     });
   }
 
+  registerVoter(publicKey, signature) {
+    return this.backend.post('register', {
+      public_key: publicKey,
+      signature: signature
+    });
+  }
+
   challengeEmptyCryptograms(challenges) {
     return this.backend.post('challenge_empty_cryptograms', {
         challenges

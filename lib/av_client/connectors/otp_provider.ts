@@ -7,10 +7,10 @@ export default class OTPProvider {
     this.createBackendClient(baseURL, timeout);
   }
 
-  requestOTPAuthorization(otpCode, publicKey): Promise<any> {
+  requestOTPAuthorization(otpCode: string, email: string): Promise<any> {
     return this.backend.post('authorize', {
       otp_code: otpCode,
-      public_key: publicKey
+      email: email
     });
   }
 

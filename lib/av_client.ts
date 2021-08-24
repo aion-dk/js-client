@@ -1,12 +1,12 @@
 import BulletinBoard from '../lib/av_client/connectors/bulletin_board';
 import ElectionConfig from '../lib/av_client/election_config';
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
+import RegisterVoter from '../lib/av_client/register_voter';
 import EncryptVotes from '../lib/av_client/encrypt_votes';
 import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import OTPProvider from "./av_client/connectors/otp_provider";
-import { randomKeyPair} from "./av_client/generate_key_pair";
 import validateAuthorizationToken from "./av_client/validate_authorization_token";
 
 /**
@@ -111,12 +111,19 @@ export class AVClient {
    * If voter has already authorized, then returns `'Authorized'`.
    */
   async requestAccessCode(personalIdentificationInformation: string): Promise<string> {
-    if (await this.hasAuthorizedPublicKey()) {
-      return 'Authorized';
-    } else {
-      return await this.requestOTPs(personalIdentificationInformation)
-        .then((response) => 'Unauthorized');
-    }
+    await this.updateElectionConfig();
+
+    const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
+    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
+
+    return coordinator.createSession(personalIdentificationInformation).then(
+      ({ data }) => {
+        const sessionId = data.sessionId;
+        return coordinator.startIdentification(sessionId).then(
+          (response) => 'OK',
+        );
+      }
+    );
   }
 
   /**
@@ -142,10 +149,11 @@ export class AVClient {
    *
    * Should be followed by {@link AVClient.constructBallotCryptograms | constructBallotCryptograms}.
    *
-   * @param   An access code string.
-   * @returns Returns `'Success'` if authorization succeeded.
+   * @param   code An access code string.
+   * @param   email Voter email.
+   * @returns Returns `'OK'` if authorization succeeded.
    */
-  async validateAccessCode(code: (string|string[])): Promise<string> {
+  async validateAccessCode(code: (string|string[]), email: string): Promise<string> {
     await this.updateElectionConfig();
 
     let otpCodes;
@@ -164,28 +172,22 @@ export class AVClient {
       (providerURL) => new OTPProvider(providerURL)
     );
 
-    this.keyPair = randomKeyPair();
-    const publicKey = this.publicKey();
-
     const requests = providers.map(function(provider, index) {
-      return provider.requestOTPAuthorization(otpCodes[index], publicKey)
+      return provider.requestOTPAuthorization(otpCodes[index], email)
         .then((response) => response.data);
     });
 
     const tokens = await Promise.all(requests);
     if (tokens.every(validateAuthorizationToken)) {
       this.authorizationTokens = tokens;
-
-      // TODO: properly authenticate with AVX.
-      // Expected side-effects:
-      // this.emptyCryptograms is set
-      // this.voterIdentifier is set
-      await this.authenticateWithCodes(['aAjEuD64Fo2143']);
-
-      return 'Success';
+      return 'OK';
     } else {
       return Promise.reject('Failure, not all tokens were valid');
     }
+  }
+
+  async authenticated() {
+    return await new RegisterVoter(this).call();
   }
 
   /**
@@ -329,20 +331,6 @@ export class AVClient {
     if (Object.entries(this.electionConfig).length === 0) {
       this.electionConfig = await new ElectionConfig(this.bulletinBoard).get();
     }
-  }
-
-  /**
-   * Takes PII, sends it to Voter Authorization Coordinator Service, for it
-   * to initiate Voter Authorizers to send out OTPs to the voter.
-   * @param personalIdentificationInformation We don't know what this will be yet.
-   */
-  private async requestOTPs(personalIdentificationInformation: string): Promise<any> {
-    await this.updateElectionConfig();
-
-    const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
-    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
-
-    return coordinator.requestOTPCodesToBeSent(personalIdentificationInformation);
   }
 
   private electionId(): number {
