@@ -30,7 +30,6 @@ The API is responsible for handling all the cryptographic operations and all net
 
 - [requestAccessCode](avclient.md#requestaccesscode)
 - [validateAccessCode](avclient.md#validateaccesscode)
-- [authenticated](avclient.md#authenticated)
 - [constructBallotCryptograms](avclient.md#constructballotcryptograms)
 - [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
 - [submitBallotCryptograms](avclient.md#submitballotcryptograms)
@@ -100,16 +99,6 @@ Should be followed by [constructBallotCryptograms](avclient.md#constructballotcr
 `Promise`<`string`\>
 
 Returns `'OK'` if authorization succeeded.
-
-___
-
-### authenticated
-
-▸ **authenticated**(): `Promise`<`string`\>
-
-#### Returns
-
-`Promise`<`string`\>
 
 ___
 
