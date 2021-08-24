@@ -37,6 +37,7 @@ export class AVClient {
   private keyPair: KeyPair;
   private voteEncryptions: ContestIndexed<Encryption>;
   private voterIdentifier: string;
+  private succeededMethods: string[];
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -44,6 +45,7 @@ export class AVClient {
   constructor(bulletinBoardURL: string) {
     this.bulletinBoard = new BulletinBoard(bulletinBoardURL);
     this.electionConfig = {};
+    this.succeededMethods = [];
   }
 
   /**
@@ -120,7 +122,10 @@ export class AVClient {
       ({ data }) => {
         const sessionId = data.sessionId;
         return coordinator.startIdentification(sessionId).then(
-          (response) => 'OK',
+          (response) => {
+            this.succeededMethods.push('requestAccessCode');
+            return 'OK';
+          }
         );
       }
     );
@@ -154,6 +159,7 @@ export class AVClient {
    * @returns Returns `'OK'` if authorization succeeded.
    */
   async validateAccessCode(code: (string|string[]), email: string): Promise<string> {
+    this.validateCallOrder('validateAccessCode');
     await this.updateElectionConfig();
 
     let otpCodes;
@@ -180,14 +186,12 @@ export class AVClient {
     const tokens = await Promise.all(requests);
     if (tokens.every(validateAuthorizationToken)) {
       this.authorizationTokens = tokens;
+      await new RegisterVoter(this).call();
+      this.succeededMethods.push('validateAccessCode');
       return 'OK';
     } else {
       return Promise.reject('Failure, not all tokens were valid');
     }
-  }
-
-  async authenticated() {
-    return await new RegisterVoter(this).call();
   }
 
   /**
@@ -215,6 +219,7 @@ export class AVClient {
    * ```
    */
   async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
+    this.validateCallOrder('constructBallotCryptograms');
     await this.updateElectionConfig();
 
     if (JSON.stringify(Object.keys(cvr)) !== JSON.stringify(this.contestIds())) {
@@ -245,7 +250,10 @@ export class AVClient {
 
     this.voteEncryptions = encryptionResponse
 
-    return new EncryptVotes().fingerprint(this.cryptogramsForConfirmation());
+    const fingerprint = new EncryptVotes().fingerprint(this.cryptogramsForConfirmation());
+    this.succeededMethods.push('constructBallotCryptograms');
+
+    return fingerprint;
   }
 
   /**
@@ -262,7 +270,10 @@ export class AVClient {
    * ```
    */
   async spoilBallotCryptograms(): Promise<ContestIndexed<string>> {
-    return await new BenalohChallenge(this.bulletinBoard).getServerRandomizers()
+    this.validateCallOrder('spoilBallotCryptograms');
+    const randomizers = await new BenalohChallenge(this.bulletinBoard).getServerRandomizers();
+    this.succeededMethods.push('spoilBallotCryptograms');
+    return randomizers;
   }
 
   /**
@@ -285,6 +296,7 @@ export class AVClient {
    * ```
    */
   async submitBallotCryptograms(affidavit: Affidavit): Promise<Receipt> {
+    this.validateCallOrder('submitBallotCryptograms');
     const voterIdentifier = this.voterIdentifier
     const electionId = this.electionId()
     const voteEncryptions = this.voteEncryptions
@@ -362,6 +374,27 @@ export class AVClient {
     const numberOfOTPs = await this.getNumberOfOTPs();
     return this.authorizationTokens.length == numberOfOTPs;
   }
+
+  private validateCallOrder(methodName) {
+    const expectations = {
+      validateAccessCode: ['requestAccessCode'],
+      constructBallotCryptograms: ['requestAccessCode', 'validateAccessCode'],
+      spoilBallotCryptograms: ['requestAccessCode', 'validateAccessCode', 'constructBallotCryptograms'],
+      submitBallotCryptograms: ['requestAccessCode', 'validateAccessCode', 'constructBallotCryptograms'],
+    };
+
+    const requiredCalls = expectations[methodName];
+
+    if (requiredCalls === undefined) {
+      throw new Error(`Call order validation for method #${methodName} is not implemented`)
+    } else {
+      if (JSON.stringify(this.succeededMethods) != JSON.stringify(requiredCalls)) {
+        const requiredList = requiredCalls.map((name) => `#${name}`).join(', ');
+        const gotList = this.succeededMethods.map((name) => `#${name}`).join(', ');
+        throw new CallOutOfOrderError(`#${methodName} requires exactly ${requiredList} to be called before it`);
+      }
+    }
+  }
 }
 
 /**
@@ -437,4 +470,12 @@ type Encryption = {
 type EmptyCryptogram = {
   cryptogram: Cryptogram;
   commitment: ECPoint;
+}
+
+class CallOutOfOrderError extends Error {
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, CallOutOfOrderError.prototype);
+    this.name = 'CallOutOfOrderError';
+  }
 }

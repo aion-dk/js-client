@@ -7,11 +7,11 @@ const sjcl = require('../lib/av_client/sjcl')
 const Crypto = require('../lib/av_client/aion_crypto.js')()
 
 
-describe('entire voter flow using OTP authorization', function() {
+describe('entire voter flow using OTP authorization', () => {
   let sandbox;
   let expectedNetworkRequests : any[] = [];
 
-  beforeEach(function() {
+  beforeEach(() => {
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
@@ -38,26 +38,37 @@ describe('entire voter flow using OTP authorization', function() {
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_submit_votes.json'));
   });
 
-  afterEach(function() {
+  afterEach(() => {
     sandbox.restore();
     nock.cleanAll();
   });
 
-  it('returns a receipt', async function() {
+  it('returns a receipt', async () => {
     const client = new AVClient('http://localhost:3000/test/app');
 
-    await client.requestAccessCode('some PII info').catch((e) => { expect.fail('AVClient#requestAccessCode failed.'); });
-    const confirmationToken = await client.validateAccessCode('1234', 'voter@foo.bar').catch((e) => { expect.fail('AVClient#validateAccessCode failed'); });
-    await client.authenticated().catch((e) => { console.error(e); expect.fail('AVClient#authenticated failed'); });
+    await client.requestAccessCode('some PII info').catch((e) => {
+      console.error(e);
+      expect.fail('AVClient#requestAccessCode failed.');
+    });
 
-    const fingerprint = await client.constructBallotCryptograms({
-      '1': 'option1',
-      '2': 'optiona'
+    const confirmationToken = await client.validateAccessCode('1234', 'voter@foo.bar').catch((e) => {
+      console.error(e);
+      expect.fail('AVClient#validateAccessCode failed');
+    });
+
+    const cvr = { '1': 'option1', '2': 'optiona' };
+    const fingerprint = await client.constructBallotCryptograms(cvr).catch((e) => {
+      console.error(e);
+      expect.fail('AVClient#constructBallotCryptograms failed');
     });
     expect(fingerprint).to.eql('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
 
     const affidavit = 'some bytes, most likely as binary PDF';
-    const receipt = await client.submitBallotCryptograms(affidavit);
+    const receipt = await client.submitBallotCryptograms(affidavit).catch((e) => {
+      console.error(e);
+      expect.fail('AVClient#submitBallotCryptograms failed');
+    });
+
     expect(receipt).to.eql({
       previousBoardHash: 'd8d9742271592d1b212bbd4cbbbe357aef8e00cdbdf312df95e9cf9a1a921465',
       boardHash: '87abbdea83326ba124a99f8f56ba4748f9df97022a869c297aad94c460804c03',
