@@ -89,7 +89,7 @@ describe('entire voter flow using OTP authorization', () => {
 
 ### requestAccessCode
 
-▸ **requestAccessCode**(`personalIdentificationInformation`): `Promise`<`string`\>
+▸ **requestAccessCode**(`opaqueVoterId`): `Promise`<`string`\>
 
 Should be called when a voter chooses digital vote submission (instead of mail-in).
 
@@ -101,14 +101,13 @@ Should be followed by [validateAccessCode](avclient.md#validateaccesscode) to su
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `personalIdentificationInformation` | `string` | TODO: needs better specification. |
+| `opaqueVoterId` | `string` | Voter ID that preserves voter anonymity. |
 
 #### Returns
 
 `Promise`<`string`\>
 
-If voter has not yet authorized with an access code, it will return `'Unauthorized'`.<br>
-If voter has already authorized, then returns `'Authorized'`.
+'OK' or an error.
 
 ___
 
