@@ -69,6 +69,7 @@ describe('entire voter flow using OTP authorization', () => {
 - [requestAccessCode](avclient.md#requestaccesscode)
 - [validateAccessCode](avclient.md#validateaccesscode)
 - [constructBallotCryptograms](avclient.md#constructballotcryptograms)
+- [generateTestCode](avclient.md#generatetestcode)
 - [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
 - [submitBallotCryptograms](avclient.md#submitballotcryptograms)
 - [purgeData](avclient.md#purgedata)
@@ -177,25 +178,40 @@ Returns fingerprint of the cryptograms. Example:
 
 ___
 
-### spoilBallotCryptograms
+### generateTestCode
 
-▸ **spoilBallotCryptograms**(): `Promise`<[`ContestIndexed`](../interfaces/contestindexed.md)<`string`\>\>
+▸ **generateTestCode**(): `string`
 
-Should be called when voter chooses to test the encryption of their ballot.
+Should be called after [validateAccessCode](avclient.md#validateaccesscode).
+Should be called before [spoilBallotCryptograms](avclient.md#spoilballotcryptograms).
 
-TODO: exact process needs specification.
+Generates an encryption key that is used to add another encryption layer to vote cryptograms when they are spoiled.
+
+The generateTestCode is used in case [spoilBallotCryptograms](avclient.md#spoilballotcryptograms) is called afterwards.
 
 #### Returns
 
-`Promise`<[`ContestIndexed`](../interfaces/contestindexed.md)<`string`\>\>
+`string`
 
-Returns an index, where keys are contest ids, and values are randomizers, that the digital ballot box generates. Example:
+Returns the test code. Example:
 ```javascript
-{
-  '1': '12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031',
-  '2': '1415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f30313233'
-}
+'5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
 ```
+
+___
+
+### spoilBallotCryptograms
+
+▸ **spoilBallotCryptograms**(): `Promise`<`string`\>
+
+Should be called when voter chooses to test the encryption of their ballot.
+Gets commitment opening of the digital ballot box and validates it.
+
+#### Returns
+
+`Promise`<`string`\>
+
+Returns 'Success' if the validation succeeds.
 
 ___
 
