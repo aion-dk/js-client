@@ -287,10 +287,8 @@ export class AVClient {
 
     const benaloh = new BenalohChallenge(this.bulletinBoard)
 
-
     // this is part of 'offline Benaloh Challenge'
     // const serverRandomizers = await benaloh.getServerRandomizers()
-
 
     const voterCommitmentOpening = {};
     const encryptedBallotCryptograms = {};
