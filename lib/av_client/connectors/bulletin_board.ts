@@ -49,6 +49,17 @@ export default class BulletinBoard {
     });
   }
 
+  getCommitmentOpening(voterCommitmentOpening, encryptedBallotCryptograms) {
+    return this.backend.post('get_commitment_opening', {
+      voter_commitment_opening: voterCommitmentOpening,
+      encrypted_ballot_cryptograms: encryptedBallotCryptograms
+    }, {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
+  }
+
   getBoardHash() {
     return this.backend.get('get_latest_board_hash', {
       headers: {

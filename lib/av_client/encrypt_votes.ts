@@ -19,6 +19,10 @@ export default class EncryptVotes {
     return response;
   }
 
+  generateTestCode(): BigNum {
+    return Crypto.generateRandomNumber()
+  }
+
   fingerprint(cryptograms: ContestIndexed<Cryptogram>) {
     const string = JSON.stringify(cryptograms)
 

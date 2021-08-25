@@ -74,8 +74,8 @@ describe('AVClient functions call order', () => {
       nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_get_latest_board_hash.json');
 
-      nock('http://localhost:3000/').post('/test/app/get_randomizers')
-        .replyWithFile(200, __dirname + '/replies/get_randomizers.valid.json');
+      nock('http://localhost:3000/').post('/test/app/get_commitment_opening')
+        .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
 
       sandbox = sinon.createSandbox();
       sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
@@ -94,8 +94,8 @@ describe('AVClient functions call order', () => {
 
       const cvr = { '1': 'option1', '2': 'optiona' };
       await client.constructBallotCryptograms(cvr);
-
-      const serverRandomizers = await client.spoilBallotCryptograms();
+      client.generateTestCode();
+      await client.spoilBallotCryptograms();
       nock.cleanAll();
 
       try {

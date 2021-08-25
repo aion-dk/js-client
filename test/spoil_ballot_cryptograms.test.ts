@@ -40,39 +40,35 @@ describe('AVClient#spoilBallotCryptograms', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_register.json');
       nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json');
-      nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_get_latest_board_hash.json');
     });
 
     context('all systems work', () => {
-      it('returns server randomizers', async () => {
-        nock('http://localhost:3000/').post('/test/app/get_randomizers')
-          .replyWithFile(200, __dirname + '/replies/get_randomizers.valid.json');
+      it('returns \'Success\'', async () => {
+        nock('http://localhost:3000/').post('/test/app/get_commitment_opening')
+          .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
 
         await client.requestAccessCode('voter123');
         await client.validateAccessCode('1234', 'voter@foo.bar');
 
         const cvr = { '1': 'option1', '2': 'optiona' };
-        await client.constructBallotCryptograms(cvr)
+        await client.constructBallotCryptograms(cvr);
+        client.generateTestCode();
 
-        const serverRandomizers = await client.spoilBallotCryptograms();
-        expect(serverRandomizers).to.eql({
-          '1': '12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031',
-          '2': '1415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f30313233'
-        });
+        const result = await client.spoilBallotCryptograms();
+        expect(result).to.equal('Success');
       });
     });
 
     context('remote errors', () => {
       it('returns an error message when there is a network error', async () => {
-        nock('http://localhost:3000/').post('/test/app/get_randomizers')
-          .reply(404);
+        nock('http://localhost:3000/').post('/test/app/get_commitment_opening').reply(404);
 
         await client.requestAccessCode('voter123');
         await client.validateAccessCode('1234', 'voter@foo.bar');
 
         const cvr = { '1': 'option1', '2': 'optiona' };
-        await client.constructBallotCryptograms(cvr)
+        await client.constructBallotCryptograms(cvr);
+        client.generateTestCode();
 
         return await client.spoilBallotCryptograms().then(
           () => expect.fail('Expected a rejected promise'),
@@ -81,14 +77,14 @@ describe('AVClient#spoilBallotCryptograms', () => {
       });
 
       it('returns an error message when there is a server error', async () => {
-        nock('http://localhost:3000/').post('/test/app/get_randomizers')
-          .reply(500, { nonsense: 'garbage' });
+        nock('http://localhost:3000/').post('/test/app/get_commitment_opening').reply(500, { nonsense: 'garbage' });
 
         await client.requestAccessCode('voter123');
         await client.validateAccessCode('1234', 'voter@foo.bar');
 
         const cvr = { '1': 'option1', '2': 'optiona' };
-        await client.constructBallotCryptograms(cvr)
+        await client.constructBallotCryptograms(cvr);
+        client.generateTestCode();
 
         return await client.spoilBallotCryptograms().then(
           () => expect.fail('Expected a rejected promise'),
@@ -115,11 +111,10 @@ describe('AVClient#spoilBallotCryptograms', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_register.json');
       nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json');
+      nock('http://localhost:3000/').post('/test/app/get_commitment_opening')
+        .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
       nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_get_latest_board_hash.json');
-
-      nock('http://localhost:3000/').post('/test/app/get_randomizers')
-        .replyWithFile(200, __dirname + '/replies/get_randomizers.valid.json');
 
       await client.requestAccessCode('voter123');
       await client.validateAccessCode('1234', 'voter@foo.bar');
@@ -127,7 +122,8 @@ describe('AVClient#spoilBallotCryptograms', () => {
       const cvr = { '1': 'option1', '2': 'optiona' };
       await client.constructBallotCryptograms(cvr);
 
-      const serverRandomizers = await client.spoilBallotCryptograms();
+      client.generateTestCode();
+      await client.spoilBallotCryptograms();
 
       nock.cleanAll();
       nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
