@@ -31,8 +31,8 @@ describe('AVClient#spoilBallotCryptograms', function() {
         .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
       nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
           .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
-      nock('http://localhost:3000/').post('/test/app/get_randomizers')
-        .replyWithFile(200, __dirname + '/replies/get_randomizers.valid.json');
+      nock('http://localhost:3000/').post('/test/app/get_commitment_opening')
+        .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
     });
 
     it('returns success', async function() {
@@ -41,11 +41,9 @@ describe('AVClient#spoilBallotCryptograms', function() {
 
       await client.authenticateWithCodes(validCodes);
       await client.constructBallotCryptograms(cvr);
-      const serverRandomizers = await client.spoilBallotCryptograms();
-      expect(serverRandomizers).to.eql({
-        '1': '12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031',
-        '2': '1415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f30313233'
-      });
+      client.generateTestCode();
+      const result = await client.spoilBallotCryptograms();
+      expect(result).to.equal('Success');
     });
 
   });
@@ -66,7 +64,7 @@ describe('AVClient#spoilBallotCryptograms', function() {
     });
 
     it('returns an error message when there is a network error', async function() {
-      nock('http://localhost:3000/').post('/test/app/get_randomizers').reply(404);
+      nock('http://localhost:3000/').post('/test/app/get_commitment_opening').reply(404);
       return await client.spoilBallotCryptograms().then(
         () => expect.fail('Expected a rejected promise'),
         (error) => expect(error.message).to.equal('Request failed with status code 404')
@@ -74,7 +72,7 @@ describe('AVClient#spoilBallotCryptograms', function() {
     });
 
     it('returns an error message when there is a server error', async function() {
-      nock('http://localhost:3000/').post('/test/app/get_randomizers').reply(500, { nonsense: 'garbage' });
+      nock('http://localhost:3000/').post('/test/app/get_commitment_opening').reply(500, { nonsense: 'garbage' });
       return await client.spoilBallotCryptograms().then(
         () => expect.fail('Expected a rejected promise'),
         (error) => expect(error.message).to.equal('Request failed with status code 500')
@@ -92,8 +90,8 @@ describe('AVClient#spoilBallotCryptograms', function() {
         .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
       nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
         .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
-      nock('http://localhost:3000/').post('/test/app/get_randomizers')
-        .replyWithFile(200, __dirname + '/replies/get_randomizers.valid.json');
+      nock('http://localhost:3000/').post('/test/app/get_commitment_opening')
+        .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
 
       validCodes = ['aAjEuD64Fo2143'];
       cvr = { '1': 'option1', '2': 'optiona' };

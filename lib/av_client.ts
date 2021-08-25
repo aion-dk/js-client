@@ -35,6 +35,7 @@ export class AVClient {
   private electionConfig: any;
   private emptyCryptograms: ContestIndexed<EmptyCryptogram>;
   private keyPair: KeyPair;
+  private testCode: string;
   private voteEncryptions: ContestIndexed<Encryption>;
   private voterIdentifier: string;
 
@@ -249,20 +250,59 @@ export class AVClient {
   }
 
   /**
-   * Should be called when voter chooses to test the encryption of their ballot.
+   * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
+   * Should be called before {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}.
    *
-   * TODO: exact process needs specification.
+   * Generates an encryption key that is used to add another encryption layer to vote cryptograms when they are spoiled.
    *
-   * @returns Returns an index, where keys are contest ids, and values are randomizers, that the digital ballot box generates. Example:
+   * The generateTestCode is used in case {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms} is called afterwards.
+   *
+   * @returns Returns the test code. Example:
    * ```javascript
-   * {
-   *   '1': '12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031',
-   *   '2': '1415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f30313233'
-   * }
+   * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
    */
-  async spoilBallotCryptograms(): Promise<ContestIndexed<string>> {
-    return await new BenalohChallenge(this.bulletinBoard).getServerRandomizers()
+  generateTestCode(): string {
+    const testCode = new EncryptVotes().generateTestCode()
+
+    this.testCode = testCode
+
+    return testCode
+  }
+
+  /**
+   * Should be called when voter chooses to test the encryption of their ballot.
+   * Gets commitment opening of the digital ballot box and validates it.
+   *
+   * @returns Returns 'Success' if the validation succeeds.
+   */
+  async spoilBallotCryptograms(): Promise<string> {
+    // TODO: encrypt the vote cryptograms one more time with a key derived from `this.generateTestCode`.
+    //  A key is derived like: key = hash(test code, ballot id, cryptogram index)
+    // TODO: compute commitment openings of the voter commitment
+    // TODO: call the bulletin board to spoil the cryptograms. Send the encrypted vote cryptograms and voter commitment
+    //  opening. Response contains server commitment openings.
+    // TODO: verify the server commitment openings against server commitment and server empty cryptograms
+
+    const benaloh = new BenalohChallenge(this.bulletinBoard)
+
+
+    // this is part of 'offline Benaloh Challenge'
+    // const serverRandomizers = await benaloh.getServerRandomizers()
+
+
+    const voterCommitmentOpening = {};
+    const encryptedBallotCryptograms = {};
+    const serverCommitment = ''; // get this from the state
+    const serverEmptyCryptograms = {}; // get this from the state
+    const serverCommitmentOpening = await benaloh.getServerCommitmentOpening(voterCommitmentOpening, encryptedBallotCryptograms)
+    const valid = benaloh.verifyCommitmentOpening(serverCommitmentOpening, serverCommitment, serverEmptyCryptograms)
+
+    if (valid) {
+      return 'Success'
+    } else {
+      return Promise.reject('Server commitment did not validate')
+    }
   }
 
   /**
