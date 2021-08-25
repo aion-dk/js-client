@@ -47,7 +47,7 @@ describe('AVClient#submitBallotCryptograms', () => {
 
   context('given valid values', () => {
     it('successfully submits encrypted votes', async () => {
-      await client.requestAccessCode('some PII info');
+      await client.requestAccessCode('voter123');
       await client.validateAccessCode('1234', 'voter@foo.bar');
 
       const cvr = { '1': 'option1', '2': 'optiona' };
@@ -67,7 +67,7 @@ describe('AVClient#submitBallotCryptograms', () => {
 
   context('voter identifier is corrupted', () => {
     it('fails with an error message', async () => {
-      await client.requestAccessCode('some PII info');
+      await client.requestAccessCode('voter123');
       await client.validateAccessCode('1234', 'voter@foo.bar');
 
       const cvr = { '1': 'option1', '2': 'optiona' };
@@ -86,7 +86,7 @@ describe('AVClient#submitBallotCryptograms', () => {
 
   context('proof of correct encryption is corrupted', () => {
     it('fails with an error message', async () => {
-      await client.requestAccessCode('some PII info');
+      await client.requestAccessCode('voter123');
       await client.validateAccessCode('1234', 'voter@foo.bar');
 
       const cvr = { '1': 'option1', '2': 'optiona' };
