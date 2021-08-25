@@ -132,19 +132,6 @@ export class AVClient {
   }
 
   /**
-   * Returns number of one time passwords (OTPs) that voter should enter to authorize.
-   * Number comes from election config on the bulletin board.
-   *
-   * @internal
-   * @returns Number of OTPs.
-   */
-  async getNumberOfOTPs(): Promise<number> {
-    await this.updateElectionConfig();
-
-    return this.electionConfig.OTPProviderCount;
-  }
-
-  /**
    * Should be called after {@link AVClient.requestAccessCode | requestAccessCode}.
    *
    * Takes an access code (OTP) that voter received, uses it to authorize to submit votes.
@@ -367,12 +354,6 @@ export class AVClient {
 
   private publicKey(): ECPoint {
     return this.keyPair.publicKey
-  }
-
-  private async hasAuthorizedPublicKey(): Promise<boolean> {
-    if (!this.keyPair) return false;
-    const numberOfOTPs = await this.getNumberOfOTPs();
-    return this.authorizationTokens.length == numberOfOTPs;
   }
 
   private validateCallOrder(methodName) {
