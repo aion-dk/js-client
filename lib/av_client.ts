@@ -17,7 +17,7 @@ import validateAuthorizationToken from "./av_client/validate_authorization_token
  * * the Voter Authorization Coordinator service
  * * the OTP provider(s)
  *
- * ### Expected sequence of methods being executed
+ * ## Expected sequence of methods being executed
  *
  * |Method                                                                    | Description |
  * -------------------------------------------------------------------------- | ---
@@ -27,6 +27,12 @@ import validateAuthorizationToken from "./av_client/validate_authorization_token
  * |{@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}         | Optional. Initiates process of testing the ballot encryption. |
  * |{@link AVClient.submitBallotCryptograms | submitBallotCryptograms}       | Finalizes the voting process. |
  * |{@link AVClient.purgeData | purgeData}                                   | Optional. Explicitly purges internal data. |
+ *
+ * ## Example walkthrough test
+ *
+ * ```typescript
+ * [[include:readme_example.test.ts]]
+ * ```
  */
 
 export class AVClient {
