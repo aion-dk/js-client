@@ -46,7 +46,7 @@ describe('entire voter flow using OTP authorization', () => {
   it('returns a receipt', async () => {
     const client = new AVClient('http://localhost:3000/test/app');
 
-    await client.requestAccessCode('some PII info').catch((e) => {
+    await client.requestAccessCode('voter123').catch((e) => {
       console.error(e);
       expect.fail('AVClient#requestAccessCode failed.');
     });

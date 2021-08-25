@@ -49,7 +49,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
         nock('http://localhost:3000/').post('/test/app/get_randomizers')
           .replyWithFile(200, __dirname + '/replies/get_randomizers.valid.json');
 
-        await client.requestAccessCode('some PII info');
+        await client.requestAccessCode('voter123');
         await client.validateAccessCode('1234', 'voter@foo.bar');
 
         const cvr = { '1': 'option1', '2': 'optiona' };
@@ -68,7 +68,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
         nock('http://localhost:3000/').post('/test/app/get_randomizers')
           .reply(404);
 
-        await client.requestAccessCode('some PII info');
+        await client.requestAccessCode('voter123');
         await client.validateAccessCode('1234', 'voter@foo.bar');
 
         const cvr = { '1': 'option1', '2': 'optiona' };
@@ -84,7 +84,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
         nock('http://localhost:3000/').post('/test/app/get_randomizers')
           .reply(500, { nonsense: 'garbage' });
 
-        await client.requestAccessCode('some PII info');
+        await client.requestAccessCode('voter123');
         await client.validateAccessCode('1234', 'voter@foo.bar');
 
         const cvr = { '1': 'option1', '2': 'optiona' };
@@ -121,7 +121,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
       nock('http://localhost:3000/').post('/test/app/get_randomizers')
         .replyWithFile(200, __dirname + '/replies/get_randomizers.valid.json');
 
-      await client.requestAccessCode('some PII info');
+      await client.requestAccessCode('voter123');
       await client.validateAccessCode('1234', 'voter@foo.bar');
 
       const cvr = { '1': 'option1', '2': 'optiona' };

@@ -40,8 +40,8 @@ describe('AVClient#requestAccessCode', function() {
           .reply(200)
       );
 
-      const pii = 'pii';
-      return client.requestAccessCode(pii).then(
+      const opaqueVoterId = 'voter123';
+      return client.requestAccessCode(opaqueVoterId).then(
         (result) => {
           expect(result).to.eql('OK');
           expectedNetworkRequests.forEach((mock) => mock.done());
@@ -61,8 +61,8 @@ describe('AVClient#requestAccessCode', function() {
           .reply(404)
       );
 
-      const pii = 'pii';
-      return await client.requestAccessCode(pii).then(
+      const opaqueVoterId = 'voter123';
+      return await client.requestAccessCode(opaqueVoterId).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => {
           expect(error.message).to.equal('Request failed with status code 404')

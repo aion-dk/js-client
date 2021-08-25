@@ -52,7 +52,7 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json')
       );
 
-      await client.requestAccessCode('some PII info');
+      await client.requestAccessCode('voter123');
 
       const otp = '1234';
       const result = await client.validateAccessCode(otp);
@@ -67,7 +67,7 @@ describe('AVClient#validateAccessCode', () => {
           .reply(401) // This is what decides that OTP is invalid
       );
 
-      await client.requestAccessCode('some PII info');
+      await client.requestAccessCode('voter123');
 
       const otp = '0000';
 
@@ -81,7 +81,7 @@ describe('AVClient#validateAccessCode', () => {
 
   context('given wrong number of OTPs', () => {
     it('fails with an error message', async () => {
-      await client.requestAccessCode('some PII info');
+      await client.requestAccessCode('voter123');
 
       const otps = ['1234', 'abcd'];
 

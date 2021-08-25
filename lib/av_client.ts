@@ -93,7 +93,7 @@ export class AVClient {
    *
    * @internal
    * @param   codes Array of election code strings.
-   * @returns Returns 'Success' if authentication succeeded.
+   * @returns Returns 'OK' if authentication succeeded.
    */
   async authenticateWithCodes(codes: string[]): Promise<string> {
     await this.updateElectionConfig();
@@ -104,7 +104,7 @@ export class AVClient {
     this.keyPair = authenticationResponse.keyPair;
     this.emptyCryptograms = authenticationResponse.emptyCryptograms;
 
-    return 'Success';
+    return 'OK';
   }
 
   /**
@@ -114,17 +114,16 @@ export class AVClient {
    *
    * Should be followed by {@link AVClient.validateAccessCode | validateAccessCode} to submit access code for validation.
    *
-   * @param   personalIdentificationInformation TODO: needs better specification.
-   * @returns If voter has not yet authorized with an access code, it will return `'Unauthorized'`.<br>
-   * If voter has already authorized, then returns `'Authorized'`.
+   * @param   opaqueVoterId Voter ID that preserves voter anonymity.
+   * @returns 'OK' or an error.
    */
-  async requestAccessCode(personalIdentificationInformation: string): Promise<string> {
+  async requestAccessCode(opaqueVoterId: string): Promise<string> {
     await this.updateElectionConfig();
 
     const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
-    return coordinator.createSession(personalIdentificationInformation).then(
+    return coordinator.createSession(opaqueVoterId).then(
       ({ data }) => {
         const sessionId = data.sessionId;
         return coordinator.startIdentification(sessionId).then(

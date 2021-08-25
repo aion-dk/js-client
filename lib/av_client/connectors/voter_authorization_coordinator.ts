@@ -7,9 +7,9 @@ export default class VoterAuthorizationCoordinator {
     this.createBackendClient(baseURL, timeout);
   }
 
-  createSession(personalIdentificationInformation): Promise<any> {
+  createSession(opaqueVoterId): Promise<any> {
     return this.backend.post('create_session', {
-      personal_identification_information: personalIdentificationInformation
+      opaque_voter_id: opaqueVoterId
     });
   }
 
