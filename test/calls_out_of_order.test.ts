@@ -89,7 +89,7 @@ describe('AVClient functions call order', () => {
     });
 
     it('throws an error when submitBallotCryptograms is called directly after spoiling', async () => {
-      await client.requestAccessCode('some PII info');
+      await client.requestAccessCode('voter123');
       await client.validateAccessCode('1234', 'voter@foo.bar');
 
       const cvr = { '1': 'option1', '2': 'optiona' };

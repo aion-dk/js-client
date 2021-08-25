@@ -36,7 +36,7 @@ describe('AVClient#authenticateWithCodes', function() {
     it('returns success', async function() {
       const validCodes = ['aAjEuD64Fo2143'];
       const result = await client.authenticateWithCodes(validCodes);
-      expect(result).to.equal('Success');
+      expect(result).to.equal('OK');
     });
   });
 

@@ -17,7 +17,7 @@ import validateAuthorizationToken from "./av_client/validate_authorization_token
  * * the Voter Authorization Coordinator service
  * * the OTP provider(s)
  *
- * ### Expected sequence of methods being executed
+ * ## Expected sequence of methods being executed
  *
  * |Method                                                                    | Description |
  * -------------------------------------------------------------------------- | ---
@@ -27,6 +27,12 @@ import validateAuthorizationToken from "./av_client/validate_authorization_token
  * |{@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}         | Optional. Initiates process of testing the ballot encryption. |
  * |{@link AVClient.submitBallotCryptograms | submitBallotCryptograms}       | Finalizes the voting process. |
  * |{@link AVClient.purgeData | purgeData}                                   | Optional. Explicitly purges internal data. |
+ *
+ * ## Example walkthrough test
+ *
+ * ```typescript
+ * [[include:readme_example.test.ts]]
+ * ```
  */
 
 export class AVClient {
@@ -88,7 +94,7 @@ export class AVClient {
    *
    * @internal
    * @param   codes Array of election code strings.
-   * @returns Returns 'Success' if authentication succeeded.
+   * @returns Returns 'OK' if authentication succeeded.
    */
   async authenticateWithCodes(codes: string[]): Promise<string> {
     await this.updateElectionConfig();
@@ -99,7 +105,7 @@ export class AVClient {
     this.keyPair = authenticationResponse.keyPair;
     this.emptyCryptograms = authenticationResponse.emptyCryptograms;
 
-    return 'Success';
+    return 'OK';
   }
 
   /**
@@ -109,17 +115,16 @@ export class AVClient {
    *
    * Should be followed by {@link AVClient.validateAccessCode | validateAccessCode} to submit access code for validation.
    *
-   * @param   personalIdentificationInformation TODO: needs better specification.
-   * @returns If voter has not yet authorized with an access code, it will return `'Unauthorized'`.<br>
-   * If voter has already authorized, then returns `'Authorized'`.
+   * @param   opaqueVoterId Voter ID that preserves voter anonymity.
+   * @returns 'OK' or an error.
    */
-  async requestAccessCode(personalIdentificationInformation: string): Promise<string> {
+  async requestAccessCode(opaqueVoterId: string): Promise<string> {
     await this.updateElectionConfig();
 
     const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
-    return coordinator.createSession(personalIdentificationInformation).then(
+    return coordinator.createSession(opaqueVoterId).then(
       ({ data }) => {
         const sessionId = data.sessionId;
         return coordinator.startIdentification(sessionId).then(
@@ -130,19 +135,6 @@ export class AVClient {
         );
       }
     );
-  }
-
-  /**
-   * Returns number of one time passwords (OTPs) that voter should enter to authorize.
-   * Number comes from election config on the bulletin board.
-   *
-   * @internal
-   * @returns Number of OTPs.
-   */
-  async getNumberOfOTPs(): Promise<number> {
-    await this.updateElectionConfig();
-
-    return this.electionConfig.OTPProviderCount;
   }
 
   /**
@@ -406,12 +398,6 @@ export class AVClient {
 
   private publicKey(): ECPoint {
     return this.keyPair.publicKey
-  }
-
-  private async hasAuthorizedPublicKey(): Promise<boolean> {
-    if (!this.keyPair) return false;
-    const numberOfOTPs = await this.getNumberOfOTPs();
-    return this.authorizationTokens.length == numberOfOTPs;
   }
 
   private validateCallOrder(methodName) {

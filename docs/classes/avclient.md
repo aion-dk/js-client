@@ -9,7 +9,7 @@ The API is responsible for handling all the cryptographic operations and all net
 * the Voter Authorization Coordinator service
 * the OTP provider(s)
 
-### Expected sequence of methods being executed
+## Expected sequence of methods being executed
 
 |Method                                                                    | Description |
 -------------------------------------------------------------------------- | ---
@@ -19,6 +19,44 @@ The API is responsible for handling all the cryptographic operations and all net
 |[spoilBallotCryptograms](avclient.md#spoilballotcryptograms)         | Optional. Initiates process of testing the ballot encryption. |
 |[submitBallotCryptograms](avclient.md#submitballotcryptograms)       | Finalizes the voting process. |
 |[purgeData](avclient.md#purgedata)                                   | Optional. Explicitly purges internal data. |
+
+## Example walkthrough test
+
+```typescript
+import { AVClient } from '../lib/av_client';
+import { expect } from 'chai';
+import { readmeTestSetup, readmeTestTeardown } from './readme_example_helper';
+
+describe('entire voter flow using OTP authorization', () => {
+  beforeEach(() => readmeTestSetup());
+  afterEach(() => readmeTestTeardown());
+
+  it('returns a receipt', async () => {
+    const client = new AVClient('http://localhost:3000/test/app');
+
+    const requestAccessCodeResult = await client.requestAccessCode('some PII info');
+    expect(requestAccessCodeResult).to.eq('OK')
+
+    const validateAccessCodeResult = await client.validateAccessCode('1234', 'voter@foo.bar');
+    expect(validateAccessCodeResult).to.eq('OK');
+
+    const cvr = { '1': 'option1', '2': 'optiona' };
+    const fingerprint = await client.constructBallotCryptograms(cvr);
+    expect(fingerprint).to.eq('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
+
+    const affidavit = 'some bytes, most likely as binary PDF';
+    const receipt = await client.submitBallotCryptograms(affidavit);
+    expect(receipt).to.eql({
+      previousBoardHash: 'd8d9742271592d1b212bbd4cbbbe357aef8e00cdbdf312df95e9cf9a1a921465',
+      boardHash: '87abbdea83326ba124a99f8f56ba4748f9df97022a869c297aad94c460804c03',
+      registeredAt: '2020-03-01T10:00:00.000+01:00',
+      serverSignature: 'bfaffbaf8778abce29ea98ebc90ca91e091881480e18ef31da815d181cead1f6,8977ad08d4fc3b1d9be311d93cf8e98178142685c5fbbf703abf2188a8d1c862',
+      voteSubmissionId: 6
+    });
+  });
+});
+
+```
 
 ## Table of contents
 
@@ -51,7 +89,7 @@ The API is responsible for handling all the cryptographic operations and all net
 
 ### requestAccessCode
 
-▸ **requestAccessCode**(`personalIdentificationInformation`): `Promise`<`string`\>
+▸ **requestAccessCode**(`opaqueVoterId`): `Promise`<`string`\>
 
 Should be called when a voter chooses digital vote submission (instead of mail-in).
 
@@ -63,14 +101,13 @@ Should be followed by [validateAccessCode](avclient.md#validateaccesscode) to su
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `personalIdentificationInformation` | `string` | TODO: needs better specification. |
+| `opaqueVoterId` | `string` | Voter ID that preserves voter anonymity. |
 
 #### Returns
 
 `Promise`<`string`\>
 
-If voter has not yet authorized with an access code, it will return `'Unauthorized'`.<br>
-If voter has already authorized, then returns `'Authorized'`.
+'OK' or an error.
 
 ___
 
