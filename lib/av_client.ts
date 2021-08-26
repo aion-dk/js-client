@@ -170,9 +170,7 @@ export class AVClient {
       throw new Error('Wrong number of OTPs submitted');
     }
 
-    const providers = this.OTPProviderUrls().map(
-      (providerURL) => new OTPProvider(providerURL)
-    );
+    const providers = this.setupOTPProviders();
 
     const requests = providers.map(function(provider, index) {
       return provider.requestOTPAuthorization(otpCodes[index], email)
@@ -185,6 +183,10 @@ export class AVClient {
 
     this.authorizationTokens = tokens
     return 'OK'
+  }
+
+  async submitAccessCode(code: (string|string[]), email: string): Promise<string> {
+    return this.validateAccessCode(code, email)
   }
 
   /**
@@ -419,8 +421,10 @@ export class AVClient {
     }
   }
 
-  private OTPProviderUrls(): string[] {
-    return this.electionConfig.OTPProviderURLs;
+  private setupOTPProviders(): OTPProvider[] {
+    return this.electionConfig.OTPProviderURLs.map(
+      (providerURL) => new OTPProvider(providerURL)
+    );
   }
 }
 
