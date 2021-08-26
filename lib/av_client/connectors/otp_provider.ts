@@ -2,7 +2,7 @@ import axios from 'axios'
 import { AccessCodeInvalid, AccessCodeExpired, NetworkError } from "../errors";
 
 export interface Token {
-  token: 'authorized' | 'expired' | 'invalid';
+  token: 'authorized'
 }
 
 export class OTPProvider {
@@ -19,13 +19,13 @@ export class OTPProvider {
     }).then(res => res.data) // Transform the return type to a Token
       .catch(error => {
 
-        // If we get errors from the provider, we
+        // If we get errors from the provider, we wrap in custom errors
         if (error.response && error.response.status === 403) {
-          const token = error.response.data?.token
-          if( token === 'expired' ){
+          const _error = error.response.data?.error
+          if( _error === 'expired' ){
             throw new AccessCodeExpired('OTP code expired')
           }
-          if( token === 'invalid' ){
+          if( _error === 'invalid' ){
             throw new AccessCodeInvalid('OTP code invalid')
           }
         }
