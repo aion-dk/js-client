@@ -18,22 +18,24 @@ export class OTPProvider {
       email: email
     }).then(res => res.data) // Transform the return type to a Token
       .catch(error => {
-        if (error.response) {
-          if( error.response.status === 403 ){
-            switch (error.response.data?.token) {
-              case 'expired':
-                throw new AccessCodeExpired('OTP code expired')
-              case 'invalid':
-                throw new AccessCodeInvalid('OTP code invalid')
-              default: // fall through to
-            }
+
+        // If we get errors from the provider, we
+        if (error.response && error.response.status === 403) {
+          const token = error.response.data?.token
+          if( token === 'expired' ){
+            throw new AccessCodeExpired('OTP code expired')
           }
-        } else if (error.request) {
-          // The request was made but no response was received
+          if( token === 'invalid' ){
+            throw new AccessCodeInvalid('OTP code invalid')
+          }
+        }
+
+        // The request was made but no response was received
+        if ( error.request && ! error.response) {
           throw new NetworkError('Network error')
         }
 
-        // Something happened in setting up the request and triggered an Error
+        // If we don't understand the error, then we rethrow
         throw error
       })
   }
