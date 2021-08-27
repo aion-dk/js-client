@@ -68,6 +68,7 @@ describe('entire voter flow using OTP authorization', () => {
 
 - [requestAccessCode](avclient.md#requestaccesscode)
 - [validateAccessCode](avclient.md#validateaccesscode)
+- [submitAccessCode](avclient.md#submitaccesscode)
 - [constructBallotCryptograms](avclient.md#constructballotcryptograms)
 - [generateTestCode](avclient.md#generatetestcode)
 - [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
@@ -125,6 +126,12 @@ key with each OTP provider.
 
 Should be followed by [constructBallotCryptograms](avclient.md#constructballotcryptograms).
 
+**`throws`** AccessCodeExpired if an OTP code has expired
+
+**`throws`** AccessCodeInvalid if an OTP code is invalid
+
+**`throws`** NetworkError if any request failed to get a response
+
 #### Parameters
 
 | Name | Type | Description |
@@ -137,6 +144,23 @@ Should be followed by [constructBallotCryptograms](avclient.md#constructballotcr
 `Promise`<`string`\>
 
 Returns `'OK'` if authorization succeeded.
+
+___
+
+### submitAccessCode
+
+▸ **submitAccessCode**(`code`, `email`): `Promise`<`string`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `code` | `string` \| `string`[] |
+| `email` | `string` |
+
+#### Returns
+
+`Promise`<`string`\>
 
 ___
 
