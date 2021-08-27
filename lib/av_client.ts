@@ -6,8 +6,8 @@ import EncryptVotes from '../lib/av_client/encrypt_votes';
 import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
-import OTPProvider from "./av_client/connectors/otp_provider";
-import validateAuthorizationToken from "./av_client/validate_authorization_token";
+import { OTPProvider, Token } from "./av_client/connectors/otp_provider";
+import { AccessCodeExpired, AccessCodeInvalid, NetworkError } from './av_client/errors';
 
 /**
  * # Assembly Voting Client API.
@@ -36,7 +36,7 @@ import validateAuthorizationToken from "./av_client/validate_authorization_token
  */
 
 export class AVClient {
-  private authorizationTokens: any[];
+  private authorizationTokens: Token[];
   private bulletinBoard: any;
   private electionConfig: any;
   private emptyCryptograms: ContestIndexed<EmptyCryptogram>;
@@ -150,6 +150,9 @@ export class AVClient {
    * @param   code An access code string.
    * @param   email Voter email.
    * @returns Returns `'OK'` if authorization succeeded.
+   * @throws AccessCodeExpired if an OTP code has expired
+   * @throws AccessCodeInvalid if an OTP code is invalid
+   * @throws NetworkError if any request failed to get a response
    */
   async validateAccessCode(code: (string|string[]), email: string): Promise<string> {
     this.validateCallOrder('validateAccessCode');
@@ -167,24 +170,23 @@ export class AVClient {
       throw new Error('Wrong number of OTPs submitted');
     }
 
-    const providers = this.electionConfig.OTPProviderURLs.map(
-      (providerURL) => new OTPProvider(providerURL)
-    );
+    const providers = this.setupOTPProviders();
 
     const requests = providers.map(function(provider, index) {
       return provider.requestOTPAuthorization(otpCodes[index], email)
-        .then((response) => response.data);
     });
 
-    const tokens = await Promise.all(requests);
-    if (tokens.every(validateAuthorizationToken)) {
-      this.authorizationTokens = tokens;
-      await new RegisterVoter(this).call();
-      this.succeededMethods.push('validateAccessCode');
-      return 'OK';
-    } else {
-      return Promise.reject('Failure, not all tokens were valid');
-    }
+    const tokens: Token[] = await Promise.all(requests)
+
+    await new RegisterVoter(this).call();
+    this.succeededMethods.push('validateAccessCode');
+
+    this.authorizationTokens = tokens
+    return 'OK'
+  }
+
+  async submitAccessCode(code: (string|string[]), email: string): Promise<string> {
+    return this.validateAccessCode(code, email)
   }
 
   /**
@@ -417,6 +419,12 @@ export class AVClient {
         throw new CallOutOfOrderError(`#${methodName} requires exactly ${requiredList} to be called before it`);
       }
     }
+  }
+
+  private setupOTPProviders(): OTPProvider[] {
+    return this.electionConfig.OTPProviderURLs.map(
+      (providerURL) => new OTPProvider(providerURL)
+    );
   }
 }
 
