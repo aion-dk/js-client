@@ -117,6 +117,8 @@ export class AVClient {
    *
    * @param opaqueVoterId Voter ID that preserves voter anonymity.
    * @returns undefined or throws an error.
+   * @throws VoterRecordNotFound if no voter was found
+   * @throws NetworkError if any request failed to get a response
    */
   async requestAccessCode(opaqueVoterId: string): Promise<void> {
     await this.updateElectionConfig();
@@ -150,6 +152,7 @@ export class AVClient {
    * @param   code An access code string.
    * @param   email Voter email.
    * @returns Returns `'OK'` if authorization succeeded.
+   * @throws CallOutOfOrderError if called before required data is available
    * @throws AccessCodeExpired if an OTP code has expired
    * @throws AccessCodeInvalid if an OTP code is invalid
    * @throws NetworkError if any request failed to get a response
@@ -208,6 +211,9 @@ export class AVClient {
    * ```javascript
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
+   * @throws CallOutOfOrderError if called before required data is available
+   * @throws CorruptCVRError if the cast vote record is invalid
+   * @throws NetworkError if any request failed to get a response
    */
   async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
     this.validateCallOrder('constructBallotCryptograms');
@@ -273,6 +279,9 @@ export class AVClient {
    * Gets commitment opening of the digital ballot box and validates it.
    *
    * @returns Returns 'Success' if the validation succeeds.
+   * @throws CallOutOfOrderError if called before required data is available
+   * @throws ServerCommitmentError if the server commitment is invalid
+   * @throws NetworkError if any request failed to get a response
    */
   async spoilBallotCryptograms(): Promise<void> {
     this.validateCallOrder('spoilBallotCryptograms');
@@ -320,6 +329,7 @@ export class AVClient {
    *    voteSubmissionId: 6
       }
    * ```
+   * @throws NetworkError if any request failed to get a response
    */
   async submitBallotCryptograms(affidavit: Affidavit): Promise<Receipt> {
     this.validateCallOrder('submitBallotCryptograms');
