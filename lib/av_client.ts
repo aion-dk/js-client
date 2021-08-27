@@ -94,7 +94,7 @@ export class AVClient {
    *
    * @internal
    * @param   codes Array of election code strings.
-   * @returns undefined if authentication succeeded or throws an error
+   * @returns Returns undefined if authentication succeeded or throws an error
    */
   async authenticateWithCodes(codes: string[]): Promise<void> {
     await this.updateElectionConfig();
@@ -116,7 +116,7 @@ export class AVClient {
    * Should be followed by {@link AVClient.validateAccessCode | validateAccessCode} to submit access code for validation.
    *
    * @param opaqueVoterId Voter ID that preserves voter anonymity.
-   * @returns undefined or throws an error.
+   * @returns Returns undefined or throws an error.
    * @throws VoterRecordNotFound if no voter was found
    * @throws NetworkError if any request failed to get a response
    */
@@ -151,7 +151,7 @@ export class AVClient {
    *
    * @param   code An access code string.
    * @param   email Voter email.
-   * @returns undefined if authorization succeeded or throws an error
+   * @returns Returns undefined if authorization succeeded or throws an error
    * @throws CallOutOfOrderError if called before required data is available
    * @throws AccessCodeExpired if an OTP code has expired
    * @throws AccessCodeInvalid if an OTP code is invalid
@@ -278,7 +278,7 @@ export class AVClient {
    * Should be called when voter chooses to test the encryption of their ballot.
    * Gets commitment opening of the digital ballot box and validates it.
    *
-   * @returns Returns 'Success' if the validation succeeds.
+   * @returns Returns undefined if the validation succeeds or throws an error
    * @throws CallOutOfOrderError if called before required data is available
    * @throws ServerCommitmentError if the server commitment is invalid
    * @throws NetworkError if any request failed to get a response
