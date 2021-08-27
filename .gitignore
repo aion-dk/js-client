@@ -1,5 +1,4 @@
 .DS_Store
 node_modules
-dist
 html_docs
 .nyc_output

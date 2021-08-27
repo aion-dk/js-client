@@ -1,0 +1,370 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AVClient = exports.sjcl = void 0;
+const bulletin_board_1 = require("../lib/av_client/connectors/bulletin_board");
+const election_config_1 = require("../lib/av_client/election_config");
+const authenticate_with_codes_1 = require("../lib/av_client/authenticate_with_codes");
+const register_voter_1 = require("../lib/av_client/register_voter");
+const encrypt_votes_1 = require("../lib/av_client/encrypt_votes");
+const benaloh_challenge_1 = require("./av_client/benaloh_challenge");
+const submit_votes_1 = require("./av_client/submit_votes");
+const voter_authorization_coordinator_1 = require("./av_client/connectors/voter_authorization_coordinator");
+const otp_provider_1 = require("./av_client/connectors/otp_provider");
+const validate_authorization_token_1 = require("./av_client/validate_authorization_token");
+/** @internal */
+exports.sjcl = require('../lib/av_client/sjcl');
+/**
+ * # Assembly Voting Client API.
+ *
+ * The API is responsible for handling all the cryptographic operations and all network communication with:
+ * * the Digital Ballot Box
+ * * the Voter Authorization Coordinator service
+ * * the OTP provider(s)
+ *
+ * ## Expected sequence of methods being executed
+ *
+ * |Method                                                                    | Description |
+ * -------------------------------------------------------------------------- | ---
+ * |{@link AVClient.requestAccessCode | requestAccessCode}                   | Initiates the authorization process, in case voter has not authorized yet. Requests access code to be sent to voter email |
+ * |{@link AVClient.validateAccessCode | validateAccessCode}                 | Gets voter authorized to vote. |
+ * |{@link AVClient.constructBallotCryptograms | constructBallotCryptograms} | Constructs voter ballot cryptograms. |
+ * |{@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}         | Optional. Initiates process of testing the ballot encryption. |
+ * |{@link AVClient.submitBallotCryptograms | submitBallotCryptograms}       | Finalizes the voting process. |
+ * |{@link AVClient.purgeData | purgeData}                                   | Optional. Explicitly purges internal data. |
+ *
+ * ## Example walkthrough test
+ *
+ * ```typescript
+ * [[include:readme_example.test.ts]]
+ * ```
+ */
+class AVClient {
+    /**
+     * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
+     */
+    constructor(bulletinBoardURL) {
+        this.bulletinBoard = new bulletin_board_1.default(bulletinBoardURL);
+        this.electionConfig = {};
+        this.succeededMethods = [];
+    }
+    /**
+     * Returns voter authorization mode from the election configuration.
+     *
+     * @internal
+     * @returns Returns an object with the method name, and the reference to the function.
+     * Available method names are
+     * * {@link AVClient.authenticateWithCodes | authenticateWithCodes} for authentication via election codes.
+     * * {@link AVClient.requestAccessCode | requestAccessCode} for authorization via OTPs.
+     */
+    getAuthorizationMethod() {
+        if (!this.electionConfig) {
+            throw new Error('Please fetch election config first');
+        }
+        switch (this.electionConfig.authorizationMode) {
+            case 'election codes':
+                return {
+                    methodName: 'authenticateWithCodes',
+                    method: this.authenticateWithCodes
+                };
+                break;
+            case 'otps':
+                return {
+                    methodName: 'requestAccessCode',
+                    method: this.requestAccessCode
+                };
+                break;
+            default:
+                throw new Error('Authorization method not found in election config');
+        }
+    }
+    /**
+     * Should only be used when election authorization mode is 'election codes'.
+     *
+     * Authenticates or rejects voter, based on their submitted election codes.
+     *
+     * @internal
+     * @param   codes Array of election code strings.
+     * @returns Returns 'OK' if authentication succeeded.
+     */
+    async authenticateWithCodes(codes) {
+        await this.updateElectionConfig();
+        const authenticationResponse = await new authenticate_with_codes_1.default(this.bulletinBoard)
+            .authenticate(codes, this.electionId(), this.electionEncryptionKey());
+        this.voterIdentifier = authenticationResponse.voterIdentifier;
+        this.keyPair = authenticationResponse.keyPair;
+        this.emptyCryptograms = authenticationResponse.emptyCryptograms;
+        return 'OK';
+    }
+    /**
+     * Should be called when a voter chooses digital vote submission (instead of mail-in).
+     *
+     * Will attempt to get backend services to send an access code (one time password, OTP) to voter's email address.
+     *
+     * Should be followed by {@link AVClient.validateAccessCode | validateAccessCode} to submit access code for validation.
+     *
+     * @param   opaqueVoterId Voter ID that preserves voter anonymity.
+     * @returns 'OK' or an error.
+     */
+    async requestAccessCode(opaqueVoterId) {
+        await this.updateElectionConfig();
+        const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
+        const coordinator = new voter_authorization_coordinator_1.default(coordinatorURL);
+        return coordinator.createSession(opaqueVoterId).then(({ data }) => {
+            const sessionId = data.sessionId;
+            return coordinator.startIdentification(sessionId).then((response) => {
+                this.succeededMethods.push('requestAccessCode');
+                return 'OK';
+            });
+        });
+    }
+    /**
+     * Should be called after {@link AVClient.requestAccessCode | requestAccessCode}.
+     *
+     * Takes an access code (OTP) that voter received, uses it to authorize to submit votes.
+     *
+     * Internally, generates a private/public key pair, then attempts to authorize the public
+     * key with each OTP provider.
+     *
+     * Should be followed by {@link AVClient.constructBallotCryptograms | constructBallotCryptograms}.
+     *
+     * @param   code An access code string.
+     * @param   email Voter email.
+     * @returns Returns `'OK'` if authorization succeeded.
+     */
+    async validateAccessCode(code, email) {
+        this.validateCallOrder('validateAccessCode');
+        await this.updateElectionConfig();
+        let otpCodes;
+        if (typeof code === 'string') {
+            otpCodes = [code];
+        }
+        else {
+            otpCodes = code;
+        }
+        if (otpCodes.length != this.electionConfig.OTPProviderCount) {
+            throw new Error('Wrong number of OTPs submitted');
+        }
+        const providers = this.electionConfig.OTPProviderURLs.map((providerURL) => new otp_provider_1.default(providerURL));
+        const requests = providers.map(function (provider, index) {
+            return provider.requestOTPAuthorization(otpCodes[index], email)
+                .then((response) => response.data);
+        });
+        const tokens = await Promise.all(requests);
+        if (tokens.every(validate_authorization_token_1.default)) {
+            this.authorizationTokens = tokens;
+            await new register_voter_1.default(this).call();
+            this.succeededMethods.push('validateAccessCode');
+            return 'OK';
+        }
+        else {
+            return Promise.reject('Failure, not all tokens were valid');
+        }
+    }
+    /**
+     * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
+     *
+     * Encrypts a cast-vote-record (CVR) and generates vote cryptograms.
+     *
+     * Example:
+     * ```javascript
+     * const client = new AVClient(url);
+     * const cvr = { '1': 'option1', '2': 'optiona' };
+     * const fingerprint = await client.constructBallotCryptograms(cvr);
+     * ```
+     *
+     * Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
+     * values internal to the AV election config.
+     *
+     * Should be followed by either {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}
+     * or {@link AVClient.submitBallotCryptograms | submitBallotCryptograms}.
+     *
+     * @param   cvr Object containing the selections for each contest.<br>TODO: needs better specification.
+     * @returns Returns fingerprint of the cryptograms. Example:
+     * ```javascript
+     * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
+     * ```
+     */
+    async constructBallotCryptograms(cvr) {
+        this.validateCallOrder('constructBallotCryptograms');
+        await this.updateElectionConfig();
+        if (JSON.stringify(Object.keys(cvr)) !== JSON.stringify(this.contestIds())) {
+            throw new Error('Corrupt CVR: Contains invalid contest');
+        }
+        const contests = this.electionConfig.ballots;
+        const valid_contest_selections = Object.keys(cvr).every(function (contestId) {
+            const contest = contests.find(b => b.id == contestId);
+            return contest.options.some(o => o.handle == cvr[contestId]);
+        });
+        if (!valid_contest_selections) {
+            throw new Error('Corrupt CVR: Contains invalid option');
+        }
+        const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].cryptogram]));
+        const contestEncodingTypes = Object.fromEntries(Object.keys(cvr).map((contestId) => {
+            const contest = contests.find(b => b.id == contestId);
+            return [contestId, contest.vote_encoding_type];
+        }));
+        const encryptionResponse = new encrypt_votes_1.default().encrypt(cvr, emptyCryptograms, contestEncodingTypes, this.electionEncryptionKey());
+        this.voteEncryptions = encryptionResponse;
+        const fingerprint = new encrypt_votes_1.default().fingerprint(this.cryptogramsForConfirmation());
+        this.succeededMethods.push('constructBallotCryptograms');
+        return fingerprint;
+    }
+    /**
+     * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
+     * Should be called before {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}.
+     *
+     * Generates an encryption key that is used to add another encryption layer to vote cryptograms when they are spoiled.
+     *
+     * The generateTestCode is used in case {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms} is called afterwards.
+     *
+     * @returns Returns the test code. Example:
+     * ```javascript
+     * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
+     * ```
+     */
+    generateTestCode() {
+        const testCode = new encrypt_votes_1.default().generateTestCode();
+        this.testCode = testCode;
+        return testCode;
+    }
+    /**
+     * Should be called when voter chooses to test the encryption of their ballot.
+     * Gets commitment opening of the digital ballot box and validates it.
+     *
+     * @returns Returns 'Success' if the validation succeeds.
+     */
+    async spoilBallotCryptograms() {
+        this.validateCallOrder('spoilBallotCryptograms');
+        // TODO: encrypt the vote cryptograms one more time with a key derived from `this.generateTestCode`.
+        //  A key is derived like: key = hash(test code, ballot id, cryptogram index)
+        // TODO: compute commitment openings of the voter commitment
+        // TODO: call the bulletin board to spoil the cryptograms. Send the encrypted vote cryptograms and voter commitment
+        //  opening. Response contains server commitment openings.
+        // TODO: verify the server commitment openings against server commitment and server empty cryptograms
+        const benaloh = new benaloh_challenge_1.default(this.bulletinBoard);
+        // this is part of 'offline Benaloh Challenge'
+        // const serverRandomizers = await benaloh.getServerRandomizers()
+        const voterCommitmentOpening = {};
+        const encryptedBallotCryptograms = {};
+        const serverCommitment = ''; // get this from the state
+        const serverEmptyCryptograms = {}; // get this from the state
+        const serverCommitmentOpening = await benaloh.getServerCommitmentOpening(voterCommitmentOpening, encryptedBallotCryptograms);
+        const valid = benaloh.verifyCommitmentOpening(serverCommitmentOpening, serverCommitment, serverEmptyCryptograms);
+        if (valid) {
+            this.succeededMethods.push('spoilBallotCryptograms');
+            return 'Success';
+        }
+        else {
+            return Promise.reject('Server commitment did not validate');
+        }
+    }
+    /**
+     * Should be the last call in the entire voting process.
+     *
+     * Submits encrypted ballot and the affidavit to the digital ballot box.
+  
+     *
+     *
+     * @param  affidavit The affidavit document.<br>TODO: clarification of the affidavit format is still needed.
+     * @return Returns the vote receipt. Example of a receipt:
+     * ```javascript
+     * {
+     *    previousBoardHash: 'd8d9742271592d1b212bbd4cbbbe357aef8e00cdbdf312df95e9cf9a1a921465',
+     *    boardHash: '5a9175c2b3617298d78be7d0244a68f34bc8b2a37061bb4d3fdf97edc1424098',
+     *    registeredAt: '2020-03-01T10:00:00.000+01:00',
+     *    serverSignature: 'dbcce518142b8740a5c911f727f3c02829211a8ddfccabeb89297877e4198bc1,46826ddfccaac9ca105e39c8a2d015098479624c411b4783ca1a3600daf4e8fa',
+     *    voteSubmissionId: 6
+        }
+     * ```
+     */
+    async submitBallotCryptograms(affidavit) {
+        this.validateCallOrder('submitBallotCryptograms');
+        const voterIdentifier = this.voterIdentifier;
+        const electionId = this.electionId();
+        const voteEncryptions = this.voteEncryptions;
+        const privateKey = this.privateKey();
+        const signatureKey = this.electionSigningPublicKey();
+        return await new submit_votes_1.default(this.bulletinBoard)
+            .signAndSubmitVotes({
+            voterIdentifier,
+            electionId,
+            voteEncryptions,
+            privateKey,
+            signatureKey,
+            affidavit
+        });
+    }
+    /**
+     * Purges internal data.
+     */
+    purgeData() {
+        // TODO: implement me
+        return;
+    }
+    /**
+     * Returns data for rendering the list of cryptograms of the ballot
+     * @return Object containing a cryptogram for each contest
+     */
+    cryptogramsForConfirmation() {
+        const cryptograms = {};
+        const voteEncryptions = this.voteEncryptions;
+        this.contestIds().forEach(function (id) {
+            cryptograms[id] = voteEncryptions[id].cryptogram;
+        });
+        return cryptograms;
+    }
+    /**
+     * Attempts to populate election configuration data from backend server, if it hasn't been populated yet.
+     */
+    async updateElectionConfig() {
+        if (Object.entries(this.electionConfig).length === 0) {
+            this.electionConfig = await new election_config_1.default(this.bulletinBoard).get();
+        }
+    }
+    electionId() {
+        return this.electionConfig.election.id;
+    }
+    contestIds() {
+        return this.electionConfig.ballots.map(ballot => ballot.id.toString());
+    }
+    electionEncryptionKey() {
+        return this.electionConfig.encryptionKey;
+    }
+    electionSigningPublicKey() {
+        return this.electionConfig.signingPublicKey;
+    }
+    privateKey() {
+        return this.keyPair.privateKey;
+    }
+    publicKey() {
+        return this.keyPair.publicKey;
+    }
+    validateCallOrder(methodName) {
+        const expectations = {
+            validateAccessCode: ['requestAccessCode'],
+            constructBallotCryptograms: ['requestAccessCode', 'validateAccessCode'],
+            spoilBallotCryptograms: ['requestAccessCode', 'validateAccessCode', 'constructBallotCryptograms'],
+            submitBallotCryptograms: ['requestAccessCode', 'validateAccessCode', 'constructBallotCryptograms'],
+        };
+        const requiredCalls = expectations[methodName];
+        if (requiredCalls === undefined) {
+            throw new Error(`Call order validation for method #${methodName} is not implemented`);
+        }
+        else {
+            if (JSON.stringify(this.succeededMethods) != JSON.stringify(requiredCalls)) {
+                const requiredList = requiredCalls.map((name) => `#${name}`).join(', ');
+                const gotList = this.succeededMethods.map((name) => `#${name}`).join(', ');
+                throw new CallOutOfOrderError(`#${methodName} requires exactly ${requiredList} to be called before it`);
+            }
+        }
+    }
+}
+exports.AVClient = AVClient;
+class CallOutOfOrderError extends Error {
+    constructor(message) {
+        super(message);
+        Object.setPrototypeOf(this, CallOutOfOrderError.prototype);
+        this.name = 'CallOutOfOrderError';
+    }
+}
+//# sourceMappingURL=av_client.js.map

@@ -8,6 +8,8 @@ import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import OTPProvider from "./av_client/connectors/otp_provider";
 import validateAuthorizationToken from "./av_client/validate_authorization_token";
+/** @internal */
+export const sjcl = require('../lib/av_client/sjcl');
 
 /**
  * # Assembly Voting Client API.
