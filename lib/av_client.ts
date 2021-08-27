@@ -185,10 +185,6 @@ export class AVClient {
     return 'OK'
   }
 
-  async submitAccessCode(code: (string|string[]), email: string): Promise<string> {
-    return this.validateAccessCode(code, email)
-  }
-
   /**
    * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
    *
