@@ -43,7 +43,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
     });
 
     context('all systems work', () => {
-      it('returns \'Success\'', async () => {
+      it('resolves without errors', async () => {
         nock('http://localhost:3000/').post('/test/app/get_commitment_opening')
           .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
 
@@ -55,7 +55,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
         client.generateTestCode();
 
         const result = await client.spoilBallotCryptograms();
-        expect(result).to.equal('Success');
+        expect(result).to.equal(undefined);
       });
     });
 

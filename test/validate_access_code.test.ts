@@ -40,7 +40,7 @@ describe('AVClient#validateAccessCode', () => {
   });
 
   context('OTP services work', () => {
-    it('returns success', async () => {
+    it('resolves without errors', async () => {
       expectedNetworkRequests.push(
         nock('http://localhost:1111/').post('/authorize')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json')
@@ -60,7 +60,7 @@ describe('AVClient#validateAccessCode', () => {
       const email = 'blabla@aion.dk';
       const result = await client.validateAccessCode(otp, email);
 
-      expect(result).to.equal('OK');
+      expect(result).to.equal(undefined);
       expectedNetworkRequests.forEach((mock) => mock.done());
     })
 

@@ -33,10 +33,10 @@ describe('AVClient#authenticateWithCodes', function() {
         .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
     });
 
-    it('returns success', async function() {
+    it('resolves without errors', async function() {
       const validCodes = ['aAjEuD64Fo2143'];
       const result = await client.authenticateWithCodes(validCodes);
-      expect(result).to.equal('OK');
+      expect(result).to.equal(undefined);
     });
   });
 

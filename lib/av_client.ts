@@ -96,7 +96,7 @@ export class AVClient {
    * @param   codes Array of election code strings.
    * @returns Returns 'OK' if authentication succeeded.
    */
-  async authenticateWithCodes(codes: string[]): Promise<string> {
+  async authenticateWithCodes(codes: string[]): Promise<void> {
     await this.updateElectionConfig();
     const authenticationResponse = await new AuthenticateWithCodes(this.bulletinBoard)
       .authenticate(codes, this.electionId(), this.electionEncryptionKey());
@@ -105,7 +105,7 @@ export class AVClient {
     this.keyPair = authenticationResponse.keyPair;
     this.emptyCryptograms = authenticationResponse.emptyCryptograms;
 
-    return 'OK';
+    return Promise.resolve();
   }
 
   /**
@@ -115,10 +115,10 @@ export class AVClient {
    *
    * Should be followed by {@link AVClient.validateAccessCode | validateAccessCode} to submit access code for validation.
    *
-   * @param   opaqueVoterId Voter ID that preserves voter anonymity.
-   * @returns 'OK' or an error.
+   * @param opaqueVoterId Voter ID that preserves voter anonymity.
+   * @returns undefined or throws an error.
    */
-  async requestAccessCode(opaqueVoterId: string): Promise<string> {
+  async requestAccessCode(opaqueVoterId: string): Promise<void> {
     await this.updateElectionConfig();
 
     const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
@@ -130,7 +130,7 @@ export class AVClient {
         return coordinator.startIdentification(sessionId).then(
           (response) => {
             this.succeededMethods.push('requestAccessCode');
-            return 'OK';
+            return Promise.resolve()
           }
         );
       }
@@ -154,7 +154,7 @@ export class AVClient {
    * @throws AccessCodeInvalid if an OTP code is invalid
    * @throws NetworkError if any request failed to get a response
    */
-  async validateAccessCode(code: (string|string[]), email: string): Promise<string> {
+  async validateAccessCode(code: (string|string[]), email: string): Promise<void> {
     this.validateCallOrder('validateAccessCode');
     await this.updateElectionConfig();
 
@@ -182,7 +182,7 @@ export class AVClient {
     this.succeededMethods.push('validateAccessCode');
 
     this.authorizationTokens = tokens
-    return 'OK'
+    return Promise.resolve()
   }
 
   /**
@@ -274,7 +274,7 @@ export class AVClient {
    *
    * @returns Returns 'Success' if the validation succeeds.
    */
-  async spoilBallotCryptograms(): Promise<string> {
+  async spoilBallotCryptograms(): Promise<void> {
     this.validateCallOrder('spoilBallotCryptograms');
     // TODO: encrypt the vote cryptograms one more time with a key derived from `this.generateTestCode`.
     //  A key is derived like: key = hash(test code, ballot id, cryptogram index)
@@ -297,7 +297,7 @@ export class AVClient {
 
     if (valid) {
       this.succeededMethods.push('spoilBallotCryptograms');
-      return 'Success'
+      return Promise.resolve()
     } else {
       return Promise.reject('Server commitment did not validate')
     }
@@ -307,7 +307,6 @@ export class AVClient {
    * Should be the last call in the entire voting process.
    *
    * Submits encrypted ballot and the affidavit to the digital ballot box.
-
    *
    *
    * @param  affidavit The affidavit document.<br>TODO: clarification of the affidavit format is still needed.
