@@ -94,7 +94,7 @@ export class AVClient {
    *
    * @internal
    * @param   codes Array of election code strings.
-   * @returns Returns 'OK' if authentication succeeded.
+   * @returns undefined if authentication succeeded or throws an error
    */
   async authenticateWithCodes(codes: string[]): Promise<void> {
     await this.updateElectionConfig();
@@ -151,7 +151,7 @@ export class AVClient {
    *
    * @param   code An access code string.
    * @param   email Voter email.
-   * @returns Returns `'OK'` if authorization succeeded.
+   * @returns undefined if authorization succeeded or throws an error
    * @throws CallOutOfOrderError if called before required data is available
    * @throws AccessCodeExpired if an OTP code has expired
    * @throws AccessCodeInvalid if an OTP code is invalid
