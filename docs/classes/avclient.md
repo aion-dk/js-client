@@ -33,6 +33,7 @@ describe('entire voter flow using OTP authorization', () => {
 
   it('returns a receipt', async () => {
     const client = new AVClient('http://localhost:3000/test/app');
+    await client.initialize()
 
     await client.requestAccessCode('some PII info');
 
@@ -66,6 +67,7 @@ describe('entire voter flow using OTP authorization', () => {
 
 ### Methods
 
+- [initialize](avclient.md#initialize)
 - [requestAccessCode](avclient.md#requestaccesscode)
 - [validateAccessCode](avclient.md#validateaccesscode)
 - [constructBallotCryptograms](avclient.md#constructballotcryptograms)
@@ -73,6 +75,7 @@ describe('entire voter flow using OTP authorization', () => {
 - [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
 - [submitBallotCryptograms](avclient.md#submitballotcryptograms)
 - [purgeData](avclient.md#purgedata)
+- [getElectionConfig](avclient.md#getelectionconfig)
 
 ## Constructors
 
@@ -87,6 +90,35 @@ describe('entire voter flow using OTP authorization', () => {
 | `bulletinBoardURL` | `string` | URL to the Assembly Voting backend server, specific for election. |
 
 ## Methods
+
+### initialize
+
+▸ **initialize**(`electionConfig`): `Promise`<`void`\>
+
+Initializes the client with an election config.
+If no config is provided, it fetches one from the backend.
+
+**`throws`** NetworkError if any request failed to get a response
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `electionConfig` | `ElectionConfig` | override election config object |
+
+#### Returns
+
+`Promise`<`void`\>
+
+Returns undefined if succeeded or throws an error
+
+▸ **initialize**(): `Promise`<`void`\>
+
+#### Returns
+
+`Promise`<`void`\>
+
+___
 
 ### requestAccessCode
 
@@ -281,3 +313,13 @@ Purges internal data.
 #### Returns
 
 `void`
+
+___
+
+### getElectionConfig
+
+▸ **getElectionConfig**(): `ElectionConfig`
+
+#### Returns
+
+`ElectionConfig`
