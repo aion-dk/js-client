@@ -47,9 +47,9 @@ describe('AVClient#constructBallotCryptograms', () => {
 
       const cvr = { '1': 'option1', '2': 'optiona' };
 
-      const fingerprint = await client.constructBallotCryptograms(cvr);
+      const trackingCode = await client.constructBallotCryptograms(cvr);
 
-      expect(fingerprint).to.equal('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
+      expect(trackingCode).to.equal('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
     });
   });
 

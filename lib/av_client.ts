@@ -196,7 +196,7 @@ export class AVClient {
    * ```javascript
    * const client = new AVClient(url);
    * const cvr = { '1': 'option1', '2': 'optiona' };
-   * const fingerprint = await client.constructBallotCryptograms(cvr);
+   * const trackingCode = await client.constructBallotCryptograms(cvr);
    * ```
    *
    * Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
@@ -206,7 +206,7 @@ export class AVClient {
    * or {@link AVClient.submitBallotCryptograms | submitBallotCryptograms}.
    *
    * @param   cvr Object containing the selections for each contest.<br>TODO: needs better specification.
-   * @returns Returns fingerprint of the cryptograms. Example:
+   * @returns Returns the ballot tracking code. Example:
    * ```javascript
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
@@ -243,10 +243,10 @@ export class AVClient {
 
     this.voteEncryptions = encryptionResponse
 
-    const fingerprint = new EncryptVotes().fingerprint(this.cryptogramsForConfirmation());
+    const trackingCode = new EncryptVotes().fingerprint(this.cryptogramsForConfirmation());
     this.succeededMethods.push('constructBallotCryptograms');
 
-    return fingerprint;
+    return trackingCode;
   }
 
   /**

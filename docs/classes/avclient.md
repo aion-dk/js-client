@@ -41,8 +41,8 @@ describe('entire voter flow using OTP authorization', () => {
     expect(validateAccessCodeResult).to.eq('OK');
 
     const cvr = { '1': 'option1', '2': 'optiona' };
-    const fingerprint = await client.constructBallotCryptograms(cvr);
-    expect(fingerprint).to.eq('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
+    const trackingCode  = await client.constructBallotCryptograms(cvr);
+    expect(trackingCode).to.eq('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
 
     const affidavit = 'some bytes, most likely as binary PDF';
     const receipt = await client.submitBallotCryptograms(affidavit);
@@ -152,7 +152,7 @@ Example:
 ```javascript
 const client = new AVClient(url);
 const cvr = { '1': 'option1', '2': 'optiona' };
-const fingerprint = await client.constructBallotCryptograms(cvr);
+const trackingCode = await client.constructBallotCryptograms(cvr);
 ```
 
 Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
@@ -171,7 +171,7 @@ or [submitBallotCryptograms](avclient.md#submitballotcryptograms).
 
 `Promise`<`string`\>
 
-Returns fingerprint of the cryptograms. Example:
+Returns the ballot tracking code. Example:
 ```javascript
 '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
 ```
