@@ -1,4 +1,5 @@
 import { randomKeyPair} from './generate_key_pair';
+import { ContestIndexed } from "./types";
 const Crypto = require('./aion_crypto.js')()
 
 export default class RegisterVoter {
@@ -23,12 +24,12 @@ export default class RegisterVoter {
         this.client.bulletinBoard.setVoterSessionUuid(data.voterSessionUuid);
         this.client.voterIdentifier = data.voterIdentifier;
         this.client.emptyCryptograms = data.emptyCryptograms;
-        this.client.electionConfig.ballots = data.ballots;
+        this.client.getElectionConfig().ballots = data.ballots;
       }
     )
     randomKeyPair(); // TODO: remove, this just increases deterministic randomness offset for tests
 
-    const challenges = Object.fromEntries(this.client.contestIds().map(contestId => {
+    const challenges: ContestIndexed<string> = Object.fromEntries(this.client.contestIds().map(contestId => {
       return [contestId, Crypto.generateRandomNumber()]
     }));
 

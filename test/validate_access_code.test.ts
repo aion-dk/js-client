@@ -13,13 +13,12 @@ describe('AVClient#validateAccessCode', () => {
   let sandbox;
   const expectedNetworkRequests : any[] = [];
 
-  beforeEach(() => {
+  beforeEach(async () => {
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
     resetDeterministicOffset();
 
-    client = new AVClient('http://localhost:3000/test/app');
     expectedNetworkRequests.push(
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json')
@@ -32,6 +31,9 @@ describe('AVClient#validateAccessCode', () => {
       nock('http://localhost:1234/').post('/start_identification')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json')
     )
+
+    client = new AVClient('http://localhost:3000/test/app');
+    await client.initialize()
   });
 
   afterEach(() => {
@@ -151,15 +153,14 @@ describe('AVClient#validateAccessCode', () => {
       const otp = '1234';
       const email = 'blabla@aion.dk'
 
-      const clientWithBadOtpProvider = new AVClient('http://localhost:3000/test/app');
+      await client.initialize({
+        ...client.getElectionConfig(),
+        OTPProviderURLs: ['http://sdkghskfglksjlkfgjdlkfjglkdfjglkjdlfgjlkdjgflkjdlkfgjlkdfg.com']
+      })
 
-      sandbox.stub(clientWithBadOtpProvider, 'setupOTPProviders').callsFake(() =>
-        [new OTPProvider('http://sdkghskfglksjlkfgjdlkfjglkdfjglkjdlfgjlkdjgflkjdlkfgjlkdfg.com')]
-      );
+      await client.requestAccessCode('voter123');
 
-      await clientWithBadOtpProvider.requestAccessCode('voter123');
-
-      return clientWithBadOtpProvider.validateAccessCode(otp, email).then(
+      return client.validateAccessCode(otp, email).then(
         () => {
           expect.fail('Expected promise to be rejected')
         },
