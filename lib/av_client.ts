@@ -1,5 +1,5 @@
 import BulletinBoard from '../lib/av_client/connectors/bulletin_board';
-import ElectionConfig from '../lib/av_client/election_config';
+import { fetchElectionConfig, ElectionConfig } from '../lib/av_client/election_config';
 import { ContestIndexed } from './av_client/types'
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
 import RegisterVoter from '../lib/av_client/register_voter';
@@ -8,7 +8,6 @@ import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, Token } from "./av_client/connectors/otp_provider";
-import { AccessCodeExpired, AccessCodeInvalid, NetworkError } from './av_client/errors';
 
 /**
  * # Assembly Voting Client API.
@@ -39,7 +38,7 @@ import { AccessCodeExpired, AccessCodeInvalid, NetworkError } from './av_client/
 export class AVClient {
   private authorizationTokens: Token[];
   private bulletinBoard: any;
-  private electionConfig: any;
+  private electionConfig?: ElectionConfig;
   private emptyCryptograms: ContestIndexed<EmptyCryptogram>;
   private keyPair: KeyPair;
   private testCode: string;
@@ -52,8 +51,24 @@ export class AVClient {
    */
   constructor(bulletinBoardURL: string) {
     this.bulletinBoard = new BulletinBoard(bulletinBoardURL);
-    this.electionConfig = {};
     this.succeededMethods = [];
+  }
+
+  /**
+   * Initializes the client with an election config.
+   * If no config is provided, it fetches one from the backend.
+   *
+   * @param electionConfig override election config object
+   * @returns Returns undefined if succeeded or throws an error
+   * @throws NetworkError if any request failed to get a response
+   */
+  async initialize(electionConfig: ElectionConfig): Promise<void>
+  async initialize(): Promise<void>
+  async initialize(electionConfig?: ElectionConfig): Promise<void> {
+    if( electionConfig )
+      this.electionConfig = electionConfig
+    else
+      this.electionConfig = await fetchElectionConfig(this.bulletinBoard);
   }
 
   /**
@@ -66,23 +81,17 @@ export class AVClient {
    * * {@link AVClient.requestAccessCode | requestAccessCode} for authorization via OTPs.
    */
   getAuthorizationMethod(): { methodName: string; method: Function } {
-    if (!this.electionConfig) {
-      throw new Error('Please fetch election config first');
-    }
-
-    switch(this.electionConfig.authorizationMode) {
+    switch(this.getElectionConfig().authorizationMode) {
       case 'election codes':
         return {
           methodName: 'authenticateWithCodes',
           method: this.authenticateWithCodes
         }
-        break;
       case 'otps':
         return {
           methodName: 'requestAccessCode',
           method: this.requestAccessCode
         }
-        break;
       default:
         throw new Error('Authorization method not found in election config')
     }
@@ -98,7 +107,6 @@ export class AVClient {
    * @returns Returns undefined if authentication succeeded or throws an error
    */
   async authenticateWithCodes(codes: string[]): Promise<void> {
-    await this.updateElectionConfig();
     const authenticationResponse = await new AuthenticateWithCodes(this.bulletinBoard)
       .authenticate(codes, this.electionId(), this.electionEncryptionKey());
 
@@ -122,9 +130,7 @@ export class AVClient {
    * @throws NetworkError if any request failed to get a response
    */
   async requestAccessCode(opaqueVoterId: string): Promise<void> {
-    await this.updateElectionConfig();
-
-    const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
+    const coordinatorURL = this.getElectionConfig().voterAuthorizationCoordinatorURL;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
     return coordinator.createSession(opaqueVoterId).then(
@@ -160,9 +166,8 @@ export class AVClient {
    */
   async validateAccessCode(code: (string|string[]), email: string): Promise<void> {
     this.validateCallOrder('validateAccessCode');
-    await this.updateElectionConfig();
 
-    let otpCodes;
+    let otpCodes: string[];
 
     if (typeof code === 'string') {
       otpCodes = [code];
@@ -170,7 +175,7 @@ export class AVClient {
       otpCodes = code;
     }
 
-    if (otpCodes.length != this.electionConfig.OTPProviderCount) {
+    if (otpCodes.length != this.getElectionConfig().OTPProviderCount) {
       throw new Error('Wrong number of OTPs submitted');
     }
 
@@ -218,16 +223,15 @@ export class AVClient {
    */
   async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
     this.validateCallOrder('constructBallotCryptograms');
-    await this.updateElectionConfig();
 
     if (JSON.stringify(Object.keys(cvr)) !== JSON.stringify(this.contestIds())) {
       throw new Error('Corrupt CVR: Contains invalid contest');
     }
 
-    const contests = this.electionConfig.ballots
+    const contests = this.getElectionConfig().ballots
     const valid_contest_selections = Object.keys(cvr).every(function(contestId) {
-      const contest = contests.find(b => b.id == contestId)
-      return contest.options.some(o => o.handle == cvr[contestId])
+      const contest = contests.find(b => b.id.toString() == contestId)
+      return contest && contest.options.some(o => o.handle == cvr[contestId])
     })
     if (!valid_contest_selections) {
       throw new Error('Corrupt CVR: Contains invalid option');
@@ -235,8 +239,9 @@ export class AVClient {
 
     const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].cryptogram ]))
     const contestEncodingTypes = Object.fromEntries(Object.keys(cvr).map((contestId) => {
-      const contest = contests.find(b => b.id == contestId)
-      return [contestId, contest.vote_encoding_type];
+      const contest = contests.find(b => b.id.toString() == contestId)
+      // We can use non-null assertion for contest because selections have been validated
+      return [contestId, contest!.vote_encoding_type];
     }))
 
     const encryptionResponse = new EncryptVotes().encrypt(
@@ -373,29 +378,28 @@ export class AVClient {
     return cryptograms
   }
 
-  /**
-   * Attempts to populate election configuration data from backend server, if it hasn't been populated yet.
-   */
-  private async updateElectionConfig() {
-    if (Object.entries(this.electionConfig).length === 0) {
-      this.electionConfig = await new ElectionConfig(this.bulletinBoard).get();
-    }
+
+  public getElectionConfig(): ElectionConfig {
+    if(!this.electionConfig)
+      throw new Error('No configuration loaded. Did you call initialize()?')
+
+    return this.electionConfig
   }
 
   private electionId(): number {
-    return this.electionConfig.election.id;
+    return this.getElectionConfig().election.id;
   }
 
   private contestIds(): string[] {
-    return this.electionConfig.ballots.map(ballot => ballot.id.toString())
+    return this.getElectionConfig().ballots.map(ballot => ballot.id.toString())
   }
 
   private electionEncryptionKey(): ECPoint {
-    return this.electionConfig.encryptionKey
+    return this.getElectionConfig().encryptionKey
   }
 
   private electionSigningPublicKey(): ECPoint {
-    return this.electionConfig.signingPublicKey
+    return this.getElectionConfig().signingPublicKey
   }
 
   private privateKey(): BigNum {
@@ -428,7 +432,7 @@ export class AVClient {
   }
 
   private setupOTPProviders(): OTPProvider[] {
-    return this.electionConfig.OTPProviderURLs.map(
+    return this.getElectionConfig().OTPProviderURLs.map(
       (providerURL) => new OTPProvider(providerURL)
     );
   }

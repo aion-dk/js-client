@@ -8,6 +8,7 @@ describe('entire voter flow using OTP authorization', () => {
 
   it('returns a receipt', async () => {
     const client = new AVClient('http://localhost:3000/test/app');
+    await client.initialize()
 
     await client.requestAccessCode('some PII info');
 

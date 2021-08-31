@@ -55,7 +55,7 @@ describe('AVClient functions call order', () => {
   context('submitBallotCryptograms is called directly after spoiling', () => {
     let sandbox;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json');
 
@@ -76,6 +76,9 @@ describe('AVClient functions call order', () => {
 
       nock('http://localhost:3000/').post('/test/app/get_commitment_opening')
         .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
+
+      client = new AVClient('http://localhost:3000/test/app');
+      await client.initialize()
 
       sandbox = sinon.createSandbox();
       sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);

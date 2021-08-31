@@ -11,17 +11,19 @@ describe('AVClient#requestAccessCode', function() {
   let sandbox;
   const expectedNetworkRequests : any[] = [];
 
-  beforeEach(function() {
+  beforeEach(async () => {
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
     resetDeterministicOffset();
 
-    client = new AVClient('http://localhost:3000/test/app');
     expectedNetworkRequests.push(
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json')
     );
+
+    client = new AVClient('http://localhost:3000/test/app');
+    await client.initialize()
   });
 
   afterEach(function() {

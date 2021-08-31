@@ -9,9 +9,7 @@ describe('AVClient#constructBallotCryptograms', () => {
   let client;
   let sandbox;
 
-  beforeEach(() => {
-    client = new AVClient('http://localhost:3000/test/app');
-
+  beforeEach(async () => {
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
@@ -33,6 +31,9 @@ describe('AVClient#constructBallotCryptograms', () => {
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json');
     nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_get_latest_board_hash.json');
+
+    client = new AVClient('http://localhost:3000/test/app');
+    await client.initialize()
   });
 
   afterEach(() => {

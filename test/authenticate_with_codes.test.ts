@@ -9,13 +9,19 @@ describe('AVClient#authenticateWithCodes', function() {
   let client;
   let sandbox;
 
-  beforeEach(function() {
+  beforeEach(async () => {
     client = new AVClient('http://localhost:3000/test/app');
 
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
     resetDeterministicOffset();
+
+    nock('http://localhost:3000/').get('/test/app/config')
+      .replyWithFile(200, __dirname + '/replies/config.valid.json');
+
+    client = new AVClient('http://localhost:3000/test/app');
+    await client.initialize()
   });
 
   afterEach( function() {
@@ -24,9 +30,7 @@ describe('AVClient#authenticateWithCodes', function() {
   })
 
   context('given valid election codes', function() {
-    beforeEach(function() {
-      nock('http://localhost:3000/').get('/test/app/config')
-        .replyWithFile(200, __dirname + '/replies/config.valid.json');
+    beforeEach(() => {
       nock('http://localhost:3000/').post('/test/app/sign_in')
         .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
       nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
@@ -42,8 +46,6 @@ describe('AVClient#authenticateWithCodes', function() {
 
   context('given invalid election codes', function() {
     beforeEach(function() {
-      nock('http://localhost:3000/').get('/test/app/config')
-        .replyWithFile(200, __dirname + '/replies/config.valid.json');
       nock('http://localhost:3000/').post('/test/app/sign_in')
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_3.json');
     });
