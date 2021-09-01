@@ -161,7 +161,7 @@ key with each OTP provider.
 
 Should be followed by [constructBallotCryptograms](avclient.md#constructballotcryptograms).
 
-**`throws`** CallOutOfOrderError if called before required data is available
+**`throws`** InvalidStateError if called before required data is available
 
 **`throws`** AccessCodeExpired if an OTP code has expired
 
@@ -205,7 +205,7 @@ values internal to the AV election config.
 Should be followed by either [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
 or [submitBallotCryptograms](avclient.md#submitballotcryptograms).
 
-**`throws`** CallOutOfOrderError if called before required data is available
+**`throws`** InvalidStateError if called before required data is available
 
 **`throws`** CorruptCVRError if the cast vote record is invalid
 
@@ -257,7 +257,7 @@ ___
 Should be called when voter chooses to test the encryption of their ballot.
 Gets commitment opening of the digital ballot box and validates it.
 
-**`throws`** CallOutOfOrderError if called before required data is available
+**`throws`** InvalidStateError if called before required data is available
 
 **`throws`** ServerCommitmentError if the server commitment is invalid
 
