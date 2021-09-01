@@ -219,10 +219,7 @@ export class AVClient {
    * ```javascript
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
-   * @throws InvalidStateError
-   * 
-   * 
-   *  if called before required data is available
+   * @throws InvalidStateError if called before required data is available
    * @throws CorruptCVRError if the cast vote record is invalid
    * @throws NetworkError if any request failed to get a response
    */
