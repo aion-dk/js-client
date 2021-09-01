@@ -1,5 +1,6 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
+import { InvalidConfigError, InvalidStateError } from '../lib/av_client/errors'
 
 describe('AVClient#getAuthorizationMethod', function() {
   let client: AVClient;
@@ -32,7 +33,7 @@ describe('AVClient#getAuthorizationMethod', function() {
   context('election config is not available', function() {
     it('returns an error', function() {
       client = new AVClient('http://localhost:3000/test/app');
-      expect(() => client.getAuthorizationMethod()).to.throw(Error, 'No configuration loaded. Did you call initialize()?');
+      expect(() => client.getAuthorizationMethod()).to.throw(InvalidStateError, 'No configuration loaded. Did you call initialize()?');
     })
   });
 
@@ -43,7 +44,7 @@ describe('AVClient#getAuthorizationMethod', function() {
 
       await client.initialize(electionConfig)
 
-      expect(() => client.getAuthorizationMethod()).to.throw(Error, 'Authorization method not found in election config');
+      expect(() => client.getAuthorizationMethod()).to.throw(InvalidConfigError, 'Authorization method not found in election config');
     })
   });
 });

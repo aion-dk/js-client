@@ -42,3 +42,19 @@ export class NetworkError extends AvClientError {
     this.setUpStackTrace();
   }
 }
+
+export class InvalidConfigError extends AvClientError {
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, InvalidConfigError.prototype);
+    this.setUpStackTrace();
+  }
+}
+
+export class InvalidStateError extends AvClientError {
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, InvalidStateError.prototype);
+    this.setUpStackTrace();
+  }
+}
