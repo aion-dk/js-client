@@ -8,6 +8,7 @@ import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, Token } from "./av_client/connectors/otp_provider";
+import { InvalidConfigError, InvalidStateError } from './av_client/errors'
 
 /**
  * # Assembly Voting Client API.
@@ -79,6 +80,7 @@ export class AVClient {
    * Available method names are
    * * {@link AVClient.authenticateWithCodes | authenticateWithCodes} for authentication via election codes.
    * * {@link AVClient.requestAccessCode | requestAccessCode} for authorization via OTPs.
+   * @throws InvalidConfigError if the config does not specify a supported authorizationMode
    */
   getAuthorizationMethod(): { methodName: string; method: Function } {
     switch(this.getElectionConfig().authorizationMode) {
@@ -93,7 +95,7 @@ export class AVClient {
           method: this.requestAccessCode
         }
       default:
-        throw new Error('Authorization method not found in election config')
+        throw new InvalidConfigError('Authorization method not found in election config')
     }
   }
 
@@ -159,7 +161,7 @@ export class AVClient {
    * @param   code An access code string.
    * @param   email Voter email.
    * @returns Returns undefined if authorization succeeded or throws an error
-   * @throws CallOutOfOrderError if called before required data is available
+   * @throws InvalidStateError if called before required data is available
    * @throws AccessCodeExpired if an OTP code has expired
    * @throws AccessCodeInvalid if an OTP code is invalid
    * @throws NetworkError if any request failed to get a response
@@ -217,7 +219,10 @@ export class AVClient {
    * ```javascript
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
-   * @throws CallOutOfOrderError if called before required data is available
+   * @throws InvalidStateError
+   * 
+   * 
+   *  if called before required data is available
    * @throws CorruptCVRError if the cast vote record is invalid
    * @throws NetworkError if any request failed to get a response
    */
@@ -285,7 +290,7 @@ export class AVClient {
    * Gets commitment opening of the digital ballot box and validates it.
    *
    * @returns Returns undefined if the validation succeeds or throws an error
-   * @throws CallOutOfOrderError if called before required data is available
+   * @throws InvalidStateError if called before required data is available
    * @throws ServerCommitmentError if the server commitment is invalid
    * @throws NetworkError if any request failed to get a response
    */
@@ -380,8 +385,9 @@ export class AVClient {
 
 
   public getElectionConfig(): ElectionConfig {
-    if(!this.electionConfig)
-      throw new Error('No configuration loaded. Did you call initialize()?')
+    if(!this.electionConfig){
+      throw new InvalidStateError('No configuration loaded. Did you call initialize()?')
+    }
 
     return this.electionConfig
   }
@@ -426,7 +432,7 @@ export class AVClient {
       if (JSON.stringify(this.succeededMethods) != JSON.stringify(requiredCalls)) {
         const requiredList = requiredCalls.map((name) => `#${name}`).join(', ');
         const gotList = this.succeededMethods.map((name) => `#${name}`).join(', ');
-        throw new CallOutOfOrderError(`#${methodName} requires exactly ${requiredList} to be called before it`);
+        throw new InvalidStateError(`#${methodName} requires exactly ${requiredList} to be called before it`);
       }
     }
   }
@@ -495,12 +501,4 @@ type Encryption = {
 type EmptyCryptogram = {
   cryptogram: Cryptogram;
   commitment: ECPoint;
-}
-
-class CallOutOfOrderError extends Error {
-  constructor(message: string) {
-    super(message);
-    Object.setPrototypeOf(this, CallOutOfOrderError.prototype);
-    this.name = 'CallOutOfOrderError';
-  }
 }
