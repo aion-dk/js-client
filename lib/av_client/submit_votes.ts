@@ -13,7 +13,7 @@ type SignAndSubmitArguments = {
 }
 
 export default class SubmitVotes {
-  bulletinBoard: any;
+  bulletinBoard: BulletinBoard;
 
   constructor(bulletinBoard: BulletinBoard) {
     this.bulletinBoard = bulletinBoard;
