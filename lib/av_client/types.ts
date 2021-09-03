@@ -13,3 +13,21 @@
 export interface ContestIndexed<T> {
   [contestId: string]: T;
 }
+
+export type KeyPair = {
+  privateKey: string;
+  publicKey: string;
+}
+
+export interface EmptyCryptogram {
+  commitment: string;
+  cryptogram: string;
+}
+
+export type VoteEncryption = {
+  cryptogram: string;
+  randomness: string;
+  proof: string;
+}
+
+export type Affidavit = string

@@ -24,6 +24,8 @@ describe('entire voter flow using OTP authorization', () => {
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json'));
     expectedNetworkRequests.push(nock('http://localhost:1234/').post('/start_identification')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json'));
+      expectedNetworkRequests.push(nock('http://localhost:1234/').post('/request_authorization')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json'));
 
     expectedNetworkRequests.push(nock('http://localhost:1111/').post('/authorize')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json'));
@@ -47,15 +49,20 @@ describe('entire voter flow using OTP authorization', () => {
     const client = new AVClient('http://localhost:3000/test/app');
     await client.initialize()
 
-    await client.requestAccessCode('voter123').catch((e) => {
+    await client.requestAccessCode('voter123', 'voter@foo.bar').catch((e) => {
       console.error(e);
       expect.fail('AVClient#requestAccessCode failed.');
     });
 
-    const confirmationToken = await client.validateAccessCode('1234', 'voter@foo.bar').catch((e) => {
+    const confirmationToken = await client.validateAccessCode('1234').catch((e) => {
       console.error(e);
       expect.fail('AVClient#validateAccessCode failed');
     });
+
+    await client.registerVoter().catch((e) => {
+      console.error(e);
+      expect.fail('AVClient#registerVoter failed');
+    })
 
     const cvr = { '1': 'option1', '2': 'optiona' };
     const trackingCode = await client.constructBallotCryptograms(cvr).catch((e) => {

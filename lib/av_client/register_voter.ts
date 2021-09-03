@@ -1,58 +1,72 @@
 import { randomKeyPair} from './generate_key_pair';
 import { ContestIndexed } from "./types";
+import { Ballot } from './election_config'
 const Crypto = require('./aion_crypto.js')()
 
-export default class RegisterVoter {
-  client: any;
+interface EmptyCryptogram {
+  commitment: string;
+  cryptogram: string;
+}
 
-  constructor(client) {
-    this.client = client;
-  }
+interface RegisterVoterResponse {
+  voterSessionUuid: string;
+  voterIdentifier: string;
+  emptyCryptograms: ContestIndexed<EmptyCryptogram>;
+  ballots: Ballot[];
+  /*
+   Maybe we receive ballots that we can vote on.
+   We need to consider if we only receive contestIds that the voter has access to.
+   */
+}
 
-  async call() {
-    const confirmationToken = this.client.authorizationTokens;
+export async function registerVoter(bulletinBoard, keyPair, electionEncryptionKey, voterRecord, authorizationToken): Promise<RegisterVoterResponse> {
 
-    this.client.keyPair = {
-      privateKey: '70d161fe8546c88b719c3e511d113a864013cda166f289ff6de9aba3eb4e8a4d',
-      publicKey: '039490ed35e0cabb39592792d69b5d4bf2104f20df8c4bbf36ee6b705595e776d2'
-    }
+  const signature = Crypto.generateSchnorrSignature('', keyPair.privateKey)
 
-    const signature = Crypto.generateSchnorrSignature('', this.client.keyPair.privateKey);
-
-    await this.client.bulletinBoard.registerVoter(this.client.keyPair.publicKey, signature).then(
-      ({ data }) => {
-        this.client.bulletinBoard.setVoterSessionUuid(data.voterSessionUuid);
-        this.client.voterIdentifier = data.voterIdentifier;
-        this.client.emptyCryptograms = data.emptyCryptograms;
-        this.client.getElectionConfig().ballots = data.ballots;
+  // TODO make this call send all relevant values to the connector
+  const registerVoterResponse: RegisterVoterResponse = await bulletinBoard.registerVoter(keyPair.publicKey, signature).then(
+    ({ data }) => {
+      // this.bulletinBoard.setVoterSessionUuid(data.voterSessionUuid)
+      // FIXME we need to make sure that the bulletinBoard gets info about its voterSessionUuid another way
+      return {
+        voterSessionUuid: data.voterSessionUuid,
+        voterIdentifier: data.voterIdentifier,
+        emptyCryptograms: data.emptyCryptograms,
+        ballots: data.ballots
       }
-    )
-    randomKeyPair(); // TODO: remove, this just increases deterministic randomness offset for tests
-
-    const challenges: ContestIndexed<string> = Object.fromEntries(this.client.contestIds().map(contestId => {
-      return [contestId, Crypto.generateRandomNumber()]
-    }));
-
-    const emptyCryptogramsVerified = await this.client.bulletinBoard.challengeEmptyCryptograms(challenges).then(response => {
-      const responses = response.data.responses;
-      const valid = this.client.contestIds().every((contestId) => {
-        const emptyCryptogram = this.client.emptyCryptograms[contestId];
-        const proofString = [
-          emptyCryptogram.commitment,
-          challenges[contestId],
-          responses[contestId],
-        ].join(',');
-        const verified = Crypto.verifyEmptyCryptogramProof(proofString, emptyCryptogram.cryptogram, this.client.electionEncryptionKey());
-        return verified;
-      });
-      return valid;
-    })
-
-    if (emptyCryptogramsVerified) {
-      return 'OK';
-    } else {
-      throw new Error('Empty cryptogram verification failed')
     }
-    return 'OK';
+  )
+
+  randomKeyPair(); // TODO: remove, this just increases deterministic randomness offset for tests
+
+  const { ballots, emptyCryptograms, voterSessionUuid } = registerVoterResponse
+
+  const contestIds = ballots.map(ballot => ballot.id.toString())
+
+  const challenges: ContestIndexed<string> = Object.fromEntries(contestIds.map(contestId => {
+    return [contestId, Crypto.generateRandomNumber()]
+  }))
+
+  // 
+  bulletinBoard.setVoterSessionUuid(voterSessionUuid)
+
+  const emptyCryptogramsVerified = await bulletinBoard.challengeEmptyCryptograms(challenges).then(response => {
+    const responses = response.data.responses;
+    const valid: boolean = contestIds.every((contestId) => {
+      const emptyCryptogram = emptyCryptograms[contestId];
+      const proofString = [
+        emptyCryptogram.commitment,
+        challenges[contestId],
+        responses[contestId],
+      ].join(',');
+      return Crypto.verifyEmptyCryptogramProof(proofString, emptyCryptogram.cryptogram, electionEncryptionKey);
+    });
+    return valid;
+  })
+
+  if (!emptyCryptogramsVerified) {
+    throw new Error('Empty cryptogram verification failed')
   }
+
+  return registerVoterResponse;
 }

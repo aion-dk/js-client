@@ -48,6 +48,10 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json')
       );
       expectedNetworkRequests.push(
+        nock('http://localhost:1234/').post('/request_authorization')
+          .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
+      );
+      expectedNetworkRequests.push(
         nock('http://localhost:3000/').post('/test/app/register')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_register.json')
       );
@@ -56,11 +60,12 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json')
       );
 
-      await client.requestAccessCode('voter123');
-
       const otp = '1234';
       const email = 'blabla@aion.dk';
-      const result = await client.validateAccessCode(otp, email);
+
+      await client.requestAccessCode('voter123', email);
+      const result = await client.validateAccessCode(otp);
+      await client.registerVoter();
 
       expect(result).to.equal(undefined);
       expectedNetworkRequests.forEach((mock) => mock.done());
@@ -72,12 +77,12 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(403, __dirname + '/replies/otp_provider_authorize.invalid.json'),
       );
 
-      await client.requestAccessCode('voter123');
-
       const otp = '0000';
       const email = 'blabla@aion.dk';
 
-      return client.validateAccessCode(otp, email).then(
+      await client.requestAccessCode('voter123', email);
+
+      return client.validateAccessCode(otp).then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => {
           expect(error).to.be.an.instanceof(AccessCodeInvalid)
@@ -93,11 +98,12 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(403, __dirname + '/replies/otp_provider_authorize.expired.json'),
       );
 
-      await client.requestAccessCode('voter123');
-
       const otp = '1234';
       const email = 'blabla@aion.dk';
-      return client.validateAccessCode(otp, email).then(
+
+      await client.requestAccessCode('voter123', email);
+
+      return client.validateAccessCode(otp).then(
         () => {
           expect.fail('Expected promise to be rejected')
         },
@@ -111,22 +117,6 @@ describe('AVClient#validateAccessCode', () => {
     })
   });
 
-  context('given wrong number of OTPs', () => {
-    it('fails', async () => {
-      await client.requestAccessCode('voter123');
-
-      const otps = ['1234', 'abcd']
-      const email = 'blabla@aion.dk'
-
-      try {
-        await client.validateAccessCode(otps, email);
-        expect.fail('Expected error to be thrown');
-      } catch(error) {
-        expect(error.message).to.equal('Wrong number of OTPs submitted');
-      }
-    })
-  });
-
   context('OTP services is unavailable', function() {
     it('returns network error on timeout', async function () {
       expectedNetworkRequests.push(
@@ -134,11 +124,12 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithError({code: 'ETIMEDOUT'})
       );
 
-      await client.requestAccessCode('voter123');
-
       const otp = '1234';
-      const email = 'blabla@aion.dk';
-      return client.validateAccessCode(otp, email).then(
+      
+      await client.requestAccessCode('voter123', 'blabla@aion.dk');
+
+      
+      return client.validateAccessCode(otp).then(
         () => {
           expect.fail('Expected promise to be rejected')
         },
@@ -155,12 +146,12 @@ describe('AVClient#validateAccessCode', () => {
 
       await client.initialize({
         ...client.getElectionConfig(),
-        OTPProviderURLs: ['http://sdkghskfglksjlkfgjdlkfjglkdfjglkjdlfgjlkdjgflkjdlkfgjlkdfg.com']
+        OTPProviderURL: 'http://sdkghskfglksjlkfgjdlkfjglkdfjglkjdlfgjlkdjgflkjdlkfgjlkdfg.com'
       })
 
-      await client.requestAccessCode('voter123');
+      await client.requestAccessCode('voter123', 'blabla@aion.dk');
 
-      return client.validateAccessCode(otp, email).then(
+      return client.validateAccessCode(otp).then(
         () => {
           expect.fail('Expected promise to be rejected')
         },
