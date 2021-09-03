@@ -139,19 +139,17 @@ export class AVClient {
     const coordinatorURL = this.getElectionConfig().voterAuthorizationCoordinatorURL;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
-    return coordinator.createSession(opaqueVoterId, email).then(
-      ({ data }) => {
-        const sessionId = data.sessionId;
-        return coordinator.startIdentification(sessionId).then(
-          (response) => {
-            this.authorizationSessionId = sessionId
-            this.email = email
-            this.succeededMethods.push('requestAccessCode');
-            return Promise.resolve()
-          }
-        );
-      }
-    );
+    return coordinator.createSession(opaqueVoterId, email)
+      .then(({ data: { sessionId } }) => {
+        return sessionId
+      })
+      .then(async sessionId => {
+        this.authorizationSessionId = sessionId
+        this.email = email
+        this.succeededMethods.push('requestAccessCode');
+
+        await coordinator.startIdentification(sessionId);
+      });
   }
 
   /**
