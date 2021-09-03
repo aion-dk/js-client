@@ -10,8 +10,7 @@ export interface ElectionConfig {
 
   // appended data:
   voterAuthorizationCoordinatorURL: string;
-  OTPProviderCount: number;
-  OTPProviderURLs: string[];
+  OTPProviderURL: string;
 
   authorizationMode: 'election codes' | 'otps'
 }
@@ -25,7 +24,7 @@ interface Election {
   //...
 }
 
-interface Ballot {
+export interface Ballot {
   id: number;
   vote_encoding_type: number;
   title: LocalString;
@@ -53,10 +52,7 @@ export async function fetchElectionConfig(bulletinBoard: any): Promise<ElectionC
       (response: { data: ElectionConfig }) => {
         let configData = response.data;
         configData.voterAuthorizationCoordinatorURL = 'http://localhost:1234';
-        configData.OTPProviderCount = 1;
-        configData.OTPProviderURLs = [
-          'http://localhost:1111',
-        ]
+        configData.OTPProviderURL = 'http://localhost:1111'
         return configData;
       },
       (error: any) => { return Promise.reject(error) }

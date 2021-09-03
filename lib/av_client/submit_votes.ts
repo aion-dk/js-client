@@ -1,13 +1,25 @@
 const Crypto = require('./aion_crypto.js')()
+import { ContestIndexed, EncryptedVote } from './types'
+
+type Affidavit = string
+
+type SignAndSubmitArguments = {
+  voterIdentifier: string;
+  electionId: number;
+  voteEncryptions: ContestIndexed<EncryptedVote>;
+  privateKey: string;
+  signatureKey: string,
+  affidavit: Affidavit
+}
 
 export default class SubmitVotes {
-  bulletinBoard: any;
+  bulletinBoard: BulletinBoard;
 
   constructor(bulletinBoard: BulletinBoard) {
     this.bulletinBoard = bulletinBoard;
   }
 
-  async signAndSubmitVotes({ voterIdentifier, electionId, voteEncryptions, privateKey, signatureKey, affidavit }) {
+  async signAndSubmitVotes({ voterIdentifier, electionId, voteEncryptions, privateKey, signatureKey, affidavit }: SignAndSubmitArguments) {
     const acknowledgeResponse = await this.acknowledge()
 
     const votes = {}
@@ -101,7 +113,7 @@ export default class SubmitVotes {
       return Promise.reject('Invalid vote receipt: corrupt server signature')
     }
 
-    return 'Valid vote receipt'
+    return Promise.resolve()
   }
 
 }
@@ -109,10 +121,6 @@ export default class SubmitVotes {
 interface BulletinBoard {
   getBoardHash: () => any;
   submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestIndexed<CryptogramWithProof>) => any
-}
-
-interface ContestIndexed<Type> {
-  [index: string]: Type;
 }
 
 type CryptogramWithProof = {

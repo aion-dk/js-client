@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { AccessCodeInvalid, AccessCodeExpired, NetworkError } from "../errors";
 
-export interface Token {
+export interface IdentityConfirmationToken {
   token: 'authorized'
 }
 
@@ -12,7 +12,7 @@ export class OTPProvider {
     this.createBackendClient(baseURL, timeout);
   }
 
-  requestOTPAuthorization(otpCode: string, email: string): Promise<Token> {
+  requestOTPAuthorization(otpCode: string, email: string): Promise<IdentityConfirmationToken> {
     return this.backend.post('authorize', {
       otp_code: otpCode,
       email: email

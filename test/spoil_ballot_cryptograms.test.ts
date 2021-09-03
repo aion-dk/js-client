@@ -30,6 +30,8 @@ describe('AVClient#spoilBallotCryptograms', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
       nock('http://localhost:1234/').post('/start_identification')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json');
+      nock('http://localhost:1234/').post('/request_authorization')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
 
       nock('http://localhost:1111/').post('/authorize')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
@@ -50,6 +52,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
 
         await client.requestAccessCode('voter123');
         await client.validateAccessCode('1234', 'voter@foo.bar');
+        await client.registerVoter()
 
         const cvr = { '1': 'option1', '2': 'optiona' };
         await client.constructBallotCryptograms(cvr);
@@ -66,6 +69,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
 
         await client.requestAccessCode('voter123');
         await client.validateAccessCode('1234', 'voter@foo.bar');
+        await client.registerVoter()
 
         const cvr = { '1': 'option1', '2': 'optiona' };
         await client.constructBallotCryptograms(cvr);
@@ -82,6 +86,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
 
         await client.requestAccessCode('voter123');
         await client.validateAccessCode('1234', 'voter@foo.bar');
+        await client.registerVoter()
 
         const cvr = { '1': 'option1', '2': 'optiona' };
         await client.constructBallotCryptograms(cvr);
@@ -104,6 +109,8 @@ describe('AVClient#spoilBallotCryptograms', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
       nock('http://localhost:1234/').post('/start_identification')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json');
+      nock('http://localhost:1234/').post('/request_authorization')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
 
       nock('http://localhost:1111/').post('/authorize')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
@@ -122,6 +129,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
 
       await client.requestAccessCode('voter123');
       await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.registerVoter()
 
       const cvr = { '1': 'option1', '2': 'optiona' };
       await client.constructBallotCryptograms(cvr);

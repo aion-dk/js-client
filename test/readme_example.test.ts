@@ -10,11 +10,13 @@ describe('entire voter flow using OTP authorization', () => {
     const client = new AVClient('http://localhost:3000/test/app');
     await client.initialize()
 
-    await client.requestAccessCode('some PII info');
+    await client.requestAccessCode('some PII info', 'voter@foo.bar');
 
     // ... voter receives email with access code (OTP code) ...
 
-    await client.validateAccessCode('1234', 'voter@foo.bar');
+    await client.validateAccessCode('1234');
+
+    await client.registerVoter()
 
     const cvr = { '1': 'option1', '2': 'optiona' };
     const trackingCode  = await client.constructBallotCryptograms(cvr);

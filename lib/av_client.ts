@@ -1,13 +1,13 @@
-import BulletinBoard from '../lib/av_client/connectors/bulletin_board';
+import { BulletinBoard } from '../lib/av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig } from '../lib/av_client/election_config';
-import { ContestIndexed } from './av_client/types'
+import { ContestIndexed, EncryptedVote } from './av_client/types'
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
-import RegisterVoter from '../lib/av_client/register_voter';
+import { registerVoter } from '../lib/av_client/register_voter';
 import EncryptVotes from '../lib/av_client/encrypt_votes';
 import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
-import { OTPProvider, Token } from "./av_client/connectors/otp_provider";
+import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
 
 /**
@@ -37,13 +37,16 @@ import { InvalidConfigError, InvalidStateError } from './av_client/errors'
  */
 
 export class AVClient {
-  private authorizationTokens: Token[];
-  private bulletinBoard: any;
+  private authorizationSessionId: string;
+  private email: string;
+  private identityConfirmationToken: IdentityConfirmationToken;
+
+  private bulletinBoard: BulletinBoard;
   private electionConfig?: ElectionConfig;
   private emptyCryptograms: ContestIndexed<EmptyCryptogram>;
   private keyPair: KeyPair;
   private testCode: string;
-  private voteEncryptions: ContestIndexed<Encryption>;
+  private voteEncryptions: ContestIndexed<EncryptedVote>;
   private voterIdentifier: string;
   private succeededMethods: string[];
 
@@ -127,25 +130,26 @@ export class AVClient {
    * Should be followed by {@link AVClient.validateAccessCode | validateAccessCode} to submit access code for validation.
    *
    * @param opaqueVoterId Voter ID that preserves voter anonymity.
+   * @param email where the voter expects to receive otp code.
    * @returns Returns undefined or throws an error.
    * @throws VoterRecordNotFound if no voter was found
    * @throws NetworkError if any request failed to get a response
    */
-  async requestAccessCode(opaqueVoterId: string): Promise<void> {
+  async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
     const coordinatorURL = this.getElectionConfig().voterAuthorizationCoordinatorURL;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
-    return coordinator.createSession(opaqueVoterId).then(
-      ({ data }) => {
-        const sessionId = data.sessionId;
-        return coordinator.startIdentification(sessionId).then(
-          (response) => {
-            this.succeededMethods.push('requestAccessCode');
-            return Promise.resolve()
-          }
-        );
-      }
-    );
+    return coordinator.createSession(opaqueVoterId, email)
+      .then(({ data: { sessionId } }) => {
+        return sessionId
+      })
+      .then(async sessionId => {
+        this.authorizationSessionId = sessionId
+        this.email = email
+        this.succeededMethods.push('requestAccessCode');
+
+        await coordinator.startIdentification(sessionId);
+      });
   }
 
   /**
@@ -166,33 +170,47 @@ export class AVClient {
    * @throws AccessCodeInvalid if an OTP code is invalid
    * @throws NetworkError if any request failed to get a response
    */
-  async validateAccessCode(code: (string|string[]), email: string): Promise<void> {
+  async validateAccessCode(code: string): Promise<void> {
     this.validateCallOrder('validateAccessCode');
 
-    let otpCodes: string[];
+    const provider = new OTPProvider(this.getElectionConfig().OTPProviderURL)
+    
+    this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email)
 
-    if (typeof code === 'string') {
-      otpCodes = [code];
-    } else {
-      otpCodes = code;
-    }
-
-    if (otpCodes.length != this.getElectionConfig().OTPProviderCount) {
-      throw new Error('Wrong number of OTPs submitted');
-    }
-
-    const providers = this.setupOTPProviders();
-
-    const requests = providers.map(function(provider, index) {
-      return provider.requestOTPAuthorization(otpCodes[index], email)
-    });
-
-    const tokens: Token[] = await Promise.all(requests)
-
-    await new RegisterVoter(this).call();
     this.succeededMethods.push('validateAccessCode');
 
-    this.authorizationTokens = tokens
+    return Promise.resolve()
+  }
+
+
+  /**
+   * Registers a voter
+   * 
+   * @returns undefined or throws an error
+   */
+  async registerVoter(): Promise<void> {
+
+    // FIXME this needs to be generated
+    this.keyPair = {
+      privateKey: '70d161fe8546c88b719c3e511d113a864013cda166f289ff6de9aba3eb4e8a4d',
+      publicKey: '039490ed35e0cabb39592792d69b5d4bf2104f20df8c4bbf36ee6b705595e776d2'
+    }
+
+    const coordinatorURL = this.getElectionConfig().voterAuthorizationCoordinatorURL;
+    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
+
+    const authrorizationResponse = await coordinator.requestPublicKeyAuthorization(this.authorizationSessionId, this.identityConfirmationToken, this.keyPair.publicKey)
+    const { voterRecord, authorizationToken } = authrorizationResponse
+
+    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, voterRecord, authorizationToken)
+
+    this.voterIdentifier = registerVoterResponse.voterIdentifier
+    this.emptyCryptograms = registerVoterResponse.emptyCryptograms
+    
+    // FIXME in time we need for config to include all available ballots, 
+    // but for registerVoterResponse to return contestIds that the voter has access to
+    this.getElectionConfig().ballots = registerVoterResponse.ballots
+
     return Promise.resolve()
   }
 
@@ -433,22 +451,12 @@ export class AVClient {
       }
     }
   }
-
-  private setupOTPProviders(): OTPProvider[] {
-    return this.getElectionConfig().OTPProviderURLs.map(
-      (providerURL) => new OTPProvider(providerURL)
-    );
-  }
 }
 
-type HashValue = string;
 type BigNum = string;
 type ECPoint = string;
 type Cryptogram = string;
-type Signature = string;
-type DateTimeStamp = string;
 type Proof = string;
-
 
 /**
  * Example of a receipt:
@@ -490,11 +498,7 @@ type KeyPair = {
   privateKey: BigNum;
   publicKey: ECPoint;
 };
-type Encryption = {
-  cryptogram: Cryptogram;
-  randomness: BigNum;
-  proof: Proof;
-}
+
 type EmptyCryptogram = {
   cryptogram: Cryptogram;
   commitment: ECPoint;
