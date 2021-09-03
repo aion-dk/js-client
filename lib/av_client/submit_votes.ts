@@ -3,13 +3,13 @@ import { ContestIndexed, EncryptedVote } from './types'
 
 type Affidavit = string
 
-type SignAndSubmitArguments = { 
-  voterIdentifier: string; 
-  electionId: string; 
+type SignAndSubmitArguments = {
+  voterIdentifier: string;
+  electionId: number;
   voteEncryptions: ContestIndexed<EncryptedVote>;
-  privateKey: string; 
-  signatureKey: string, 
-  affidavit: Affidavit 
+  privateKey: string;
+  signatureKey: string,
+  affidavit: Affidavit
 }
 
 export default class SubmitVotes {

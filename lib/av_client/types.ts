@@ -24,7 +24,7 @@ export interface EmptyCryptogram {
   cryptogram: string;
 }
 
-export type VoteEncryption = {
+export type EncryptedVote = {
   cryptogram: string;
   randomness: string;
   proof: string;
