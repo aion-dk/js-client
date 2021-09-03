@@ -35,11 +35,13 @@ describe('entire voter flow using OTP authorization', () => {
     const client = new AVClient('http://localhost:3000/test/app');
     await client.initialize()
 
-    await client.requestAccessCode('some PII info');
+    await client.requestAccessCode('some PII info', 'voter@foo.bar');
 
     // ... voter receives email with access code (OTP code) ...
 
-    await client.validateAccessCode('1234', 'voter@foo.bar');
+    await client.validateAccessCode('1234');
+
+    await client.registerVoter()
 
     const cvr = { '1': 'option1', '2': 'optiona' };
     const trackingCode  = await client.constructBallotCryptograms(cvr);
@@ -70,6 +72,7 @@ describe('entire voter flow using OTP authorization', () => {
 - [initialize](avclient.md#initialize)
 - [requestAccessCode](avclient.md#requestaccesscode)
 - [validateAccessCode](avclient.md#validateaccesscode)
+- [registerVoter](avclient.md#registervoter)
 - [constructBallotCryptograms](avclient.md#constructballotcryptograms)
 - [generateTestCode](avclient.md#generatetestcode)
 - [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
@@ -122,7 +125,7 @@ ___
 
 ### requestAccessCode
 
-▸ **requestAccessCode**(`opaqueVoterId`): `Promise`<`void`\>
+▸ **requestAccessCode**(`opaqueVoterId`, `email`): `Promise`<`void`\>
 
 Should be called when a voter chooses digital vote submission (instead of mail-in).
 
@@ -139,6 +142,7 @@ Should be followed by [validateAccessCode](avclient.md#validateaccesscode) to su
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `opaqueVoterId` | `string` | Voter ID that preserves voter anonymity. |
+| `email` | `string` | where the voter expects to receive otp code. |
 
 #### Returns
 
@@ -150,7 +154,7 @@ ___
 
 ### validateAccessCode
 
-▸ **validateAccessCode**(`code`, `email`): `Promise`<`void`\>
+▸ **validateAccessCode**(`code`): `Promise`<`void`\>
 
 Should be called after [requestAccessCode](avclient.md#requestaccesscode).
 
@@ -173,14 +177,27 @@ Should be followed by [constructBallotCryptograms](avclient.md#constructballotcr
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `code` | `string` \| `string`[] | An access code string. |
-| `email` | `string` | Voter email. |
+| `code` | `string` | An access code string. |
 
 #### Returns
 
 `Promise`<`void`\>
 
 Returns undefined if authorization succeeded or throws an error
+
+___
+
+### registerVoter
+
+▸ **registerVoter**(): `Promise`<`void`\>
+
+Registers a voter
+
+#### Returns
+
+`Promise`<`void`\>
+
+undefined or throws an error
 
 ___
 
