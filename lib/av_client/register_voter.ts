@@ -20,7 +20,6 @@ interface RegisterVoterResponse {
 }
 
 export async function registerVoter(bulletinBoard, keyPair, electionEncryptionKey, voterRecord, authorizationToken): Promise<RegisterVoterResponse> {
-
   const signature = Crypto.generateSchnorrSignature('', keyPair.privateKey)
 
   // TODO make this call send all relevant values to the connector

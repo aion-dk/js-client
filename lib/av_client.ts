@@ -171,7 +171,8 @@ export class AVClient {
    * @throws NetworkError if any request failed to get a response
    */
   async validateAccessCode(code: string): Promise<void> {
-    this.validateCallOrder('validateAccessCode');
+    if(!this.email)
+      throw new InvalidStateError('Cannot validate access code. No email state stored.');
 
     const provider = new OTPProvider(this.getElectionConfig().OTPProviderURL)
     
@@ -185,10 +186,12 @@ export class AVClient {
 
   /**
    * Registers a voter
-   * 
+   *
    * @returns undefined or throws an error
    */
   async registerVoter(): Promise<void> {
+    if(!this.identityConfirmationToken)
+      throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
 
     // FIXME this needs to be generated
     this.keyPair = {
@@ -292,12 +295,10 @@ export class AVClient {
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
    */
-  generateTestCode(): string {
+  generateTestCode() {
     const testCode = new EncryptVotes().generateTestCode()
 
     this.testCode = testCode
-
-    return testCode
   }
 
   /**
@@ -433,7 +434,6 @@ export class AVClient {
 
   private validateCallOrder(methodName) {
     const expectations = {
-      validateAccessCode: ['requestAccessCode'],
       constructBallotCryptograms: ['requestAccessCode', 'validateAccessCode'],
       spoilBallotCryptograms: ['requestAccessCode', 'validateAccessCode', 'constructBallotCryptograms'],
       submitBallotCryptograms: ['requestAccessCode', 'validateAccessCode', 'constructBallotCryptograms'],

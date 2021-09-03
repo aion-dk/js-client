@@ -7,7 +7,7 @@ const sjcl = require('../lib/av_client/sjcl')
 const Crypto = require('../lib/av_client/aion_crypto.js')()
 
 describe('AVClient#submitBallotCryptograms', () => {
-  let client;
+  let client: AVClient;
   let sandbox;
   let affidavit;
 
@@ -50,8 +50,8 @@ describe('AVClient#submitBallotCryptograms', () => {
 
   context('given valid values', () => {
     it('successfully submits encrypted votes', async () => {
-      await client.requestAccessCode('voter123');
-      await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.requestAccessCode('voter123', 'voter@foo.bar');
+      await client.validateAccessCode('1234');
       await client.registerVoter();
 
       const cvr = { '1': 'option1', '2': 'optiona' };
@@ -71,8 +71,8 @@ describe('AVClient#submitBallotCryptograms', () => {
 
   context('voter identifier is corrupted', () => {
     it('fails with an error message', async () => {
-      await client.requestAccessCode('voter123');
-      await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.requestAccessCode('voter123', 'voter@foo.bar');
+      await client.validateAccessCode('1234');
       await client.registerVoter()
 
       const cvr = { '1': 'option1', '2': 'optiona' };
@@ -91,8 +91,8 @@ describe('AVClient#submitBallotCryptograms', () => {
 
   context('proof of correct encryption is corrupted', () => {
     it('fails with an error message', async () => {
-      await client.requestAccessCode('voter123');
-      await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.requestAccessCode('voter123', 'voter@foo.bar');
+      await client.validateAccessCode('1234');
       await client.registerVoter()
 
       const cvr = { '1': 'option1', '2': 'optiona' };

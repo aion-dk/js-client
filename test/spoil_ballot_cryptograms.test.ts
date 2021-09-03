@@ -6,7 +6,7 @@ import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
 describe('AVClient#spoilBallotCryptograms', () => {
-  let client;
+  let client: AVClient;
   let sandbox;
 
   beforeEach(() => {
@@ -50,8 +50,8 @@ describe('AVClient#spoilBallotCryptograms', () => {
         nock('http://localhost:3000/').post('/test/app/get_commitment_opening')
           .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
 
-        await client.requestAccessCode('voter123');
-        await client.validateAccessCode('1234', 'voter@foo.bar');
+        await client.requestAccessCode('voter123', 'voter@foo.bar');
+        await client.validateAccessCode('1234');
         await client.registerVoter()
 
         const cvr = { '1': 'option1', '2': 'optiona' };
@@ -67,8 +67,8 @@ describe('AVClient#spoilBallotCryptograms', () => {
       it('returns an error message when there is a network error', async () => {
         nock('http://localhost:3000/').post('/test/app/get_commitment_opening').reply(404);
 
-        await client.requestAccessCode('voter123');
-        await client.validateAccessCode('1234', 'voter@foo.bar');
+        await client.requestAccessCode('voter123', 'voter@foo.bar');
+        await client.validateAccessCode('1234');
         await client.registerVoter()
 
         const cvr = { '1': 'option1', '2': 'optiona' };
@@ -84,8 +84,8 @@ describe('AVClient#spoilBallotCryptograms', () => {
       it('returns an error message when there is a server error', async () => {
         nock('http://localhost:3000/').post('/test/app/get_commitment_opening').reply(500, { nonsense: 'garbage' });
 
-        await client.requestAccessCode('voter123');
-        await client.validateAccessCode('1234', 'voter@foo.bar');
+        await client.requestAccessCode('voter123', 'voter@foo.bar');
+        await client.validateAccessCode('1234');
         await client.registerVoter()
 
         const cvr = { '1': 'option1', '2': 'optiona' };
@@ -127,8 +127,8 @@ describe('AVClient#spoilBallotCryptograms', () => {
       client = new AVClient('http://localhost:3000/test/app');
       await client.initialize()
 
-      await client.requestAccessCode('voter123');
-      await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.requestAccessCode('voter123', 'voter@foo.bar');
+      await client.validateAccessCode('1234');
       await client.registerVoter()
 
       const cvr = { '1': 'option1', '2': 'optiona' };

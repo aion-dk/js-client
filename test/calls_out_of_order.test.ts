@@ -3,10 +3,12 @@ import { expect } from 'chai';
 import nock = require('nock');
 import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
 import sinon = require('sinon');
+import { InvalidStateError } from '../lib/av_client/errors';
 const sjcl = require('../lib/av_client/sjcl')
 
+
 describe('AVClient functions call order', () => {
-  let client;
+  let client: AVClient;
 
   beforeEach(() => {
     client = new AVClient('http://localhost:3000/test/app');
@@ -18,7 +20,7 @@ describe('AVClient functions call order', () => {
       expect.fail('Expected an InvalidStateError, got no error');
     } catch (e) {
       expect(e.name).to.eql('InvalidStateError');
-      expect(e.message).to.eql('#validateAccessCode requires exactly #requestAccessCode to be called before it');
+      expect(e.message).to.eql('Cannot validate access code. No email state stored.');
     }
   });
 
@@ -94,8 +96,8 @@ describe('AVClient functions call order', () => {
     });
 
     it('throws an error when submitBallotCryptograms is called directly after spoiling', async () => {
-      await client.requestAccessCode('voter123');
-      await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.requestAccessCode('voter123', 'voter@foo.bar');
+      await client.validateAccessCode('1234');
       await client.registerVoter()
 
       const cvr = { '1': 'option1', '2': 'optiona' };
@@ -110,6 +112,15 @@ describe('AVClient functions call order', () => {
       } catch (error) {
         expect(error.name).to.eql('InvalidStateError');
         expect(error.message).to.eql('#submitBallotCryptograms requires exactly #requestAccessCode, #validateAccessCode, #constructBallotCryptograms to be called before it');
+      }
+    });
+
+    it('throws an error if trying to register voter without validated OTP', async () => {
+      try {
+        await client.registerVoter();
+        throw new Error('Should have thrown InvalidStateError');
+      } catch(e) {
+        expect(e).to.be.instanceOf(InvalidStateError)
       }
     });
   });
