@@ -69,26 +69,6 @@ describe('AVClient#submitBallotCryptograms', () => {
     });
   });
 
-  context('voter identifier is corrupted', () => {
-    it('fails with an error message', async () => {
-      await client.requestAccessCode('voter123', 'voter@foo.bar');
-      await client.validateAccessCode('1234');
-      await client.registerVoter()
-
-      const cvr = { '1': 'option1', '2': 'optiona' };
-      await client.constructBallotCryptograms(cvr)
-
-      // change the voter identifier
-      client.voterIdentifier = 'corrupt identifier';
-
-      const affidavit = 'some bytes, most likely as binary PDF';
-      return await client.submitBallotCryptograms(affidavit).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => expect(error).to.equal('Invalid vote receipt: corrupt board hash')
-      );
-    });
-  });
-
   context('proof of correct encryption is corrupted', () => {
     it('fails with an error message', async () => {
       await client.requestAccessCode('voter123', 'voter@foo.bar');

@@ -1,12 +1,14 @@
 const Crypto = require('./aion_crypto.js')()
-import { ContestIndexed, EncryptedVote } from './types'
+import { ContestIndexed as ContestMap, EncryptedVote } from './types'
+import { AcknowledgedBoardHash, signVotes } from './sign'
+
 
 type Affidavit = string
 
 type SignAndSubmitArguments = {
   voterIdentifier: string;
   electionId: number;
-  voteEncryptions: ContestIndexed<EncryptedVote>;
+  voteEncryptions: ContestMap<EncryptedVote>;
   privateKey: string;
   signatureKey: string,
   affidavit: Affidavit
@@ -22,27 +24,7 @@ export default class SubmitVotes {
   async signAndSubmitVotes({ voterIdentifier, electionId, voteEncryptions, privateKey, signatureKey, affidavit }: SignAndSubmitArguments) {
     const acknowledgeResponse = await this.acknowledge()
 
-    const votes = {}
-    const cryptogramsWithProofs = {}
-    for (let contestId in voteEncryptions) {
-      votes[contestId] = voteEncryptions[contestId].cryptogram
-      cryptogramsWithProofs[contestId] = {
-        cryptogram: voteEncryptions[contestId].cryptogram,
-        proof: voteEncryptions[contestId].proof
-      }
-    }
-
-    const content = {
-      acknowledged_at: acknowledgeResponse.currentTime,
-      acknowledged_board_hash: acknowledgeResponse.currentBoardHash,
-      election_id: electionId,
-      voter_identifier: voterIdentifier,
-      votes
-    };
-
-    const contentString = JSON.stringify(content)
-    const contentHash = Crypto.hashString(contentString)
-    const voterSignature = this.sign(contentHash, privateKey)
+    const { contentHash, voterSignature, cryptogramsWithProofs } = signVotes(voteEncryptions, acknowledgeResponse, electionId, voterIdentifier, privateKey);
 
     const receipt = await this.submit({ contentHash, voterSignature, cryptogramsWithProofs })
     await this.verifyReceipt({ contentHash, voterSignature, receipt, signatureKey });
@@ -68,7 +50,7 @@ export default class SubmitVotes {
     return receipt
   }
 
-  private async acknowledge() {
+  private async acknowledge(): Promise<AcknowledgedBoardHash> {
     const { data } = await this.bulletinBoard.getBoardHash()
 
     if (!data.currentBoardHash || !data.currentTime) {
@@ -82,10 +64,6 @@ export default class SubmitVotes {
     return acknowledgedBoard
   }
 
-  private sign(contentHash: HashValue, privateKey: PrivateKey) {
-    const signature = Crypto.generateSchnorrSignature(contentHash, privateKey)
-    return signature
-  }
 
   private async verifyReceipt({ contentHash, voterSignature, receipt, signatureKey }) {
     // verify board hash computation
@@ -120,7 +98,7 @@ export default class SubmitVotes {
 
 interface BulletinBoard {
   getBoardHash: () => any;
-  submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestIndexed<CryptogramWithProof>) => any
+  submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestMap<CryptogramWithProof>) => any
 }
 
 type CryptogramWithProof = {
@@ -133,11 +111,6 @@ type Cryptogram = string
 type Signature = string;
 type PrivateKey = string
 type HashValue = string;
-
-type AcknowledgedBoard = {
-  currentBoardHash: HashValue;
-  currentTime: string;
-}
 
 type VoteReceipt = {
   previousBoardHash: HashValue;
