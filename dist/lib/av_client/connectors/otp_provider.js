@@ -15,7 +15,7 @@ class OTPProvider {
             .catch(error => {
             // If we get errors from the provider, we wrap in custom errors
             if (error.response && error.response.status === 403) {
-                const _error = error.response.data?.error;
+                const _error = error.response.data.error; // TODO: revert to error.response.data?.error
                 if (_error === 'expired') {
                     throw new errors_1.AccessCodeExpired('OTP code expired');
                 }
