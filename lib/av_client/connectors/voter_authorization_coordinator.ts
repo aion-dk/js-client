@@ -1,3 +1,5 @@
+import { IdentityConfirmationToken } from "./otp_provider";
+
 const axios = require('axios')
 
 export default class VoterAuthorizationCoordinator {
@@ -7,9 +9,15 @@ export default class VoterAuthorizationCoordinator {
     this.createBackendClient(baseURL, timeout);
   }
 
-  createSession(opaqueVoterId): Promise<any> {
+  /**
+   * 
+   * @param opaqueVoterId Gets 
+   * @returns 
+   */
+   createSession(opaqueVoterId: string, email: string): Promise<any> {
     return this.backend.post('create_session', {
-      opaque_voter_id: opaqueVoterId
+      opaque_voter_id: opaqueVoterId,
+      email
     });
   }
 
@@ -17,6 +25,14 @@ export default class VoterAuthorizationCoordinator {
     return this.backend.post('start_identification', {
       session_id: sessionId
     });
+  }
+
+  requestPublicKeyAuthorization(sessionId: string, identityConfirmationToken: IdentityConfirmationToken, publicKey: string){
+    return this.backend.post('request_authorization', {
+      session_id: sessionId,
+      identity_confirmation_token: identityConfirmationToken,
+      public_key: publicKey
+    })
   }
 
   private createBackendClient(baseURL: string, timeout: number) {

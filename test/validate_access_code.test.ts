@@ -3,21 +3,22 @@ import { expect } from 'chai';
 import nock = require('nock');
 import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
 import sinon = require('sinon');
+import { AccessCodeExpired, AccessCodeInvalid, NetworkError } from "../lib/av_client/errors";
+import {OTPProvider} from "../lib/av_client/connectors/otp_provider";
 const sjcl = require('../lib/av_client/sjcl')
 const Crypto = require('../lib/av_client/aion_crypto.js')()
 
 describe('AVClient#validateAccessCode', () => {
-  let client;
+  let client: AVClient;
   let sandbox;
   const expectedNetworkRequests : any[] = [];
 
-  beforeEach(() => {
+  beforeEach(async () => {
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
     resetDeterministicOffset();
 
-    client = new AVClient('http://localhost:3000/test/app');
     expectedNetworkRequests.push(
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json')
@@ -30,6 +31,9 @@ describe('AVClient#validateAccessCode', () => {
       nock('http://localhost:1234/').post('/start_identification')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json')
     )
+
+    client = new AVClient('http://localhost:3000/test/app');
+    await client.initialize()
   });
 
   afterEach(() => {
@@ -38,10 +42,14 @@ describe('AVClient#validateAccessCode', () => {
   });
 
   context('OTP services work', () => {
-    it('returns success', async () => {
+    it('resolves without errors', async () => {
       expectedNetworkRequests.push(
         nock('http://localhost:1111/').post('/authorize')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json')
+      );
+      expectedNetworkRequests.push(
+        nock('http://localhost:1234/').post('/request_authorization')
+          .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
         nock('http://localhost:3000/').post('/test/app/register')
@@ -52,45 +60,106 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json')
       );
 
-      await client.requestAccessCode('voter123');
-
       const otp = '1234';
-      const result = await client.validateAccessCode(otp);
+      const email = 'blabla@aion.dk';
 
-      expect(result).to.equal('OK');
+      await client.requestAccessCode('voter123', email);
+      const result = await client.validateAccessCode(otp);
+      await client.registerVoter();
+
+      expect(result).to.equal(undefined);
       expectedNetworkRequests.forEach((mock) => mock.done());
     })
 
     it('fails given invalid otps', async () => {
       expectedNetworkRequests.push(
         nock('http://localhost:1111/').post('/authorize')
-          .reply(401) // This is what decides that OTP is invalid
+          .replyWithFile(403, __dirname + '/replies/otp_provider_authorize.invalid.json'),
       );
 
-      await client.requestAccessCode('voter123');
-
       const otp = '0000';
+      const email = 'blabla@aion.dk';
+
+      await client.requestAccessCode('voter123', email);
 
       return client.validateAccessCode(otp).then(
         () => expect.fail('Expected promise to be rejected'),
-        (error) => expect(error.message).to.equal('Request failed with status code 401')
+        (error) => {
+          expect(error).to.be.an.instanceof(AccessCodeInvalid)
+          expect(error.message).to.equal('OTP code invalid')
+        }
       )
+      expectedNetworkRequests.forEach((mock) => mock.done());
+    })
+
+    it('fails given expired otp', async function(){
+      expectedNetworkRequests.push(
+        nock('http://localhost:1111/').post('/authorize')
+          .replyWithFile(403, __dirname + '/replies/otp_provider_authorize.expired.json'),
+      );
+
+      const otp = '1234';
+      const email = 'blabla@aion.dk';
+
+      await client.requestAccessCode('voter123', email);
+
+      return client.validateAccessCode(otp).then(
+        () => {
+          expect.fail('Expected promise to be rejected')
+        },
+        (error) => {
+          expect(error).to.be.an.instanceof(AccessCodeExpired);
+          expect(error.message).to.equal('OTP code expired')
+        }
+      );
+
       expectedNetworkRequests.forEach((mock) => mock.done());
     })
   });
 
-  context('given wrong number of OTPs', () => {
-    it('fails with an error message', async () => {
-      await client.requestAccessCode('voter123');
+  context('OTP services is unavailable', function() {
+    it('returns network error on timeout', async function () {
+      expectedNetworkRequests.push(
+        nock('http://localhost:1111/').post('/authorize')
+          .replyWithError({code: 'ETIMEDOUT'})
+      );
 
-      const otps = ['1234', 'abcd'];
+      const otp = '1234';
+      
+      await client.requestAccessCode('voter123', 'blabla@aion.dk');
 
-      try {
-        await client.validateAccessCode(otps);
-        expect.fail('Expected error to be thrown');
-      } catch(error) {
-        expect(error.message).to.equal('Wrong number of OTPs submitted');
-      }
+      
+      return client.validateAccessCode(otp).then(
+        () => {
+          expect.fail('Expected promise to be rejected')
+        },
+        (error) => {
+          expect(error).to.be.an.instanceof(NetworkError);
+          expect(error.message).to.equal('Network error')
+        }
+      );
+    })
+
+    it('returns network error on host not available', async function(){
+      const otp = '1234';
+      const email = 'blabla@aion.dk'
+
+      await client.initialize({
+        ...client.getElectionConfig(),
+        OTPProviderURL: 'http://sdkghskfglksjlkfgjdlkfjglkdfjglkjdlfgjlkdjgflkjdlkfgjlkdfg.com'
+      })
+
+      await client.requestAccessCode('voter123', 'blabla@aion.dk');
+
+      return client.validateAccessCode(otp).then(
+        () => {
+          expect.fail('Expected promise to be rejected')
+        },
+        (error) => {
+          expect(error).to.be.an.instanceof(NetworkError);
+          expect(error.message).to.equal('Network error')
+        }
+      );
     })
   });
 });

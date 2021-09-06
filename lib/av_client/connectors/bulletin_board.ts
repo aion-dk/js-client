@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-export default class BulletinBoard {
+export class BulletinBoard {
   private backend: any;
   voterAuthorizationCoordinator: any;
   voterSessionUuid: string;

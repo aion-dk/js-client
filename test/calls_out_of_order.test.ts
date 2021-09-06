@@ -15,9 +15,9 @@ describe('AVClient functions call order', () => {
   it('throws an error when validateAccessCode is called first', async () => {
     try {
       await client.validateAccessCode('1234');
-      expect.fail('Expected an CallOutOfOrderError, got no error');
+      expect.fail('Expected an InvalidStateError, got no error');
     } catch (e) {
-      expect(e.name).to.eql('CallOutOfOrderError');
+      expect(e.name).to.eql('InvalidStateError');
       expect(e.message).to.eql('#validateAccessCode requires exactly #requestAccessCode to be called before it');
     }
   });
@@ -25,9 +25,9 @@ describe('AVClient functions call order', () => {
   it('throws an error when constructBallotCryptograms is called first', async () => {
     try {
       await client.constructBallotCryptograms({ '1': 'option1', '2': 'optiona' });
-      expect.fail('Expected an CallOutOfOrderError, got no error');
+      expect.fail('Expected an InvalidStateError, got no error');
     } catch (e) {
-      expect(e.name).to.eql('CallOutOfOrderError');
+      expect(e.name).to.eql('InvalidStateError');
       expect(e.message).to.eql('#constructBallotCryptograms requires exactly #requestAccessCode, #validateAccessCode to be called before it');
     }
   });
@@ -35,9 +35,9 @@ describe('AVClient functions call order', () => {
   it('throws an error when spoilBallotCryptograms is called first', async () => {
     try {
       await client.spoilBallotCryptograms();
-      expect.fail('Expected an CallOutOfOrderError, got no error');
+      expect.fail('Expected an InvalidStateError, got no error');
     } catch (e) {
-      expect(e.name).to.eql('CallOutOfOrderError');
+      expect(e.name).to.eql('InvalidStateError');
       expect(e.message).to.eql('#spoilBallotCryptograms requires exactly #requestAccessCode, #validateAccessCode, #constructBallotCryptograms to be called before it');
     }
   });
@@ -45,9 +45,9 @@ describe('AVClient functions call order', () => {
   it('throws an error when submitBallotCryptograms is called first', async () => {
     try {
       await client.submitBallotCryptograms('affidavit bytes');
-      expect.fail('Expected an CallOutOfOrderError, got no error');
+      expect.fail('Expected an InvalidStateError, got no error');
     } catch (e) {
-      expect(e.name).to.eql('CallOutOfOrderError');
+      expect(e.name).to.eql('InvalidStateError');
       expect(e.message).to.eql('#submitBallotCryptograms requires exactly #requestAccessCode, #validateAccessCode, #constructBallotCryptograms to be called before it');
     }
   });
@@ -55,7 +55,7 @@ describe('AVClient functions call order', () => {
   context('submitBallotCryptograms is called directly after spoiling', () => {
     let sandbox;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json');
 
@@ -63,6 +63,8 @@ describe('AVClient functions call order', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
       nock('http://localhost:1234/').post('/start_identification')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json');
+      nock('http://localhost:1234/').post('/request_authorization')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
 
       nock('http://localhost:1111/').post('/authorize')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
@@ -76,6 +78,9 @@ describe('AVClient functions call order', () => {
 
       nock('http://localhost:3000/').post('/test/app/get_commitment_opening')
         .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
+
+      client = new AVClient('http://localhost:3000/test/app');
+      await client.initialize()
 
       sandbox = sinon.createSandbox();
       sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
@@ -91,6 +96,7 @@ describe('AVClient functions call order', () => {
     it('throws an error when submitBallotCryptograms is called directly after spoiling', async () => {
       await client.requestAccessCode('voter123');
       await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.registerVoter()
 
       const cvr = { '1': 'option1', '2': 'optiona' };
       await client.constructBallotCryptograms(cvr);
@@ -100,9 +106,9 @@ describe('AVClient functions call order', () => {
 
       try {
         await client.submitBallotCryptograms('affidavit bytes');
-        expect.fail('Expected an CallOutOfOrderError, got no error');
+        expect.fail('Expected an InvalidStateError, got no error');
       } catch (error) {
-        expect(error.name).to.eql('CallOutOfOrderError');
+        expect(error.name).to.eql('InvalidStateError');
         expect(error.message).to.eql('#submitBallotCryptograms requires exactly #requestAccessCode, #validateAccessCode, #constructBallotCryptograms to be called before it');
       }
     });

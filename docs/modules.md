@@ -8,10 +8,6 @@
 
 - [AVClient](classes/avclient.md)
 
-### Interfaces
-
-- [ContestIndexed](interfaces/contestindexed.md)
-
 ### Type aliases
 
 - [Receipt](modules.md#receipt)
@@ -49,7 +45,7 @@ ___
 
 ### CastVoteRecord
 
-Ƭ **CastVoteRecord**: [`ContestIndexed`](interfaces/contestindexed.md)<`string`\>
+Ƭ **CastVoteRecord**: `ContestIndexed`<`string`\>
 
 Example of a cvr:
 ```javascript

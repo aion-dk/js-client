@@ -10,8 +10,6 @@ describe('AVClient#spoilBallotCryptograms', () => {
   let sandbox;
 
   beforeEach(() => {
-    client = new AVClient('http://localhost:3000/test/app');
-
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
@@ -24,7 +22,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
   });
 
   context('given valid values', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json');
 
@@ -32,6 +30,8 @@ describe('AVClient#spoilBallotCryptograms', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
       nock('http://localhost:1234/').post('/start_identification')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json');
+      nock('http://localhost:1234/').post('/request_authorization')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
 
       nock('http://localhost:1111/').post('/authorize')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
@@ -40,22 +40,26 @@ describe('AVClient#spoilBallotCryptograms', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_register.json');
       nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json');
+
+      client = new AVClient('http://localhost:3000/test/app');
+      await client.initialize()
     });
 
     context('all systems work', () => {
-      it('returns \'Success\'', async () => {
+      it('resolves without errors', async () => {
         nock('http://localhost:3000/').post('/test/app/get_commitment_opening')
           .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
 
         await client.requestAccessCode('voter123');
         await client.validateAccessCode('1234', 'voter@foo.bar');
+        await client.registerVoter()
 
         const cvr = { '1': 'option1', '2': 'optiona' };
         await client.constructBallotCryptograms(cvr);
         client.generateTestCode();
 
         const result = await client.spoilBallotCryptograms();
-        expect(result).to.equal('Success');
+        expect(result).to.equal(undefined);
       });
     });
 
@@ -65,6 +69,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
 
         await client.requestAccessCode('voter123');
         await client.validateAccessCode('1234', 'voter@foo.bar');
+        await client.registerVoter()
 
         const cvr = { '1': 'option1', '2': 'optiona' };
         await client.constructBallotCryptograms(cvr);
@@ -81,6 +86,7 @@ describe('AVClient#spoilBallotCryptograms', () => {
 
         await client.requestAccessCode('voter123');
         await client.validateAccessCode('1234', 'voter@foo.bar');
+        await client.registerVoter()
 
         const cvr = { '1': 'option1', '2': 'optiona' };
         await client.constructBallotCryptograms(cvr);
@@ -103,6 +109,8 @@ describe('AVClient#spoilBallotCryptograms', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
       nock('http://localhost:1234/').post('/start_identification')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json');
+      nock('http://localhost:1234/').post('/request_authorization')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
 
       nock('http://localhost:1111/').post('/authorize')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
@@ -116,8 +124,12 @@ describe('AVClient#spoilBallotCryptograms', () => {
       nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_get_latest_board_hash.json');
 
+      client = new AVClient('http://localhost:3000/test/app');
+      await client.initialize()
+
       await client.requestAccessCode('voter123');
       await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.registerVoter()
 
       const cvr = { '1': 'option1', '2': 'optiona' };
       await client.constructBallotCryptograms(cvr);

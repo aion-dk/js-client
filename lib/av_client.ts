@@ -1,13 +1,14 @@
-import BulletinBoard from '../lib/av_client/connectors/bulletin_board';
-import ElectionConfig from '../lib/av_client/election_config';
+import { BulletinBoard } from '../lib/av_client/connectors/bulletin_board';
+import { fetchElectionConfig, ElectionConfig } from '../lib/av_client/election_config';
+import { ContestIndexed, EncryptedVote } from './av_client/types'
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
-import RegisterVoter from '../lib/av_client/register_voter';
+import { registerVoter } from '../lib/av_client/register_voter';
 import EncryptVotes from '../lib/av_client/encrypt_votes';
 import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
-import OTPProvider from "./av_client/connectors/otp_provider";
-import validateAuthorizationToken from "./av_client/validate_authorization_token";
+import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
+import { InvalidConfigError, InvalidStateError } from './av_client/errors'
 /** @internal */
 export const sjcl = require('../lib/av_client/sjcl');
 
@@ -38,13 +39,16 @@ export const sjcl = require('../lib/av_client/sjcl');
  */
 
 export class AVClient {
-  private authorizationTokens: any[];
-  private bulletinBoard: any;
-  private electionConfig: any;
+  private authorizationSessionId: string;
+  private email: string;
+  private identityConfirmationToken: IdentityConfirmationToken;
+
+  private bulletinBoard: BulletinBoard;
+  private electionConfig?: ElectionConfig;
   private emptyCryptograms: ContestIndexed<EmptyCryptogram>;
   private keyPair: KeyPair;
   private testCode: string;
-  private voteEncryptions: ContestIndexed<Encryption>;
+  private voteEncryptions: ContestIndexed<EncryptedVote>;
   private voterIdentifier: string;
   private succeededMethods: string[];
 
@@ -53,8 +57,24 @@ export class AVClient {
    */
   constructor(bulletinBoardURL: string) {
     this.bulletinBoard = new BulletinBoard(bulletinBoardURL);
-    this.electionConfig = {};
     this.succeededMethods = [];
+  }
+
+  /**
+   * Initializes the client with an election config.
+   * If no config is provided, it fetches one from the backend.
+   *
+   * @param electionConfig override election config object
+   * @returns Returns undefined if succeeded or throws an error
+   * @throws NetworkError if any request failed to get a response
+   */
+  async initialize(electionConfig: ElectionConfig): Promise<void>
+  async initialize(): Promise<void>
+  async initialize(electionConfig?: ElectionConfig): Promise<void> {
+    if( electionConfig )
+      this.electionConfig = electionConfig
+    else
+      this.electionConfig = await fetchElectionConfig(this.bulletinBoard);
   }
 
   /**
@@ -65,27 +85,22 @@ export class AVClient {
    * Available method names are
    * * {@link AVClient.authenticateWithCodes | authenticateWithCodes} for authentication via election codes.
    * * {@link AVClient.requestAccessCode | requestAccessCode} for authorization via OTPs.
+   * @throws InvalidConfigError if the config does not specify a supported authorizationMode
    */
   getAuthorizationMethod(): { methodName: string; method: Function } {
-    if (!this.electionConfig) {
-      throw new Error('Please fetch election config first');
-    }
-
-    switch(this.electionConfig.authorizationMode) {
+    switch(this.getElectionConfig().authorizationMode) {
       case 'election codes':
         return {
           methodName: 'authenticateWithCodes',
           method: this.authenticateWithCodes
         }
-        break;
       case 'otps':
         return {
           methodName: 'requestAccessCode',
           method: this.requestAccessCode
         }
-        break;
       default:
-        throw new Error('Authorization method not found in election config')
+        throw new InvalidConfigError('Authorization method not found in election config')
     }
   }
 
@@ -96,10 +111,9 @@ export class AVClient {
    *
    * @internal
    * @param   codes Array of election code strings.
-   * @returns Returns 'OK' if authentication succeeded.
+   * @returns Returns undefined if authentication succeeded or throws an error
    */
-  async authenticateWithCodes(codes: string[]): Promise<string> {
-    await this.updateElectionConfig();
+  async authenticateWithCodes(codes: string[]): Promise<void> {
     const authenticationResponse = await new AuthenticateWithCodes(this.bulletinBoard)
       .authenticate(codes, this.electionId(), this.electionEncryptionKey());
 
@@ -107,7 +121,7 @@ export class AVClient {
     this.keyPair = authenticationResponse.keyPair;
     this.emptyCryptograms = authenticationResponse.emptyCryptograms;
 
-    return 'OK';
+    return Promise.resolve();
   }
 
   /**
@@ -117,26 +131,27 @@ export class AVClient {
    *
    * Should be followed by {@link AVClient.validateAccessCode | validateAccessCode} to submit access code for validation.
    *
-   * @param   opaqueVoterId Voter ID that preserves voter anonymity.
-   * @returns 'OK' or an error.
+   * @param opaqueVoterId Voter ID that preserves voter anonymity.
+   * @param email where the voter expects to receive otp code.
+   * @returns Returns undefined or throws an error.
+   * @throws VoterRecordNotFound if no voter was found
+   * @throws NetworkError if any request failed to get a response
    */
-  async requestAccessCode(opaqueVoterId: string): Promise<string> {
-    await this.updateElectionConfig();
-
-    const coordinatorURL = this.electionConfig.voterAuthorizationCoordinatorURL;
+  async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
+    const coordinatorURL = this.getElectionConfig().voterAuthorizationCoordinatorURL;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
-    return coordinator.createSession(opaqueVoterId).then(
-      ({ data }) => {
-        const sessionId = data.sessionId;
-        return coordinator.startIdentification(sessionId).then(
-          (response) => {
-            this.succeededMethods.push('requestAccessCode');
-            return 'OK';
-          }
-        );
-      }
-    );
+    return coordinator.createSession(opaqueVoterId, email)
+      .then(({ data: { sessionId } }) => {
+        return sessionId
+      })
+      .then(async sessionId => {
+        this.authorizationSessionId = sessionId
+        this.email = email
+        this.succeededMethods.push('requestAccessCode');
+
+        await coordinator.startIdentification(sessionId);
+      });
   }
 
   /**
@@ -151,42 +166,54 @@ export class AVClient {
    *
    * @param   code An access code string.
    * @param   email Voter email.
-   * @returns Returns `'OK'` if authorization succeeded.
+   * @returns Returns undefined if authorization succeeded or throws an error
+   * @throws InvalidStateError if called before required data is available
+   * @throws AccessCodeExpired if an OTP code has expired
+   * @throws AccessCodeInvalid if an OTP code is invalid
+   * @throws NetworkError if any request failed to get a response
    */
-  async validateAccessCode(code: (string|string[]), email: string): Promise<string> {
+  async validateAccessCode(code: string): Promise<void> {
     this.validateCallOrder('validateAccessCode');
-    await this.updateElectionConfig();
 
-    let otpCodes;
+    const provider = new OTPProvider(this.getElectionConfig().OTPProviderURL)
+    
+    this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email)
 
-    if (typeof code === 'string') {
-      otpCodes = [code];
-    } else {
-      otpCodes = code;
+    this.succeededMethods.push('validateAccessCode');
+
+    return Promise.resolve()
+  }
+
+
+  /**
+   * Registers a voter
+   * 
+   * @returns undefined or throws an error
+   */
+  async registerVoter(): Promise<void> {
+
+    // FIXME this needs to be generated
+    this.keyPair = {
+      privateKey: '70d161fe8546c88b719c3e511d113a864013cda166f289ff6de9aba3eb4e8a4d',
+      publicKey: '039490ed35e0cabb39592792d69b5d4bf2104f20df8c4bbf36ee6b705595e776d2'
     }
 
-    if (otpCodes.length != this.electionConfig.OTPProviderCount) {
-      throw new Error('Wrong number of OTPs submitted');
-    }
+    const coordinatorURL = this.getElectionConfig().voterAuthorizationCoordinatorURL;
+    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
-    const providers = this.electionConfig.OTPProviderURLs.map(
-      (providerURL) => new OTPProvider(providerURL)
-    );
+    const authrorizationResponse = await coordinator.requestPublicKeyAuthorization(this.authorizationSessionId, this.identityConfirmationToken, this.keyPair.publicKey)
+    const { voterRecord, authorizationToken } = authrorizationResponse
 
-    const requests = providers.map(function(provider, index) {
-      return provider.requestOTPAuthorization(otpCodes[index], email)
-        .then((response) => response.data);
-    });
+    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, voterRecord, authorizationToken)
 
-    const tokens = await Promise.all(requests);
-    if (tokens.every(validateAuthorizationToken)) {
-      this.authorizationTokens = tokens;
-      await new RegisterVoter(this).call();
-      this.succeededMethods.push('validateAccessCode');
-      return 'OK';
-    } else {
-      return Promise.reject('Failure, not all tokens were valid');
-    }
+    this.voterIdentifier = registerVoterResponse.voterIdentifier
+    this.emptyCryptograms = registerVoterResponse.emptyCryptograms
+    
+    // FIXME in time we need for config to include all available ballots, 
+    // but for registerVoterResponse to return contestIds that the voter has access to
+    this.getElectionConfig().ballots = registerVoterResponse.ballots
+
+    return Promise.resolve()
   }
 
   /**
@@ -198,7 +225,7 @@ export class AVClient {
    * ```javascript
    * const client = new AVClient(url);
    * const cvr = { '1': 'option1', '2': 'optiona' };
-   * const fingerprint = await client.constructBallotCryptograms(cvr);
+   * const trackingCode = await client.constructBallotCryptograms(cvr);
    * ```
    *
    * Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
@@ -208,23 +235,25 @@ export class AVClient {
    * or {@link AVClient.submitBallotCryptograms | submitBallotCryptograms}.
    *
    * @param   cvr Object containing the selections for each contest.<br>TODO: needs better specification.
-   * @returns Returns fingerprint of the cryptograms. Example:
+   * @returns Returns the ballot tracking code. Example:
    * ```javascript
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
+   * @throws InvalidStateError if called before required data is available
+   * @throws CorruptCVRError if the cast vote record is invalid
+   * @throws NetworkError if any request failed to get a response
    */
   async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
     this.validateCallOrder('constructBallotCryptograms');
-    await this.updateElectionConfig();
 
     if (JSON.stringify(Object.keys(cvr)) !== JSON.stringify(this.contestIds())) {
       throw new Error('Corrupt CVR: Contains invalid contest');
     }
 
-    const contests = this.electionConfig.ballots
+    const contests = this.getElectionConfig().ballots
     const valid_contest_selections = Object.keys(cvr).every(function(contestId) {
-      const contest = contests.find(b => b.id == contestId)
-      return contest.options.some(o => o.handle == cvr[contestId])
+      const contest = contests.find(b => b.id.toString() == contestId)
+      return contest && contest.options.some(o => o.handle == cvr[contestId])
     })
     if (!valid_contest_selections) {
       throw new Error('Corrupt CVR: Contains invalid option');
@@ -232,8 +261,9 @@ export class AVClient {
 
     const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].cryptogram ]))
     const contestEncodingTypes = Object.fromEntries(Object.keys(cvr).map((contestId) => {
-      const contest = contests.find(b => b.id == contestId)
-      return [contestId, contest.vote_encoding_type];
+      const contest = contests.find(b => b.id.toString() == contestId)
+      // We can use non-null assertion for contest because selections have been validated
+      return [contestId, contest!.vote_encoding_type];
     }))
 
     const encryptionResponse = new EncryptVotes().encrypt(
@@ -245,10 +275,10 @@ export class AVClient {
 
     this.voteEncryptions = encryptionResponse
 
-    const fingerprint = new EncryptVotes().fingerprint(this.cryptogramsForConfirmation());
+    const trackingCode = new EncryptVotes().fingerprint(this.cryptogramsForConfirmation());
     this.succeededMethods.push('constructBallotCryptograms');
 
-    return fingerprint;
+    return trackingCode;
   }
 
   /**
@@ -276,9 +306,12 @@ export class AVClient {
    * Should be called when voter chooses to test the encryption of their ballot.
    * Gets commitment opening of the digital ballot box and validates it.
    *
-   * @returns Returns 'Success' if the validation succeeds.
+   * @returns Returns undefined if the validation succeeds or throws an error
+   * @throws InvalidStateError if called before required data is available
+   * @throws ServerCommitmentError if the server commitment is invalid
+   * @throws NetworkError if any request failed to get a response
    */
-  async spoilBallotCryptograms(): Promise<string> {
+  async spoilBallotCryptograms(): Promise<void> {
     this.validateCallOrder('spoilBallotCryptograms');
     // TODO: encrypt the vote cryptograms one more time with a key derived from `this.generateTestCode`.
     //  A key is derived like: key = hash(test code, ballot id, cryptogram index)
@@ -301,7 +334,7 @@ export class AVClient {
 
     if (valid) {
       this.succeededMethods.push('spoilBallotCryptograms');
-      return 'Success'
+      return Promise.resolve()
     } else {
       return Promise.reject('Server commitment did not validate')
     }
@@ -311,7 +344,6 @@ export class AVClient {
    * Should be the last call in the entire voting process.
    *
    * Submits encrypted ballot and the affidavit to the digital ballot box.
-
    *
    *
    * @param  affidavit The affidavit document.<br>TODO: clarification of the affidavit format is still needed.
@@ -325,6 +357,7 @@ export class AVClient {
    *    voteSubmissionId: 6
       }
    * ```
+   * @throws NetworkError if any request failed to get a response
    */
   async submitBallotCryptograms(affidavit: Affidavit): Promise<Receipt> {
     this.validateCallOrder('submitBallotCryptograms');
@@ -367,29 +400,29 @@ export class AVClient {
     return cryptograms
   }
 
-  /**
-   * Attempts to populate election configuration data from backend server, if it hasn't been populated yet.
-   */
-  private async updateElectionConfig() {
-    if (Object.entries(this.electionConfig).length === 0) {
-      this.electionConfig = await new ElectionConfig(this.bulletinBoard).get();
+
+  public getElectionConfig(): ElectionConfig {
+    if(!this.electionConfig){
+      throw new InvalidStateError('No configuration loaded. Did you call initialize()?')
     }
+
+    return this.electionConfig
   }
 
   private electionId(): number {
-    return this.electionConfig.election.id;
+    return this.getElectionConfig().election.id;
   }
 
   private contestIds(): string[] {
-    return this.electionConfig.ballots.map(ballot => ballot.id.toString())
+    return this.getElectionConfig().ballots.map(ballot => ballot.id.toString())
   }
 
   private electionEncryptionKey(): ECPoint {
-    return this.electionConfig.encryptionKey
+    return this.getElectionConfig().encryptionKey
   }
 
   private electionSigningPublicKey(): ECPoint {
-    return this.electionConfig.signingPublicKey
+    return this.getElectionConfig().signingPublicKey
   }
 
   private privateKey(): BigNum {
@@ -416,36 +449,16 @@ export class AVClient {
       if (JSON.stringify(this.succeededMethods) != JSON.stringify(requiredCalls)) {
         const requiredList = requiredCalls.map((name) => `#${name}`).join(', ');
         const gotList = this.succeededMethods.map((name) => `#${name}`).join(', ');
-        throw new CallOutOfOrderError(`#${methodName} requires exactly ${requiredList} to be called before it`);
+        throw new InvalidStateError(`#${methodName} requires exactly ${requiredList} to be called before it`);
       }
     }
   }
 }
 
-/**
- * This is an index, with contest ids for keys, and arbitrary values that belong to matching contests.
- *
- * Example, with selected contest options:
- * ```javascript
- * { '1': 'option1', '2': 'optiona' }
- * ```
- *
- * Here `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are selected contest options.
- *
- * @template T Defines the data type of the value
- */
-export interface ContestIndexed<T> {
-  [contestId: string]: T;
-}
-
-type HashValue = string;
 type BigNum = string;
 type ECPoint = string;
 type Cryptogram = string;
-type Signature = string;
-type DateTimeStamp = string;
 type Proof = string;
-
 
 /**
  * Example of a receipt:
@@ -487,20 +500,8 @@ type KeyPair = {
   privateKey: BigNum;
   publicKey: ECPoint;
 };
-type Encryption = {
-  cryptogram: Cryptogram;
-  randomness: BigNum;
-  proof: Proof;
-}
+
 type EmptyCryptogram = {
   cryptogram: Cryptogram;
   commitment: ECPoint;
-}
-
-class CallOutOfOrderError extends Error {
-  constructor(message: string) {
-    super(message);
-    Object.setPrototypeOf(this, CallOutOfOrderError.prototype);
-    this.name = 'CallOutOfOrderError';
-  }
 }

@@ -1,0 +1,9 @@
+{
+  "votorRecord": {
+    "opagueVoterId": 666,
+    "email": "tester@aion.dk",
+    "presinctId": 666,
+    "contestIds": ["1", "2"]
+  },
+  "authorizationToken": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+}

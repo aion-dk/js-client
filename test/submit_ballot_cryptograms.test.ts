@@ -11,9 +11,7 @@ describe('AVClient#submitBallotCryptograms', () => {
   let sandbox;
   let affidavit;
 
-  beforeEach(() => {
-    client = new AVClient('http://localhost:3000/test/app');
-
+  beforeEach(async () => {
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
@@ -26,6 +24,8 @@ describe('AVClient#submitBallotCryptograms', () => {
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
     nock('http://localhost:1234/').post('/start_identification')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json');
+    nock('http://localhost:1234/').post('/request_authorization')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
 
     nock('http://localhost:1111/').post('/authorize')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
@@ -38,6 +38,9 @@ describe('AVClient#submitBallotCryptograms', () => {
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_get_latest_board_hash.json');
     nock('http://localhost:3000/').post('/test/app/submit_votes')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_submit_votes.json');
+
+    client = new AVClient('http://localhost:3000/test/app');
+    await client.initialize()
   });
 
   afterEach( () => {
@@ -49,6 +52,7 @@ describe('AVClient#submitBallotCryptograms', () => {
     it('successfully submits encrypted votes', async () => {
       await client.requestAccessCode('voter123');
       await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.registerVoter();
 
       const cvr = { '1': 'option1', '2': 'optiona' };
       await client.constructBallotCryptograms(cvr)
@@ -69,6 +73,7 @@ describe('AVClient#submitBallotCryptograms', () => {
     it('fails with an error message', async () => {
       await client.requestAccessCode('voter123');
       await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.registerVoter()
 
       const cvr = { '1': 'option1', '2': 'optiona' };
       await client.constructBallotCryptograms(cvr)
@@ -88,6 +93,7 @@ describe('AVClient#submitBallotCryptograms', () => {
     it('fails with an error message', async () => {
       await client.requestAccessCode('voter123');
       await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.registerVoter()
 
       const cvr = { '1': 'option1', '2': 'optiona' };
       await client.constructBallotCryptograms(cvr)

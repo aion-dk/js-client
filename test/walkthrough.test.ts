@@ -24,6 +24,8 @@ describe('entire voter flow using OTP authorization', () => {
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json'));
     expectedNetworkRequests.push(nock('http://localhost:1234/').post('/start_identification')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json'));
+      expectedNetworkRequests.push(nock('http://localhost:1234/').post('/request_authorization')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json'));
 
     expectedNetworkRequests.push(nock('http://localhost:1111/').post('/authorize')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json'));
@@ -45,23 +47,29 @@ describe('entire voter flow using OTP authorization', () => {
 
   it('returns a receipt', async () => {
     const client = new AVClient('http://localhost:3000/test/app');
+    await client.initialize()
 
-    await client.requestAccessCode('voter123').catch((e) => {
+    await client.requestAccessCode('voter123', 'voter@foo.bar').catch((e) => {
       console.error(e);
       expect.fail('AVClient#requestAccessCode failed.');
     });
 
-    const confirmationToken = await client.validateAccessCode('1234', 'voter@foo.bar').catch((e) => {
+    const confirmationToken = await client.validateAccessCode('1234').catch((e) => {
       console.error(e);
       expect.fail('AVClient#validateAccessCode failed');
     });
 
+    await client.registerVoter().catch((e) => {
+      console.error(e);
+      expect.fail('AVClient#registerVoter failed');
+    })
+
     const cvr = { '1': 'option1', '2': 'optiona' };
-    const fingerprint = await client.constructBallotCryptograms(cvr).catch((e) => {
+    const trackingCode = await client.constructBallotCryptograms(cvr).catch((e) => {
       console.error(e);
       expect.fail('AVClient#constructBallotCryptograms failed');
     });
-    expect(fingerprint).to.eql('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
+    expect(trackingCode).to.eql('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
 
     const affidavit = 'some bytes, most likely as binary PDF';
     const receipt = await client.submitBallotCryptograms(affidavit).catch((e) => {

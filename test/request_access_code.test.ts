@@ -11,17 +11,19 @@ describe('AVClient#requestAccessCode', function() {
   let sandbox;
   const expectedNetworkRequests : any[] = [];
 
-  beforeEach(function() {
+  beforeEach(async () => {
     sandbox = sinon.createSandbox();
     sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
     resetDeterministicOffset();
 
-    client = new AVClient('http://localhost:3000/test/app');
     expectedNetworkRequests.push(
       nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json')
     );
+
+    client = new AVClient('http://localhost:3000/test/app');
+    await client.initialize()
   });
 
   afterEach(function() {
@@ -30,7 +32,7 @@ describe('AVClient#requestAccessCode', function() {
   });
 
   context('OTP services work', function() {
-    it('returns "OK"', async function() {
+    it('resolves without errors', async function() {
       expectedNetworkRequests.push(
         nock('http://localhost:1234/').post('/create_session')
           .reply(200)
@@ -43,7 +45,7 @@ describe('AVClient#requestAccessCode', function() {
       const opaqueVoterId = 'voter123';
       return client.requestAccessCode(opaqueVoterId).then(
         (result) => {
-          expect(result).to.eql('OK');
+          expect(result).to.eql(undefined);
           expectedNetworkRequests.forEach((mock) => mock.done());
         },
         (error) => {

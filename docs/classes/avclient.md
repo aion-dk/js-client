@@ -33,16 +33,19 @@ describe('entire voter flow using OTP authorization', () => {
 
   it('returns a receipt', async () => {
     const client = new AVClient('http://localhost:3000/test/app');
+    await client.initialize()
 
-    const requestAccessCodeResult = await client.requestAccessCode('some PII info');
-    expect(requestAccessCodeResult).to.eq('OK')
+    await client.requestAccessCode('some PII info', 'voter@foo.bar');
 
-    const validateAccessCodeResult = await client.validateAccessCode('1234', 'voter@foo.bar');
-    expect(validateAccessCodeResult).to.eq('OK');
+    // ... voter receives email with access code (OTP code) ...
+
+    await client.validateAccessCode('1234');
+
+    await client.registerVoter()
 
     const cvr = { '1': 'option1', '2': 'optiona' };
-    const fingerprint = await client.constructBallotCryptograms(cvr);
-    expect(fingerprint).to.eq('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
+    const trackingCode  = await client.constructBallotCryptograms(cvr);
+    expect(trackingCode).to.eq('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
 
     const affidavit = 'some bytes, most likely as binary PDF';
     const receipt = await client.submitBallotCryptograms(affidavit);
@@ -66,13 +69,16 @@ describe('entire voter flow using OTP authorization', () => {
 
 ### Methods
 
+- [initialize](avclient.md#initialize)
 - [requestAccessCode](avclient.md#requestaccesscode)
 - [validateAccessCode](avclient.md#validateaccesscode)
+- [registerVoter](avclient.md#registervoter)
 - [constructBallotCryptograms](avclient.md#constructballotcryptograms)
 - [generateTestCode](avclient.md#generatetestcode)
 - [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
 - [submitBallotCryptograms](avclient.md#submitballotcryptograms)
 - [purgeData](avclient.md#purgedata)
+- [getElectionConfig](avclient.md#getelectionconfig)
 
 ## Constructors
 
@@ -88,9 +94,38 @@ describe('entire voter flow using OTP authorization', () => {
 
 ## Methods
 
+### initialize
+
+▸ **initialize**(`electionConfig`): `Promise`<`void`\>
+
+Initializes the client with an election config.
+If no config is provided, it fetches one from the backend.
+
+**`throws`** NetworkError if any request failed to get a response
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `electionConfig` | `ElectionConfig` | override election config object |
+
+#### Returns
+
+`Promise`<`void`\>
+
+Returns undefined if succeeded or throws an error
+
+▸ **initialize**(): `Promise`<`void`\>
+
+#### Returns
+
+`Promise`<`void`\>
+
+___
+
 ### requestAccessCode
 
-▸ **requestAccessCode**(`opaqueVoterId`): `Promise`<`string`\>
+▸ **requestAccessCode**(`opaqueVoterId`, `email`): `Promise`<`void`\>
 
 Should be called when a voter chooses digital vote submission (instead of mail-in).
 
@@ -98,23 +133,28 @@ Will attempt to get backend services to send an access code (one time password, 
 
 Should be followed by [validateAccessCode](avclient.md#validateaccesscode) to submit access code for validation.
 
+**`throws`** VoterRecordNotFound if no voter was found
+
+**`throws`** NetworkError if any request failed to get a response
+
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `opaqueVoterId` | `string` | Voter ID that preserves voter anonymity. |
+| `email` | `string` | where the voter expects to receive otp code. |
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<`void`\>
 
-'OK' or an error.
+Returns undefined or throws an error.
 
 ___
 
 ### validateAccessCode
 
-▸ **validateAccessCode**(`code`, `email`): `Promise`<`string`\>
+▸ **validateAccessCode**(`code`): `Promise`<`void`\>
 
 Should be called after [requestAccessCode](avclient.md#requestaccesscode).
 
@@ -125,18 +165,39 @@ key with each OTP provider.
 
 Should be followed by [constructBallotCryptograms](avclient.md#constructballotcryptograms).
 
+**`throws`** InvalidStateError if called before required data is available
+
+**`throws`** AccessCodeExpired if an OTP code has expired
+
+**`throws`** AccessCodeInvalid if an OTP code is invalid
+
+**`throws`** NetworkError if any request failed to get a response
+
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `code` | `string` \| `string`[] | An access code string. |
-| `email` | `string` | Voter email. |
+| `code` | `string` | An access code string. |
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<`void`\>
 
-Returns `'OK'` if authorization succeeded.
+Returns undefined if authorization succeeded or throws an error
+
+___
+
+### registerVoter
+
+▸ **registerVoter**(): `Promise`<`void`\>
+
+Registers a voter
+
+#### Returns
+
+`Promise`<`void`\>
+
+undefined or throws an error
 
 ___
 
@@ -152,7 +213,7 @@ Example:
 ```javascript
 const client = new AVClient(url);
 const cvr = { '1': 'option1', '2': 'optiona' };
-const fingerprint = await client.constructBallotCryptograms(cvr);
+const trackingCode = await client.constructBallotCryptograms(cvr);
 ```
 
 Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
@@ -160,6 +221,12 @@ values internal to the AV election config.
 
 Should be followed by either [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
 or [submitBallotCryptograms](avclient.md#submitballotcryptograms).
+
+**`throws`** InvalidStateError if called before required data is available
+
+**`throws`** CorruptCVRError if the cast vote record is invalid
+
+**`throws`** NetworkError if any request failed to get a response
 
 #### Parameters
 
@@ -171,7 +238,7 @@ or [submitBallotCryptograms](avclient.md#submitballotcryptograms).
 
 `Promise`<`string`\>
 
-Returns fingerprint of the cryptograms. Example:
+Returns the ballot tracking code. Example:
 ```javascript
 '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
 ```
@@ -202,16 +269,22 @@ ___
 
 ### spoilBallotCryptograms
 
-▸ **spoilBallotCryptograms**(): `Promise`<`string`\>
+▸ **spoilBallotCryptograms**(): `Promise`<`void`\>
 
 Should be called when voter chooses to test the encryption of their ballot.
 Gets commitment opening of the digital ballot box and validates it.
 
+**`throws`** InvalidStateError if called before required data is available
+
+**`throws`** ServerCommitmentError if the server commitment is invalid
+
+**`throws`** NetworkError if any request failed to get a response
+
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<`void`\>
 
-Returns 'Success' if the validation succeeds.
+Returns undefined if the validation succeeds or throws an error
 
 ___
 
@@ -222,6 +295,8 @@ ___
 Should be the last call in the entire voting process.
 
 Submits encrypted ballot and the affidavit to the digital ballot box.
+
+**`throws`** NetworkError if any request failed to get a response
 
 #### Parameters
 
@@ -255,3 +330,13 @@ Purges internal data.
 #### Returns
 
 `void`
+
+___
+
+### getElectionConfig
+
+▸ **getElectionConfig**(): `ElectionConfig`
+
+#### Returns
+
+`ElectionConfig`
