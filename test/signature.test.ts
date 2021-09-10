@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { signVotes } from '../lib/av_client/sign';
-import { ContestIndexed as ContestMap, EncryptedVote } from '../lib/av_client/types'
+
+const Crypto = require('../lib/av_client/aion_crypto')()
 
 describe('Sign', () => {
   const lastestBoardHash = { currentBoardHash: 'abc', currentTime: '2019-09-05 12:19:34' }
@@ -26,5 +27,11 @@ describe('Sign', () => {
 
       expect(correctVoterHash).to.not.eq(badVoterHash)
     });
+
+    // it('corrupted voter id yields different content hash', async () => {
+    //   console.log(Crypto.hashString("sune123"))
+    //   console.log(Crypto.hashString("sune123"))
+    //   console.log(Crypto.hashString("sune123"))
+    // });
   });
 });

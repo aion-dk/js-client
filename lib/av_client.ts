@@ -1,6 +1,6 @@
 import { BulletinBoard } from '../lib/av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig } from '../lib/av_client/election_config';
-import { ContestIndexed, EncryptedVote } from './av_client/types'
+import { ContestIndexed, OpenableEnvelope, EmptyCryptogram } from './av_client/types'
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
 import { registerVoter } from '../lib/av_client/register_voter';
 import EncryptVotes from '../lib/av_client/encrypt_votes';
@@ -46,9 +46,10 @@ export class AVClient {
   private emptyCryptograms: ContestIndexed<EmptyCryptogram>;
   private keyPair: KeyPair;
   private testCode: string;
-  private voteEncryptions: ContestIndexed<EncryptedVote>;
+  private voteEncryptions: ContestIndexed<OpenableEnvelope>;
   private voterIdentifier: string;
   private succeededMethods: string[];
+  private contestIds: number[];
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -203,16 +204,13 @@ export class AVClient {
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
     const authrorizationResponse = await coordinator.requestPublicKeyAuthorization(this.authorizationSessionId, this.identityConfirmationToken, this.keyPair.publicKey)
-    const { voterRecord, authorizationToken } = authrorizationResponse
+    const { authorizationToken } = authrorizationResponse.data
 
-    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, voterRecord, authorizationToken)
+    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, authorizationToken)
 
     this.voterIdentifier = registerVoterResponse.voterIdentifier
     this.emptyCryptograms = registerVoterResponse.emptyCryptograms
-    
-    // FIXME in time we need for config to include all available ballots, 
-    // but for registerVoterResponse to return contestIds that the voter has access to
-    this.getElectionConfig().ballots = registerVoterResponse.ballots
+    this.contestIds = registerVoterResponse.contestIds
 
     return Promise.resolve()
   }
@@ -247,7 +245,7 @@ export class AVClient {
   async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
     this.validateCallOrder('constructBallotCryptograms');
 
-    if (JSON.stringify(Object.keys(cvr)) !== JSON.stringify(this.contestIds())) {
+    if (JSON.stringify(Object.keys(cvr).map(k => parseInt(k))) !== JSON.stringify(this.contestIds)) {
       throw new Error('Corrupt CVR: Contains invalid contest');
     }
 
@@ -260,7 +258,7 @@ export class AVClient {
       throw new Error('Corrupt CVR: Contains invalid option');
     }
 
-    const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].cryptogram ]))
+    const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].empty_cryptogram ]))
     const contestEncodingTypes = Object.fromEntries(Object.keys(cvr).map((contestId) => {
       const contest = contests.find(b => b.id.toString() == contestId)
       // We can use non-null assertion for contest because selections have been validated
@@ -362,17 +360,17 @@ export class AVClient {
     this.validateCallOrder('submitBallotCryptograms');
     const voterIdentifier = this.voterIdentifier
     const electionId = this.electionId()
-    const voteEncryptions = this.voteEncryptions
-    const privateKey = this.privateKey();
-    const signatureKey = this.electionSigningPublicKey();
+    const encryptedVotes = this.voteEncryptions
+    const voterPrivateKey = this.privateKey();
+    const electionSigningPublicKey = this.electionSigningPublicKey();
 
     return await new SubmitVotes(this.bulletinBoard)
       .signAndSubmitVotes({
         voterIdentifier,
         electionId,
-        voteEncryptions,
-        privateKey,
-        signatureKey,
+        encryptedVotes,
+        voterPrivateKey,
+        electionSigningPublicKey,
         affidavit
     });
   }
@@ -392,8 +390,8 @@ export class AVClient {
   private cryptogramsForConfirmation(): ContestIndexed<Cryptogram> {
     const cryptograms = {}
     const voteEncryptions = this.voteEncryptions
-    this.contestIds().forEach(function (id) {
-      cryptograms[id] = voteEncryptions[id].cryptogram
+    this.contestIds.forEach(function (id) {
+      cryptograms[id.toString()] = voteEncryptions[id].cryptogram
     })
 
     return cryptograms
@@ -410,10 +408,6 @@ export class AVClient {
 
   private electionId(): number {
     return this.getElectionConfig().election.id;
-  }
-
-  private contestIds(): string[] {
-    return this.getElectionConfig().ballots.map(ballot => ballot.id.toString())
   }
 
   private electionEncryptionKey(): ECPoint {
@@ -498,8 +492,3 @@ type KeyPair = {
   privateKey: BigNum;
   publicKey: ECPoint;
 };
-
-type EmptyCryptogram = {
-  cryptogram: Cryptogram;
-  commitment: ECPoint;
-}

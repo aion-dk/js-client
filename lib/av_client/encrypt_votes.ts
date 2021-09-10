@@ -1,8 +1,9 @@
 const Crypto = require('./aion_crypto.js')()
+import { OpenableEnvelope } from "./types";
 
 export default class EncryptVotes {
   encrypt(contestSelections, emptyCryptograms, contestEncodingTypes, encryptionKey: PublicKey) {
-    const response: ContestIndexed<EncryptionResponse> = {}
+    const response: ContestIndexed<OpenableEnvelope> = {}
 
     Object.keys(contestSelections).forEach(function(contestId) {
       const { cryptogram, randomness } = Crypto.encryptVote(
@@ -11,9 +12,8 @@ export default class EncryptVotes {
         emptyCryptograms[contestId],
         encryptionKey
       );
-      const proof = Crypto.generateDiscreteLogarithmProof(randomness)
 
-      response[contestId] = { cryptogram, randomness, proof }
+      response[contestId] = { cryptogram, randomness }
     })
 
     return response;
@@ -37,11 +37,7 @@ type BigNum = string;
 interface ContestIndexed<Type> {
   [index: string]: Type;
 }
-type EncryptionResponse = {
-  cryptogram: Cryptogram;
-  randomness: BigNum;
-  proof: Proof;
-}
+
 type EncryptionData = {
   vote: string;
   voteEncodingType: Number;

@@ -1,29 +1,26 @@
 import { randomKeyPair} from './generate_key_pair';
-import { ContestIndexed } from "./types";
+import { ContestIndexed, EmptyCryptogram } from "./types";
 import { Ballot } from './election_config'
-const Crypto = require('./aion_crypto.js')()
+import { BulletinBoard } from './connectors/bulletin_board';
 
-interface EmptyCryptogram {
-  commitment: string;
-  cryptogram: string;
-}
+const Crypto = require('./aion_crypto.js')()
 
 interface RegisterVoterResponse {
   voterSessionUuid: string;
   voterIdentifier: string;
   emptyCryptograms: ContestIndexed<EmptyCryptogram>;
-  ballots: Ballot[];
+  contestIds: number[];
   /*
    Maybe we receive ballots that we can vote on.
    We need to consider if we only receive contestIds that the voter has access to.
    */
 }
 
-export async function registerVoter(bulletinBoard, keyPair, electionEncryptionKey, voterRecord, authorizationToken): Promise<RegisterVoterResponse> {
+export async function registerVoter(bulletinBoard: BulletinBoard, keyPair, electionEncryptionKey, authorizationToken): Promise<RegisterVoterResponse> {
   const signature = Crypto.generateSchnorrSignature('', keyPair.privateKey)
 
   // TODO make this call send all relevant values to the connector
-  const registerVoterResponse: RegisterVoterResponse = await bulletinBoard.registerVoter(keyPair.publicKey, signature).then(
+  const registerVoterResponse: RegisterVoterResponse = await bulletinBoard.registerVoter(authorizationToken, signature).then(
     ({ data }) => {
       // this.bulletinBoard.setVoterSessionUuid(data.voterSessionUuid)
       // FIXME we need to make sure that the bulletinBoard gets info about its voterSessionUuid another way
@@ -31,16 +28,14 @@ export async function registerVoter(bulletinBoard, keyPair, electionEncryptionKe
         voterSessionUuid: data.voterSessionUuid,
         voterIdentifier: data.voterIdentifier,
         emptyCryptograms: data.emptyCryptograms,
-        ballots: data.ballots
-      }
+        contestIds: data.ballotIds
+      } as RegisterVoterResponse
     }
   )
 
   randomKeyPair(); // TODO: remove, this just increases deterministic randomness offset for tests
 
-  const { ballots, emptyCryptograms, voterSessionUuid } = registerVoterResponse
-
-  const contestIds = ballots.map(ballot => ballot.id.toString())
+  const { contestIds, emptyCryptograms, voterSessionUuid } = registerVoterResponse
 
   const challenges: ContestIndexed<string> = Object.fromEntries(contestIds.map(contestId => {
     return [contestId, Crypto.generateRandomNumber()]
@@ -54,11 +49,11 @@ export async function registerVoter(bulletinBoard, keyPair, electionEncryptionKe
     const valid: boolean = contestIds.every((contestId) => {
       const emptyCryptogram = emptyCryptograms[contestId];
       const proofString = [
-        emptyCryptogram.commitment,
+        emptyCryptogram.commitment_point,
         challenges[contestId],
         responses[contestId],
       ].join(',');
-      return Crypto.verifyEmptyCryptogramProof(proofString, emptyCryptogram.cryptogram, electionEncryptionKey);
+      return Crypto.verifyEmptyCryptogramProof(proofString, emptyCryptogram.empty_cryptogram, electionEncryptionKey);
     });
     return valid;
   })

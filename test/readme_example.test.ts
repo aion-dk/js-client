@@ -20,7 +20,7 @@ describe('entire voter flow using OTP authorization', () => {
 
     const cvr = { '1': 'option1', '2': 'optiona' };
     const trackingCode  = await client.constructBallotCryptograms(cvr);
-    expect(trackingCode).to.eq('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
+    expect(trackingCode).to.eq('8cd7f8c3317c5317c066a42eddd86ca23fc4df14ae88165e38276854c19fff42');
 
     const affidavit = 'some bytes, most likely as binary PDF';
     const receipt = await client.submitBallotCryptograms(affidavit);

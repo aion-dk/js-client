@@ -1,16 +1,14 @@
-const Crypto = require('./aion_crypto.js')()
-import { ContestIndexed as ContestMap, EncryptedVote } from './types'
-import { AcknowledgedBoardHash, signVotes } from './sign'
-
+import { ContestIndexed as ContestMap, OpenableEnvelope } from './types'
+import { AcknowledgedBoardHash, signVotes, sealEnvelopes, assertValidReceipt } from './sign'
 
 type Affidavit = string
 
 type SignAndSubmitArguments = {
   voterIdentifier: string;
   electionId: number;
-  voteEncryptions: ContestMap<EncryptedVote>;
-  privateKey: string;
-  signatureKey: string,
+  encryptedVotes: ContestMap<OpenableEnvelope>;
+  voterPrivateKey: string;
+  electionSigningPublicKey: string,
   affidavit: Affidavit
 }
 
@@ -21,15 +19,19 @@ export default class SubmitVotes {
     this.bulletinBoard = bulletinBoard;
   }
 
-  async signAndSubmitVotes({ voterIdentifier, electionId, voteEncryptions, privateKey, signatureKey, affidavit }: SignAndSubmitArguments) {
+  async signAndSubmitVotes(args: SignAndSubmitArguments) {
+    const { voterIdentifier, electionId, encryptedVotes, voterPrivateKey, electionSigningPublicKey } = args
+
     const acknowledgeResponse = await this.acknowledge()
 
-    const { contentHash, voterSignature, cryptogramsWithProofs } = signVotes(voteEncryptions, acknowledgeResponse, electionId, voterIdentifier, privateKey);
+    const { contentHash, voterSignature } = signVotes(encryptedVotes, acknowledgeResponse, electionId, voterIdentifier, voterPrivateKey);
+    const cryptogramsWithProofs = sealEnvelopes(encryptedVotes)
 
-    const receipt = await this.submit({ contentHash, voterSignature, cryptogramsWithProofs })
-    await this.verifyReceipt({ contentHash, voterSignature, receipt, signatureKey });
+    const ballotBoxReceipt = await this.submit({ contentHash, voterSignature, cryptogramsWithProofs })
+    console.log(ballotBoxReceipt)
+    assertValidReceipt({ contentHash, voterSignature, receipt: ballotBoxReceipt, electionSigningPublicKey });
 
-    return receipt
+    return ballotBoxReceipt
   }
 
   private async submit({ contentHash, voterSignature, cryptogramsWithProofs }) {
@@ -63,37 +65,6 @@ export default class SubmitVotes {
     }
     return acknowledgedBoard
   }
-
-
-  private async verifyReceipt({ contentHash, voterSignature, receipt, signatureKey }) {
-    // verify board hash computation
-    const boardHashObject = {
-      content_hash: contentHash,
-      previous_board_hash: receipt.previousBoardHash,
-      registered_at: receipt.registeredAt
-    }
-    const boardHashString = JSON.stringify(boardHashObject)
-    const computedBoardHash = Crypto.hashString(boardHashString)
-
-    if (computedBoardHash != receipt.boardHash) {
-      return Promise.reject('Invalid vote receipt: corrupt board hash')
-    }
-
-    // verify server signature
-    const receiptHashObject = {
-      board_hash: receipt.boardHash,
-      signature: voterSignature
-    }
-    const receiptHashString = JSON.stringify(receiptHashObject)
-    const receiptHash = Crypto.hashString(receiptHashString)
-
-    if (!Crypto.verifySchnorrSignature(receipt.serverSignature, receiptHash, signatureKey)) {
-      return Promise.reject('Invalid vote receipt: corrupt server signature')
-    }
-
-    return Promise.resolve()
-  }
-
 }
 
 interface BulletinBoard {

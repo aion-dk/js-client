@@ -53,7 +53,7 @@ describe('AVClient#constructBallotCryptograms', () => {
 
       const trackingCode = await client.constructBallotCryptograms(cvr);
 
-      expect(trackingCode).to.equal('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
+      expect(trackingCode).to.equal('8cd7f8c3317c5317c066a42eddd86ca23fc4df14ae88165e38276854c19fff42');
     });
   });
 

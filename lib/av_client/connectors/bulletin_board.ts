@@ -5,7 +5,7 @@ export class BulletinBoard {
   voterAuthorizationCoordinator: any;
   voterSessionUuid: string;
 
-  constructor(baseURL: string, timeout: number = 1000) {
+  constructor(baseURL: string, timeout: number = 10000) {
     this.createBackendClient(baseURL, timeout);
   }
 
@@ -24,9 +24,9 @@ export class BulletinBoard {
     });
   }
 
-  registerVoter(publicKey, signature) {
+  registerVoter(authorizationToken, signature) {
     return this.backend.post('register', {
-      public_key: publicKey,
+      authorization_token: authorizationToken,
       signature: signature
     });
   }

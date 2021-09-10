@@ -79,14 +79,13 @@ describe('AVClient#submitBallotCryptograms', () => {
       await client.constructBallotCryptograms(cvr)
 
       // change the proof of ballot 1
-      const randomness = client.voteEncryptions['1'].randomness
-      const newRandomness = Crypto.addBigNums(randomness, randomness)
-      client.voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(newRandomness)
+      const randomness = 'corrupted_randomness!'
+      client.voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(randomness)
 
       const affidavit = 'some bytes, most likely as binary PDF';
       return await client.submitBallotCryptograms(affidavit).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => expect(error).to.equal('Invalid vote receipt: corrupt server signature')
+        () => expect.fail('Expected exception to be thrown'),
+        (error: Error) => expect(error.message).to.equal('Invalid vote receipt: corrupt server signature')
       );
     });
   });
