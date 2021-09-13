@@ -48,7 +48,6 @@ export class AVClient {
   private testCode: string;
   private voteEncryptions: ContestIndexed<OpenableEnvelope>;
   private voterIdentifier: string;
-  private succeededMethods: string[];
   private contestIds: number[];
 
   /**
@@ -56,7 +55,6 @@ export class AVClient {
    */
   constructor(bulletinBoardURL: string) {
     this.bulletinBoard = new BulletinBoard(bulletinBoardURL);
-    this.succeededMethods = [];
   }
 
   /**
@@ -147,7 +145,6 @@ export class AVClient {
       .then(async sessionId => {
         this.authorizationSessionId = sessionId
         this.email = email
-        this.succeededMethods.push('requestAccessCode');
 
         await coordinator.startIdentification(sessionId);
       });
@@ -178,8 +175,6 @@ export class AVClient {
     const provider = new OTPProvider(this.getElectionConfig().OTPProviderURL)
     
     this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email)
-
-    this.succeededMethods.push('validateAccessCode');
 
     return Promise.resolve()
   }
@@ -277,7 +272,6 @@ export class AVClient {
     this.voteEncryptions = encryptionResponse
 
     const trackingCode = new EncryptVotes().fingerprint(this.cryptogramsForConfirmation());
-    this.succeededMethods.push('constructBallotCryptograms');
 
     return trackingCode;
   }
@@ -311,7 +305,6 @@ export class AVClient {
    * @throws NetworkError if any request failed to get a response
    */
   async spoilBallotCryptograms(): Promise<void> {
-    //this.validateCallOrder('spoilBallotCryptograms');
     // TODO: encrypt the vote cryptograms one more time with a key derived from `this.generateTestCode`.
     //  A key is derived like: key = hash(test code, ballot id, cryptogram index)
     // TODO: compute commitment openings of the voter commitment
@@ -332,7 +325,6 @@ export class AVClient {
     const valid = benaloh.verifyCommitmentOpening(serverCommitmentOpening, serverCommitment, serverEmptyCryptograms)
 
     if (valid) {
-      this.succeededMethods.push('spoilBallotCryptograms');
       return Promise.resolve()
     } else {
       return Promise.reject('Server commitment did not validate')
@@ -429,26 +421,6 @@ export class AVClient {
 
   private publicKey(): ECPoint {
     return this.keyPair.publicKey
-  }
-
-  private validateCallOrder(methodName) {
-    const expectations = {
-      constructBallotCryptograms: ['requestAccessCode', 'validateAccessCode'],
-      spoilBallotCryptograms: ['requestAccessCode', 'validateAccessCode', 'constructBallotCryptograms'],
-      submitBallotCryptograms: ['requestAccessCode', 'validateAccessCode', 'constructBallotCryptograms'],
-    };
-
-    const requiredCalls = expectations[methodName];
-
-    if (requiredCalls === undefined) {
-      throw new Error(`Call order validation for method #${methodName} is not implemented`)
-    } else {
-      if (JSON.stringify(this.succeededMethods) != JSON.stringify(requiredCalls)) {
-        const requiredList = requiredCalls.map((name) => `#${name}`).join(', ');
-        const gotList = this.succeededMethods.map((name) => `#${name}`).join(', ');
-        throw new InvalidStateError(`#${methodName} requires exactly ${requiredList} to be called before it`);
-      }
-    }
   }
 }
 

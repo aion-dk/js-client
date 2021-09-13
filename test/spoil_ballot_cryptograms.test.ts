@@ -141,9 +141,6 @@ describe('AVClient#spoilBallotCryptograms', () => {
       nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
         .replyWithFile(403, __dirname + '/replies/avx_error.invalid_2.json');
 
-      // Force AVClient to be unaware of spoilBallotCryptograms having been called.
-      client.succeededMethods.pop();
-
       const affidavit = 'fake affidavit data';
       return await client.submitBallotCryptograms(affidavit).then(
         () => expect.fail('Expected promise to be rejected'),
