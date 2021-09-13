@@ -76,8 +76,10 @@ describe('AVClient#submitBallotCryptograms', () => {
       await client.constructBallotCryptograms(cvr)
 
       // change the proof of ballot 1
-      const randomness = 'corrupted_randomness!'
-      client.voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(randomness)
+      const randomness = 'corrupted_randomness!';
+
+      // TODO: Refactor to avoid manipulation of internal state
+      (client as any ).voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(randomness)
 
       const affidavit = 'some bytes, most likely as binary PDF';
       return await client.submitBallotCryptograms(affidavit).then(
