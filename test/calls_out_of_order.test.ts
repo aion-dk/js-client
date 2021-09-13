@@ -20,7 +20,7 @@ describe('AVClient functions call order', () => {
       expect.fail('Expected an InvalidStateError, got no error');
     } catch (e) {
       expect(e.name).to.eql('InvalidStateError');
-      expect(e.message).to.eql('Cannot validate access code. No email state stored.');
+      expect(e.message).to.eql('Cannot validate access code. Access code was not requested.');
     }
   });
 
@@ -30,15 +30,17 @@ describe('AVClient functions call order', () => {
       expect.fail('Expected an InvalidStateError, got no error');
     } catch (e) {
       expect(e.name).to.eql('InvalidStateError');
-      expect(e.message).to.eql('#constructBallotCryptograms requires exactly #requestAccessCode, #validateAccessCode to be called before it');
+      expect(e.message).to.eql('Cannot construct ballot cryptograms. Voter registration not completed successfully');
     }
   });
 
-  it('throws an error when spoilBallotCryptograms is called first', async () => {
+  // TODO: Skip test, spoilBallotCryptogram is not implemented yet
+  it.skip('throws an error when spoilBallotCryptograms is prior to voter authentication', async () => {
     try {
       await client.spoilBallotCryptograms();
       expect.fail('Expected an InvalidStateError, got no error');
     } catch (e) {
+      console.log(e)
       expect(e.name).to.eql('InvalidStateError');
       expect(e.message).to.eql('#spoilBallotCryptograms requires exactly #requestAccessCode, #validateAccessCode, #constructBallotCryptograms to be called before it');
     }
@@ -50,7 +52,7 @@ describe('AVClient functions call order', () => {
       expect.fail('Expected an InvalidStateError, got no error');
     } catch (e) {
       expect(e.name).to.eql('InvalidStateError');
-      expect(e.message).to.eql('#submitBallotCryptograms requires exactly #requestAccessCode, #validateAccessCode, #constructBallotCryptograms to be called before it');
+      expect(e.message).to.eql('Cannot submit cryptograms. Voter identity unknown or no open envelopes');
     }
   });
 
@@ -95,7 +97,8 @@ describe('AVClient functions call order', () => {
       nock.cleanAll();
     });
 
-    it('throws an error when submitBallotCryptograms is called directly after spoiling', async () => {
+    // TODO: Skipped as it is not implemented yet
+    it.skip('throws an error when submitBallotCryptograms is called after spoiling', async () => {
       await client.requestAccessCode('voter123', 'voter@foo.bar');
       await client.validateAccessCode('1234');
       await client.registerVoter()
@@ -111,7 +114,7 @@ describe('AVClient functions call order', () => {
         expect.fail('Expected an InvalidStateError, got no error');
       } catch (error) {
         expect(error.name).to.eql('InvalidStateError');
-        expect(error.message).to.eql('#submitBallotCryptograms requires exactly #requestAccessCode, #validateAccessCode, #constructBallotCryptograms to be called before it');
+        expect(error.message).to.eql('Cannot submit cryptograms after spoiling');
       }
     });
 

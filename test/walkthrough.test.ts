@@ -23,17 +23,14 @@ describe('entire voter flow using OTP authorization', () => {
     if(USE_MOCK) {
       expectedNetworkRequests.push(nock('http://localhost:3000/').get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json'));
-
       expectedNetworkRequests.push(nock('http://localhost:1234/').post('/create_session')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json'));
       expectedNetworkRequests.push(nock('http://localhost:1234/').post('/start_identification')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json'));
-        expectedNetworkRequests.push(nock('http://localhost:1234/').post('/request_authorization')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json'));
-
+      expectedNetworkRequests.push(nock('http://localhost:1234/').post('/request_authorization')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json'));
       expectedNetworkRequests.push(nock('http://localhost:1111/').post('/authorize')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json'));
-
       expectedNetworkRequests.push(nock('http://localhost:3000/').post('/test/app/register')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_register.json'));
       expectedNetworkRequests.push(nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')

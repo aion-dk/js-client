@@ -173,7 +173,7 @@ export class AVClient {
    */
   async validateAccessCode(code: string): Promise<void> {
     if(!this.email)
-      throw new InvalidStateError('Cannot validate access code. No email state stored.');
+      throw new InvalidStateError('Cannot validate access code. Access code was not requested.');
 
     const provider = new OTPProvider(this.getElectionConfig().OTPProviderURL)
     
@@ -243,7 +243,9 @@ export class AVClient {
    * @throws NetworkError if any request failed to get a response
    */
   async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
-    this.validateCallOrder('constructBallotCryptograms');
+    if(!(this.voterIdentifier || this.emptyCryptograms || this.contestIds)) {
+      throw new InvalidStateError('Cannot construct ballot cryptograms. Voter registration not completed successfully')
+    }
 
     if (JSON.stringify(Object.keys(cvr).map(k => parseInt(k))) !== JSON.stringify(this.contestIds)) {
       throw new Error('Corrupt CVR: Contains invalid contest');
@@ -309,7 +311,7 @@ export class AVClient {
    * @throws NetworkError if any request failed to get a response
    */
   async spoilBallotCryptograms(): Promise<void> {
-    this.validateCallOrder('spoilBallotCryptograms');
+    //this.validateCallOrder('spoilBallotCryptograms');
     // TODO: encrypt the vote cryptograms one more time with a key derived from `this.generateTestCode`.
     //  A key is derived like: key = hash(test code, ballot id, cryptogram index)
     // TODO: compute commitment openings of the voter commitment
@@ -357,7 +359,10 @@ export class AVClient {
    * @throws NetworkError if any request failed to get a response
    */
   async submitBallotCryptograms(affidavit: Affidavit): Promise<Receipt> {
-    this.validateCallOrder('submitBallotCryptograms');
+    if(!(this.voterIdentifier || this.voteEncryptions)) {
+      throw new InvalidStateError('Cannot submit cryptograms. Voter identity unknown or no open envelopes')
+    }
+
     const voterIdentifier = this.voterIdentifier
     const electionId = this.electionId()
     const encryptedVotes = this.voteEncryptions
