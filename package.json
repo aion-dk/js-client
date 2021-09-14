@@ -1,6 +1,6 @@
 {
   "name": "@aion-dk/js-client",
-  "version": "0.0.2021-09-14",
+  "version": "0.0.71425",
   "description": "Assembly Voting JS client",
   "main": "dist/lib/av_client.js",
   "types": "dist/lib/av_client.d.ts",

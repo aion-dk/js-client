@@ -21,12 +21,14 @@ export class OTPProvider {
 
         // If we get errors from the provider, we wrap in custom errors
         if (error.response && error.response.status === 403) {
-          const _error = error.response.data.error // TODO: revert to error.response.data?.error
-          if( _error === 'expired' ){
-            throw new AccessCodeExpired('OTP code expired')
-          }
-          if( _error === 'invalid' ){
-            throw new AccessCodeInvalid('OTP code invalid')
+          if (error.response.data && error.response.data.error) {
+            const _error = error.response.data.error // TODO: revert to error.response.data?.error
+            if( _error === 'expired' ){
+              throw new AccessCodeExpired('OTP code expired')
+            }
+            if( _error === 'invalid' ){
+              throw new AccessCodeInvalid('OTP code invalid')
+            }
           }
         }
 
