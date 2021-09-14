@@ -6,7 +6,7 @@ import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
 describe('AVClient#constructBallotCryptograms', () => {
-  let client;
+  let client: AVClient;
   let sandbox;
 
   beforeEach(async () => {
@@ -45,22 +45,22 @@ describe('AVClient#constructBallotCryptograms', () => {
 
   context('given previous steps succeeded, and it receives valid values', () => {
     it('encrypts correctly', async () => {
-      await client.requestAccessCode('voter123');
-      await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.requestAccessCode('voter123', 'voter@foo.bar');
+      await client.validateAccessCode('1234');
       await client.registerVoter()
 
       const cvr = { '1': 'option1', '2': 'optiona' };
 
       const trackingCode = await client.constructBallotCryptograms(cvr);
 
-      expect(trackingCode).to.equal('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
+      expect(trackingCode).to.equal('8cd7f8c3317c5317c066a42eddd86ca23fc4df14ae88165e38276854c19fff42');
     });
   });
 
   context('given invalid CVR', () => {
     it('encryption fails when voting on invalid contest', async () => {
-      await client.requestAccessCode('voter123');
-      await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.requestAccessCode('voter123', 'voter@foo.bar');
+      await client.validateAccessCode('1234');
       await client.registerVoter()
 
       const cvr = { '1': 'option1', '3': 'optiona' };
@@ -74,8 +74,8 @@ describe('AVClient#constructBallotCryptograms', () => {
     });
 
     it('encryption fails when voting on invalid option', async () => {
-      await client.requestAccessCode('voter123');
-      await client.validateAccessCode('1234', 'voter@foo.bar');
+      await client.requestAccessCode('voter123', 'voter@foo.bar');
+      await client.validateAccessCode('1234');
       await client.registerVoter()
 
       const cvr = { '1': 'option1', '2': 'wrong_option' };

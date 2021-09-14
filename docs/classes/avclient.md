@@ -45,16 +45,16 @@ describe('entire voter flow using OTP authorization', () => {
 
     const cvr = { '1': 'option1', '2': 'optiona' };
     const trackingCode  = await client.constructBallotCryptograms(cvr);
-    expect(trackingCode).to.eq('da46ec752fd9197c0d77e6d843924b082b8b23350e8ac5fd454051dc1bf85ad2');
+    expect(trackingCode).to.eq('12918186c8a535b7c94576dca7b94ef2dbb9a728f63d466a4faf558a2e4be165');
 
     const affidavit = 'some bytes, most likely as binary PDF';
     const receipt = await client.submitBallotCryptograms(affidavit);
     expect(receipt).to.eql({
-      previousBoardHash: 'd8d9742271592d1b212bbd4cbbbe357aef8e00cdbdf312df95e9cf9a1a921465',
-      boardHash: '87abbdea83326ba124a99f8f56ba4748f9df97022a869c297aad94c460804c03',
+      previousBoardHash: '0de4ec18961c66cc75ddaeb4a55bdd01c2200eed787be5ea7e7ed0284e724a3b',
+      boardHash: '4874559661833c93ac7c06610d5c111c698d3a2f850f35346ddc43b526fe373e',
       registeredAt: '2020-03-01T10:00:00.000+01:00',
-      serverSignature: 'bfaffbaf8778abce29ea98ebc90ca91e091881480e18ef31da815d181cead1f6,8977ad08d4fc3b1d9be311d93cf8e98178142685c5fbbf703abf2188a8d1c862',
-      voteSubmissionId: 6
+      serverSignature: '11c1ba9b9738eea669dfb79358cd906ad341a466ebe02d5f39ea215585c18b27,bdafb61f0c2facedebc2aeba252bec2a7fe1e123f6affe3fc2fc87db650c5546',
+      voteSubmissionId: 7
     });
   });
 });
@@ -247,7 +247,7 @@ ___
 
 ### generateTestCode
 
-▸ **generateTestCode**(): `string`
+▸ **generateTestCode**(): `void`
 
 Should be called after [validateAccessCode](avclient.md#validateaccesscode).
 Should be called before [spoilBallotCryptograms](avclient.md#spoilballotcryptograms).
@@ -258,7 +258,7 @@ The generateTestCode is used in case [spoilBallotCryptograms](avclient.md#spoilb
 
 #### Returns
 
-`string`
+`void`
 
 Returns the test code. Example:
 ```javascript
