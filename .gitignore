@@ -1,5 +1,6 @@
 .DS_Store
-node_modules
+.nyc_output
+coverage
 dist
 html_docs
-.nyc_output
+node_modules

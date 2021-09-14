@@ -2,6 +2,8 @@
 
 # Assembly Voting JS Client
 
+![Code coverage](./.github/coverage_badge.svg)
+
 Javascript API for building voter-facing election applications.
 
 ## Testing

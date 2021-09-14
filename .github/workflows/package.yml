@@ -1,13 +1,5 @@
 name: Package
-on:
-  workflow_run:
-    workflows:
-     - Tests
-    branches:
-      - main
-    types:
-      - completed
-      - requested
+on: workflow_dispatch
 jobs:
   publish-package:
     runs-on: ubuntu-20.04
