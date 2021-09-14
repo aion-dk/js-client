@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { AccessCodeInvalid, AccessCodeExpired, NetworkError } from "../errors";
+import { AccessCodeInvalid, AccessCodeExpired, NetworkError, UnsupportedServerReplyError } from "../errors";
 
 export interface IdentityConfirmationToken {
   token: 'authorized'
@@ -20,19 +20,22 @@ export class OTPProvider {
       .catch(error => {
 
         // If we get errors from the provider, we wrap in custom errors
-        if (error.response && error.response.status === 403) {
-          const _error = error.response.data?.error
-          if( _error === 'expired' ){
-            throw new AccessCodeExpired('OTP code expired')
-          }
-          if( _error === 'invalid' ){
-            throw new AccessCodeInvalid('OTP code invalid')
+        if (error.response && error.response.status === 403 && error.response.data) {
+          if (error.response.data.error) {
+            const errorMessage = error.response.data.error;
+            switch(errorMessage) {
+              case 'expired': throw new AccessCodeExpired('OTP code expired'); break;
+              case 'invalid': throw new AccessCodeInvalid('OTP code invalid'); break;
+              default: throw new UnsupportedServerReplyError(`Unsupported server error: ${errorMessage}`);
+            }
+          } else {
+            throw new UnsupportedServerReplyError(`Unsupported server error message: ${JSON.stringify(error.response.data)}`)
           }
         }
 
         // The request was made but no response was received
-        if ( error.request && ! error.response) {
-          throw new NetworkError('Network error')
+        if (error.request && ! error.response) {
+          throw new NetworkError('Network error');
         }
 
         // If we don't understand the error, then we rethrow
