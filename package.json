@@ -6,7 +6,7 @@
   "types": "dist/lib/av_client.d.ts",
   "scripts": {
     "test": "mocha --require ts-node/register/transpile-only --require source-map-support/register --recursive --extension ts ./test/*.test.ts",
-    "coverage": "tsc && nyc --reporter=text npm run test",
+    "coverage": "tsc && nyc --reporter=json-summary --reporter=text npm run test",
     "tdd": "mocha --require ts-node/register/transpile-only --require source-map-support/register --extension ts ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
     "docs": "typedoc --includes test/",
     "html_docs": "typedoc --plugin none --out html_docs --includes test/ --theme typedoc-wide-theme",
