@@ -1,3 +1,10 @@
 {
-  "extends": "@istanbuljs/nyc-config-typescript"
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "all": true,
+  "exclude": [
+    "dist/*",
+    "html_docs/*",
+    "typedoc-wide-theme/*",
+    "test/*"
+  ]
 }
