@@ -20,14 +20,18 @@ export type KeyPair = {
 }
 
 export interface EmptyCryptogram {
-  commitment: string;
-  cryptogram: string;
-}
-
-export type EncryptedVote = {
-  cryptogram: string;
-  randomness: string;
-  proof: string;
+  commitment_point: string;
+  empty_cryptogram: string;
 }
 
 export type Affidavit = string
+
+export interface OpenableEnvelope {
+  cryptogram: string
+  randomness: string
+}
+
+export interface SealedEnvelope {
+  cryptogram: string
+  proof: string
+}

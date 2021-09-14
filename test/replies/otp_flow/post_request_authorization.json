@@ -1,9 +1,3 @@
 {
-  "votorRecord": {
-    "opagueVoterId": 666,
-    "email": "tester@aion.dk",
-    "presinctId": 666,
-    "contestIds": ["1", "2"]
-  },
-  "authorizationToken": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+  "authorizationToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiMiIsInB1YmxpY19rZXkiOiIwMzk0OTBlZDM1ZTBjYWJiMzk1OTI3OTJkNjliNWQ0YmYyMTA0ZjIwZGY4YzRiYmYzNmVlNmI3MDU1OTVlNzc2ZDIiLCJ2b3Rlcl9ncm91cF9rZXkiOiI2MSIsInNlZ21lbnQxIjoicHJlY2luY3QtNzYiLCJleHAiOjE5NDY3MTMzNDJ9.GALctKSTiFbNTZ_0Z-T6Ex54U01zZCk7HAIe3OYqYLcJDrDtiDuEYsxpmO2cM56nksClnnMtgEd5lAGY3wfnww"
 }

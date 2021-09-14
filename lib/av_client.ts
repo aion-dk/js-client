@@ -1,6 +1,6 @@
 import { BulletinBoard } from '../lib/av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig } from '../lib/av_client/election_config';
-import { ContestIndexed, EncryptedVote } from './av_client/types'
+import { ContestIndexed, OpenableEnvelope, EmptyCryptogram } from './av_client/types'
 import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
 import { registerVoter } from '../lib/av_client/register_voter';
 import EncryptVotes from '../lib/av_client/encrypt_votes';
@@ -46,16 +46,15 @@ export class AVClient {
   private emptyCryptograms: ContestIndexed<EmptyCryptogram>;
   private keyPair: KeyPair;
   private testCode: string;
-  private voteEncryptions: ContestIndexed<EncryptedVote>;
+  private voteEncryptions: ContestIndexed<OpenableEnvelope>;
   private voterIdentifier: string;
-  private succeededMethods: string[];
+  private contestIds: number[];
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
    */
   constructor(bulletinBoardURL: string) {
     this.bulletinBoard = new BulletinBoard(bulletinBoardURL);
-    this.succeededMethods = [];
   }
 
   /**
@@ -146,7 +145,6 @@ export class AVClient {
       .then(async sessionId => {
         this.authorizationSessionId = sessionId
         this.email = email
-        this.succeededMethods.push('requestAccessCode');
 
         await coordinator.startIdentification(sessionId);
       });
@@ -171,13 +169,12 @@ export class AVClient {
    * @throws NetworkError if any request failed to get a response
    */
   async validateAccessCode(code: string): Promise<void> {
-    this.validateCallOrder('validateAccessCode');
+    if(!this.email)
+      throw new InvalidStateError('Cannot validate access code. Access code was not requested.');
 
     const provider = new OTPProvider(this.getElectionConfig().OTPProviderURL)
     
     this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email)
-
-    this.succeededMethods.push('validateAccessCode');
 
     return Promise.resolve()
   }
@@ -185,10 +182,12 @@ export class AVClient {
 
   /**
    * Registers a voter
-   * 
+   *
    * @returns undefined or throws an error
    */
   async registerVoter(): Promise<void> {
+    if(!this.identityConfirmationToken)
+      throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
 
     // FIXME this needs to be generated
     this.keyPair = {
@@ -200,16 +199,13 @@ export class AVClient {
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
     const authrorizationResponse = await coordinator.requestPublicKeyAuthorization(this.authorizationSessionId, this.identityConfirmationToken, this.keyPair.publicKey)
-    const { voterRecord, authorizationToken } = authrorizationResponse
+    const { authorizationToken } = authrorizationResponse.data
 
-    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, voterRecord, authorizationToken)
+    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, authorizationToken)
 
     this.voterIdentifier = registerVoterResponse.voterIdentifier
     this.emptyCryptograms = registerVoterResponse.emptyCryptograms
-    
-    // FIXME in time we need for config to include all available ballots, 
-    // but for registerVoterResponse to return contestIds that the voter has access to
-    this.getElectionConfig().ballots = registerVoterResponse.ballots
+    this.contestIds = registerVoterResponse.contestIds
 
     return Promise.resolve()
   }
@@ -242,9 +238,11 @@ export class AVClient {
    * @throws NetworkError if any request failed to get a response
    */
   async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
-    this.validateCallOrder('constructBallotCryptograms');
+    if(!(this.voterIdentifier || this.emptyCryptograms || this.contestIds)) {
+      throw new InvalidStateError('Cannot construct ballot cryptograms. Voter registration not completed successfully')
+    }
 
-    if (JSON.stringify(Object.keys(cvr)) !== JSON.stringify(this.contestIds())) {
+    if (JSON.stringify(Object.keys(cvr).map(k => parseInt(k))) !== JSON.stringify(this.contestIds)) {
       throw new Error('Corrupt CVR: Contains invalid contest');
     }
 
@@ -257,7 +255,7 @@ export class AVClient {
       throw new Error('Corrupt CVR: Contains invalid option');
     }
 
-    const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].cryptogram ]))
+    const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].empty_cryptogram ]))
     const contestEncodingTypes = Object.fromEntries(Object.keys(cvr).map((contestId) => {
       const contest = contests.find(b => b.id.toString() == contestId)
       // We can use non-null assertion for contest because selections have been validated
@@ -274,7 +272,6 @@ export class AVClient {
     this.voteEncryptions = encryptionResponse
 
     const trackingCode = new EncryptVotes().fingerprint(this.cryptogramsForConfirmation());
-    this.succeededMethods.push('constructBallotCryptograms');
 
     return trackingCode;
   }
@@ -292,12 +289,10 @@ export class AVClient {
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
    */
-  generateTestCode(): string {
+  generateTestCode() {
     const testCode = new EncryptVotes().generateTestCode()
 
     this.testCode = testCode
-
-    return testCode
   }
 
   /**
@@ -310,7 +305,6 @@ export class AVClient {
    * @throws NetworkError if any request failed to get a response
    */
   async spoilBallotCryptograms(): Promise<void> {
-    this.validateCallOrder('spoilBallotCryptograms');
     // TODO: encrypt the vote cryptograms one more time with a key derived from `this.generateTestCode`.
     //  A key is derived like: key = hash(test code, ballot id, cryptogram index)
     // TODO: compute commitment openings of the voter commitment
@@ -331,7 +325,6 @@ export class AVClient {
     const valid = benaloh.verifyCommitmentOpening(serverCommitmentOpening, serverCommitment, serverEmptyCryptograms)
 
     if (valid) {
-      this.succeededMethods.push('spoilBallotCryptograms');
       return Promise.resolve()
     } else {
       return Promise.reject('Server commitment did not validate')
@@ -358,20 +351,23 @@ export class AVClient {
    * @throws NetworkError if any request failed to get a response
    */
   async submitBallotCryptograms(affidavit: Affidavit): Promise<Receipt> {
-    this.validateCallOrder('submitBallotCryptograms');
+    if(!(this.voterIdentifier || this.voteEncryptions)) {
+      throw new InvalidStateError('Cannot submit cryptograms. Voter identity unknown or no open envelopes')
+    }
+
     const voterIdentifier = this.voterIdentifier
     const electionId = this.electionId()
-    const voteEncryptions = this.voteEncryptions
-    const privateKey = this.privateKey();
-    const signatureKey = this.electionSigningPublicKey();
+    const encryptedVotes = this.voteEncryptions
+    const voterPrivateKey = this.privateKey();
+    const electionSigningPublicKey = this.electionSigningPublicKey();
 
     return await new SubmitVotes(this.bulletinBoard)
       .signAndSubmitVotes({
         voterIdentifier,
         electionId,
-        voteEncryptions,
-        privateKey,
-        signatureKey,
+        encryptedVotes,
+        voterPrivateKey,
+        electionSigningPublicKey,
         affidavit
     });
   }
@@ -391,8 +387,8 @@ export class AVClient {
   private cryptogramsForConfirmation(): ContestIndexed<Cryptogram> {
     const cryptograms = {}
     const voteEncryptions = this.voteEncryptions
-    this.contestIds().forEach(function (id) {
-      cryptograms[id] = voteEncryptions[id].cryptogram
+    this.contestIds.forEach(function (id) {
+      cryptograms[id.toString()] = voteEncryptions[id].cryptogram
     })
 
     return cryptograms
@@ -411,10 +407,6 @@ export class AVClient {
     return this.getElectionConfig().election.id;
   }
 
-  private contestIds(): string[] {
-    return this.getElectionConfig().ballots.map(ballot => ballot.id.toString())
-  }
-
   private electionEncryptionKey(): ECPoint {
     return this.getElectionConfig().encryptionKey
   }
@@ -429,27 +421,6 @@ export class AVClient {
 
   private publicKey(): ECPoint {
     return this.keyPair.publicKey
-  }
-
-  private validateCallOrder(methodName) {
-    const expectations = {
-      validateAccessCode: ['requestAccessCode'],
-      constructBallotCryptograms: ['requestAccessCode', 'validateAccessCode'],
-      spoilBallotCryptograms: ['requestAccessCode', 'validateAccessCode', 'constructBallotCryptograms'],
-      submitBallotCryptograms: ['requestAccessCode', 'validateAccessCode', 'constructBallotCryptograms'],
-    };
-
-    const requiredCalls = expectations[methodName];
-
-    if (requiredCalls === undefined) {
-      throw new Error(`Call order validation for method #${methodName} is not implemented`)
-    } else {
-      if (JSON.stringify(this.succeededMethods) != JSON.stringify(requiredCalls)) {
-        const requiredList = requiredCalls.map((name) => `#${name}`).join(', ');
-        const gotList = this.succeededMethods.map((name) => `#${name}`).join(', ');
-        throw new InvalidStateError(`#${methodName} requires exactly ${requiredList} to be called before it`);
-      }
-    }
   }
 }
 
@@ -498,8 +469,3 @@ type KeyPair = {
   privateKey: BigNum;
   publicKey: ECPoint;
 };
-
-type EmptyCryptogram = {
-  cryptogram: Cryptogram;
-  commitment: ECPoint;
-}

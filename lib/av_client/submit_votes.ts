@@ -1,14 +1,14 @@
-const Crypto = require('./aion_crypto.js')()
-import { ContestIndexed, EncryptedVote } from './types'
+import { ContestIndexed as ContestMap, OpenableEnvelope } from './types'
+import { AcknowledgedBoardHash, signVotes, sealEnvelopes, assertValidReceipt } from './sign'
 
 type Affidavit = string
 
 type SignAndSubmitArguments = {
   voterIdentifier: string;
   electionId: number;
-  voteEncryptions: ContestIndexed<EncryptedVote>;
-  privateKey: string;
-  signatureKey: string,
+  encryptedVotes: ContestMap<OpenableEnvelope>;
+  voterPrivateKey: string;
+  electionSigningPublicKey: string,
   affidavit: Affidavit
 }
 
@@ -19,35 +19,19 @@ export default class SubmitVotes {
     this.bulletinBoard = bulletinBoard;
   }
 
-  async signAndSubmitVotes({ voterIdentifier, electionId, voteEncryptions, privateKey, signatureKey, affidavit }: SignAndSubmitArguments) {
+  async signAndSubmitVotes(args: SignAndSubmitArguments) {
+    const { voterIdentifier, electionId, encryptedVotes, voterPrivateKey, electionSigningPublicKey } = args
+
     const acknowledgeResponse = await this.acknowledge()
 
-    const votes = {}
-    const cryptogramsWithProofs = {}
-    for (let contestId in voteEncryptions) {
-      votes[contestId] = voteEncryptions[contestId].cryptogram
-      cryptogramsWithProofs[contestId] = {
-        cryptogram: voteEncryptions[contestId].cryptogram,
-        proof: voteEncryptions[contestId].proof
-      }
-    }
+    const { contentHash, voterSignature } = signVotes(encryptedVotes, acknowledgeResponse, electionId, voterIdentifier, voterPrivateKey);
+    const cryptogramsWithProofs = sealEnvelopes(encryptedVotes)
 
-    const content = {
-      acknowledged_at: acknowledgeResponse.currentTime,
-      acknowledged_board_hash: acknowledgeResponse.currentBoardHash,
-      election_id: electionId,
-      voter_identifier: voterIdentifier,
-      votes
-    };
+    const ballotBoxReceipt = await this.submit({ contentHash, voterSignature, cryptogramsWithProofs })
+    //console.log(ballotBoxReceipt, voterSignature)
+    assertValidReceipt({ contentHash, voterSignature, receipt: ballotBoxReceipt, electionSigningPublicKey });
 
-    const contentString = JSON.stringify(content)
-    const contentHash = Crypto.hashString(contentString)
-    const voterSignature = this.sign(contentHash, privateKey)
-
-    const receipt = await this.submit({ contentHash, voterSignature, cryptogramsWithProofs })
-    await this.verifyReceipt({ contentHash, voterSignature, receipt, signatureKey });
-
-    return receipt
+    return ballotBoxReceipt
   }
 
   private async submit({ contentHash, voterSignature, cryptogramsWithProofs }) {
@@ -68,7 +52,7 @@ export default class SubmitVotes {
     return receipt
   }
 
-  private async acknowledge() {
+  private async acknowledge(): Promise<AcknowledgedBoardHash> {
     const { data } = await this.bulletinBoard.getBoardHash()
 
     if (!data.currentBoardHash || !data.currentTime) {
@@ -81,46 +65,11 @@ export default class SubmitVotes {
     }
     return acknowledgedBoard
   }
-
-  private sign(contentHash: HashValue, privateKey: PrivateKey) {
-    const signature = Crypto.generateSchnorrSignature(contentHash, privateKey)
-    return signature
-  }
-
-  private async verifyReceipt({ contentHash, voterSignature, receipt, signatureKey }) {
-    // verify board hash computation
-    const boardHashObject = {
-      content_hash: contentHash,
-      previous_board_hash: receipt.previousBoardHash,
-      registered_at: receipt.registeredAt
-    }
-    const boardHashString = JSON.stringify(boardHashObject)
-    const computedBoardHash = Crypto.hashString(boardHashString)
-
-    if (computedBoardHash != receipt.boardHash) {
-      return Promise.reject('Invalid vote receipt: corrupt board hash')
-    }
-
-    // verify server signature
-    const receiptHashObject = {
-      board_hash: receipt.boardHash,
-      signature: voterSignature
-    }
-    const receiptHashString = JSON.stringify(receiptHashObject)
-    const receiptHash = Crypto.hashString(receiptHashString)
-
-    if (!Crypto.verifySchnorrSignature(receipt.serverSignature, receiptHash, signatureKey)) {
-      return Promise.reject('Invalid vote receipt: corrupt server signature')
-    }
-
-    return Promise.resolve()
-  }
-
 }
 
 interface BulletinBoard {
   getBoardHash: () => any;
-  submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestIndexed<CryptogramWithProof>) => any
+  submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestMap<CryptogramWithProof>) => any
 }
 
 type CryptogramWithProof = {
@@ -133,11 +82,6 @@ type Cryptogram = string
 type Signature = string;
 type PrivateKey = string
 type HashValue = string;
-
-type AcknowledgedBoard = {
-  currentBoardHash: HashValue;
-  currentTime: string;
-}
 
 type VoteReceipt = {
   previousBoardHash: HashValue;
