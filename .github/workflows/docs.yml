@@ -1,13 +1,5 @@
 name: Documentation
-on:
-  workflow_run:
-    workflows:
-      - Tests
-    branches:
-      - main
-    types:
-      - completed
-      - requested
+on: workflow_dispatch
 jobs:
   generate-documentation:
     runs-on: ubuntu-20.04
