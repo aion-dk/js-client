@@ -50,7 +50,7 @@ export async function fetchElectionConfig(bulletinBoard: any): Promise<ElectionC
   return bulletinBoard.getElectionConfig()
     .then(
       (response: { data: ElectionConfig }) => {
-        let configData = response.data;
+        const configData = response.data;
         configData.voterAuthorizationCoordinatorURL = 'http://localhost:1234';
         configData.OTPProviderURL = 'http://localhost:1111'
         return configData;

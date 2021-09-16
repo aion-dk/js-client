@@ -40,6 +40,6 @@ interface ContestIndexed<Type> {
 
 type EncryptionData = {
   vote: string;
-  voteEncodingType: Number;
+  voteEncodingType: number;
   emptyCryptogram: Cryptogram;
 }

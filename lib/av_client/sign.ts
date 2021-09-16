@@ -9,7 +9,7 @@ export type AcknowledgedBoardHash = {
 export function signVotes(encryptedVotes: ContestMap<OpenableEnvelope>, lastestBoardHash: AcknowledgedBoardHash, electionId: number, voterIdentifier: string, privateKey: string) {
   const votes: ContestMap<string> = {};
 
-  for (let contestId in encryptedVotes) {
+  for (const contestId in encryptedVotes) {
     votes[contestId] =  encryptedVotes[contestId].cryptogram;
   }
 

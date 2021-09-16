@@ -8,7 +8,7 @@ export interface IdentityConfirmationToken {
 export class OTPProvider {
   private backend: any;
 
-  constructor(baseURL: string, timeout: number = 10000) {
+  constructor(baseURL: string, timeout = 10000) {
     this.createBackendClient(baseURL, timeout);
   }
 
