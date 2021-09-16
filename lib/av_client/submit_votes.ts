@@ -12,6 +12,14 @@ type SignAndSubmitArguments = {
   affidavit: Affidavit
 }
 
+interface BallotBoxReceipt {
+  previousBoardHash: HashValue
+  boardHash: HashValue
+  registeredAt: string
+  serverSignature: Signature
+  voteSubmissionId: any
+}
+
 export default class SubmitVotes {
   bulletinBoard: BulletinBoard;
 
@@ -19,7 +27,7 @@ export default class SubmitVotes {
     this.bulletinBoard = bulletinBoard;
   }
 
-  async signAndSubmitVotes(args: SignAndSubmitArguments) {
+  async signAndSubmitVotes(args: SignAndSubmitArguments): Promise<BallotBoxReceipt> {
     const { voterIdentifier, electionId, encryptedVotes, voterPrivateKey, electionSigningPublicKey } = args
 
     const acknowledgeResponse = await this.acknowledge()
