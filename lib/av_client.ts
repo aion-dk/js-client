@@ -292,10 +292,8 @@ export class AVClient {
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
    */
-  generateTestCode() {
-    const testCode = new EncryptVotes().generateTestCode()
-
-    this.testCode = testCode
+  generateTestCode(): void {
+    this.testCode = new EncryptVotes().generateTestCode()
   }
 
   /**

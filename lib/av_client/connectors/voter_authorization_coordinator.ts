@@ -20,7 +20,7 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
-  startIdentification(sessionId): Promise<any> {
+  startIdentification(sessionId: string): Promise<any> {
     return this.backend.post('start_identification', {
       session_id: sessionId
     });

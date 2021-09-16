@@ -1,5 +1,5 @@
 import { randomKeyPair} from './generate_key_pair';
-import { ContestIndexed, EmptyCryptogram } from "./types";
+import { ContestIndexed, EmptyCryptogram, KeyPair } from "./types";
 import { BulletinBoard } from './connectors/bulletin_board';
 import * as crypto from './aion_crypto'
 const Crypto = crypto();
@@ -15,7 +15,7 @@ interface RegisterVoterResponse {
    */
 }
 
-export async function registerVoter(bulletinBoard: BulletinBoard, keyPair, electionEncryptionKey, authorizationToken): Promise<RegisterVoterResponse> {
+export async function registerVoter(bulletinBoard: BulletinBoard, keyPair: KeyPair, electionEncryptionKey: string, authorizationToken: string): Promise<RegisterVoterResponse> {
   const signature = Crypto.generateSchnorrSignature('', keyPair.privateKey)
 
   // TODO make this call send all relevant values to the connector

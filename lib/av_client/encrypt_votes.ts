@@ -2,8 +2,8 @@ import { OpenableEnvelope } from "./types";
 import * as crypto from './aion_crypto'
 const Crypto = crypto();
 export default class EncryptVotes {
-  encrypt(contestSelections, emptyCryptograms, contestEncodingTypes, encryptionKey: PublicKey) {
-    const response: ContestIndexed<OpenableEnvelope> = {}
+  encrypt(contestSelections, emptyCryptograms, contestEncodingTypes, encryptionKey: PublicKey): ContestIndexed<OpenableEnvelope> {
+    const response = {}
 
     Object.keys(contestSelections).forEach(function(contestId) {
       const { cryptogram, randomness } = Crypto.encryptVote(
