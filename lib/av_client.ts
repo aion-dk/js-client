@@ -10,7 +10,8 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
 /** @internal */
-export const sjcl = require('../lib/av_client/sjcl');
+import sjclLib from './av_client/sjcl'
+export const sjcl = sjclLib
 
 /**
  * # Assembly Voting Client API.

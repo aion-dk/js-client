@@ -1,6 +1,5 @@
+import axios from 'axios'
 import { IdentityConfirmationToken } from "./otp_provider";
-
-const axios = require('axios')
 
 export default class VoterAuthorizationCoordinator {
   private backend: any;

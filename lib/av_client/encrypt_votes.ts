@@ -1,6 +1,6 @@
-const Crypto = require('./aion_crypto.js')()
 import { OpenableEnvelope } from "./types";
-
+import * as crypto from './aion_crypto'
+const Crypto = crypto();
 export default class EncryptVotes {
   encrypt(contestSelections, emptyCryptograms, contestEncodingTypes, encryptionKey: PublicKey) {
     const response: ContestIndexed<OpenableEnvelope> = {}
