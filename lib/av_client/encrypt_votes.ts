@@ -32,14 +32,7 @@ export default class EncryptVotes {
 
 type PublicKey = string;
 type Cryptogram = string;
-type Proof = string;
 type BigNum = string;
 interface ContestIndexed<Type> {
   [index: string]: Type;
-}
-
-type EncryptionData = {
-  vote: string;
-  voteEncodingType: number;
-  emptyCryptogram: Cryptogram;
 }

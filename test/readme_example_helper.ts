@@ -2,7 +2,6 @@ import nock = require('nock');
 import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
-const Crypto = require('../lib/av_client/aion_crypto.js')()
 
 let sandbox;
 

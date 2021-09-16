@@ -1,4 +1,5 @@
-const Crypto = require('./aion_crypto.js')()
+import * as crypto from './aion_crypto'
+const Crypto = crypto();
 
 export function randomKeyPair() {
   const keyPair = Crypto.generateKeyPair();

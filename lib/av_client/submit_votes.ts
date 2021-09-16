@@ -80,12 +80,4 @@ type CryptogramWithProof = {
 type Proof = string
 type Cryptogram = string
 type Signature = string;
-type PrivateKey = string
 type HashValue = string;
-
-type VoteReceipt = {
-  previousBoardHash: HashValue;
-  boardHash: HashValue;
-  registeredAt: string;
-  serverSignature: Signature
-}

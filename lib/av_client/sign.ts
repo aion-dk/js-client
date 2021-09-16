@@ -1,5 +1,6 @@
-const Crypto = require('./aion_crypto.js')()
 import { ContestIndexed as ContestMap, OpenableEnvelope, SealedEnvelope } from './types'
+import * as crypto from './aion_crypto'
+const Crypto = crypto();
 
 export type AcknowledgedBoardHash = {
   currentBoardHash: string;

@@ -1,9 +1,8 @@
 import { randomKeyPair} from './generate_key_pair';
 import { ContestIndexed, EmptyCryptogram } from "./types";
-import { Ballot } from './election_config'
 import { BulletinBoard } from './connectors/bulletin_board';
-
-const Crypto = require('./aion_crypto.js')()
+import * as crypto from './aion_crypto'
+const Crypto = crypto();
 
 interface RegisterVoterResponse {
   voterSessionUuid: string;

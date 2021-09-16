@@ -1,4 +1,5 @@
-const Crypto = require('./aion_crypto.js')()
+import * as crypto from './aion_crypto'
+const Crypto = crypto();
 
 export default class AuthenticateWithCodes {
   bulletinBoard: any;
@@ -81,7 +82,7 @@ const createSession = async function(keyPair: KeyPair, electionId: number, bulle
         voterIdentifier: data.voterIdentifier,
         contestIds,
         emptyCryptograms,
-        precinctId: '909'
+        precinctId: '909' // TODO: Hardcoded number?!
       };
       return voterSession;
     });
@@ -98,4 +99,3 @@ type KeyPair = {
 }
 
 type Signature = string;
-type PublicKey = string;
