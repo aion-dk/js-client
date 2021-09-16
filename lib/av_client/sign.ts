@@ -40,8 +40,6 @@ export function assertValidReceipt({ contentHash, voterSignature, receipt, elect
   const boardHashString = JSON.stringify(boardHashObject)
   const computedBoardHash = Crypto.hashString(boardHashString)
 
-  //console.log(computedBoardHash, 'not equal?', receipt.boardHash)
-
   if (computedBoardHash != receipt.boardHash) {
     throw new Error('Invalid vote receipt: corrupt board hash')
   }
@@ -52,13 +50,10 @@ export function assertValidReceipt({ contentHash, voterSignature, receipt, elect
     signature: voterSignature
   }
 
-  //console.log(receiptHashObject)
-
   const receiptHashString = JSON.stringify(receiptHashObject)
   const receiptHash = Crypto.hashString(receiptHashString)
 
   if (!Crypto.verifySchnorrSignature(receipt.serverSignature, receiptHash, electionSigningPublicKey)) {
-    //console.log('server signature ', receipt.serverSignature)
     throw new Error('Invalid vote receipt: corrupt server signature')
   }
 }
