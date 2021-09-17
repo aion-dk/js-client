@@ -1,7 +1,7 @@
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
 export class BulletinBoard {
-  private backend: any;
+  private backend: AxiosInstance;
   voterAuthorizationCoordinator: any;
   voterSessionUuid: string;
 

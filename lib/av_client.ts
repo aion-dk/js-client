@@ -428,7 +428,6 @@ export class AVClient {
 type BigNum = string;
 type ECPoint = string;
 type Cryptogram = string;
-type Proof = string;
 
 /**
  * Example of a receipt:

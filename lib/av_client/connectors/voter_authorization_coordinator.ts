@@ -1,8 +1,8 @@
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
 import { IdentityConfirmationToken } from "./otp_provider";
 
 export default class VoterAuthorizationCoordinator {
-  private backend: any;
+  private backend: AxiosInstance;
 
   constructor(baseURL: string, timeout = 10000) {
     this.createBackendClient(baseURL, timeout);
