@@ -1,3 +1,5 @@
+import { BulletinBoard } from "./connectors/bulletin_board";
+
 export interface ElectionConfig {
   app_url: string;
   encryptionKey: string;
@@ -46,7 +48,7 @@ interface LocalString {
   [locale: string]: string;
 }
 
-export async function fetchElectionConfig(bulletinBoard: any): Promise<ElectionConfig> {
+export async function fetchElectionConfig(bulletinBoard: BulletinBoard): Promise<ElectionConfig> {
   return bulletinBoard.getElectionConfig()
     .then(
       (response: { data: ElectionConfig }) => {
