@@ -71,7 +71,7 @@ export class AVClient {
    */
   async initialize(electionConfig: ElectionConfig): Promise<void>
   async initialize(): Promise<void>
-  async initialize(electionConfig?: ElectionConfig): Promise<void> {
+  public async initialize(electionConfig?: ElectionConfig): Promise<void> {
     if( electionConfig )
       this.electionConfig = electionConfig
     else
@@ -88,7 +88,7 @@ export class AVClient {
    * * {@link AVClient.requestAccessCode | requestAccessCode} for authorization via OTPs.
    * @throws InvalidConfigError if the config does not specify a supported authorizationMode
    */
-  getAuthorizationMethod(): { methodName: string; method: Function } {
+  public getAuthorizationMethod(): { methodName: string; method: Function } {
     switch(this.getElectionConfig().authorizationMode) {
       case 'election codes':
         return {
@@ -114,7 +114,7 @@ export class AVClient {
    * @param   codes Array of election code strings.
    * @returns Returns undefined if authentication succeeded or throws an error
    */
-  async authenticateWithCodes(codes: string[]): Promise<void> {
+  public async authenticateWithCodes(codes: string[]): Promise<void> {
     const authenticationResponse = await new AuthenticateWithCodes(this.bulletinBoard)
       .authenticate(codes, this.electionId(), this.electionEncryptionKey());
 
@@ -136,7 +136,7 @@ export class AVClient {
    * @throws VoterRecordNotFound if no voter was found
    * @throws NetworkError if any request failed to get a response
    */
-  async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
+  public async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
     const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
@@ -183,7 +183,7 @@ export class AVClient {
    *
    * @returns undefined or throws an error
    */
-  async registerVoter(): Promise<void> {
+  public async registerVoter(): Promise<void> {
     if(!this.identityConfirmationToken)
       throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
 
@@ -238,7 +238,7 @@ export class AVClient {
    * @throws CorruptCVRError if the cast vote record is invalid
    * @throws NetworkError if any request failed to get a response
    */
-  async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
+  public async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
     if(!(this.voterIdentifier || this.emptyCryptograms || this.contestIds)) {
       throw new InvalidStateError('Cannot construct ballot cryptograms. Voter registration not completed successfully')
     }
@@ -290,7 +290,7 @@ export class AVClient {
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
    */
-  generateTestCode(): void {
+  public generateTestCode(): void {
     this.testCode = new EncryptVotes().generateTestCode()
   }
 
@@ -303,7 +303,7 @@ export class AVClient {
    * @throws ServerCommitmentError if the server commitment is invalid
    * @throws NetworkError if any request failed to get a response
    */
-  async spoilBallotCryptograms(): Promise<void> {
+  public async spoilBallotCryptograms(): Promise<void> {
     // TODO: encrypt the vote cryptograms one more time with a key derived from `this.generateTestCode`.
     //  A key is derived like: key = hash(test code, ballot id, cryptogram index)
     // TODO: compute commitment openings of the voter commitment
@@ -347,7 +347,7 @@ export class AVClient {
    * ```
    * @throws NetworkError if any request failed to get a response
    */
-  async submitBallotCryptograms(affidavit: Affidavit): Promise<Receipt> {
+  public async submitBallotCryptograms(affidavit: Affidavit): Promise<Receipt> {
     if(!(this.voterIdentifier || this.voteEncryptions)) {
       throw new InvalidStateError('Cannot submit cryptograms. Voter identity unknown or no open envelopes')
     }
@@ -378,7 +378,7 @@ export class AVClient {
   /**
    * Purges internal data.
    */
-  purgeData(): void {
+  public purgeData(): void {
     // TODO: implement me
     return
   }
