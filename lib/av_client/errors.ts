@@ -2,7 +2,7 @@ export class AvClientError extends Error {
   public code: number;
   public statusCode: number;
 
-  constructor(message: string, code: number = 0, statusCode: number = 0) {
+  constructor(message: string, code = 0, statusCode = 0) {
     super(message);
     this.statusCode = statusCode;
     this.code = code;
@@ -10,12 +10,6 @@ export class AvClientError extends Error {
     // this is mandatory due:
     // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
     Object.setPrototypeOf(this, AvClientError.prototype);
-    this.setUpStackTrace();
-  }
-
-  protected setUpStackTrace() {
-    this.name = this.constructor.name;
-    Error.captureStackTrace(this, this.constructor);
   }
 }
 
@@ -23,7 +17,7 @@ export class AccessCodeInvalid extends AvClientError {
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, AccessCodeInvalid.prototype);
-    this.setUpStackTrace();
+    this.name = "AccessCodeInvalid";
   }
 }
 
@@ -31,7 +25,7 @@ export class AccessCodeExpired extends AvClientError {
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, AccessCodeExpired.prototype);
-    this.setUpStackTrace();
+    this.name = "AccessCodeExpired";
   }
 }
 
@@ -39,7 +33,7 @@ export class NetworkError extends AvClientError {
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, NetworkError.prototype);
-    this.setUpStackTrace();
+    this.name = "NetworkError";
   }
 }
 
@@ -47,7 +41,7 @@ export class InvalidConfigError extends AvClientError {
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, InvalidConfigError.prototype);
-    this.setUpStackTrace();
+    this.name = "InvalidConfigError";
   }
 }
 
@@ -55,7 +49,7 @@ export class InvalidStateError extends AvClientError {
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, InvalidStateError.prototype);
-    this.setUpStackTrace();
+    this.name = "InvalidStateError";
   }
 }
 
@@ -63,6 +57,6 @@ export class UnsupportedServerReplyError extends AvClientError {
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, UnsupportedServerReplyError.prototype);
-    this.setUpStackTrace();
+    this.name = "UnsupportedServerReplyError";
   }
 }

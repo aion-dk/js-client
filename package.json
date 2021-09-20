@@ -1,6 +1,6 @@
 {
   "name": "@aion-dk/js-client",
-  "version": "0.0.6",
+  "version": "0.0.71425",
   "description": "Assembly Voting JS client",
   "main": "dist/lib/av_client.js",
   "types": "dist/lib/av_client.d.ts",
@@ -11,7 +11,8 @@
     "docs": "typedoc --includes test/",
     "html_docs": "typedoc --plugin none --out html_docs --includes test/ --theme typedoc-wide-theme",
     "prepublish": "tsc && typedoc --includes test/",
-    "build": "tsc && cp lib/av_client/*.js dist/lib/av_client"
+    "build": "tsc && cp lib/av_client/*.js dist/lib/av_client",
+    "lint": "eslint lib/"
   },
   "dependencies": {
     "axios": "^0.21.1"
@@ -21,7 +22,10 @@
     "@types/chai": "^4.2.20",
     "@types/mocha": "^8.2.3",
     "@types/node": "^16.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.31.1",
+    "@typescript-eslint/parser": "^4.31.1",
     "chai": "^4.3.4",
+    "eslint": "^7.32.0",
     "mocha": "^9.0.1",
     "nock": "^13.1.1",
     "nyc": "^15.1.0",
