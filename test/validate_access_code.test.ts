@@ -4,9 +4,7 @@ import nock = require('nock');
 import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
 import sinon = require('sinon');
 import { AccessCodeExpired, AccessCodeInvalid, NetworkError } from "../lib/av_client/errors";
-import {OTPProvider} from "../lib/av_client/connectors/otp_provider";
 const sjcl = require('../lib/av_client/sjcl')
-const Crypto = require('../lib/av_client/aion_crypto.js')()
 
 describe('AVClient#validateAccessCode', () => {
   let client: AVClient;

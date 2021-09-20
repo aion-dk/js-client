@@ -1,5 +1,3 @@
-const Crypto = require('./aion_crypto.js')()
-
 export default class BenalohChallenge {
   bulletinBoard: any;
 

@@ -10,7 +10,8 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
 /** @internal */
-export const sjcl = require('../lib/av_client/sjcl');
+import sjclLib from './av_client/sjcl'
+export const sjcl = sjclLib
 
 /**
  * # Assembly Voting Client API.
@@ -291,10 +292,8 @@ export class AVClient {
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
    */
-  generateTestCode() {
-    const testCode = new EncryptVotes().generateTestCode()
-
-    this.testCode = testCode
+  generateTestCode(): void {
+    this.testCode = new EncryptVotes().generateTestCode()
   }
 
   /**
@@ -429,7 +428,6 @@ export class AVClient {
 type BigNum = string;
 type ECPoint = string;
 type Cryptogram = string;
-type Proof = string;
 
 /**
  * Example of a receipt:

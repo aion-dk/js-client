@@ -1,5 +1,6 @@
-const Crypto = require('./aion_crypto.js')()
 import { ContestIndexed as ContestMap, OpenableEnvelope, SealedEnvelope } from './types'
+import * as crypto from './aion_crypto'
+const Crypto = crypto();
 
 export type AcknowledgedBoardHash = {
   currentBoardHash: string;
@@ -9,7 +10,7 @@ export type AcknowledgedBoardHash = {
 export function signVotes(encryptedVotes: ContestMap<OpenableEnvelope>, lastestBoardHash: AcknowledgedBoardHash, electionId: number, voterIdentifier: string, privateKey: string) {
   const votes: ContestMap<string> = {};
 
-  for (let contestId in encryptedVotes) {
+  for (const contestId in encryptedVotes) {
     votes[contestId] =  encryptedVotes[contestId].cryptogram;
   }
 
@@ -39,8 +40,6 @@ export function assertValidReceipt({ contentHash, voterSignature, receipt, elect
   const boardHashString = JSON.stringify(boardHashObject)
   const computedBoardHash = Crypto.hashString(boardHashString)
 
-  //console.log(computedBoardHash, 'not equal?', receipt.boardHash)
-
   if (computedBoardHash != receipt.boardHash) {
     throw new Error('Invalid vote receipt: corrupt board hash')
   }
@@ -51,13 +50,10 @@ export function assertValidReceipt({ contentHash, voterSignature, receipt, elect
     signature: voterSignature
   }
 
-  //console.log(receiptHashObject)
-
   const receiptHashString = JSON.stringify(receiptHashObject)
   const receiptHash = Crypto.hashString(receiptHashString)
 
   if (!Crypto.verifySchnorrSignature(receipt.serverSignature, receiptHash, electionSigningPublicKey)) {
-    //console.log('server signature ', receipt.serverSignature)
     throw new Error('Invalid vote receipt: corrupt server signature')
   }
 }

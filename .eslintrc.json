@@ -15,6 +15,7 @@
     "plugins": [
         "@typescript-eslint"
     ],
+    "ignorePatterns": [ "aion_crypto.js" ],
     "rules": {
     }
 }
