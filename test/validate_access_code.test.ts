@@ -3,7 +3,8 @@ import { expect } from 'chai';
 import nock = require('nock');
 import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
 import sinon = require('sinon');
-import { AccessCodeExpired, AccessCodeInvalid, NetworkError } from "../lib/av_client/errors";
+import { AccessCodeExpired, AccessCodeInvalid, NetworkError, UnsupportedServerReplyError } from "../lib/av_client/errors";
+
 const sjcl = require('../lib/av_client/sjcl')
 
 describe('AVClient#validateAccessCode', () => {
@@ -69,7 +70,7 @@ describe('AVClient#validateAccessCode', () => {
       expectedNetworkRequests.forEach((mock) => mock.done());
     })
 
-    it('fails given invalid otps', async () => {
+    it('fails given invalid OTP', async () => {
       expectedNetworkRequests.push(
         nock('http://localhost:1111/').post('/authorize')
           .replyWithFile(403, __dirname + '/replies/otp_provider_authorize.invalid.json'),
@@ -90,7 +91,7 @@ describe('AVClient#validateAccessCode', () => {
       expectedNetworkRequests.forEach((mock) => mock.done());
     })
 
-    it('fails given expired otp', async function(){
+    it('fails given expired OTP', async function(){
       expectedNetworkRequests.push(
         nock('http://localhost:1111/').post('/authorize')
           .replyWithFile(403, __dirname + '/replies/otp_provider_authorize.expired.json'),
@@ -113,9 +114,57 @@ describe('AVClient#validateAccessCode', () => {
 
       expectedNetworkRequests.forEach((mock) => mock.done());
     })
+
+    it('fails if the server returns unsupported response', async function(){
+      expectedNetworkRequests.push(
+        nock('http://localhost:1111/').post('/authorize')
+          .reply(403, { nonsense: 'garbage' })
+      );
+
+      const otp = '1234';
+      const email = 'blabla@aion.dk';
+
+      await client.requestAccessCode('voter123', email);
+
+      return client.validateAccessCode(otp).then(
+        () => {
+          expect.fail('Expected promise to be rejected')
+        },
+        (error) => {
+          expect(error).to.be.an.instanceof(UnsupportedServerReplyError);
+          expect(error.message).to.equal('Unsupported server error message: {"nonsense":"garbage"}');
+        }
+      );
+
+      expectedNetworkRequests.forEach((mock) => mock.done());
+    });
+
+    it('fails if the server returns unsupported error response', async function(){
+      expectedNetworkRequests.push(
+        nock('http://localhost:1111/').post('/authorize')
+          .reply(403, { error: 'some yet unsupported error message' })
+      );
+
+      const otp = '1234';
+      const email = 'blabla@aion.dk';
+
+      await client.requestAccessCode('voter123', email);
+
+      return client.validateAccessCode(otp).then(
+        () => {
+          expect.fail('Expected promise to be rejected')
+        },
+        (error) => {
+          expect(error).to.be.an.instanceof(UnsupportedServerReplyError);
+          expect(error.message).to.equal('Unsupported server error: some yet unsupported error message')
+        }
+      );
+
+      expectedNetworkRequests.forEach((mock) => mock.done());
+    });
   });
 
-  context('OTP services is unavailable', function() {
+  context('OTP services are unavailable', function() {
     it('returns network error on timeout', async function () {
       expectedNetworkRequests.push(
         nock('http://localhost:1111/').post('/authorize')

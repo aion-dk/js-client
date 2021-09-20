@@ -52,3 +52,11 @@ export class InvalidStateError extends AvClientError {
     this.name = "InvalidStateError";
   }
 }
+
+export class UnsupportedServerReplyError extends AvClientError {
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, UnsupportedServerReplyError.prototype);
+    this.name = "UnsupportedServerReplyError";
+  }
+}
