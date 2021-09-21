@@ -13,9 +13,11 @@
         "sourceType": "module"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "promise"
     ],
     "ignorePatterns": [ "aion_crypto.js" ],
     "rules": {
+        "promise/no-return-wrap": "error"
     }
 }
