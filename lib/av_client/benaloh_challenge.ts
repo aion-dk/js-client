@@ -9,7 +9,7 @@ export default class BenalohChallenge {
     const { data } = await this.bulletinBoard.getRandomizers()
 
     if (data.error) {
-      return Promise.reject(data.error.description)
+      throw new Error(data.error.description)
     }
 
     return data.randomizers
@@ -19,7 +19,7 @@ export default class BenalohChallenge {
     const { data } = await this.bulletinBoard.getCommitmentOpening(voterCommitmentOpening, encryptedBallotCryptograms)
 
     if (data.error) {
-      return Promise.reject(data.error.description)
+      throw new Error(data.error.description)
     }
 
     return data.commitment_opening

@@ -56,7 +56,5 @@ export async function fetchElectionConfig(bulletinBoard: BulletinBoard): Promise
         configData.voterAuthorizationCoordinatorURL = 'http://localhost:1234';
         configData.OTPProviderURL = 'http://localhost:1111'
         return configData;
-      },
-      (error: Error) => { return Promise.reject(error) }
-    );
+      });
 }

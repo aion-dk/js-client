@@ -46,7 +46,7 @@ export default class SubmitVotes {
     const { data } = await this.bulletinBoard.submitVotes(contentHash, voterSignature, cryptogramsWithProofs)
 
     if (data.error) {
-      return Promise.reject(data.error.description)
+      throw new Error(data.error.description)
     }
 
     const receipt = {
@@ -64,7 +64,7 @@ export default class SubmitVotes {
     const { data } = await this.bulletinBoard.getBoardHash()
 
     if (!data.currentBoardHash || !data.currentTime) {
-      return Promise.reject('Could not get latest board hash');
+      throw new Error('Could not get latest board hash');
     }
 
     const acknowledgedBoard = {

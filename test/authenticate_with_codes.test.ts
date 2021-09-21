@@ -54,7 +54,7 @@ describe('AVClient#authenticateWithCodes', function() {
       const invalidCodes = ['no', 'no'];
       return client.authenticateWithCodes(invalidCodes).then(
         () => expect.fail('Expected promise to be rejected'),
-        (error) => expect(error).to.equal('No ballots found for the submitted election codes')
+        (error) => expect(error.message).to.equal('No ballots found for the submitted election codes')
       )
     });
   });
