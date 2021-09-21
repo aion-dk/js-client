@@ -362,6 +362,7 @@ export class AVClient {
     const encryptedVotes = this.voteEncryptions
     const voterPrivateKey = this.privateKey();
     const electionSigningPublicKey = this.electionSigningPublicKey();
+    const affidavitConfig = this.affidavitConfig();
 
     return await new SubmitVotes(this.bulletinBoard)
       .signAndSubmitVotes({
@@ -417,6 +418,10 @@ export class AVClient {
     return this.getElectionConfig().signingPublicKey
   }
 
+  private affidavitConfig(): AffidavitConfig {
+    return this.getElectionConfig().affidavit
+  }
+
   private privateKey(): BigNum {
     return this.keyPair.privateKey
   }
@@ -430,6 +435,11 @@ type BigNum = string;
 type ECPoint = string;
 type Cryptogram = string;
 type Proof = string;
+
+type AffidavitConfig = {
+  curve: string;
+  encryptionKey: string;
+}
 
 /**
  * Example of a receipt:
