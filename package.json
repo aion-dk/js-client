@@ -9,7 +9,7 @@
     "coverage": "tsc && nyc --reporter=json-summary --reporter=text npm run test",
     "tdd": "mocha --require ts-node/register/transpile-only --require source-map-support/register --extension ts ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
     "docs": "typedoc --includes test/",
-    "html_docs": "typedoc --plugin none --out html_docs --includes test/ --theme typedoc-wide-theme",
+    "html_docs": "typedoc --plugin none --out html_docs --includes test/",
     "prepublish": "tsc && typedoc --includes test/",
     "build": "tsc && cp lib/av_client/*.js dist/lib/av_client",
     "lint": "eslint lib/"
