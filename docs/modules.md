@@ -4,15 +4,25 @@
 
 ## Table of contents
 
+### Variables
+
+- [sjcl](modules.md#sjcl)
+
 ### Classes
 
-- [AVClient](classes/avclient.md)
+- [AVClient](classes/AVClient.md)
 
 ### Type aliases
 
 - [Receipt](modules.md#receipt)
 - [CastVoteRecord](modules.md#castvoterecord)
 - [Affidavit](modules.md#affidavit)
+
+## Variables
+
+### sjcl
+
+• **sjcl**: `any`
 
 ## Type aliases
 
