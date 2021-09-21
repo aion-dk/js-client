@@ -7,7 +7,6 @@ export type AcknowledgedBoardHash = {
   currentTime: string;
 }
 
-export function signVotes(encryptedVotes: ContestMap<OpenableEnvelope>, lastestBoardHash: AcknowledgedBoardHash, electionId: number, voterIdentifier: string, privateKey: string) {
 export type AffidavitConfig = {
   curve: string;
   encryptionKey: string;
@@ -22,13 +21,19 @@ export function encryptAES(payload: string, encryptionConfig: AffidavitConfig): 
   return sjcl.encrypt(pubKey, payload)
 }
 
+export function fingerprint(encryptedAffidavid: string): string {
+  return Crypto.hashString(encryptedAffidavid)
+}
+
+export function signVotes(encryptedVotes: ContestMap<OpenableEnvelope>, privateKey: string, contentToSign: object) {
   const votes: ContestMap<string> = {};
 
   for (let contestId in encryptedVotes) {
     votes[contestId] =  encryptedVotes[contestId].cryptogram;
   }
+  contentToSign['votes'] = votes
 
-  const contentHash = computeNextBoardHash(lastestBoardHash, electionId, voterIdentifier, votes);
+  const contentHash = computeNextBoardHash(contentToSign);
   const voterSignature = Crypto.generateSchnorrSignature(contentHash, privateKey);
   return { contentHash, voterSignature };
 }
@@ -77,15 +82,7 @@ export function assertValidReceipt({ contentHash, voterSignature, receipt, elect
   }
 }
 
-function computeNextBoardHash(lastestBoardHash: AcknowledgedBoardHash, electionId: number, voterIdentifier: string, votes: ContestMap<string>) {
-  const content = {
-    acknowledged_at: lastestBoardHash.currentTime,
-    acknowledged_board_hash: lastestBoardHash.currentBoardHash,
-    election_id: electionId,
-    voter_identifier: voterIdentifier,
-    votes
-  };
-
+function computeNextBoardHash(content: object) {
   const contentString = JSON.stringify(content);
   const contentHash = Crypto.hashString(contentString);
   return contentHash;

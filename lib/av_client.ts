@@ -376,7 +376,7 @@ export class AVClient {
         encryptedVotes,
         voterPrivateKey,
         electionSigningPublicKey,
-        affidavit
+        encryptedAffidavit
     });
   }
 

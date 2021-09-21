@@ -33,18 +33,26 @@ export default class SubmitVotes {
 
     const acknowledgeResponse = await this.acknowledge()
 
-    const { contentHash, voterSignature } = signVotes(encryptedVotes, acknowledgeResponse, electionId, voterIdentifier, voterPrivateKey);
+    const contentToSign = {
+      acknowledged_at: acknowledgeResponse.currentTime,
+      acknowledged_board_hash: acknowledgeResponse.currentBoardHash,
+      election_id: electionId,
+      ...(typeof encryptedAffidavit !== 'undefined') && {encrypted_affidavit_hash: fingerprint(encryptedAffidavit)},
+      voter_identifier: voterIdentifier
+    };
+
+    const { contentHash, voterSignature } = signVotes(encryptedVotes, voterPrivateKey, contentToSign);
     const cryptogramsWithProofs = sealEnvelopes(encryptedVotes)
 
-    const ballotBoxReceipt = await this.submit({ contentHash, voterSignature, cryptogramsWithProofs })
+    const ballotBoxReceipt = await this.submit({ contentHash, voterSignature, cryptogramsWithProofs, encryptedAffidavit })
     //console.log(ballotBoxReceipt, voterSignature)
     assertValidReceipt({ contentHash, voterSignature, receipt: ballotBoxReceipt, electionSigningPublicKey });
 
     return ballotBoxReceipt
   }
 
-  private async submit({ contentHash, voterSignature, cryptogramsWithProofs }) {
-    const { data } = await this.bulletinBoard.submitVotes(contentHash, voterSignature, cryptogramsWithProofs)
+  private async submit({ contentHash, voterSignature, cryptogramsWithProofs, encryptedAffidavit }) {
+    const { data } = await this.bulletinBoard.submitVotes(contentHash, voterSignature, cryptogramsWithProofs, encryptedAffidavit)
 
     if (data.error) {
       return Promise.reject(data.error.description)
@@ -78,7 +86,7 @@ export default class SubmitVotes {
 
 interface BulletinBoard {
   getBoardHash: () => any;
-  submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestMap<CryptogramWithProof>) => any
+  submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestMap<CryptogramWithProof>, encryptedAffidavit: HashValue) => any
 }
 
 type CryptogramWithProof = {
