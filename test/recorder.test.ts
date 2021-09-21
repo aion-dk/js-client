@@ -16,8 +16,7 @@ describe.skip("record stuff", () => {
       }
     });
     return backend.get("singlelist?text=Test&noofRecords=10").then(
-      (response) => { console.log(`Got ${response.status}`); return response.data },
-      (error) => { return Promise.reject(error) }
+      (response) => { console.log(`Got ${response.status}`); return response.data }
     );
   }
 
