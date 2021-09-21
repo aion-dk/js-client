@@ -1,5 +1,5 @@
 import { ContestIndexed as ContestMap, OpenableEnvelope } from './types'
-import { AcknowledgedBoardHash, signVotes, sealEnvelopes, assertValidReceipt } from './sign'
+import { AcknowledgedBoardHash, signVotes, sealEnvelopes, assertValidReceipt, encryptAES, fingerprint } from './sign'
 
 type Affidavit = string
 
@@ -9,7 +9,12 @@ type SignAndSubmitArguments = {
   encryptedVotes: ContestMap<OpenableEnvelope>;
   voterPrivateKey: string;
   electionSigningPublicKey: string,
-  affidavit: Affidavit
+  encryptedAffidavit: string
+}
+
+type AffidavitConfig = {
+  curve: string;
+  encryptionKey: string;
 }
 
 export default class SubmitVotes {
@@ -19,8 +24,12 @@ export default class SubmitVotes {
     this.bulletinBoard = bulletinBoard;
   }
 
+  encryptAffidavit(affidavit: Affidavit, affidavitConfig: AffidavitConfig): string {
+    return encryptAES(affidavit, affidavitConfig)
+  }
+
   async signAndSubmitVotes(args: SignAndSubmitArguments) {
-    const { voterIdentifier, electionId, encryptedVotes, voterPrivateKey, electionSigningPublicKey } = args
+    const { voterIdentifier, electionId, encryptedVotes, voterPrivateKey, electionSigningPublicKey, encryptedAffidavit } = args
 
     const acknowledgeResponse = await this.acknowledge()
 

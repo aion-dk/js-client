@@ -1,4 +1,5 @@
 const Crypto = require('./aion_crypto.js')()
+const sjcl = require('./sjcl')
 import { ContestIndexed as ContestMap, OpenableEnvelope, SealedEnvelope } from './types'
 
 export type AcknowledgedBoardHash = {
@@ -7,6 +8,20 @@ export type AcknowledgedBoardHash = {
 }
 
 export function signVotes(encryptedVotes: ContestMap<OpenableEnvelope>, lastestBoardHash: AcknowledgedBoardHash, electionId: number, voterIdentifier: string, privateKey: string) {
+export type AffidavitConfig = {
+  curve: string;
+  encryptionKey: string;
+}
+
+export function encryptAES(payload: string, encryptionConfig: AffidavitConfig): string {
+  const pubKey = new sjcl.ecc.elGamal.publicKey(
+    sjcl.ecc.curves[encryptionConfig.curve],
+    Crypto.pointFromBits(sjcl.codec.hex.toBits(encryptionConfig.encryptionKey))
+  )
+
+  return sjcl.encrypt(pubKey, payload)
+}
+
   const votes: ContestMap<string> = {};
 
   for (let contestId in encryptedVotes) {

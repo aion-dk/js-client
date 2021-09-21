@@ -364,8 +364,13 @@ export class AVClient {
     const electionSigningPublicKey = this.electionSigningPublicKey();
     const affidavitConfig = this.affidavitConfig();
 
-    return await new SubmitVotes(this.bulletinBoard)
-      .signAndSubmitVotes({
+    const votesSubmitter = new SubmitVotes(this.bulletinBoard)
+    const encryptedAffidavit = votesSubmitter.encryptAffidavit(
+      affidavit,
+      affidavitConfig
+    )
+
+    return await votesSubmitter.signAndSubmitVotes({
         voterIdentifier,
         electionId,
         encryptedVotes,
