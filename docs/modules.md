@@ -6,7 +6,7 @@
 
 ### Classes
 
-- [AVClient](classes/AVClient.md)
+- [AVClient](classes/avclient.md)
 
 ### Type aliases
 

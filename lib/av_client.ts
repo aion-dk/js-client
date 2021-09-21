@@ -11,7 +11,6 @@ import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/o
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
 /** @internal */
 import sjclLib from './av_client/sjcl'
-/** @internal */
 export const sjcl = sjclLib
 
 /**
