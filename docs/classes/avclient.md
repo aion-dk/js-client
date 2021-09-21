@@ -47,7 +47,7 @@ describe('entire voter flow using OTP authorization', () => {
     const trackingCode  = await client.constructBallotCryptograms(cvr);
     expect(trackingCode).to.eq('12918186c8a535b7c94576dca7b94ef2dbb9a728f63d466a4faf558a2e4be165');
 
-    const affidavit = 'some bytes, most likely as binary PDF';
+    const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
     const receipt = await client.submitBallotCryptograms(affidavit);
     expect(receipt).to.eql({
       previousBoardHash: '0de4ec18961c66cc75ddaeb4a55bdd01c2200eed787be5ea7e7ed0284e724a3b',
