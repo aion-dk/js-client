@@ -6,7 +6,7 @@
 We are introducing two new methods on the client library.
 
 #### New method: initialize()
-Motivation: 
+Motivation:
 This is allows fetching the  initial election configuration, but without relying on an asynchronous constructor.
 
 #### New method: registerVoter()
