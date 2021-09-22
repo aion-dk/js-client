@@ -26,7 +26,7 @@ jobs:
             git config --local user.email "action@github.com"
             git config --local user.name "Github Action"
             git add .github/coverage_badge.svg
-            git commit -m "Updated coverage badge"
+            git commit -m "Updated coverage badge to $coverage_percentage %"
           else
             echo 'Coverage remains the same'
           fi

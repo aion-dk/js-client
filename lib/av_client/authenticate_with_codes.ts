@@ -1,4 +1,5 @@
-const Crypto = require('./aion_crypto.js')()
+import * as crypto from './aion_crypto'
+const Crypto = crypto();
 
 export default class AuthenticateWithCodes {
   bulletinBoard: any;
@@ -48,10 +49,8 @@ export default class AuthenticateWithCodes {
         return verified;
       })
 
-      if (valid) {
-        return Promise.resolve('Empty cryptograms verified');
-      } else {
-        return Promise.reject('Empty cryptogram challenge proof was invalid');
+      if (!valid) {
+        throw new Error('Empty cryptogram challenge proof was invalid');
       }
     })
   }
@@ -62,7 +61,7 @@ const createSession = async function(keyPair: KeyPair, electionId: number, bulle
   return bulletinBoard.createSession(keyPair.publicKey, signature)
     .then(({ data }) => {
       if (!data.ballotIds || data.ballotIds.length == 0) {
-        return Promise.reject('No ballots found for the submitted election codes');
+        throw new Error('No ballots found for the submitted election codes');
       }
 
       const contestIds = data.ballotIds;
@@ -81,7 +80,7 @@ const createSession = async function(keyPair: KeyPair, electionId: number, bulle
         voterIdentifier: data.voterIdentifier,
         contestIds,
         emptyCryptograms,
-        precinctId: '909'
+        precinctId: '909' // TODO: Hardcoded number?!
       };
       return voterSession;
     });
@@ -98,4 +97,3 @@ type KeyPair = {
 }
 
 type Signature = string;
-type PublicKey = string;

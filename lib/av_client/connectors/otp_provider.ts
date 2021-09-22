@@ -1,14 +1,14 @@
-import axios from 'axios'
-import { AccessCodeInvalid, AccessCodeExpired, NetworkError } from "../errors";
+import axios, { AxiosInstance } from 'axios'
+import { AccessCodeInvalid, AccessCodeExpired, NetworkError, UnsupportedServerReplyError } from "../errors";
 
 export interface IdentityConfirmationToken {
   token: 'authorized'
 }
 
 export class OTPProvider {
-  private backend: any;
+  private backend: AxiosInstance;
 
-  constructor(baseURL: string, timeout: number = 10000) {
+  constructor(baseURL: string, timeout = 10000) {
     this.createBackendClient(baseURL, timeout);
   }
 
@@ -19,22 +19,24 @@ export class OTPProvider {
     }).then(res => res.data) // Transform the return type to a Token
       .catch(error => {
 
-        // If we get errors from the provider, we wrap in custom errors
-        if (error.response && error.response.status === 403) {
-          if (error.response.data && error.response.data.error) {
-            const _error = error.response.data.error // TODO: revert to error.response.data?.error
-            if( _error === 'expired' ){
-              throw new AccessCodeExpired('OTP code expired')
-            }
-            if( _error === 'invalid' ){
-              throw new AccessCodeInvalid('OTP code invalid')
-            }
-          }
-        }
+        const response = error.response;
 
         // The request was made but no response was received
-        if ( error.request && ! error.response) {
-          throw new NetworkError('Network error')
+        if (error.request && !response) {
+          throw new NetworkError('Network error');
+        }
+
+        // If we get errors from the provider, we wrap in custom errors
+        if (response && response.status === 403 && response.data) {
+          if (!response.data.error) {
+            throw new UnsupportedServerReplyError(`Unsupported server error message: ${JSON.stringify(error.response.data)}`)
+          }
+          const errorMessage = response.data.error;
+          switch(errorMessage) {
+            case 'expired': throw new AccessCodeExpired('OTP code expired'); break;
+            case 'invalid': throw new AccessCodeInvalid('OTP code invalid'); break;
+            default: throw new UnsupportedServerReplyError(`Unsupported server error: ${errorMessage}`);
+          }
         }
 
         // If we don't understand the error, then we rethrow

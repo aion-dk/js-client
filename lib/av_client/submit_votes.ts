@@ -17,6 +17,14 @@ type AffidavitConfig = {
   encryptionKey: string;
 }
 
+interface BallotBoxReceipt {
+  previousBoardHash: HashValue
+  boardHash: HashValue
+  registeredAt: string
+  serverSignature: Signature
+  voteSubmissionId: any
+}
+
 export default class SubmitVotes {
   bulletinBoard: BulletinBoard;
 
@@ -28,7 +36,7 @@ export default class SubmitVotes {
     return encryptAES(affidavit, affidavitConfig)
   }
 
-  async signAndSubmitVotes(args: SignAndSubmitArguments) {
+  async signAndSubmitVotes(args: SignAndSubmitArguments): Promise<BallotBoxReceipt> {
     const { voterIdentifier, electionId, encryptedVotes, voterPrivateKey, electionSigningPublicKey, encryptedAffidavit } = args
 
     const acknowledgeResponse = await this.acknowledge()
@@ -55,7 +63,7 @@ export default class SubmitVotes {
     const { data } = await this.bulletinBoard.submitVotes(contentHash, voterSignature, cryptogramsWithProofs, encryptedAffidavit)
 
     if (data.error) {
-      return Promise.reject(data.error.description)
+      throw new Error(data.error.description)
     }
 
     const receipt = {
@@ -73,7 +81,7 @@ export default class SubmitVotes {
     const { data } = await this.bulletinBoard.getBoardHash()
 
     if (!data.currentBoardHash || !data.currentTime) {
-      return Promise.reject('Could not get latest board hash');
+      throw new Error('Could not get latest board hash');
     }
 
     const acknowledgedBoard = {
@@ -97,12 +105,4 @@ type CryptogramWithProof = {
 type Proof = string
 type Cryptogram = string
 type Signature = string;
-type PrivateKey = string
 type HashValue = string;
-
-type VoteReceipt = {
-  previousBoardHash: HashValue;
-  boardHash: HashValue;
-  registeredAt: string;
-  serverSignature: Signature
-}

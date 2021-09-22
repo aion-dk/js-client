@@ -1,11 +1,11 @@
-const axios = require('axios')
+import axios, { AxiosInstance } from 'axios'
 
 export class BulletinBoard {
-  private backend: any;
+  private backend: AxiosInstance;
   voterAuthorizationCoordinator: any;
   voterSessionUuid: string;
 
-  constructor(baseURL: string, timeout: number = 10000) {
+  constructor(baseURL: string, timeout = 10000) {
     this.createBackendClient(baseURL, timeout);
   }
 

@@ -1,11 +1,10 @@
+import axios, { AxiosInstance } from 'axios'
 import { IdentityConfirmationToken } from "./otp_provider";
 
-const axios = require('axios')
-
 export default class VoterAuthorizationCoordinator {
-  private backend: any;
+  private backend: AxiosInstance;
 
-  constructor(baseURL: string, timeout: number = 10000) {
+  constructor(baseURL: string, timeout = 10000) {
     this.createBackendClient(baseURL, timeout);
   }
 
@@ -21,7 +20,7 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
-  startIdentification(sessionId): Promise<any> {
+  startIdentification(sessionId: string): Promise<any> {
     return this.backend.post('start_identification', {
       session_id: sessionId
     });

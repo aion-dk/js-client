@@ -4,8 +4,6 @@ import nock = require('nock');
 import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
-const Crypto = require('../lib/av_client/aion_crypto.js')()
-import { randomKeyPair } from '../lib/av_client/generate_key_pair'
 import { recordResponses } from './test_helpers'
 
 const USE_MOCK = true

@@ -1,8 +1,6 @@
 import { expect } from 'chai';
 import { signVotes } from '../lib/av_client/sign';
 
-const Crypto = require('../lib/av_client/aion_crypto')()
-
 describe('Sign', () => {
   const lastestBoardHash = { currentBoardHash: 'abc', currentTime: '2019-09-05 12:19:34' }
   const votes = { 1: { cryptogram: 'a', randomness: 'b', proof: 'c' } }

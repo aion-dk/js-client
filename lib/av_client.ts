@@ -10,7 +10,8 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
 /** @internal */
-export const sjcl = require('../lib/av_client/sjcl');
+import sjclLib from './av_client/sjcl'
+export const sjcl = sjclLib
 
 /**
  * # Assembly Voting Client API.
@@ -119,8 +120,6 @@ export class AVClient {
     this.voterIdentifier = authenticationResponse.voterIdentifier;
     this.keyPair = authenticationResponse.keyPair;
     this.emptyCryptograms = authenticationResponse.emptyCryptograms;
-
-    return Promise.resolve();
   }
 
   /**
@@ -177,8 +176,6 @@ export class AVClient {
     const provider = new OTPProvider(this.getElectionConfig().OTPProviderURL)
     
     this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email)
-
-    return Promise.resolve()
   }
 
 
@@ -208,8 +205,6 @@ export class AVClient {
     this.voterIdentifier = registerVoterResponse.voterIdentifier
     this.emptyCryptograms = registerVoterResponse.emptyCryptograms
     this.contestIds = registerVoterResponse.contestIds
-
-    return Promise.resolve()
   }
 
   /**
@@ -291,10 +286,8 @@ export class AVClient {
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
    */
-  generateTestCode() {
-    const testCode = new EncryptVotes().generateTestCode()
-
-    this.testCode = testCode
+  generateTestCode(): void {
+    this.testCode = new EncryptVotes().generateTestCode()
   }
 
   /**
@@ -326,10 +319,8 @@ export class AVClient {
     const serverCommitmentOpening = await benaloh.getServerCommitmentOpening(voterCommitmentOpening, encryptedBallotCryptograms)
     const valid = benaloh.verifyCommitmentOpening(serverCommitmentOpening, serverCommitment, serverEmptyCryptograms)
 
-    if (valid) {
-      return Promise.resolve()
-    } else {
-      return Promise.reject('Server commitment did not validate')
+    if (!valid) {
+      throw new Error('Server commitment did not validate')
     }
   }
 
@@ -439,7 +430,6 @@ export class AVClient {
 type BigNum = string;
 type ECPoint = string;
 type Cryptogram = string;
-type Proof = string;
 
 type AffidavitConfig = {
   curve: string;
