@@ -10,7 +10,7 @@ describe('entire voter flow using OTP authorization', () => {
     const client = new AVClient('http://localhost:3000/test/app');
     await client.initialize()
 
-    await client.requestAccessCode('some PII info', 'voter@foo.bar');
+    await client.requestAccessCode('123', 'us-voter-123@aion.dk');
 
     // ... voter receives email with access code (OTP code) ...
 
@@ -24,12 +24,15 @@ describe('entire voter flow using OTP authorization', () => {
 
     const affidavit = 'some bytes, most likely as binary PDF';
     const receipt = await client.submitBallotCryptograms(affidavit);
-    expect(receipt).to.eql({
-      previousBoardHash: '0de4ec18961c66cc75ddaeb4a55bdd01c2200eed787be5ea7e7ed0284e724a3b',
-      boardHash: '4874559661833c93ac7c06610d5c111c698d3a2f850f35346ddc43b526fe373e',
-      registeredAt: '2020-03-01T10:00:00.000+01:00',
-      serverSignature: '11c1ba9b9738eea669dfb79358cd906ad341a466ebe02d5f39ea215585c18b27,bdafb61f0c2facedebc2aeba252bec2a7fe1e123f6affe3fc2fc87db650c5546',
-      voteSubmissionId: 7
-    });
+    expect(receipt).to.have.keys(
+      'boardHash',
+      'previousBoardHash',
+      'registeredAt',
+      'serverSignature',
+      'voteSubmissionId'
+    )
+    expect(receipt.previousBoardHash).to.eql('b8c006ae94b5f98d684317beaf4784938fc6cf2921d856cc3c8416ea4b510a30')
+    expect(receipt.registeredAt).to.eql('2020-03-01T10:00:00.000+01:00')
+    expect(receipt.voteSubmissionId).to.eql(7)
   });
 });

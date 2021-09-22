@@ -146,8 +146,6 @@ export class AVClient {
       .then(async sessionId => {
         this.authorizationSessionId = sessionId
         this.email = email
-
-        await coordinator.startIdentification(sessionId);
       });
   }
 
@@ -175,7 +173,8 @@ export class AVClient {
 
     const provider = new OTPProvider(this.getElectionConfig().OTPProviderURL)
     
-    this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email)
+    this.identityConfirmationToken = (await provider.requestOTPAuthorization(code, this.email))
+      .emailConfirmationToken;
   }
 
 
@@ -197,10 +196,15 @@ export class AVClient {
     const coordinatorURL = this.getElectionConfig().voterAuthorizationCoordinatorURL;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
-    const authrorizationResponse = await coordinator.requestPublicKeyAuthorization(this.authorizationSessionId, this.identityConfirmationToken, this.keyPair.publicKey)
-    const { authorizationToken } = authrorizationResponse.data
+    const authorizationResponse = await coordinator.requestPublicKeyAuthorization(
+      this.authorizationSessionId,
+      this.identityConfirmationToken,
+      this.keyPair.publicKey
+    )
 
-    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, authorizationToken)
+    const { registrationToken, publicKeyToken } = authorizationResponse.data
+
+    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, registrationToken, publicKeyToken)
 
     this.voterIdentifier = registerVoterResponse.voterIdentifier
     this.emptyCryptograms = registerVoterResponse.emptyCryptograms

@@ -21,8 +21,6 @@ describe('AVClient#submitBallotCryptograms', () => {
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
     nock('http://localhost:1234/').post('/create_session')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
-    nock('http://localhost:1234/').post('/start_identification')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json');
     nock('http://localhost:1234/').post('/request_authorization')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
     nock('http://localhost:1111/').post('/authorize')
@@ -55,14 +53,18 @@ describe('AVClient#submitBallotCryptograms', () => {
       await client.constructBallotCryptograms(cvr)
 
       const affidavit = 'some bytes, most likely as binary PDF';
-      const voteReceipt = await client.submitBallotCryptograms(affidavit);
-      expect(voteReceipt).to.eql({
-        previousBoardHash: '0de4ec18961c66cc75ddaeb4a55bdd01c2200eed787be5ea7e7ed0284e724a3b',
-        boardHash: '4874559661833c93ac7c06610d5c111c698d3a2f850f35346ddc43b526fe373e',
-        registeredAt: '2020-03-01T10:00:00.000+01:00',
-        serverSignature: '11c1ba9b9738eea669dfb79358cd906ad341a466ebe02d5f39ea215585c18b27,bdafb61f0c2facedebc2aeba252bec2a7fe1e123f6affe3fc2fc87db650c5546',
-        voteSubmissionId: 7
-      });
+      const receipt = await client.submitBallotCryptograms(affidavit);
+
+      expect(receipt).to.have.keys(
+        'boardHash',
+        'previousBoardHash',
+        'registeredAt',
+        'serverSignature',
+        'voteSubmissionId'
+      )
+      expect(receipt.previousBoardHash).to.eql('b8c006ae94b5f98d684317beaf4784938fc6cf2921d856cc3c8416ea4b510a30')
+      expect(receipt.registeredAt).to.eql('2020-03-01T10:00:00.000+01:00')
+      expect(receipt.voteSubmissionId).to.eql(7)
     });
   });
 
