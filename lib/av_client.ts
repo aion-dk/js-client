@@ -173,8 +173,7 @@ export class AVClient {
 
     const provider = new OTPProvider(this.getElectionConfig().OTPProviderURL)
     
-    this.identityConfirmationToken = (await provider.requestOTPAuthorization(code, this.email))
-      .emailConfirmationToken;
+    this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email);
   }
 
 

@@ -14,7 +14,7 @@ export class OTPProvider {
     return this.backend.post('authorize', {
       otpCode: otpCode,
       email: email
-    }).then(res => res.data) // Transform the return type to a Token
+    }).then(res => res.data.emailConfirmationToken)
       .catch(error => {
 
         const response = error.response;
