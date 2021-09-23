@@ -13,12 +13,12 @@ The API is responsible for handling all the cryptographic operations and all net
 
 |Method                                                                    | Description |
 -------------------------------------------------------------------------- | ---
-|[requestAccessCode](avclient.md#requestaccesscode)                   | Initiates the authorization process, in case voter has not authorized yet. Requests access code to be sent to voter email |
-|[validateAccessCode](avclient.md#validateaccesscode)                 | Gets voter authorized to vote. |
-|[constructBallotCryptograms](avclient.md#constructballotcryptograms) | Constructs voter ballot cryptograms. |
-|[spoilBallotCryptograms](avclient.md#spoilballotcryptograms)         | Optional. Initiates process of testing the ballot encryption. |
-|[submitBallotCryptograms](avclient.md#submitballotcryptograms)       | Finalizes the voting process. |
-|[purgeData](avclient.md#purgedata)                                   | Optional. Explicitly purges internal data. |
+|[requestAccessCode](AVClient.md#requestaccesscode)                   | Initiates the authorization process, in case voter has not authorized yet. Requests access code to be sent to voter email |
+|[validateAccessCode](AVClient.md#validateaccesscode)                 | Gets voter authorized to vote. |
+|[constructBallotCryptograms](AVClient.md#constructballotcryptograms) | Constructs voter ballot cryptograms. |
+|[spoilBallotCryptograms](AVClient.md#spoilballotcryptograms)         | Optional. Initiates process of testing the ballot encryption. |
+|[submitBallotCryptograms](AVClient.md#submitballotcryptograms)       | Finalizes the voting process. |
+|[purgeData](AVClient.md#purgedata)                                   | Optional. Explicitly purges internal data. |
 
 ## Example walkthrough test
 
@@ -58,27 +58,26 @@ describe('entire voter flow using OTP authorization', () => {
     });
   });
 });
-
 ```
 
 ## Table of contents
 
 ### Constructors
 
-- [constructor](avclient.md#constructor)
+- [constructor](AVClient.md#constructor)
 
 ### Methods
 
-- [initialize](avclient.md#initialize)
-- [requestAccessCode](avclient.md#requestaccesscode)
-- [validateAccessCode](avclient.md#validateaccesscode)
-- [registerVoter](avclient.md#registervoter)
-- [constructBallotCryptograms](avclient.md#constructballotcryptograms)
-- [generateTestCode](avclient.md#generatetestcode)
-- [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
-- [submitBallotCryptograms](avclient.md#submitballotcryptograms)
-- [purgeData](avclient.md#purgedata)
-- [getElectionConfig](avclient.md#getelectionconfig)
+- [initialize](AVClient.md#initialize)
+- [requestAccessCode](AVClient.md#requestaccesscode)
+- [validateAccessCode](AVClient.md#validateaccesscode)
+- [registerVoter](AVClient.md#registervoter)
+- [constructBallotCryptograms](AVClient.md#constructballotcryptograms)
+- [generateTestCode](AVClient.md#generatetestcode)
+- [spoilBallotCryptograms](AVClient.md#spoilballotcryptograms)
+- [submitBallotCryptograms](AVClient.md#submitballotcryptograms)
+- [purgeData](AVClient.md#purgedata)
+- [getElectionConfig](AVClient.md#getelectionconfig)
 
 ## Constructors
 
@@ -131,7 +130,7 @@ Should be called when a voter chooses digital vote submission (instead of mail-i
 
 Will attempt to get backend services to send an access code (one time password, OTP) to voter's email address.
 
-Should be followed by [validateAccessCode](avclient.md#validateaccesscode) to submit access code for validation.
+Should be followed by [validateAccessCode](AVClient.md#validateaccesscode) to submit access code for validation.
 
 **`throws`** VoterRecordNotFound if no voter was found
 
@@ -156,14 +155,14 @@ ___
 
 ▸ **validateAccessCode**(`code`): `Promise`<`void`\>
 
-Should be called after [requestAccessCode](avclient.md#requestaccesscode).
+Should be called after [requestAccessCode](AVClient.md#requestaccesscode).
 
 Takes an access code (OTP) that voter received, uses it to authorize to submit votes.
 
 Internally, generates a private/public key pair, then attempts to authorize the public
 key with each OTP provider.
 
-Should be followed by [constructBallotCryptograms](avclient.md#constructballotcryptograms).
+Should be followed by [constructBallotCryptograms](AVClient.md#constructballotcryptograms).
 
 **`throws`** InvalidStateError if called before required data is available
 
@@ -205,7 +204,7 @@ ___
 
 ▸ **constructBallotCryptograms**(`cvr`): `Promise`<`string`\>
 
-Should be called after [validateAccessCode](avclient.md#validateaccesscode).
+Should be called after [validateAccessCode](AVClient.md#validateaccesscode).
 
 Encrypts a cast-vote-record (CVR) and generates vote cryptograms.
 
@@ -219,8 +218,8 @@ const trackingCode = await client.constructBallotCryptograms(cvr);
 Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
 values internal to the AV election config.
 
-Should be followed by either [spoilBallotCryptograms](avclient.md#spoilballotcryptograms)
-or [submitBallotCryptograms](avclient.md#submitballotcryptograms).
+Should be followed by either [spoilBallotCryptograms](AVClient.md#spoilballotcryptograms)
+or [submitBallotCryptograms](AVClient.md#submitballotcryptograms).
 
 **`throws`** InvalidStateError if called before required data is available
 
@@ -249,12 +248,12 @@ ___
 
 ▸ **generateTestCode**(): `void`
 
-Should be called after [validateAccessCode](avclient.md#validateaccesscode).
-Should be called before [spoilBallotCryptograms](avclient.md#spoilballotcryptograms).
+Should be called after [validateAccessCode](AVClient.md#validateaccesscode).
+Should be called before [spoilBallotCryptograms](AVClient.md#spoilballotcryptograms).
 
 Generates an encryption key that is used to add another encryption layer to vote cryptograms when they are spoiled.
 
-The generateTestCode is used in case [spoilBallotCryptograms](avclient.md#spoilballotcryptograms) is called afterwards.
+The generateTestCode is used in case [spoilBallotCryptograms](AVClient.md#spoilballotcryptograms) is called afterwards.
 
 #### Returns
 
