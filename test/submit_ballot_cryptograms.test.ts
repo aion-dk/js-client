@@ -5,11 +5,11 @@ import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOf
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 const Crypto = require('../lib/av_client/aion_crypto.js')()
+const fs = require('fs')
 
 describe('AVClient#submitBallotCryptograms', () => {
   let client: AVClient;
   let sandbox;
-  let affidavit;
 
   beforeEach(async () => {
     sandbox = sinon.createSandbox();
@@ -52,9 +52,8 @@ describe('AVClient#submitBallotCryptograms', () => {
       const cvr = { '1': 'option1', '2': 'optiona' };
       await client.constructBallotCryptograms(cvr)
 
-      const affidavit = 'some bytes, most likely as binary PDF';
+      const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       const receipt = await client.submitBallotCryptograms(affidavit);
-
       expect(receipt).to.have.keys(
         'boardHash',
         'previousBoardHash',
@@ -83,10 +82,10 @@ describe('AVClient#submitBallotCryptograms', () => {
       // TODO: Refactor to avoid manipulation of internal state
       (client as any ).voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(randomness)
 
-      const affidavit = 'some bytes, most likely as binary PDF';
+      const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       return await client.submitBallotCryptograms(affidavit).then(
         () => expect.fail('Expected exception to be thrown'),
-        (error: Error) => expect(error.message).to.equal('Invalid vote receipt: corrupt server signature')
+        (error: Error) => expect(error.message).to.equal('Invalid vote receipt: corrupt board hash')
       );
     });
   });

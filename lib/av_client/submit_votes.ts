@@ -1,5 +1,5 @@
 import { ContestIndexed as ContestMap, OpenableEnvelope } from './types'
-import { AcknowledgedBoardHash, signVotes, sealEnvelopes, assertValidReceipt } from './sign'
+import { AcknowledgedBoardHash, signVotes, sealEnvelopes, assertValidReceipt, encryptAES, fingerprint } from './sign'
 
 type Affidavit = string
 
@@ -9,7 +9,12 @@ type SignAndSubmitArguments = {
   encryptedVotes: ContestMap<OpenableEnvelope>;
   voterPrivateKey: string;
   electionSigningPublicKey: string,
-  affidavit: Affidavit
+  encryptedAffidavit: string
+}
+
+type AffidavitConfig = {
+  curve: string;
+  encryptionKey: string;
 }
 
 interface BallotBoxReceipt {
@@ -27,23 +32,35 @@ export default class SubmitVotes {
     this.bulletinBoard = bulletinBoard;
   }
 
+  encryptAffidavit(affidavit: Affidavit, affidavitConfig: AffidavitConfig): string {
+    return encryptAES(affidavit, affidavitConfig)
+  }
+
   async signAndSubmitVotes(args: SignAndSubmitArguments): Promise<BallotBoxReceipt> {
-    const { voterIdentifier, electionId, encryptedVotes, voterPrivateKey, electionSigningPublicKey } = args
+    const { voterIdentifier, electionId, encryptedVotes, voterPrivateKey, electionSigningPublicKey, encryptedAffidavit } = args
 
     const acknowledgeResponse = await this.acknowledge()
 
-    const { contentHash, voterSignature } = signVotes(encryptedVotes, acknowledgeResponse, electionId, voterIdentifier, voterPrivateKey);
+    const contentToSign = {
+      acknowledged_at: acknowledgeResponse.currentTime,
+      acknowledged_board_hash: acknowledgeResponse.currentBoardHash,
+      election_id: electionId,
+      ...(typeof encryptedAffidavit !== 'undefined') && {encrypted_affidavit_hash: fingerprint(encryptedAffidavit)},
+      voter_identifier: voterIdentifier
+    };
+
+    const { contentHash, voterSignature } = signVotes(encryptedVotes, voterPrivateKey, contentToSign);
     const cryptogramsWithProofs = sealEnvelopes(encryptedVotes)
 
-    const ballotBoxReceipt = await this.submit({ contentHash, voterSignature, cryptogramsWithProofs })
+    const ballotBoxReceipt = await this.submit({ contentHash, voterSignature, cryptogramsWithProofs, encryptedAffidavit })
     //console.log(ballotBoxReceipt, voterSignature)
     assertValidReceipt({ contentHash, voterSignature, receipt: ballotBoxReceipt, electionSigningPublicKey });
 
     return ballotBoxReceipt
   }
 
-  private async submit({ contentHash, voterSignature, cryptogramsWithProofs }) {
-    const { data } = await this.bulletinBoard.submitVotes(contentHash, voterSignature, cryptogramsWithProofs)
+  private async submit({ contentHash, voterSignature, cryptogramsWithProofs, encryptedAffidavit }) {
+    const { data } = await this.bulletinBoard.submitVotes(contentHash, voterSignature, cryptogramsWithProofs, encryptedAffidavit)
 
     if (data.error) {
       throw new Error(data.error.description)
@@ -77,7 +94,7 @@ export default class SubmitVotes {
 
 interface BulletinBoard {
   getBoardHash: () => any;
-  submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestMap<CryptogramWithProof>) => any
+  submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestMap<CryptogramWithProof>, encryptedAffidavit: HashValue) => any
 }
 
 type CryptogramWithProof = {

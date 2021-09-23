@@ -69,9 +69,10 @@ export class BulletinBoard {
     });
   }
 
-  submitVotes(contentHash, signature, cryptogramsWithProofs) {
+  submitVotes(contentHash, signature, cryptogramsWithProofs, encryptedAffidavit) {
     return this.backend.post('submit_votes', {
       content_hash: contentHash,
+      encrypted_affidavit: encryptedAffidavit,
       signature,
       votes: cryptogramsWithProofs
     }, {
