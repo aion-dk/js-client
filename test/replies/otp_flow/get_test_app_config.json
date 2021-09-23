@@ -51,6 +51,8 @@
       "title": {
         "en": "First ballot"
       },
+      "collapse_default": true,
+      "collapsable": false,
       "description": {},
       "options": [
         {
@@ -63,7 +65,9 @@
           "description": {},
           "url": {},
           "video_url": {},
-          "image": null
+          "image": null,
+          "ancestry": null,
+          "selectable": true
         },
         {
           "id": 2,
@@ -75,7 +79,9 @@
           "description": {},
           "url": {},
           "video_url": {},
-          "image": null
+          "image": null,
+          "ancestry": null,
+          "selectable": true
         }
       ],
       "write_in": false
@@ -89,6 +95,8 @@
       "title": {
         "en": "Second ballot"
       },
+      "collapse_default": true,
+      "collapsable": false,
       "description": {},
       "options": [
         {
@@ -101,7 +109,9 @@
           "description": {},
           "url": {},
           "video_url": {},
-          "image": null
+          "image": null,
+          "ancestry": null,
+          "selectable": true
         },
         {
           "id": 4,
@@ -113,7 +123,9 @@
           "description": {},
           "url": {},
           "video_url": {},
-          "image": null
+          "image": null,
+          "ancestry": null,
+          "selectable": true
         },
         {
           "id": 5,
@@ -125,7 +137,9 @@
           "description": {},
           "url": {},
           "video_url": {},
-          "image": null
+          "image": null,
+          "ancestry": null,
+          "selectable": true
         }
       ],
       "write_in": false
@@ -251,7 +265,10 @@
       },
       "option": {
         "info_link_text_html": "Info",
-        "video_link_text_html": "Video"
+        "video_link_text_html": "Video",
+        "expand-text": "Click to expand",
+        "collapse-text": "Collapse",
+        "sub_options_select": "<strong>%{options_count}</strong> selected"
       },
       "receipt": {
         "acknowledgement_body": "The server acknowledged your submission, registered it and sent back a server signature as a proof of registration.",

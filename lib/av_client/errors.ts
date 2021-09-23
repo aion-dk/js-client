@@ -53,6 +53,14 @@ export class InvalidStateError extends AvClientError {
   }
 }
 
+export class EmailDoesNotMatchVoterRecordError extends AvClientError {
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, EmailDoesNotMatchVoterRecordError.prototype);
+    this.name = "EmailDoesNotMatchVoterRecordError";
+  }
+}
+
 export class UnsupportedServerReplyError extends AvClientError {
   constructor(message: string) {
     super(message);

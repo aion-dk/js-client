@@ -24,9 +24,10 @@ export class BulletinBoard {
     });
   }
 
-  registerVoter(authorizationToken, signature) {
+  registerVoter(registrationToken, publicKeyToken, signature) {
     return this.backend.post('register', {
-      authorization_token: authorizationToken,
+      registration_token: registrationToken,
+      public_key_token: publicKeyToken,
       signature: signature
     });
   }
