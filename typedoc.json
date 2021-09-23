@@ -4,6 +4,7 @@
   "excludePrivate": true,
   "excludeInternal": true,
   "disableSources": true,
+  "githubPages": false,
   "hideGenerator": true,
   "sort": "source-order"
 }
