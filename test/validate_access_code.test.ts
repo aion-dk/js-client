@@ -187,10 +187,9 @@ describe('AVClient#validateAccessCode', () => {
       const otp = '1234';
       const email = 'blabla@aion.dk'
 
-      await client.initialize({
-        ...client.getElectionConfig(),
-        OTPProviderURL: 'http://sdkghskfglksjlkfgjdlkfjglkdfjglkjdlfgjlkdjgflkjdlkfgjlkdfg.com'
-      })
+      let configWithBadURL = client.getElectionConfig();
+      configWithBadURL.services.otp_provider.url = 'http://sdguet432t4tjsdjf.does-not-exist';
+      await client.initialize(configWithBadURL);
 
       await client.requestAccessCode('voter123', 'blabla@aion.dk');
 
