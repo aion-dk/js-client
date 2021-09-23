@@ -85,7 +85,7 @@ describe('AVClient#submitBallotCryptograms', () => {
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       return await client.submitBallotCryptograms(affidavit).then(
         () => expect.fail('Expected exception to be thrown'),
-        (error: Error) => expect(error.message).to.equal('Invalid vote receipt: corrupt server signature')
+        (error: Error) => expect(error.message).to.equal('Invalid vote receipt: corrupt board hash')
       );
     });
   });

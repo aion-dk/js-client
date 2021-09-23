@@ -353,5 +353,9 @@
       }
     }
   },
-  "app_url": "http://localhost:3000/test"
+  "app_url": "http://localhost:3000/test",
+  "affidavit": {
+    "curve": "k256",
+    "encryption_key": "03e9858b6e48eb93d8f27aa76b60806298c4c7dd94077ad6c3ff97c44937888647"
+  }
 }
