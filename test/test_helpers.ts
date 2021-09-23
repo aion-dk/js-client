@@ -70,7 +70,7 @@ function saveFiles() {
 
 function filenameFromRequest(httpMethod, url) {
   const extension = 'json';
-  const targetDir = __dirname + '/replies/';
+  const targetDir = __dirname + '/replies/otp_flow/';
 
   const urlPathForFilename = url
     .replace(/^\//g, '') // Remove leading slash

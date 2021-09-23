@@ -37,10 +37,6 @@ describe('AVClient#requestAccessCode', function() {
         nock('http://localhost:1234/').post('/create_session')
           .reply(200)
       );
-      expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/start_identification')
-          .reply(200)
-      );
 
       const opaqueVoterId = 'voter123';
       return client.requestAccessCode(opaqueVoterId).then(

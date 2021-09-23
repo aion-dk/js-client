@@ -19,8 +19,6 @@ describe('AVClient#constructBallotCryptograms', () => {
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json');
     nock('http://localhost:1234/').post('/create_session')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
-    nock('http://localhost:1234/').post('/start_identification')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json');
     nock('http://localhost:1234/').post('/request_authorization')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
 

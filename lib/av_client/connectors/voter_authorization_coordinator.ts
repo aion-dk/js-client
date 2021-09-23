@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios'
 import { IdentityConfirmationToken } from "./otp_provider";
+import { EmailDoesNotMatchVoterRecordError, UnsupportedServerReplyError } from "../errors";
 
 export default class VoterAuthorizationCoordinator {
   private backend: AxiosInstance;
@@ -15,22 +16,30 @@ export default class VoterAuthorizationCoordinator {
    */
    createSession(opaqueVoterId: string, email: string): Promise<any> {
     return this.backend.post('create_session', {
-      opaque_voter_id: opaqueVoterId,
+      opaqueVoterId: opaqueVoterId,
       email
-    });
-  }
+    }).catch(error => {
+      const response = error.response;
 
-  startIdentification(sessionId: string): Promise<any> {
-    return this.backend.post('start_identification', {
-      session_id: sessionId
+      if (response.status == 403 && response.data) {
+        const errorCode = response.data.error_code;
+        const errorMessage = response.data.error_message;
+        switch(errorCode) {
+          case "EMAIL_DOES_NOT_MATCH_VOTER_RECORD":
+            throw new EmailDoesNotMatchVoterRecordError(errorMessage)
+          default: throw new UnsupportedServerReplyError(`Unsupported server error: ${errorMessage}`);
+        }
+      }
+
+      throw error;
     });
   }
 
   requestPublicKeyAuthorization(sessionId: string, identityConfirmationToken: IdentityConfirmationToken, publicKey: string){
     return this.backend.post('request_authorization', {
-      session_id: sessionId,
-      identity_confirmation_token: identityConfirmationToken,
-      public_key: publicKey
+      sessionId: sessionId,
+      emailConfirmationToken: identityConfirmationToken,
+      publicKey: publicKey
     })
   }
 
