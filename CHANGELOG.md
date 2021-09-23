@@ -1,6 +1,6 @@
 # AV Client Library Changelog
 
-## 0.0.7
+## 0.1.2
 
 ### New
 We are introducing two new methods on the client library.
