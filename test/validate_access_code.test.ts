@@ -20,7 +20,7 @@ describe('AVClient#validateAccessCode', () => {
 
     expectedNetworkRequests.push(
       nock('http://localhost:3000/').get('/test/app/config')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json')
     );
     expectedNetworkRequests.push(
       nock('http://localhost:1234/').post('/create_session')
@@ -48,11 +48,11 @@ describe('AVClient#validateAccessCode', () => {
       );
       expectedNetworkRequests.push(
         nock('http://localhost:3000/').post('/test/app/register')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_register.json')
+          .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_register.json')
       );
       expectedNetworkRequests.push(
         nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json')
+          .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_challenge_empty_cryptograms.json')
       );
 
       const otp = '1234';

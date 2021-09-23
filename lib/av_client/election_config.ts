@@ -15,7 +15,8 @@ export interface ElectionConfig {
   OTPProviderURL: string;
   affidavit: AffidavitConfig;
 
-  authorizationMode: 'election codes' | 'otps'
+  authorizationMode: 'election codes' | 'otps';
+  services: any; // TODO: Sune, please help us improve this
 }
 
 interface AffidavitConfig {

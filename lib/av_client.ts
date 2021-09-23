@@ -135,6 +135,7 @@ export class AVClient {
    * @throws NetworkError if any request failed to get a response
    */
   async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
+    // console.log(this.getElectionConfig())
     const coordinatorURL = this.getElectionConfig().voterAuthorizationCoordinatorURL;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
