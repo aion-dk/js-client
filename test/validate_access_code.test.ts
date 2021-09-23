@@ -26,10 +26,6 @@ describe('AVClient#validateAccessCode', () => {
       nock('http://localhost:1234/').post('/create_session')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json')
     );
-    expectedNetworkRequests.push(
-      nock('http://localhost:1234/').post('/start_identification')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_start_identification.json')
-    )
 
     client = new AVClient('http://localhost:3000/test/app');
     await client.initialize()

@@ -10,9 +10,7 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
 /** @internal */
-import sjclLib from './av_client/sjcl'
-/** @internal */
-export const sjcl = sjclLib
+export const sjcl = require('./av_client/sjcl');
 
 /**
  * # Assembly Voting Client API.
@@ -147,8 +145,6 @@ export class AVClient {
       .then(async sessionId => {
         this.authorizationSessionId = sessionId
         this.email = email
-
-        await coordinator.startIdentification(sessionId);
       });
   }
 
@@ -176,7 +172,7 @@ export class AVClient {
 
     const provider = new OTPProvider(this.getElectionConfig().OTPProviderURL)
     
-    this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email)
+    this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email);
   }
 
 
@@ -198,10 +194,15 @@ export class AVClient {
     const coordinatorURL = this.getElectionConfig().voterAuthorizationCoordinatorURL;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
-    const authrorizationResponse = await coordinator.requestPublicKeyAuthorization(this.authorizationSessionId, this.identityConfirmationToken, this.keyPair.publicKey)
-    const { authorizationToken } = authrorizationResponse.data
+    const authorizationResponse = await coordinator.requestPublicKeyAuthorization(
+      this.authorizationSessionId,
+      this.identityConfirmationToken,
+      this.keyPair.publicKey
+    )
 
-    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, authorizationToken)
+    const { registrationToken, publicKeyToken } = authorizationResponse.data
+
+    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, registrationToken, publicKeyToken)
 
     this.voterIdentifier = registerVoterResponse.voterIdentifier
     this.emptyCryptograms = registerVoterResponse.emptyCryptograms

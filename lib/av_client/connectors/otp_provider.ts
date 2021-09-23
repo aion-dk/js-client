@@ -1,9 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 import { AccessCodeInvalid, AccessCodeExpired, NetworkError, UnsupportedServerReplyError } from "../errors";
 
-export interface IdentityConfirmationToken {
-  token: 'authorized'
-}
+export type IdentityConfirmationToken = string;
 
 export class OTPProvider {
   private backend: AxiosInstance;
@@ -14,9 +12,9 @@ export class OTPProvider {
 
   requestOTPAuthorization(otpCode: string, email: string): Promise<IdentityConfirmationToken> {
     return this.backend.post('authorize', {
-      otp_code: otpCode,
+      otpCode: otpCode,
       email: email
-    }).then(res => res.data) // Transform the return type to a Token
+    }).then(res => res.data.emailConfirmationToken)
       .catch(error => {
 
         const response = error.response;
