@@ -24,12 +24,14 @@ export const sjcl = require('./av_client/sjcl');
  *
  * |Method                                                                    | Description |
  * -------------------------------------------------------------------------- | ---
- * |{@link AVClient.requestAccessCode | requestAccessCode}                   | Initiates the authorization process, in case voter has not authorized yet. Requests access code to be sent to voter email |
- * |{@link AVClient.validateAccessCode | validateAccessCode}                 | Gets voter authorized to vote. |
- * |{@link AVClient.constructBallotCryptograms | constructBallotCryptograms} | Constructs voter ballot cryptograms. |
- * |{@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}         | Optional. Initiates process of testing the ballot encryption. |
- * |{@link AVClient.submitBallotCryptograms | submitBallotCryptograms}       | Finalizes the voting process. |
- * |{@link AVClient.purgeData | purgeData}                                   | Optional. Explicitly purges internal data. |
+ * |{@link AVClient.initialize | initialize }                                 | Initializes the library by fetching election configuration |
+ * |{@link AVClient.requestAccessCode | requestAccessCode }                   | Initiates the authorization process, in case voter has not authorized yet. Requests access code to be sent to voter email |
+ * |{@link AVClient.validateAccessCode | validateAccessCode }                 | Gets voter authorized to vote. |
+ * |{@link AVClient.registerVoter | registerVoter }                           | Registers the voter on the bulletin board |
+ * |{@link AVClient.constructBallotCryptograms | constructBallotCryptograms } | Constructs voter ballot cryptograms. |
+ * |{@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms }         | Optional. Initiates process of testing the ballot encryption. |
+ * |{@link AVClient.submitBallotCryptograms | submitBallotCryptograms }       | Finalizes the voting process. |
+ * |{@link AVClient.purgeData | purgeData }                                   | Optional. Explicitly purges internal data. |
  *
  * ## Example walkthrough test
  *
@@ -63,7 +65,7 @@ export class AVClient {
    * Initializes the client with an election config.
    * If no config is provided, it fetches one from the backend.
    *
-   * @param electionConfig override election config object
+   * @param electionConfig Allows injection of an election configuration for testing purposes
    * @returns Returns undefined if succeeded or throws an error
    * @throws NetworkError if any request failed to get a response
    */
