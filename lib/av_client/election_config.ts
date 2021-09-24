@@ -14,7 +14,15 @@ export interface ElectionConfig {
   affidavit: AffidavitConfig;
 
   authorizationMode: 'election codes' | 'otps';
-  services: any; // TODO: Sune, please help us improve this
+
+  services: {
+    'voter_authorizer': Service,
+    'otp_provider': Service
+  };
+}
+
+interface Service {
+  url: string;
 }
 
 interface AffidavitConfig {
