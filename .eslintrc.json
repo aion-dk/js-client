@@ -16,7 +16,7 @@
         "@typescript-eslint",
         "promise"
     ],
-    "ignorePatterns": [ "aion_crypto.js" ],
+    "ignorePatterns": [ "aion_crypto.js", "sjcl.js" ],
     "rules": {
         "promise/no-return-wrap": "error"
     }
