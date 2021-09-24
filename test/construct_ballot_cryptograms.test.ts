@@ -16,7 +16,7 @@ describe('AVClient#constructBallotCryptograms', () => {
     resetDeterministicOffset();
 
     nock('http://localhost:3000/').get('/test/app/config')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json');
+      .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
     nock('http://localhost:1234/').post('/create_session')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
     nock('http://localhost:1234/').post('/request_authorization')
@@ -26,11 +26,11 @@ describe('AVClient#constructBallotCryptograms', () => {
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
 
     nock('http://localhost:3000/').post('/test/app/register')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_register.json');
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_register.json');
     nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_challenge_empty_cryptograms.json');
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_challenge_empty_cryptograms.json');
     nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_get_latest_board_hash.json');
+      .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_get_latest_board_hash.json');
 
     client = new AVClient('http://localhost:3000/test/app');
     await client.initialize()
@@ -51,7 +51,7 @@ describe('AVClient#constructBallotCryptograms', () => {
 
       const trackingCode = await client.constructBallotCryptograms(cvr);
 
-      expect(trackingCode).to.equal('8cd7f8c3317c5317c066a42eddd86ca23fc4df14ae88165e38276854c19fff42');
+      expect(trackingCode.length).to.eql(64);
     });
   });
 

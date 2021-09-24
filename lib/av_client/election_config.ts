@@ -11,11 +11,10 @@ export interface ElectionConfig {
   //...
 
   // appended data:
-  voterAuthorizationCoordinatorURL: string;
-  OTPProviderURL: string;
   affidavit: AffidavitConfig;
 
-  authorizationMode: 'election codes' | 'otps'
+  authorizationMode: 'election codes' | 'otps';
+  services: any; // TODO: Sune, please help us improve this
 }
 
 interface AffidavitConfig {
@@ -59,8 +58,6 @@ export async function fetchElectionConfig(bulletinBoard: BulletinBoard): Promise
     .then(
       (response: { data: ElectionConfig }) => {
         const configData = response.data;
-        configData.voterAuthorizationCoordinatorURL = 'http://localhost:1234';
-        configData.OTPProviderURL = 'http://localhost:1111'
 
         // const privKey = 'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9'
         const pubKey = '03e9858b6e48eb93d8f27aa76b60806298c4c7dd94077ad6c3ff97c44937888647'

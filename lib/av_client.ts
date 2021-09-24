@@ -135,7 +135,7 @@ export class AVClient {
    * @throws NetworkError if any request failed to get a response
    */
   async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
-    const coordinatorURL = this.getElectionConfig().voterAuthorizationCoordinatorURL;
+    const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
     return coordinator.createSession(opaqueVoterId, email)
@@ -170,7 +170,7 @@ export class AVClient {
     if(!this.email)
       throw new InvalidStateError('Cannot validate access code. Access code was not requested.');
 
-    const provider = new OTPProvider(this.getElectionConfig().OTPProviderURL)
+    const provider = new OTPProvider(this.getElectionConfig().services.otp_provider.url)
     
     this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email);
   }
@@ -191,7 +191,7 @@ export class AVClient {
       publicKey: '039490ed35e0cabb39592792d69b5d4bf2104f20df8c4bbf36ee6b705595e776d2'
     }
 
-    const coordinatorURL = this.getElectionConfig().voterAuthorizationCoordinatorURL;
+    const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
 
     const authorizationResponse = await coordinator.requestPublicKeyAuthorization(

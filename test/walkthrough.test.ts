@@ -70,7 +70,7 @@ describe('entire voter flow using OTP authorization', () => {
         console.error(e);
         expect.fail('AVClient#constructBallotCryptograms failed');
       });
-      expect(trackingCode).to.eql('12918186c8a535b7c94576dca7b94ef2dbb9a728f63d466a4faf558a2e4be165');
+      expect(trackingCode.length).to.eql(64)
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       const receipt = await client.submitBallotCryptograms(affidavit);

@@ -19,7 +19,7 @@ describe('AVClient#requestAccessCode', function() {
 
     expectedNetworkRequests.push(
       nock('http://localhost:3000/').get('/test/app/config')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_config.json')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json')
     );
 
     client = new AVClient('http://localhost:3000/test/app');
