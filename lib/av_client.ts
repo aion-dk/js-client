@@ -9,6 +9,8 @@ import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
+import { KeyPair } from './av_client/types';
+
 /** @internal */
 export const sjcl = require('./av_client/sjcl');
 
@@ -475,8 +477,3 @@ export type CastVoteRecord = ContestMap<string>
  * For now, we assume it is just a string.
  */
 export type Affidavit = string;
-
-type KeyPair = {
-  privateKey: BigNum;
-  publicKey: ECPoint;
-};

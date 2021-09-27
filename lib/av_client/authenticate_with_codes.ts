@@ -1,3 +1,4 @@
+import { KeyPair } from './types';
 import * as crypto from './aion_crypto'
 const Crypto = crypto();
 
@@ -65,6 +66,7 @@ const createSession = async function(keyPair: KeyPair, electionId: number, bulle
       }
 
       const contestIds = data.ballotIds;
+
       const emptyCryptograms = {};
       contestIds.forEach(contestId => {
         const {
@@ -89,11 +91,6 @@ const createSession = async function(keyPair: KeyPair, electionId: number, bulle
 interface BulletinBoard {
   challengeEmptyCryptograms: (array) => Promise<boolean | string>,
   createSession: (PublicKey, Signature) => any
-}
-
-type KeyPair = {
-  privateKey: string;
-  publicKey: string;
 }
 
 type Signature = string;
