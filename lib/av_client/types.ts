@@ -10,7 +10,7 @@
  *
  * @template T Defines the data type of the value
  */
-export interface ContestIndexed<T> {
+export interface ContestMap<T> {
   [contestId: string]: T;
 }
 

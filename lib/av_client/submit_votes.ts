@@ -1,4 +1,4 @@
-import { ContestIndexed as ContestMap, OpenableEnvelope } from './types'
+import { ContestMap, OpenableEnvelope } from './types'
 import { AcknowledgedBoardHash, signVotes, sealEnvelopes, assertValidReceipt, encryptAES, fingerprint } from './sign'
 
 type Affidavit = string

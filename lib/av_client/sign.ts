@@ -1,4 +1,4 @@
-import { ContestIndexed as ContestMap, OpenableEnvelope, SealedEnvelope } from './types'
+import { ContestMap, OpenableEnvelope, SealedEnvelope } from './types'
 import * as crypto from './aion_crypto'
 const sjcl = require('./sjcl')
 const Crypto = crypto();
