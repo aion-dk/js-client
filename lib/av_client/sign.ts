@@ -32,9 +32,12 @@ export function signVotes(encryptedVotes: ContestMap<OpenableEnvelope>, privateK
   for (const contestId in encryptedVotes) {
     votes[contestId] =  encryptedVotes[contestId].cryptogram;
   }
-  contentToSign['votes'] = votes
 
-  const contentHash = computeNextBoardHash(contentToSign);
+  const contentHash = computeNextBoardHash({
+    ...contentToSign,
+    votes
+  });
+
   const voterSignature = Crypto.generateSchnorrSignature(contentHash, privateKey);
   return { contentHash, voterSignature };
 }
