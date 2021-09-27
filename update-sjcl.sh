@@ -1,8 +1,10 @@
 #/bin/bash
 
+VERSION=1.0.8
+
 git clone git@github.com:bitwiseshiftleft/sjcl.git /tmp/sjcl &&
 (
-  cd /tmp/sjcl; git checkout 1.0.8 && \
+  cd /tmp/sjcl; git checkout $VERSION && \
   ./configure --without-all --with-codecHex --with-codecBytes --with-ecc --with-convenience --compress=none && \
   rm sjcl.js && \
   make
