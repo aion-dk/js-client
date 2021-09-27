@@ -1,9 +1,9 @@
-import { BulletinBoard } from '../lib/av_client/connectors/bulletin_board';
-import { fetchElectionConfig, ElectionConfig } from '../lib/av_client/election_config';
+import { BulletinBoard } from './av_client/connectors/bulletin_board';
+import { fetchElectionConfig, ElectionConfig } from './av_client/election_config';
 import { ContestMap, OpenableEnvelope, EmptyCryptogram } from './av_client/types'
-import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
-import { registerVoter } from '../lib/av_client/register_voter';
-import EncryptVotes from '../lib/av_client/encrypt_votes';
+import AuthenticateWithCodes from './av_client/authenticate_with_codes';
+import { registerVoter } from './av_client/register_voter';
+import EncryptVotes from './av_client/encrypt_votes';
 import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
