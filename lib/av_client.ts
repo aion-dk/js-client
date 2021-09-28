@@ -1,14 +1,16 @@
-import { BulletinBoard } from '../lib/av_client/connectors/bulletin_board';
-import { fetchElectionConfig, ElectionConfig } from '../lib/av_client/election_config';
-import { ContestIndexed, OpenableEnvelope, EmptyCryptogram } from './av_client/types'
-import AuthenticateWithCodes from '../lib/av_client/authenticate_with_codes';
-import { registerVoter } from '../lib/av_client/register_voter';
-import EncryptVotes from '../lib/av_client/encrypt_votes';
+import { BulletinBoard } from './av_client/connectors/bulletin_board';
+import { fetchElectionConfig, ElectionConfig } from './av_client/election_config';
+import { ContestMap, OpenableEnvelope, EmptyCryptogram } from './av_client/types'
+import AuthenticateWithCodes from './av_client/authenticate_with_codes';
+import { registerVoter } from './av_client/register_voter';
+import EncryptVotes from './av_client/encrypt_votes';
 import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
+import { KeyPair } from './av_client/types';
+
 /** @internal */
 export const sjcl = require('./av_client/sjcl');
 
@@ -47,10 +49,10 @@ export class AVClient {
 
   private bulletinBoard: BulletinBoard;
   private electionConfig?: ElectionConfig;
-  private emptyCryptograms: ContestIndexed<EmptyCryptogram>;
+  private emptyCryptograms: ContestMap<EmptyCryptogram>;
   private keyPair: KeyPair;
   private testCode: string;
-  private voteEncryptions: ContestIndexed<OpenableEnvelope>;
+  private voteEncryptions: ContestMap<OpenableEnvelope>;
   private voterIdentifier: string;
   private contestIds: number[];
 
@@ -387,7 +389,7 @@ export class AVClient {
    * Returns data for rendering the list of cryptograms of the ballot
    * @return Object containing a cryptogram for each contest
    */
-  private cryptogramsForConfirmation(): ContestIndexed<Cryptogram> {
+  private cryptogramsForConfirmation(): ContestMap<Cryptogram> {
     const cryptograms = {}
     const voteEncryptions = this.voteEncryptions
     this.contestIds.forEach(function (id) {
@@ -469,14 +471,9 @@ export type Receipt = {
  * }
  * ```
  */
-export type CastVoteRecord = ContestIndexed<string>
+export type CastVoteRecord = ContestMap<string>
 
 /**
  * For now, we assume it is just a string.
  */
 export type Affidavit = string;
-
-type KeyPair = {
-  privateKey: BigNum;
-  publicKey: ECPoint;
-};

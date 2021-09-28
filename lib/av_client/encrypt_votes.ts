@@ -1,8 +1,8 @@
-import { OpenableEnvelope } from "./types";
+import { ContestMap, OpenableEnvelope } from "./types";
 import * as crypto from './aion_crypto'
 const Crypto = crypto();
 export default class EncryptVotes {
-  encrypt(contestSelections, emptyCryptograms, contestEncodingTypes, encryptionKey: PublicKey): ContestIndexed<OpenableEnvelope> {
+  encrypt(contestSelections, emptyCryptograms, contestEncodingTypes, encryptionKey: PublicKey): ContestMap<OpenableEnvelope> {
     const response = {}
 
     Object.keys(contestSelections).forEach(function(contestId) {
@@ -23,7 +23,7 @@ export default class EncryptVotes {
     return Crypto.generateRandomNumber()
   }
 
-  fingerprint(cryptograms: ContestIndexed<Cryptogram>) {
+  fingerprint(cryptograms: ContestMap<Cryptogram>) {
     const string = JSON.stringify(cryptograms)
 
     return Crypto.hashString(string)
@@ -33,6 +33,3 @@ export default class EncryptVotes {
 type PublicKey = string;
 type Cryptogram = string;
 type BigNum = string;
-interface ContestIndexed<Type> {
-  [index: string]: Type;
-}

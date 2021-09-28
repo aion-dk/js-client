@@ -1,5 +1,5 @@
 import { randomKeyPair} from './generate_key_pair';
-import { ContestIndexed, EmptyCryptogram, KeyPair } from "./types";
+import { ContestMap, EmptyCryptogram, KeyPair } from "./types";
 import { BulletinBoard } from './connectors/bulletin_board';
 import * as crypto from './aion_crypto'
 const Crypto = crypto();
@@ -7,7 +7,7 @@ const Crypto = crypto();
 interface RegisterVoterResponse {
   voterSessionUuid: string;
   voterIdentifier: string;
-  emptyCryptograms: ContestIndexed<EmptyCryptogram>;
+  emptyCryptograms: ContestMap<EmptyCryptogram>;
   contestIds: number[];
   /*
    Maybe we receive ballots that we can vote on.
@@ -36,7 +36,7 @@ export async function registerVoter(bulletinBoard: BulletinBoard, keyPair: KeyPa
 
   const { contestIds, emptyCryptograms, voterSessionUuid } = registerVoterResponse
 
-  const challenges: ContestIndexed<string> = Object.fromEntries(contestIds.map(contestId => {
+  const challenges: ContestMap<string> = Object.fromEntries(contestIds.map(contestId => {
     return [contestId, Crypto.generateRandomNumber()]
   }))
 

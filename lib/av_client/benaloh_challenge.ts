@@ -1,3 +1,5 @@
+import { ContestMap } from "./types";
+
 export default class BenalohChallenge {
   bulletinBoard: any;
 
@@ -15,7 +17,7 @@ export default class BenalohChallenge {
     return data.randomizers
   }
 
-  async getServerCommitmentOpening(voterCommitmentOpening: ContestIndexed<BigNum []>, encryptedBallotCryptograms: ContestIndexed<Cryptogram>) {
+  async getServerCommitmentOpening(voterCommitmentOpening: ContestMap<BigNum []>, encryptedBallotCryptograms: ContestMap<Cryptogram>) {
     const { data } = await this.bulletinBoard.getCommitmentOpening(voterCommitmentOpening, encryptedBallotCryptograms)
 
     if (data.error) {
@@ -25,7 +27,7 @@ export default class BenalohChallenge {
     return data.commitment_opening
   }
 
-  verifyCommitmentOpening(serverCommitmentOpening: ContestIndexed<BigNum []>, serverCommitment: PublicKey, serverEmptyCryptograms: ContestIndexed<Cryptogram>) {
+  verifyCommitmentOpening(serverCommitmentOpening: ContestMap<BigNum []>, serverCommitment: PublicKey, serverEmptyCryptograms: ContestMap<Cryptogram>) {
     // TODO: implement me
     return true;
   }
@@ -33,11 +35,7 @@ export default class BenalohChallenge {
 
 interface Connector {
   getRandomizers: () => Promise<any>,
-  getCommitmentOpening: (voterCommitmentOpening: ContestIndexed<BigNum []>, encryptedBallotCryptograms: ContestIndexed<Cryptogram>) => Promise<any>
-}
-
-interface ContestIndexed<Type> {
-  [index: string]: Type;
+  getCommitmentOpening: (voterCommitmentOpening: ContestMap<BigNum []>, encryptedBallotCryptograms: ContestMap<Cryptogram>) => Promise<any>
 }
 
 type PublicKey = string;
