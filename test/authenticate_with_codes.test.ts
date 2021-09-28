@@ -6,7 +6,7 @@ import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
 describe('AVClient#authenticateWithCodes', function() {
-  let client;
+  let client: AVClient;
   let sandbox;
 
   beforeEach(async () => {
