@@ -4,7 +4,6 @@ import { InvalidConfigError, InvalidStateError } from '../lib/av_client/errors'
 
 describe('AVClient#getAuthorizationMethod', function() {
   let client: AVClient;
-  let sandbox;
 
   beforeEach(async function() {
     client = new AVClient('http://localhost:3000/test/app');

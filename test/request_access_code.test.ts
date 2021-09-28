@@ -7,7 +7,7 @@ const sjcl = require('../lib/av_client/sjcl')
 const Crypto = require('../lib/av_client/aion_crypto.js')()
 
 describe('AVClient#requestAccessCode', function() {
-  let client;
+  let client: AVClient;
   let sandbox;
   const expectedNetworkRequests : any[] = [];
 
@@ -38,8 +38,7 @@ describe('AVClient#requestAccessCode', function() {
           .reply(200)
       );
 
-      const opaqueVoterId = 'voter123';
-      return client.requestAccessCode(opaqueVoterId).then(
+      return client.requestAccessCode('voter123', 'test@test.dk').then(
         (result) => {
           expect(result).to.eql(undefined);
           expectedNetworkRequests.forEach((mock) => mock.done());
@@ -59,8 +58,7 @@ describe('AVClient#requestAccessCode', function() {
           .reply(404)
       );
 
-      const opaqueVoterId = 'voter123';
-      return await client.requestAccessCode(opaqueVoterId).then(
+      return await client.requestAccessCode('voter123', 'test@test.dk').then(
         () => expect.fail('Expected promise to be rejected'),
         (error) => {
           expect(error.message).to.equal('Request failed with status code 404')
