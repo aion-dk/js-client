@@ -265,16 +265,16 @@ export class AVClient {
       return [contestId, contest!.vote_encoding_type];
     }))
 
-    const encryptionResponse = new EncryptVotes().encrypt(
+    const envelopes = EncryptVotes.encrypt(
       cvr,
       emptyCryptograms,
       contestEncodingTypes,
       this.electionEncryptionKey()
     );
 
-    this.voteEncryptions = encryptionResponse
+    const trackingCode = EncryptVotes.fingerprint(this.extractCryptograms(envelopes));
 
-    const trackingCode = new EncryptVotes().fingerprint(this.cryptogramsForConfirmation());
+    this.voteEncryptions = envelopes
 
     return trackingCode;
   }
@@ -293,7 +293,7 @@ export class AVClient {
    * ```
    */
   public generateTestCode(): void {
-    this.testCode = new EncryptVotes().generateTestCode()
+    this.testCode = EncryptVotes.generateTestCode()
   }
 
   /**
@@ -387,16 +387,11 @@ export class AVClient {
 
   /**
    * Returns data for rendering the list of cryptograms of the ballot
+   * @param Map of openable envelopes with cryptograms
    * @return Object containing a cryptogram for each contest
    */
-  private cryptogramsForConfirmation(): ContestMap<Cryptogram> {
-    const cryptograms = {}
-    const voteEncryptions = this.voteEncryptions
-    this.contestIds.forEach(function (id) {
-      cryptograms[id.toString()] = voteEncryptions[id].cryptogram
-    })
-
-    return cryptograms
+  private extractCryptograms(envelopes: ContestMap<OpenableEnvelope>): ContestMap<Cryptogram> {
+    return Object.fromEntries(Object.keys(envelopes).map(contestId =>  [contestId, envelopes[contestId].cryptogram ]))
   }
 
 
