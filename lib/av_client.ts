@@ -250,8 +250,8 @@ export class AVClient {
 
     switch(validateCvr(cvr, contests)) {
       case ":invalid_contest": throw new Error('Corrupt CVR: Contains invalid contest');
-      case ':invalid_option': throw new Error('Corrupt CVR: Contains invalid option');
-      default:
+      case ":invalid_option": throw new Error('Corrupt CVR: Contains invalid option');
+      case ":okay":
     }
 
     const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].empty_cryptogram ]))
