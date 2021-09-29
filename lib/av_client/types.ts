@@ -46,7 +46,6 @@ export interface Ballot {
   //...
 }
 
-
 export interface Option {
   id: number;
   handle: string;
@@ -67,3 +66,14 @@ export interface Election {
   description: LocalString;
   //...
 }
+
+/**
+ * Example of a cvr:
+ * ```javascript
+ * {
+ *    '1': 'option1',
+ *    '2': 'optiona'
+ * }
+ * ```
+ */
+ export type CastVoteRecord = ContestMap<string>

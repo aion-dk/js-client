@@ -9,7 +9,8 @@ import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
-import { KeyPair } from './av_client/types';
+import { KeyPair, CastVoteRecord } from './av_client/types';
+import { validateCvr } from './av_client/cvr_validation';
 
 /** @internal */
 export const sjcl = require('./av_client/sjcl');
@@ -213,20 +214,6 @@ export class AVClient {
     this.contestIds = registerVoterResponse.contestIds
   }
 
-  public validateCvr(cvr: CastVoteRecord, contests: Ballot[]) : ':okay' | ':invalid_option' | ':invalid_contest' {
-    // TODO: Assuming that the voter has access to - exactly - all contests from election config.
-    const hasVotedForAllContests = JSON.stringify(Object.keys(cvr).map(k => parseInt(k))) === JSON.stringify(contests.map(c => c.id))
-
-    const areSelectedOptionsValid = Object.keys(cvr).every(function(contestId) {
-      const contest = contests.find(b => b.id.toString() == contestId)
-      return contest && contest.options.some(o => o.handle == cvr[contestId])
-    })
-
-    if(!hasVotedForAllContests) return ':invalid_contest'
-    if(!areSelectedOptionsValid) return ':invalid_option'
-    return ':okay'
-  }
-
   /**
    * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
    *
@@ -261,7 +248,7 @@ export class AVClient {
 
     const contests = this.getElectionConfig().ballots
 
-    switch(this.validateCvr(cvr, contests)) {
+    switch(validateCvr(cvr, contests)) {
       case ":invalid_contest": throw new Error('Corrupt CVR: Contains invalid contest');
       case ':invalid_option': throw new Error('Corrupt CVR: Contains invalid option');
       default:
@@ -465,17 +452,6 @@ export type Receipt = {
   serverSignature: string;
   voteSubmissionId: number;
 };
-
-/**
- * Example of a cvr:
- * ```javascript
- * {
- *    '1': 'option1',
- *    '2': 'optiona'
- * }
- * ```
- */
-export type CastVoteRecord = ContestMap<string>
 
 /**
  * For now, we assume it is just a string.

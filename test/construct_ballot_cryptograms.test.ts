@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import nock = require('nock');
 import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
 import sinon = require('sinon');
-import { ElectionConfig } from '../lib/av_client/election_config';
+import { validateCvr } from '../lib/av_client/cvr_validation';
 import { Option } from '../lib/av_client/types';
 const sjcl = require('../lib/av_client/sjcl')
 
@@ -89,9 +89,9 @@ describe('AVClient#constructBallotCryptograms', () => {
       const cvr1 = { '1': 'option1', '3': 'optionX' };
       const cvr2 = { '1': 'option1', '3': 'optionINVALID' };
 
-      expect(client.validateCvr(cvr2, ballot2)).to.be.equal(':invalid_option')
-      expect(client.validateCvr(cvr2, ballot1)).to.be.equal(':invalid_contest')
-      expect(client.validateCvr(cvr1, ballot2)).to.be.equal(':okay')
+      expect(validateCvr(cvr2, ballot2)).to.be.equal(':invalid_option')
+      expect(validateCvr(cvr2, ballot1)).to.be.equal(':invalid_contest')
+      expect(validateCvr(cvr1, ballot2)).to.be.equal(':okay')
     });
   });
 });
