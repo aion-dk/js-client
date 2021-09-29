@@ -1,6 +1,6 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig } from './av_client/election_config';
-import { ContestMap, OpenableEnvelope, EmptyCryptogram } from './av_client/types'
+import { ContestMap, OpenableEnvelope, EmptyCryptogram, Ballot } from './av_client/types'
 import AuthenticateWithCodes from './av_client/authenticate_with_codes';
 import { registerVoter } from './av_client/register_voter';
 import EncryptVotes from './av_client/encrypt_votes';
@@ -213,6 +213,20 @@ export class AVClient {
     this.contestIds = registerVoterResponse.contestIds
   }
 
+  public validateCvr(cvr: CastVoteRecord, contests: Ballot[]) : ':okay' | ':invalid_option' | ':invalid_contest' {
+    // TODO: Assuming that the voter has access to - exactly - all contests from election config.
+    const hasVotedForAllContests = JSON.stringify(Object.keys(cvr).map(k => parseInt(k))) === JSON.stringify(contests.map(c => c.id))
+
+    const areSelectedOptionsValid = Object.keys(cvr).every(function(contestId) {
+      const contest = contests.find(b => b.id.toString() == contestId)
+      return contest && contest.options.some(o => o.handle == cvr[contestId])
+    })
+
+    if(!hasVotedForAllContests) return ':invalid_contest'
+    if(!areSelectedOptionsValid) return ':invalid_option'
+    return ':okay'
+  }
+
   /**
    * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
    *
@@ -245,17 +259,12 @@ export class AVClient {
       throw new InvalidStateError('Cannot construct ballot cryptograms. Voter registration not completed successfully')
     }
 
-    if (JSON.stringify(Object.keys(cvr).map(k => parseInt(k))) !== JSON.stringify(this.contestIds)) {
-      throw new Error('Corrupt CVR: Contains invalid contest');
-    }
-
     const contests = this.getElectionConfig().ballots
-    const valid_contest_selections = Object.keys(cvr).every(function(contestId) {
-      const contest = contests.find(b => b.id.toString() == contestId)
-      return contest && contest.options.some(o => o.handle == cvr[contestId])
-    })
-    if (!valid_contest_selections) {
-      throw new Error('Corrupt CVR: Contains invalid option');
+
+    switch(this.validateCvr(cvr, contests)) {
+      case ":invalid_contest": throw new Error('Corrupt CVR: Contains invalid contest');
+      case ':invalid_option': throw new Error('Corrupt CVR: Contains invalid option');
+      default:
     }
 
     const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].empty_cryptogram ]))
