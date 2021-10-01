@@ -1,4 +1,5 @@
 import { validateCvr } from '../lib/av_client/cvr_validation';
+import { Option } from '../lib/av_client/types';
 import { expect } from 'chai';
 
 describe('validateCvr', () => {
