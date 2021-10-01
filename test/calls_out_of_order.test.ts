@@ -34,18 +34,6 @@ describe('AVClient functions call order', () => {
     }
   });
 
-  // TODO: Skip test, spoilBallotCryptogram is not implemented yet
-  it.skip('throws an error when spoilBallotCryptograms is prior to voter authentication', async () => {
-    try {
-      await client.spoilBallotCryptograms();
-      expect.fail('Expected an InvalidStateError, got no error');
-    } catch (e) {
-      console.log(e)
-      expect(e.name).to.eql('InvalidStateError');
-      expect(e.message).to.eql('#spoilBallotCryptograms requires exactly #requestAccessCode, #validateAccessCode, #constructBallotCryptograms to be called before it');
-    }
-  });
-
   it('throws an error when submitBallotCryptograms is called first', async () => {
     try {
       await client.submitBallotCryptograms('affidavit bytes');
@@ -93,27 +81,6 @@ describe('AVClient functions call order', () => {
     afterEach(() => {
       sandbox.restore();
       nock.cleanAll();
-    });
-
-    // TODO: Skipped as it is not implemented yet
-    it.skip('throws an error when submitBallotCryptograms is called after spoiling', async () => {
-      await client.requestAccessCode('voter123', 'voter@foo.bar');
-      await client.validateAccessCode('1234');
-      await client.registerVoter()
-
-      const cvr = { '1': 'option1', '2': 'optiona' };
-      await client.constructBallotCryptograms(cvr);
-      client.generateTestCode();
-      await client.spoilBallotCryptograms();
-      nock.cleanAll();
-
-      try {
-        await client.submitBallotCryptograms('affidavit bytes');
-        expect.fail('Expected an InvalidStateError, got no error');
-      } catch (error) {
-        expect(error.name).to.eql('InvalidStateError');
-        expect(error.message).to.eql('Cannot submit cryptograms after spoiling');
-      }
     });
 
     it('throws an error if trying to register voter without validated OTP', async () => {

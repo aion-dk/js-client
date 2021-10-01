@@ -4,6 +4,7 @@ const fs = require('fs');
 const axios = require('axios')
 
 // Skipping by default, as it messes with nock when running mocha in watch mode.
+// Enable this if mock recording breaks somehow.
 describe.skip("record stuff", () => {
   async function getStuff() {
     const backend = axios.create({
