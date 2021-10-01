@@ -1,33 +1,38 @@
 import { ContestMap, OpenableEnvelope } from "./types";
 import * as crypto from './aion_crypto'
 const Crypto = crypto();
-export default class EncryptVotes {
-  encrypt(contestSelections, emptyCryptograms, contestEncodingTypes, encryptionKey: PublicKey): ContestMap<OpenableEnvelope> {
-    const response = {}
 
-    Object.keys(contestSelections).forEach(function(contestId) {
-      const { cryptogram, randomness } = Crypto.encryptVote(
-        contestEncodingTypes[contestId],
-        contestSelections[contestId],
-        emptyCryptograms[contestId],
-        encryptionKey
-      );
+const encrypt = (contestSelections, emptyCryptograms, contestEncodingTypes, encryptionKey: PublicKey): ContestMap<OpenableEnvelope> => {
+  const response = {}
 
-      response[contestId] = { cryptogram, randomness }
-    })
+  Object.keys(contestSelections).forEach(function(contestId) {
+    const { cryptogram, randomness } = Crypto.encryptVote(
+      contestEncodingTypes[contestId],
+      contestSelections[contestId],
+      emptyCryptograms[contestId],
+      encryptionKey
+    );
 
-    return response;
-  }
+    response[contestId] = { cryptogram, randomness }
+  })
 
-  generateTestCode(): BigNum {
-    return Crypto.generateRandomNumber()
-  }
+  return response;
+}
 
-  fingerprint(cryptograms: ContestMap<Cryptogram>) {
-    const string = JSON.stringify(cryptograms)
+const generateTestCode = (): BigNum => {
+  return Crypto.generateRandomNumber()
+}
 
-    return Crypto.hashString(string)
-  }
+const fingerprint = (cryptograms: ContestMap<Cryptogram>) => {
+  const string = JSON.stringify(cryptograms)
+
+  return Crypto.hashString(string)
+}
+
+export default {
+  encrypt,
+  generateTestCode,
+  fingerprint
 }
 
 type PublicKey = string;

@@ -35,3 +35,45 @@ export interface SealedEnvelope {
   cryptogram: string
   proof: string
 }
+
+export interface Ballot {
+  id: number;
+  vote_encoding_type: number;
+  title: LocalString;
+  description: LocalString;
+  options: Option[];
+  write_in: boolean;
+  //...
+}
+
+export interface Option {
+  id: number;
+  handle: string;
+  title: LocalString;
+  subtitle: LocalString;
+  description: LocalString;
+}
+
+export interface LocalString {
+  [locale: string]: string;
+}
+
+export interface Election {
+  enabled: boolean;
+  id: number;
+  title: LocalString;
+  subtitle: LocalString;
+  description: LocalString;
+  //...
+}
+
+/**
+ * Example of a cvr:
+ * ```javascript
+ * {
+ *    '1': 'option1',
+ *    '2': 'optiona'
+ * }
+ * ```
+ */
+ export type CastVoteRecord = ContestMap<string>

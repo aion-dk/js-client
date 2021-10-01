@@ -1,6 +1,6 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig } from './av_client/election_config';
-import { ContestMap, OpenableEnvelope, EmptyCryptogram } from './av_client/types'
+import { ContestMap, OpenableEnvelope, EmptyCryptogram, Ballot } from './av_client/types'
 import AuthenticateWithCodes from './av_client/authenticate_with_codes';
 import { registerVoter } from './av_client/register_voter';
 import EncryptVotes from './av_client/encrypt_votes';
@@ -9,7 +9,8 @@ import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
-import { KeyPair } from './av_client/types';
+import { KeyPair, CastVoteRecord } from './av_client/types';
+import { validateCvr } from './av_client/cvr_validation';
 
 /** @internal */
 export const sjcl = require('./av_client/sjcl');
@@ -245,17 +246,12 @@ export class AVClient {
       throw new InvalidStateError('Cannot construct ballot cryptograms. Voter registration not completed successfully')
     }
 
-    if (JSON.stringify(Object.keys(cvr).map(k => parseInt(k))) !== JSON.stringify(this.contestIds)) {
-      throw new Error('Corrupt CVR: Contains invalid contest');
-    }
-
     const contests = this.getElectionConfig().ballots
-    const valid_contest_selections = Object.keys(cvr).every(function(contestId) {
-      const contest = contests.find(b => b.id.toString() == contestId)
-      return contest && contest.options.some(o => o.handle == cvr[contestId])
-    })
-    if (!valid_contest_selections) {
-      throw new Error('Corrupt CVR: Contains invalid option');
+
+    switch(validateCvr(cvr, contests)) {
+      case ":invalid_contest": throw new Error('Corrupt CVR: Contains invalid contest');
+      case ":invalid_option": throw new Error('Corrupt CVR: Contains invalid option');
+      case ":okay":
     }
 
     const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].empty_cryptogram ]))
@@ -265,16 +261,16 @@ export class AVClient {
       return [contestId, contest!.vote_encoding_type];
     }))
 
-    const encryptionResponse = new EncryptVotes().encrypt(
+    const envelopes = EncryptVotes.encrypt(
       cvr,
       emptyCryptograms,
       contestEncodingTypes,
       this.electionEncryptionKey()
     );
 
-    this.voteEncryptions = encryptionResponse
+    const trackingCode = EncryptVotes.fingerprint(this.extractCryptograms(envelopes));
 
-    const trackingCode = new EncryptVotes().fingerprint(this.cryptogramsForConfirmation());
+    this.voteEncryptions = envelopes
 
     return trackingCode;
   }
@@ -293,7 +289,7 @@ export class AVClient {
    * ```
    */
   public generateTestCode(): void {
-    this.testCode = new EncryptVotes().generateTestCode()
+    this.testCode = EncryptVotes.generateTestCode()
   }
 
   /**
@@ -387,16 +383,11 @@ export class AVClient {
 
   /**
    * Returns data for rendering the list of cryptograms of the ballot
+   * @param Map of openable envelopes with cryptograms
    * @return Object containing a cryptogram for each contest
    */
-  private cryptogramsForConfirmation(): ContestMap<Cryptogram> {
-    const cryptograms = {}
-    const voteEncryptions = this.voteEncryptions
-    this.contestIds.forEach(function (id) {
-      cryptograms[id.toString()] = voteEncryptions[id].cryptogram
-    })
-
-    return cryptograms
+  private extractCryptograms(envelopes: ContestMap<OpenableEnvelope>): ContestMap<Cryptogram> {
+    return Object.fromEntries(Object.keys(envelopes).map(contestId =>  [contestId, envelopes[contestId].cryptogram ]))
   }
 
 
@@ -461,17 +452,6 @@ export type Receipt = {
   serverSignature: string;
   voteSubmissionId: number;
 };
-
-/**
- * Example of a cvr:
- * ```javascript
- * {
- *    '1': 'option1',
- *    '2': 'optiona'
- * }
- * ```
- */
-export type CastVoteRecord = ContestMap<string>
 
 /**
  * For now, we assume it is just a string.
