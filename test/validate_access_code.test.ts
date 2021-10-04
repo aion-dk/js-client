@@ -69,7 +69,7 @@ describe('AVClient#validateAccessCode', () => {
     it('fails given invalid OTP', async () => {
       expectedNetworkRequests.push(
         nock('http://localhost:1111/').post('/authorize')
-          .replyWithFile(403, __dirname + '/replies/otp_provider_authorize.invalid.json'),
+          .reply(403, { errorCode: 'OTP_DOES_NOT_MATCH' })
       );
 
       const otp = '0000';
@@ -90,7 +90,7 @@ describe('AVClient#validateAccessCode', () => {
     it('fails given expired OTP', async function(){
       expectedNetworkRequests.push(
         nock('http://localhost:1111/').post('/authorize')
-          .replyWithFile(403, __dirname + '/replies/otp_provider_authorize.expired.json'),
+          .reply(403, { errorCode: 'OTP_SESSION_TIMED_OUT' })
       );
 
       const otp = '1234';
@@ -135,10 +135,10 @@ describe('AVClient#validateAccessCode', () => {
       expectedNetworkRequests.forEach((mock) => mock.done());
     });
 
-    it('fails if the server returns unsupported error response', async function(){
+    it('fails if the server returns unsupported 403 response', async function(){
       expectedNetworkRequests.push(
         nock('http://localhost:1111/').post('/authorize')
-          .reply(403, { error: 'some yet unsupported error message' })
+          .reply(403, { garbage: 'nonsense' })
       );
 
       const otp = '1234';
@@ -152,7 +152,7 @@ describe('AVClient#validateAccessCode', () => {
         },
         (error) => {
           expect(error).to.be.an.instanceof(UnsupportedServerReplyError);
-          expect(error.message).to.equal('Unsupported server error: some yet unsupported error message')
+          expect(error.message).to.equal('Unsupported server error message: {"garbage":"nonsense"}')
         }
       );
 

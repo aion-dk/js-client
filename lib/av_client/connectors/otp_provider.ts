@@ -26,14 +26,21 @@ export class OTPProvider {
 
         // If we get errors from the provider, we wrap in custom errors
         if (response && response.status === 403 && response.data) {
-          if (!response.data.error) {
+          if (!response.data.errorCode) {
             throw new UnsupportedServerReplyError(`Unsupported server error message: ${JSON.stringify(error.response.data)}`)
           }
-          const errorMessage = response.data.error;
-          switch(errorMessage) {
-            case 'expired': throw new AccessCodeExpired('OTP code expired'); break;
-            case 'invalid': throw new AccessCodeInvalid('OTP code invalid'); break;
-            default: throw new UnsupportedServerReplyError(`Unsupported server error: ${errorMessage}`);
+
+          const errorCode = response.data.errorCode;
+          const errorMessage = response.data.errorMessage;
+
+          switch(errorCode) {
+            case 'OTP_SESSION_TIMED_OUT':
+              throw new AccessCodeExpired('OTP code expired');
+            case 'OTP_DOES_NOT_MATCH':
+            case 'EMAIL_DOES_NOT_MATCH_LIVE_SESSION':
+              throw new AccessCodeInvalid('OTP code invalid');
+            default:
+              throw new UnsupportedServerReplyError(`Unsupported server error: ${errorMessage}`);
           }
         }
 
