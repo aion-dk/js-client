@@ -7,7 +7,7 @@ describe('AVClient#getAuthorizationMethod', function() {
 
   beforeEach(async function() {
     client = new AVClient('http://localhost:3000/test/app');
-    let electionConfig = require('./replies/config.valid.json');
+    let electionConfig = require('./replies/otp_flow/get_test_app_config.json');
     await client.initialize(electionConfig)
   });
 
@@ -38,7 +38,7 @@ describe('AVClient#getAuthorizationMethod', function() {
 
   context('election config value for authorization mode is not available', function() {
     it('returns an error', async function() {
-      let electionConfig = require('./replies/config.valid.json')
+      let electionConfig = require('./replies/otp_flow/get_test_app_config.json')
       delete electionConfig['authorizationMode']
 
       await client.initialize(electionConfig)

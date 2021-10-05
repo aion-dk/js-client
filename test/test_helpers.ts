@@ -1,3 +1,6 @@
+const fs = require('fs');
+import nock = require('nock');
+
 export function deterministicRandomWords(nwords, _paranoia) {
   const lowestValidNumber = -2147483648;
   const highestValidNumber = 2147483647;
@@ -19,6 +22,12 @@ export function deterministicRandomWords(nwords, _paranoia) {
   return output
 }
 
+export function readJSON(path) {
+  const data = fs.readFileSync(require.resolve(path));
+  const json = JSON.parse(data);
+  return json;
+}
+
 export function resetDeterministicOffset() {
   global.deterministicOffset = 0;
 }
@@ -27,9 +36,6 @@ export function resetDeterministicOffset() {
 export function deterministicMathRandom() {
   return 0.42
 }
-
-import nock = require('nock');
-const fs = require('fs');
 
 export async function recordResponses(callback) {
   setupRecording();

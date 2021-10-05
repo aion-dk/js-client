@@ -1,5 +1,6 @@
 import { BulletinBoard } from "./connectors/bulletin_board";
 import { Ballot, Election } from "./types";
+import { InvalidConfigError } from "./errors";
 
 export interface ElectionConfig {
   app_url: string;
@@ -46,4 +47,25 @@ export async function fetchElectionConfig(bulletinBoard: BulletinBoard): Promise
 
         return configData;
       });
+}
+
+export function validateElectionConfig(config) {
+  const errors : string[] = [];
+  if (!containsOTPProviderURL(config)) {
+    errors.push("Configuration is missing OTP Provider URL")
+  }
+  if (!containsVoterAuthorizerURL(config)) {
+    errors.push("Configuration is missing Voter Authorizer URL")
+  }
+
+  if (errors.length == 0) return;
+  throw new InvalidConfigError(`Received invalid election configuration. Errors: ${errors.join(",\n")}`)
+}
+
+function containsOTPProviderURL(config) {
+  return config?.services?.otp_provider?.url?.length > 0;
+}
+
+function containsVoterAuthorizerURL(config) {
+  return config?.services?.voter_authorizer?.url?.length > 0;
 }
