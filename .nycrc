@@ -3,8 +3,10 @@
   "all": true,
   "exclude": [
     "dist/*",
+    "docs/*",
     "html_docs/*",
     "typedoc-wide-theme/*",
-    "test/*"
+    "test/*",
+    "lib/av_client/sjcl.js"
   ]
 }
