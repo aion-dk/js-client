@@ -18,7 +18,7 @@ describe('AVClient#authenticateWithCodes', function() {
     resetDeterministicOffset();
 
     nock('http://localhost:3000/').get('/test/app/config')
-      .replyWithFile(200, __dirname + '/replies/config.valid.json');
+      .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
 
     client = new AVClient('http://localhost:3000/test/app');
     await client.initialize()

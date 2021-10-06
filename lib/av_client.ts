@@ -1,5 +1,5 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
-import { fetchElectionConfig, ElectionConfig } from './av_client/election_config';
+import { fetchElectionConfig, ElectionConfig, validateElectionConfig } from './av_client/election_config';
 import { ContestMap, OpenableEnvelope, EmptyCryptogram, Ballot } from './av_client/types'
 import AuthenticateWithCodes from './av_client/authenticate_with_codes';
 import { registerVoter } from './av_client/register_voter';
@@ -75,10 +75,12 @@ export class AVClient {
   async initialize(electionConfig: ElectionConfig): Promise<void>
   async initialize(): Promise<void>
   public async initialize(electionConfig?: ElectionConfig): Promise<void> {
-    if( electionConfig )
-      this.electionConfig = electionConfig
-    else
-      this.electionConfig = await fetchElectionConfig(this.bulletinBoard);
+    if (!electionConfig) {
+      electionConfig = await fetchElectionConfig(this.bulletinBoard);
+    }
+
+    validateElectionConfig(electionConfig);
+    this.electionConfig = electionConfig;
   }
 
   /**
