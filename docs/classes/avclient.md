@@ -13,8 +13,10 @@ The API is responsible for handling all the cryptographic operations and all net
 
 |Method                                                                    | Description |
 -------------------------------------------------------------------------- | ---
+|[initialize](AVClient.md#initialize)                                 | Initializes the library by fetching election configuration |
 |[requestAccessCode](AVClient.md#requestaccesscode)                   | Initiates the authorization process, in case voter has not authorized yet. Requests access code to be sent to voter email |
 |[validateAccessCode](AVClient.md#validateaccesscode)                 | Gets voter authorized to vote. |
+|[registerVoter](AVClient.md#registervoter)                           | Registers the voter on the bulletin board |
 |[constructBallotCryptograms](AVClient.md#constructballotcryptograms) | Constructs voter ballot cryptograms. |
 |[spoilBallotCryptograms](AVClient.md#spoilballotcryptograms)         | Optional. Initiates process of testing the ballot encryption. |
 |[submitBallotCryptograms](AVClient.md#submitballotcryptograms)       | Finalizes the voting process. |
@@ -23,44 +25,7 @@ The API is responsible for handling all the cryptographic operations and all net
 ## Example walkthrough test
 
 ```typescript
-import { AVClient } from '../lib/av_client';
-import { expect } from 'chai';
-import { readmeTestSetup, readmeTestTeardown } from './readme_example_helper';
-
-describe('entire voter flow using OTP authorization', () => {
-  beforeEach(() => readmeTestSetup());
-  afterEach(() => readmeTestTeardown());
-
-  it('returns a receipt', async () => {
-    const client = new AVClient('http://localhost:3000/test/app');
-    await client.initialize()
-
-    await client.requestAccessCode('123', 'us-voter-123@aion.dk');
-
-    // ... voter receives email with access code (OTP code) ...
-
-    await client.validateAccessCode('1234');
-
-    await client.registerVoter()
-
-    const cvr = { '1': 'option1', '2': 'optiona' };
-    const trackingCode  = await client.constructBallotCryptograms(cvr);
-    expect(trackingCode.length).to.eq(64);
-
-    const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
-    const receipt = await client.submitBallotCryptograms(affidavit);
-    expect(receipt).to.have.keys(
-      'boardHash',
-      'previousBoardHash',
-      'registeredAt',
-      'serverSignature',
-      'voteSubmissionId'
-    )
-    expect(receipt.previousBoardHash).to.eql('b8c006ae94b5f98d684317beaf4784938fc6cf2921d856cc3c8416ea4b510a30')
-    expect(receipt.registeredAt).to.eql('2020-03-01T10:00:00.000+01:00')
-    expect(receipt.voteSubmissionId).to.eql(7)
-  });
-});
+[[include:readme_example.test.ts]]
 ```
 
 ## Table of contents
@@ -109,7 +74,7 @@ If no config is provided, it fetches one from the backend.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `electionConfig` | `ElectionConfig` | override election config object |
+| `electionConfig` | `ElectionConfig` | Allows injection of an election configuration for testing purposes |
 
 #### Returns
 
@@ -234,7 +199,7 @@ or [submitBallotCryptograms](AVClient.md#submitballotcryptograms).
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `cvr` | [`CastVoteRecord`](../modules.md#castvoterecord) | Object containing the selections for each contest.<br>TODO: needs better specification. |
+| `cvr` | `CastVoteRecord` | Object containing the selections for each contest.<br>TODO: needs better specification. |
 
 #### Returns
 
