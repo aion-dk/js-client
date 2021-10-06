@@ -27,7 +27,7 @@ npm run tdd
 To generate HTML documentation for external usage:
 
 ```
-npm run html_docs
+npm run docs
 ```
 
 ## Sequence of client method calls, when everything works, and voter does not test encryption
