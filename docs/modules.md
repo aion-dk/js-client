@@ -11,7 +11,6 @@
 ### Type aliases
 
 - [Receipt](modules.md#receipt)
-- [CastVoteRecord](modules.md#castvoterecord)
 - [Affidavit](modules.md#affidavit)
 
 ## Type aliases
@@ -40,20 +39,6 @@ Example of a receipt:
 | `registeredAt` | `string` |
 | `serverSignature` | `string` |
 | `voteSubmissionId` | `number` |
-
-___
-
-### CastVoteRecord
-
-Ƭ **CastVoteRecord**: `ContestIndexed`<`string`\>
-
-Example of a cvr:
-```javascript
-{
-   '1': 'option1',
-   '2': 'optiona'
-}
-```
 
 ___
 
