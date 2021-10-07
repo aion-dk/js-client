@@ -1,6 +1,6 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig, validateElectionConfig } from './av_client/election_config';
-import { ContestMap, OpenableEnvelope, EmptyCryptogram, Ballot } from './av_client/types'
+import { ContestMap, OpenableEnvelope, EmptyCryptogram, BallotBoxReceipt } from './av_client/types'
 import AuthenticateWithCodes from './av_client/authenticate_with_codes';
 import { registerVoter } from './av_client/register_voter';
 import EncryptVotes from './av_client/encrypt_votes';
@@ -347,7 +347,7 @@ export class AVClient {
    * ```
    * @throws NetworkError if any request failed to get a response
    */
-  public async submitBallotCryptograms(affidavit: Affidavit): Promise<Receipt> {
+  public async submitBallotCryptograms(affidavit: Affidavit): Promise<BallotBoxReceipt> {
     if(!(this.voterIdentifier || this.voteEncryptions)) {
       throw new InvalidStateError('Cannot submit cryptograms. Voter identity unknown or no open envelopes')
     }
@@ -435,24 +435,4 @@ type AffidavitConfig = {
   encryptionKey: string;
 }
 
-/**
- * Example of a receipt:
- * ```javascript
- * {
- *    previousBoardHash: 'd8d9742271592d1b212bbd4cbbbe357aef8e00cdbdf312df95e9cf9a1a921465',
- *    boardHash: '5a9175c2b3617298d78be7d0244a68f34bc8b2a37061bb4d3fdf97edc1424098',
- *    registeredAt: '2020-03-01T10:00:00.000+01:00',
- *    serverSignature: 'dbcce518142b8740a5c911f727f3c02829211a8ddfccabeb89297877e4198bc1,46826ddfccaac9ca105e39c8a2d015098479624c411b4783ca1a3600daf4e8fa',
- *    voteSubmissionId: 6
- * }
- * ```
- */
-export type Receipt = {
-  previousBoardHash: string;
-  boardHash: string;
-  registeredAt: string;
-  serverSignature: string;
-  voteSubmissionId: number;
-};
-
-export type { CastVoteRecord, Affidavit }
+export type { CastVoteRecord, Affidavit, BallotBoxReceipt }
