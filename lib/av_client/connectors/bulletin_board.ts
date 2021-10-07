@@ -1,30 +1,31 @@
-import axios, { AxiosInstance } from 'axios'
+import { ContestMap  } from '../types';
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
 
 export class BulletinBoard {
   private backend: AxiosInstance;
-  voterAuthorizationCoordinator: any;
   voterSessionUuid: string;
 
   constructor(baseURL: string, timeout = 10000) {
     this.createBackendClient(baseURL, timeout);
   }
 
-  setVoterSessionUuid(voterSessionUuid) {
+  setVoterSessionUuid(voterSessionUuid: string): void {
     this.voterSessionUuid = voterSessionUuid
   }
 
-  getElectionConfig() {
+  getElectionConfig(): Promise<AxiosResponse> {
     return this.backend.get('config');
   }
 
-  createSession(publicKey, signature) {
+  // TODO: Never used?
+  createSession(publicKey: string, signature: string) {
     return this.backend.post('sign_in', {
       public_key: publicKey,
       signature: signature
     });
   }
 
-  registerVoter(registrationToken, publicKeyToken, signature) {
+  registerVoter(registrationToken: string, publicKeyToken: string, signature: string): Promise<AxiosResponse> {
     return this.backend.post('register', {
       registration_token: registrationToken,
       public_key_token: publicKeyToken,
@@ -32,7 +33,7 @@ export class BulletinBoard {
     });
   }
 
-  challengeEmptyCryptograms(challenges) {
+  challengeEmptyCryptograms(challenges: ContestMap<string>): Promise<AxiosResponse> {
     return this.backend.post('challenge_empty_cryptograms', {
         challenges
       }, {
@@ -42,7 +43,7 @@ export class BulletinBoard {
       });
   }
 
-  getRandomizers() {
+  getRandomizers(): Promise<AxiosResponse> {
     return this.backend.post('get_randomizers', {}, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
@@ -50,7 +51,7 @@ export class BulletinBoard {
     });
   }
 
-  getCommitmentOpening(voterCommitmentOpening, encryptedBallotCryptograms) {
+  getCommitmentOpening(voterCommitmentOpening, encryptedBallotCryptograms): Promise<AxiosResponse> {
     return this.backend.post('get_commitment_opening', {
       voter_commitment_opening: voterCommitmentOpening,
       encrypted_ballot_cryptograms: encryptedBallotCryptograms
@@ -61,7 +62,7 @@ export class BulletinBoard {
     });
   }
 
-  getBoardHash() {
+  getBoardHash(): Promise<AxiosResponse> {
     return this.backend.get('get_latest_board_hash', {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
@@ -69,7 +70,7 @@ export class BulletinBoard {
     });
   }
 
-  submitVotes(contentHash, signature, cryptogramsWithProofs, encryptedAffidavit) {
+  submitVotes(contentHash: string, signature: string, cryptogramsWithProofs, encryptedAffidavit: string): Promise<AxiosResponse> {
     return this.backend.post('submit_votes', {
       content_hash: contentHash,
       encrypted_affidavit: encryptedAffidavit,
