@@ -9,7 +9,7 @@ import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
-import { KeyPair, CastVoteRecord } from './av_client/types';
+import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
 import { validateCvr } from './av_client/cvr_validation';
 
 /** @internal */
@@ -219,7 +219,7 @@ export class AVClient {
   /**
    * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
    *
-   * Encrypts a cast-vote-record (CVR) and generates vote cryptograms.
+   * Encrypts a {@link CastVoteRecord | cast-vote-record} (CVR) and generates vote cryptograms.
    *
    * Example:
    * ```javascript
@@ -234,7 +234,7 @@ export class AVClient {
    * Should be followed by either {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}
    * or {@link AVClient.submitBallotCryptograms | submitBallotCryptograms}.
    *
-   * @param   cvr Object containing the selections for each contest.<br>TODO: needs better specification.
+   * @param   cvr Object containing the selections for each contest.
    * @returns Returns the ballot tracking code. Example:
    * ```javascript
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
@@ -334,7 +334,7 @@ export class AVClient {
    * Submits encrypted ballot and the affidavit to the digital ballot box.
    *
    *
-   * @param  affidavit The affidavit document.<br>TODO: clarification of the affidavit format is still needed.
+   * @param affidavit The {@link Affidavit | affidavit} document.
    * @return Returns the vote receipt. Example of a receipt:
    * ```javascript
    * {
@@ -455,7 +455,4 @@ export type Receipt = {
   voteSubmissionId: number;
 };
 
-/**
- * For now, we assume it is just a string.
- */
-export type Affidavit = string;
+export type { CastVoteRecord, Affidavit }

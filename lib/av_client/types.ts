@@ -24,6 +24,9 @@ export interface EmptyCryptogram {
   empty_cryptogram: string;
 }
 
+/**
+ * A Base64-encoded string containing the affidavit
+ */
 export type Affidavit = string
 
 export interface OpenableEnvelope {
@@ -68,11 +71,16 @@ export interface Election {
 }
 
 /**
- * Example of a cvr:
+ * A structure that contains the choice(s) of a voter.
+ *
+ * Key is an electionId.
+ * Value is the chosen option represented by a handle-string
+ *
+ * Example of a CastVoteRecord:
  * ```javascript
  * {
  *    '1': 'option1',
- *    '2': 'optiona'
+ *    '2': 'optionA'
  * }
  * ```
  */

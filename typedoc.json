@@ -6,5 +6,6 @@
   "disableSources": true,
   "githubPages": false,
   "hideGenerator": true,
-  "sort": "source-order"
+  "sort": "source-order",
+  "exclude": "**/*.js"
 }
