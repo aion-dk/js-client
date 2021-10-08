@@ -1,11 +1,12 @@
 import { KeyPair } from './types';
+import { BulletinBoard } from './connectors/bulletin_board';
 import * as crypto from './aion_crypto'
 const Crypto = crypto();
 
 export default class AuthenticateWithCodes {
-  bulletinBoard: any;
+  private bulletinBoard: BulletinBoard;
 
-  constructor(bulletinBoard) {
+  constructor(bulletinBoard: BulletinBoard) {
     this.bulletinBoard = bulletinBoard;
   }
 
@@ -86,11 +87,6 @@ const createSession = async function(keyPair: KeyPair, electionId: number, bulle
       };
       return voterSession;
     });
-}
-
-interface BulletinBoard {
-  challengeEmptyCryptograms: (array) => Promise<boolean | string>,
-  createSession: (PublicKey, Signature) => any
 }
 
 type Signature = string;

@@ -1,8 +1,13 @@
-import { ContestMap, OpenableEnvelope } from "./types";
+import { CastVoteRecord, ContestMap, OpenableEnvelope } from "./types";
 import * as crypto from './aion_crypto'
 const Crypto = crypto();
 
-const encrypt = (contestSelections, emptyCryptograms, contestEncodingTypes, encryptionKey: PublicKey): ContestMap<OpenableEnvelope> => {
+const encrypt = (
+  contestSelections: CastVoteRecord,
+  emptyCryptograms: ContestMap<string>,
+  contestEncodingTypes: ContestMap<number>,
+  encryptionKey: string): ContestMap<OpenableEnvelope> => {
+
   const response = {}
 
   Object.keys(contestSelections).forEach(function(contestId) {
@@ -35,6 +40,5 @@ export default {
   fingerprint
 }
 
-type PublicKey = string;
 type Cryptogram = string;
 type BigNum = string;

@@ -49,7 +49,7 @@ export async function fetchElectionConfig(bulletinBoard: BulletinBoard): Promise
       });
 }
 
-export function validateElectionConfig(config) {
+export function validateElectionConfig(config: ElectionConfig): void {
   const errors : string[] = [];
   if (!containsOTPProviderURL(config)) {
     errors.push("Configuration is missing OTP Provider URL")
@@ -58,14 +58,14 @@ export function validateElectionConfig(config) {
     errors.push("Configuration is missing Voter Authorizer URL")
   }
 
-  if (errors.length == 0) return;
-  throw new InvalidConfigError(`Received invalid election configuration. Errors: ${errors.join(",\n")}`)
+  if (errors.length > 0)
+    throw new InvalidConfigError(`Received invalid election configuration. Errors: ${errors.join(",\n")}`);
 }
 
-function containsOTPProviderURL(config) {
+function containsOTPProviderURL(config: ElectionConfig) {
   return config?.services?.otp_provider?.url?.length > 0;
 }
 
-function containsVoterAuthorizerURL(config) {
+function containsVoterAuthorizerURL(config: ElectionConfig) {
   return config?.services?.voter_authorizer?.url?.length > 0;
 }
