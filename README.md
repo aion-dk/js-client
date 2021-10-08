@@ -10,6 +10,9 @@ Install directly from Github into your Javascript project.
 npm install aion-dk/js-client#v0.1.2
 ```
 
+## Documentation
+https://aion-dk.github.io/js-client/
+
 ## Testing
 
 To run tests:

@@ -1,6 +1,6 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig, validateElectionConfig } from './av_client/election_config';
-import { ContestMap, OpenableEnvelope, EmptyCryptogram, Ballot } from './av_client/types'
+import { ContestMap, OpenableEnvelope, EmptyCryptogram, BallotBoxReceipt } from './av_client/types'
 import AuthenticateWithCodes from './av_client/authenticate_with_codes';
 import { registerVoter } from './av_client/register_voter';
 import EncryptVotes from './av_client/encrypt_votes';
@@ -9,7 +9,7 @@ import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
-import { KeyPair, CastVoteRecord } from './av_client/types';
+import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
 import { validateCvr } from './av_client/cvr_validation';
 
 /** @internal */
@@ -219,7 +219,7 @@ export class AVClient {
   /**
    * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
    *
-   * Encrypts a cast-vote-record (CVR) and generates vote cryptograms.
+   * Encrypts a {@link CastVoteRecord | cast-vote-record} (CVR) and generates vote cryptograms.
    *
    * Example:
    * ```javascript
@@ -234,7 +234,7 @@ export class AVClient {
    * Should be followed by either {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}
    * or {@link AVClient.submitBallotCryptograms | submitBallotCryptograms}.
    *
-   * @param   cvr Object containing the selections for each contest.<br>TODO: needs better specification.
+   * @param   cvr Object containing the selections for each contest.
    * @returns Returns the ballot tracking code. Example:
    * ```javascript
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
@@ -334,7 +334,7 @@ export class AVClient {
    * Submits encrypted ballot and the affidavit to the digital ballot box.
    *
    *
-   * @param  affidavit The affidavit document.<br>TODO: clarification of the affidavit format is still needed.
+   * @param affidavit The {@link Affidavit | affidavit} document.
    * @return Returns the vote receipt. Example of a receipt:
    * ```javascript
    * {
@@ -347,7 +347,7 @@ export class AVClient {
    * ```
    * @throws NetworkError if any request failed to get a response
    */
-  public async submitBallotCryptograms(affidavit: Affidavit): Promise<Receipt> {
+  public async submitBallotCryptograms(affidavit: Affidavit): Promise<BallotBoxReceipt> {
     if(!(this.voterIdentifier || this.voteEncryptions)) {
       throw new InvalidStateError('Cannot submit cryptograms. Voter identity unknown or no open envelopes')
     }
@@ -435,27 +435,4 @@ type AffidavitConfig = {
   encryptionKey: string;
 }
 
-/**
- * Example of a receipt:
- * ```javascript
- * {
- *    previousBoardHash: 'd8d9742271592d1b212bbd4cbbbe357aef8e00cdbdf312df95e9cf9a1a921465',
- *    boardHash: '5a9175c2b3617298d78be7d0244a68f34bc8b2a37061bb4d3fdf97edc1424098',
- *    registeredAt: '2020-03-01T10:00:00.000+01:00',
- *    serverSignature: 'dbcce518142b8740a5c911f727f3c02829211a8ddfccabeb89297877e4198bc1,46826ddfccaac9ca105e39c8a2d015098479624c411b4783ca1a3600daf4e8fa',
- *    voteSubmissionId: 6
- * }
- * ```
- */
-export type Receipt = {
-  previousBoardHash: string;
-  boardHash: string;
-  registeredAt: string;
-  serverSignature: string;
-  voteSubmissionId: number;
-};
-
-/**
- * For now, we assume it is just a string.
- */
-export type Affidavit = string;
+export type { CastVoteRecord, Affidavit, BallotBoxReceipt }

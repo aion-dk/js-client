@@ -24,6 +24,9 @@ export interface EmptyCryptogram {
   empty_cryptogram: string;
 }
 
+/**
+ * A Base64-encoded string containing the affidavit
+ */
 export type Affidavit = string
 
 export interface OpenableEnvelope {
@@ -68,12 +71,40 @@ export interface Election {
 }
 
 /**
- * Example of a cvr:
+ * A structure that contains the choice(s) of a voter.
+ *
+ * Key is an electionId.
+ * Value is the chosen option represented by a handle-string
+ *
+ * Example of a CastVoteRecord:
  * ```javascript
  * {
  *    '1': 'option1',
- *    '2': 'optiona'
+ *    '2': 'optionA'
  * }
  * ```
  */
  export type CastVoteRecord = ContestMap<string>
+
+ /**
+ * Example of a receipt:
+ * ```javascript
+ * {
+ *    previousBoardHash: 'd8d9742271592d1b212bbd4cbbbe357aef8e00cdbdf312df95e9cf9a1a921465',
+ *    boardHash: '5a9175c2b3617298d78be7d0244a68f34bc8b2a37061bb4d3fdf97edc1424098',
+ *    registeredAt: '2020-03-01T10:00:00.000+01:00',
+ *    serverSignature: 'dbcce518142b8740a5c911f727f3c02829211a8ddfccabeb89297877e4198bc1,46826ddfccaac9ca105e39c8a2d015098479624c411b4783ca1a3600daf4e8fa',
+ *    voteSubmissionId: 6
+ * }
+ * ```
+ */
+ export type BallotBoxReceipt = {
+  previousBoardHash: HashValue
+  boardHash: HashValue
+  registeredAt: string
+  serverSignature: Signature
+  voteSubmissionId: any
+}
+
+type Signature = string;
+type HashValue = string;

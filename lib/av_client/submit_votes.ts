@@ -1,7 +1,6 @@
-import { ContestMap, OpenableEnvelope } from './types'
+import { ContestMap, OpenableEnvelope, Affidavit, BallotBoxReceipt } from './types'
 import { AcknowledgedBoardHash, signVotes, sealEnvelopes, assertValidReceipt, encryptAES, fingerprint } from './sign'
-
-type Affidavit = string
+import { BulletinBoard } from './connectors/bulletin_board'
 
 type SignAndSubmitArguments = {
   voterIdentifier: string;
@@ -15,14 +14,6 @@ type SignAndSubmitArguments = {
 type AffidavitConfig = {
   curve: string;
   encryptionKey: string;
-}
-
-interface BallotBoxReceipt {
-  previousBoardHash: HashValue
-  boardHash: HashValue
-  registeredAt: string
-  serverSignature: Signature
-  voteSubmissionId: any
 }
 
 export default class SubmitVotes {
@@ -92,10 +83,10 @@ export default class SubmitVotes {
   }
 }
 
-interface BulletinBoard {
-  getBoardHash: () => any;
-  submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestMap<CryptogramWithProof>, encryptedAffidavit: HashValue) => any
-}
+// interface BulletinBoard {
+//   getBoardHash: () => any;
+//   submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestMap<CryptogramWithProof>, encryptedAffidavit: HashValue) => any
+// }
 
 type CryptogramWithProof = {
   cryptogram: Cryptogram;
@@ -104,5 +95,3 @@ type CryptogramWithProof = {
 
 type Proof = string
 type Cryptogram = string
-type Signature = string;
-type HashValue = string;
