@@ -74,29 +74,6 @@ describe('AVClient#validateAccessCode', () => {
     })
   });
 
-  context('wrong OTP', () => {
-    it('return an error message', async () => {
-      expectedNetworkRequests.push(
-        nock(OTPProviderHost).post('/authorize')
-          .reply(403, { errorCode: 'OTP_DOES_NOT_MATCH' })
-      );
-
-      const otp = '0000';
-      const email = 'blabla@aion.dk';
-
-      await client.requestAccessCode('voter123', email);
-
-      return client.validateAccessCode(otp).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error).to.be.an.instanceof(AccessCodeInvalid)
-          expect(error.message).to.equal('OTP code invalid')
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
-      )
-    });
-  });
-
   context('expired OTP', () => {
     it('fails given expired OTP', async () => {
       expectedNetworkRequests.push(
@@ -110,9 +87,7 @@ describe('AVClient#validateAccessCode', () => {
       await client.requestAccessCode('voter123', email);
 
       return client.validateAccessCode(otp).then(
-        () => {
-          expect.fail('Expected promise to be rejected')
-        },
+        () => expect.fail('Expected promise to be rejected'),
         (error) => {
           expect(error).to.be.an.instanceof(AccessCodeExpired);
           expect(error.message).to.equal('OTP code expired')
@@ -143,138 +118,13 @@ describe('AVClient#validateAccessCode', () => {
       await client.requestAccessCode('voter123', email);
       const result = await client.validateAccessCode(otp);
       return client.registerVoter().then(
-        () => {
-          expect.fail('Expected promise to be rejected')
-        },
+        () => expect.fail('Expected promise to be rejected'),
         (error) => {
           expect(error).to.be.an.instanceof(Error);
           expect(error.message).to.equal('Request failed with status code 404');
           expectedNetworkRequests.forEach((mock) => mock.done());
         }
       )
-    })
-  });
-
-  context('OTP Provider returns an unsupported error message', async () => {
-    it('returns an error message', async () => {
-      expectedNetworkRequests.push(
-        nock(OTPProviderHost).post('/authorize')
-          .reply(403, { garbage: 'nonsense' })
-      );
-
-      const otp = '1234';
-      const email = 'blabla@aion.dk';
-
-      await client.requestAccessCode('voter123', email);
-
-      return client.validateAccessCode(otp).then(
-        () => {
-          expect.fail('Expected promise to be rejected')
-        },
-        (error) => {
-          expect(error).to.be.an.instanceof(UnsupportedServerReplyError);
-          expect(error.message).to.equal('Unsupported OTP Provider error message: {"garbage":"nonsense"}')
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
-      );
-    });
-  });
-
-  context('OTP Provider returns an unsupported error code', async () => {
-    it('returns an error message', async () => {
-      expectedNetworkRequests.push(
-        nock(OTPProviderHost).post('/authorize')
-          .reply(403, { errorCode: 'UNKNOWN_ERROR_CODE', errorMessage: 'Not supported yet' })
-      );
-
-      const otp = '1234';
-      const email = 'blabla@aion.dk';
-
-      await client.requestAccessCode('voter123', email);
-
-      return client.validateAccessCode(otp).then(
-        () => {
-          expect.fail('Expected promise to be rejected')
-        },
-        (error) => {
-          expect(error).to.be.an.instanceof(UnsupportedServerReplyError);
-          expect(error.message).to.equal('Unsupported OTP Provider error message: Not supported yet')
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
-      );
-    });
-  });
-
-  context('OTP Provider routing changed', async () => {
-    it('returns an error message', async () => {
-      expectedNetworkRequests.push(
-        nock(OTPProviderHost).post('/authorize')
-          .reply(404)
-      );
-
-      const otp = '1234';
-      const email = 'blabla@aion.dk';
-
-      await client.requestAccessCode('voter123', email);
-
-      return client.validateAccessCode(otp).then(
-        () => {
-          expect.fail('Expected promise to be rejected')
-        },
-        (error) => {
-          expect(error.message).to.equal('Request failed with status code 404');
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
-      );
-    });
-  });
-
-  context('OTP Provider connection timeout', function() {
-    it('returns network error', async function () {
-      expectedNetworkRequests.push(
-        nock(OTPProviderHost).post('/authorize')
-          .replyWithError({code: 'ETIMEDOUT'})
-      );
-
-      const otp = '1234';
-      
-      await client.requestAccessCode('voter123', 'blabla@aion.dk');
-
-      
-      return client.validateAccessCode(otp).then(
-        () => {
-          expect.fail('Expected promise to be rejected')
-        },
-        (error) => {
-          expect(error).to.be.an.instanceof(NetworkError);
-          expect(error.message).to.equal('Network error. Could not connect to OTP Provider.')
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
-      );
-    });
-  });
-
-  context('OTP Provider host unavailable', function() {
-    it('returns network error', async function(){
-      const otp = '1234';
-      const email = 'blabla@aion.dk'
-
-      let configWithBadURL = client.getElectionConfig();
-      configWithBadURL.services.otp_provider.url = 'http://sdguet432t4tjsdjf.does-not-exist';
-      await client.initialize(configWithBadURL);
-
-      await client.requestAccessCode('voter123', 'blabla@aion.dk');
-
-      return client.validateAccessCode(otp).then(
-        () => {
-          expect.fail('Expected promise to be rejected')
-        },
-        (error) => {
-          expect(error).to.be.an.instanceof(NetworkError);
-          expect(error.message).to.equal('Network error. Could not connect to OTP Provider.')
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
-      );
     })
   });
 });
