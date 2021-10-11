@@ -1,9 +1,10 @@
+import { expect } from 'chai';
+import nock = require('nock');
+const fs = require('fs');
+
 export const bulletinBoardHost = 'http://localhost:3000/';
 export const OTPProviderHost = 'http://localhost:1111/';
 export const voterAuthorizerHost = 'http://localhost:1234/';
-
-const fs = require('fs');
-import nock = require('nock');
 
 export function deterministicRandomWords(nwords, _paranoia) {
   const lowestValidNumber = -2147483648;
@@ -49,6 +50,15 @@ export async function recordResponses(callback) {
   stopRecording();
   saveFiles();
   cleanup();
+}
+
+export async function expectError(promise: Promise<any>, errorType: any, message: string) {
+  promise
+    .then(() => expect.fail('Expected promise to be rejected'))
+    .catch(error => {
+      expect(error).to.be.an.instanceof(errorType);
+      expect(error.message).to.equal(message);
+    })
 }
 
 function setupRecording() {
