@@ -1,3 +1,7 @@
+export const bulletinBoardHost = 'http://localhost:3000/';
+export const OTPProviderHost = 'http://localhost:1111/';
+export const voterAuthorizerHost = 'http://localhost:1234/';
+
 const fs = require('fs');
 import nock = require('nock');
 

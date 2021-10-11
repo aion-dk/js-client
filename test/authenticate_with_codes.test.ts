@@ -1,7 +1,12 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
+import {
+  deterministicRandomWords,
+  deterministicMathRandom,
+  resetDeterministicOffset,
+  bulletinBoardHost
+} from './test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
@@ -17,7 +22,7 @@ describe('AVClient#authenticateWithCodes', function() {
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
     resetDeterministicOffset();
 
-    nock('http://localhost:3000/').get('/test/app/config')
+    nock(bulletinBoardHost).get('/test/app/config')
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
 
     client = new AVClient('http://localhost:3000/test/app');
@@ -31,9 +36,9 @@ describe('AVClient#authenticateWithCodes', function() {
 
   context('given valid election codes', function() {
     beforeEach(() => {
-      nock('http://localhost:3000/').post('/test/app/sign_in')
+      nock(bulletinBoardHost).post('/test/app/sign_in')
         .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
-      nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
+      nock(bulletinBoardHost).post('/test/app/challenge_empty_cryptograms')
         .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
     });
 
@@ -46,7 +51,7 @@ describe('AVClient#authenticateWithCodes', function() {
 
   context('given invalid election codes', function() {
     beforeEach(function() {
-      nock('http://localhost:3000/').post('/test/app/sign_in')
+      nock(bulletinBoardHost).post('/test/app/sign_in')
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_3.json');
     });
 

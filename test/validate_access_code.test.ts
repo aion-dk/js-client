@@ -1,7 +1,14 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
+import {
+  deterministicRandomWords,
+  deterministicMathRandom,
+  resetDeterministicOffset,
+  bulletinBoardHost,
+  OTPProviderHost,
+  voterAuthorizerHost
+} from './test_helpers';
 import sinon = require('sinon');
 import { AccessCodeExpired, AccessCodeInvalid, BulletinBoardError, NetworkError, UnsupportedServerReplyError } from '../lib/av_client/errors';
 
@@ -19,11 +26,11 @@ describe('AVClient#validateAccessCode', () => {
     resetDeterministicOffset();
 
     expectedNetworkRequests.push(
-      nock('http://localhost:3000/').get('/test/app/config')
+      nock(bulletinBoardHost).get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json')
     );
     expectedNetworkRequests.push(
-      nock('http://localhost:1234/').post('/create_session')
+      nock(voterAuthorizerHost).post('/create_session')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json')
     );
 
@@ -39,19 +46,19 @@ describe('AVClient#validateAccessCode', () => {
   context('OTP services & Bulletin Board work as expected', () => {
     it('resolves without errors', async () => {
       expectedNetworkRequests.push(
-        nock('http://localhost:1111/').post('/authorize')
+        nock(OTPProviderHost).post('/authorize')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json')
       );
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/request_authorization')
+        nock(voterAuthorizerHost).post('/request_authorization')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
-        nock('http://localhost:3000/').post('/test/app/register')
+        nock(bulletinBoardHost).post('/test/app/register')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_register.json')
       );
       expectedNetworkRequests.push(
-        nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
+        nock(bulletinBoardHost).post('/test/app/challenge_empty_cryptograms')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_challenge_empty_cryptograms.json')
       );
 
@@ -70,7 +77,7 @@ describe('AVClient#validateAccessCode', () => {
   context('wrong OTP', () => {
     it('return an error message', async () => {
       expectedNetworkRequests.push(
-        nock('http://localhost:1111/').post('/authorize')
+        nock(OTPProviderHost).post('/authorize')
           .reply(403, { errorCode: 'OTP_DOES_NOT_MATCH' })
       );
 
@@ -93,7 +100,7 @@ describe('AVClient#validateAccessCode', () => {
   context('expired OTP', () => {
     it('fails given expired OTP', async () => {
       expectedNetworkRequests.push(
-        nock('http://localhost:1111/').post('/authorize')
+        nock(OTPProviderHost).post('/authorize')
           .reply(403, { errorCode: 'OTP_SESSION_TIMED_OUT' })
       );
 
@@ -118,15 +125,15 @@ describe('AVClient#validateAccessCode', () => {
   context('OTP services work, public key already registered on Bulletin Board', () => {
     it('returns an error', async () => {
       expectedNetworkRequests.push(
-        nock('http://localhost:1111/').post('/authorize')
+        nock(OTPProviderHost).post('/authorize')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json')
       );
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/request_authorization')
+        nock(voterAuthorizerHost).post('/request_authorization')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
-        nock('http://localhost:3000/').post('/test/app/register')
+        nock(bulletinBoardHost).post('/test/app/register')
           .reply(403, { error: { code: 13, description: 'Public key error' }})
       );
 
@@ -151,15 +158,15 @@ describe('AVClient#validateAccessCode', () => {
   context('OTP services work, Bulletin Board returns unknown error', () => {
     it('returns an error', async () => {
       expectedNetworkRequests.push(
-        nock('http://localhost:1111/').post('/authorize')
+        nock(OTPProviderHost).post('/authorize')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json')
       );
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/request_authorization')
+        nock(voterAuthorizerHost).post('/request_authorization')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
-        nock('http://localhost:3000/').post('/test/app/register')
+        nock(bulletinBoardHost).post('/test/app/register')
           .reply(500, { foo: 'bar' })
       );
 
@@ -184,15 +191,15 @@ describe('AVClient#validateAccessCode', () => {
   context('OTP services work, Bulletin Board becomes unreachable', () => {
     it('returns an error', async () => {
       expectedNetworkRequests.push(
-        nock('http://localhost:1111/').post('/authorize')
+        nock(OTPProviderHost).post('/authorize')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json')
       );
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/request_authorization')
+        nock(voterAuthorizerHost).post('/request_authorization')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
-        nock('http://localhost:3000/').post('/test/app/register')
+        nock(bulletinBoardHost).post('/test/app/register')
           .replyWithError('Some network error')
       );
 
@@ -217,15 +224,15 @@ describe('AVClient#validateAccessCode', () => {
   context('OTP services work, Bulletin Board routing changed', () => {
     it('returns an error', async () => {
       expectedNetworkRequests.push(
-        nock('http://localhost:1111/').post('/authorize')
+        nock(OTPProviderHost).post('/authorize')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json')
       );
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/request_authorization')
+        nock(voterAuthorizerHost).post('/request_authorization')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
-        nock('http://localhost:3000/').post('/test/app/register')
+        nock(bulletinBoardHost).post('/test/app/register')
           .reply(404)
       );
 
@@ -250,7 +257,7 @@ describe('AVClient#validateAccessCode', () => {
   context('OTP Provider returns an unsupported error message', async () => {
     it('returns an error message', async () => {
       expectedNetworkRequests.push(
-        nock('http://localhost:1111/').post('/authorize')
+        nock(OTPProviderHost).post('/authorize')
           .reply(403, { garbage: 'nonsense' })
       );
 
@@ -275,7 +282,7 @@ describe('AVClient#validateAccessCode', () => {
   context('OTP Provider returns an unsupported error code', async () => {
     it('returns an error message', async () => {
       expectedNetworkRequests.push(
-        nock('http://localhost:1111/').post('/authorize')
+        nock(OTPProviderHost).post('/authorize')
           .reply(403, { errorCode: 'UNKNOWN_ERROR_CODE', errorMessage: 'Not supported yet' })
       );
 
@@ -300,7 +307,7 @@ describe('AVClient#validateAccessCode', () => {
   context('OTP Provider routing changed', async () => {
     it('returns an error message', async () => {
       expectedNetworkRequests.push(
-        nock('http://localhost:1111/').post('/authorize')
+        nock(OTPProviderHost).post('/authorize')
           .reply(404)
       );
 
@@ -324,7 +331,7 @@ describe('AVClient#validateAccessCode', () => {
   context('OTP Provider connection timeout', function() {
     it('returns network error', async function () {
       expectedNetworkRequests.push(
-        nock('http://localhost:1111/').post('/authorize')
+        nock(OTPProviderHost).post('/authorize')
           .replyWithError({code: 'ETIMEDOUT'})
       );
 

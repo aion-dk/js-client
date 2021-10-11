@@ -1,5 +1,12 @@
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
+import {
+  deterministicRandomWords,
+  deterministicMathRandom,
+  resetDeterministicOffset,
+  bulletinBoardHost,
+  OTPProviderHost,
+  voterAuthorizerHost
+} from './test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
@@ -11,21 +18,21 @@ export function readmeTestSetup() {
   sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
   resetDeterministicOffset();
 
-  nock('http://localhost:3000/').get('/test/app/config')
+  nock(bulletinBoardHost).get('/test/app/config')
     .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
-  nock('http://localhost:1234/').post('/create_session')
+  nock(voterAuthorizerHost).post('/create_session')
     .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
-  nock('http://localhost:1234/').post('/request_authorization')
+  nock(voterAuthorizerHost).post('/request_authorization')
     .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
-  nock('http://localhost:1111/').post('/authorize')
+  nock(OTPProviderHost).post('/authorize')
     .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
-  nock('http://localhost:3000/').post('/test/app/register')
+  nock(bulletinBoardHost).post('/test/app/register')
     .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_register.json');
-  nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
+  nock(bulletinBoardHost).post('/test/app/challenge_empty_cryptograms')
     .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_challenge_empty_cryptograms.json');
-  nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
+  nock(bulletinBoardHost).get('/test/app/get_latest_board_hash')
     .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_get_latest_board_hash.json');
-  nock('http://localhost:3000/').post('/test/app/submit_votes')
+  nock(bulletinBoardHost).post('/test/app/submit_votes')
     .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_submit_votes.json');
 }
 

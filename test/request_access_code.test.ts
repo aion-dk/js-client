@@ -1,7 +1,13 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
+import {
+  deterministicRandomWords,
+  deterministicMathRandom,
+  resetDeterministicOffset,
+  bulletinBoardHost,
+  voterAuthorizerHost
+} from './test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 const Crypto = require('../lib/av_client/aion_crypto.js')()
@@ -18,7 +24,7 @@ describe('AVClient#requestAccessCode', function() {
     resetDeterministicOffset();
 
     expectedNetworkRequests.push(
-      nock('http://localhost:3000/').get('/test/app/config')
+      nock(bulletinBoardHost).get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json')
     );
 
@@ -34,7 +40,7 @@ describe('AVClient#requestAccessCode', function() {
   context('Voter Authorization Coordinator & OTP Provider work', function() {
     it('resolves without errors', async function() {
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/create_session')
+        nock(voterAuthorizerHost).post('/create_session')
           .reply(200)
       );
 
@@ -54,7 +60,7 @@ describe('AVClient#requestAccessCode', function() {
   context('email does not match voter record on Voter Authorization Coordinator', function() {
     it('returns an error', async function() {
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/create_session')
+        nock(voterAuthorizerHost).post('/create_session')
           .reply(500, { error_code: 'EMAIL_DOES_NOT_MATCH_VOTER_RECORD', error_message: 'Error message from VAC.' })
       );
 
@@ -71,7 +77,7 @@ describe('AVClient#requestAccessCode', function() {
   context('Voter Authorization Coordinator is unavailable', function() {
     it('returns an error', async function() {
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/create_session')
+        nock(voterAuthorizerHost).post('/create_session')
           .replyWithError('Some network error')
       );
 
@@ -88,7 +94,7 @@ describe('AVClient#requestAccessCode', function() {
   context('Voter Authorization Coordinator fails to connect to OTP provider', function() {
     it('returns an error', async function() {
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/create_session')
+        nock(voterAuthorizerHost).post('/create_session')
           .reply(500, { error_code: 'COULD_NOT_CONNECT_TO_OTP_PROVIDER', error_message: 'Error message from VAC.' })
       );
 
@@ -105,7 +111,7 @@ describe('AVClient#requestAccessCode', function() {
   context('Voter Authorization Coordinator returns unknown error message', function() {
     it('returns an error', async function() {
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/create_session')
+        nock(voterAuthorizerHost).post('/create_session')
           .reply(403, { error_code: 'UNSUPPORTED_NOISE', error_message: 'Expect the unexpected.' })
       );
 
@@ -122,7 +128,7 @@ describe('AVClient#requestAccessCode', function() {
   context('Voter Authorization Coordinator routing changed', function() {
     it('returns an error', async function() {
       expectedNetworkRequests.push(
-        nock('http://localhost:1234/').post('/create_session')
+        nock(voterAuthorizerHost).post('/create_session')
           .reply(404)
       );
 
