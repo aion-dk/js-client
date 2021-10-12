@@ -4,7 +4,6 @@ import { ContestMap, OpenableEnvelope, EmptyCryptogram, BallotBoxReceipt } from 
 import AuthenticateWithCodes from './av_client/authenticate_with_codes';
 import { registerVoter } from './av_client/register_voter';
 import EncryptVotes from './av_client/encrypt_votes';
-import BenalohChallenge from './av_client/benaloh_challenge';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
@@ -313,21 +312,7 @@ export class AVClient {
     //  opening. Response contains server commitment openings.
     // TODO: verify the server commitment openings against server commitment and server empty cryptograms
 
-    const benaloh = new BenalohChallenge(this.bulletinBoard)
-
-    // this is part of 'offline Benaloh Challenge'
-    // const serverRandomizers = await benaloh.getServerRandomizers()
-
-    const voterCommitmentOpening = {};
-    const encryptedBallotCryptograms = {};
-    const serverCommitment = ''; // get this from the state
-    const serverEmptyCryptograms = {}; // get this from the state
-    const serverCommitmentOpening = await benaloh.getServerCommitmentOpening(voterCommitmentOpening, encryptedBallotCryptograms)
-    const valid = benaloh.verifyCommitmentOpening(serverCommitmentOpening, serverCommitment, serverEmptyCryptograms)
-
-    if (!valid) {
-      throw new Error('Server commitment did not validate')
-    }
+    throw new Error('Not implemented yet');
   }
 
   /**
