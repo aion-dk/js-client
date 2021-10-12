@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { IdentityConfirmationToken } from "./otp_provider";
 import { EmailDoesNotMatchVoterRecordError, NetworkError, UnsupportedServerReplyError } from "../errors";
 
@@ -14,7 +14,7 @@ export default class VoterAuthorizationCoordinator {
    * @param opaqueVoterId Gets 
    * @returns 
    */
-  createSession(opaqueVoterId: string, email: string): Promise<any> {
+  createSession(opaqueVoterId: string, email: string): Promise<AxiosResponse> {
     return this.backend.post('create_session', {
       opaqueVoterId: opaqueVoterId,
       email
@@ -41,7 +41,7 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
-  requestPublicKeyAuthorization(sessionId: string, identityConfirmationToken: IdentityConfirmationToken, publicKey: string){
+  requestPublicKeyAuthorization(sessionId: string, identityConfirmationToken: IdentityConfirmationToken, publicKey: string): Promise<AxiosResponse> {
     return this.backend.post('request_authorization', {
       sessionId: sessionId,
       emailConfirmationToken: identityConfirmationToken,

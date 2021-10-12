@@ -259,7 +259,9 @@ export class AVClient {
     const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].empty_cryptogram ]))
     const contestEncodingTypes = Object.fromEntries(Object.keys(cvr).map((contestId) => {
       const contest = contests.find(b => b.id.toString() == contestId)
+
       // We can use non-null assertion for contest because selections have been validated
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return [contestId, contest!.vote_encoding_type];
     }))
 

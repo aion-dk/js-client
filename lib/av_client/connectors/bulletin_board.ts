@@ -1,4 +1,4 @@
-import { ContestMap  } from '../types';
+import { ContestMap, SealedEnvelope } from '../types';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { BulletinBoardError, NetworkError, UnsupportedServerReplyError } from "../errors";
 
@@ -19,7 +19,7 @@ export class BulletinBoard {
   }
 
   // TODO: Never used?
-  createSession(publicKey: string, signature: string) {
+  createSession(publicKey: string, signature: string): Promise<AxiosResponse> {
     return this.backend.post('sign_in', {
       public_key: publicKey,
       signature: signature
@@ -70,7 +70,7 @@ export class BulletinBoard {
     });
   }
 
-  getCommitmentOpening(voterCommitmentOpening, encryptedBallotCryptograms): Promise<AxiosResponse> {
+  getCommitmentOpening(voterCommitmentOpening: ContestMap<string[]>, encryptedBallotCryptograms: ContestMap<string>): Promise<AxiosResponse> {
     return this.backend.post('get_commitment_opening', {
       voter_commitment_opening: voterCommitmentOpening,
       encrypted_ballot_cryptograms: encryptedBallotCryptograms
@@ -89,7 +89,7 @@ export class BulletinBoard {
     });
   }
 
-  submitVotes(contentHash: string, signature: string, cryptogramsWithProofs, encryptedAffidavit: string): Promise<AxiosResponse> {
+  submitVotes(contentHash: string, signature: string, cryptogramsWithProofs: ContestMap<SealedEnvelope>, encryptedAffidavit: string): Promise<AxiosResponse> {
     return this.backend.post('submit_votes', {
       content_hash: contentHash,
       encrypted_affidavit: encryptedAffidavit,
