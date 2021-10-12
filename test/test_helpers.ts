@@ -52,7 +52,7 @@ export async function recordResponses(callback) {
   cleanup();
 }
 
-export async function expectError(promise: Promise<any>, errorType: any, message: string): Promise<any> {
+export async function expectError(promise: (Promise<any>|Function), errorType: any, message: string): Promise<any> {
   if (typeof promise == 'object') { // Async promise
     return promise
       .then(() => expect.fail('Expected promise to be rejected'))
