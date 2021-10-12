@@ -1,11 +1,18 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
+import {
+  deterministicRandomWords,
+  deterministicMathRandom,
+  expectError,
+  resetDeterministicOffset,
+  bulletinBoardHost,
+  OTPProviderHost,
+  voterAuthorizerHost
+} from './test_helpers';
 import sinon = require('sinon');
 import { InvalidStateError } from '../lib/av_client/errors';
-const sjcl = require('../lib/av_client/sjcl')
-
+const sjcl = require('../lib/av_client/sjcl');
 
 describe('AVClient functions call order', () => {
   let client: AVClient;
@@ -15,58 +22,52 @@ describe('AVClient functions call order', () => {
   });
 
   it('throws an error when validateAccessCode is called first', async () => {
-    try {
-      await client.validateAccessCode('1234');
-      expect.fail('Expected an InvalidStateError, got no error');
-    } catch (e) {
-      expect(e.name).to.eql('InvalidStateError');
-      expect(e.message).to.eql('Cannot validate access code. Access code was not requested.');
-    }
+    await expectError(
+      client.validateAccessCode('1234'),
+      InvalidStateError,
+      'Cannot validate access code. Access code was not requested.'
+    );
   });
 
   it('throws an error when constructBallotCryptograms is called first', async () => {
-    try {
-      await client.constructBallotCryptograms({ '1': 'option1', '2': 'optiona' });
-      expect.fail('Expected an InvalidStateError, got no error');
-    } catch (e) {
-      expect(e.name).to.eql('InvalidStateError');
-      expect(e.message).to.eql('Cannot construct ballot cryptograms. Voter registration not completed successfully');
-    }
+    await expectError(
+      client.constructBallotCryptograms({ '1': 'option1', '2': 'optiona' }),
+      InvalidStateError,
+      'Cannot construct ballot cryptograms. Voter registration not completed successfully'
+    );
   });
 
   it('throws an error when submitBallotCryptograms is called first', async () => {
-    try {
-      await client.submitBallotCryptograms('affidavit bytes');
-      expect.fail('Expected an InvalidStateError, got no error');
-    } catch (e) {
-      expect(e.name).to.eql('InvalidStateError');
-      expect(e.message).to.eql('Cannot submit cryptograms. Voter identity unknown or no open envelopes');
-    }
+    await expectError(
+      client.submitBallotCryptograms('affidavit bytes'),
+      InvalidStateError,
+      'Cannot submit cryptograms. Voter identity unknown or no open envelopes'
+    );
   });
 
   context('submitBallotCryptograms is called directly after spoiling', () => {
     let sandbox;
 
     beforeEach(async () => {
-      nock('http://localhost:3000/').get('/test/app/config')
+      nock(bulletinBoardHost).get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
 
-      nock('http://localhost:1234/').post('/create_session')
+      nock(voterAuthorizerHost).post('/create_session')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
-      nock('http://localhost:1234/').post('/request_authorization')
+      nock(voterAuthorizerHost).post('/request_authorization')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
 
-      nock('http://localhost:1111/').post('/authorize')
+      nock(OTPProviderHost).post('/authorize')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
 
-      nock('http://localhost:3000/').post('/test/app/register')
+      nock(bulletinBoardHost).post('/test/app/register')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_register.json');
-      nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
+      nock(bulletinBoardHost).post('/test/app/challenge_empty_cryptograms')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_challenge_empty_cryptograms.json');
-      nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
+      nock(bulletinBoardHost).get('/test/app/get_latest_board_hash')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_get_latest_board_hash.json');
 
-      nock('http://localhost:3000/').post('/test/app/get_commitment_opening')
+      nock(bulletinBoardHost).post('/test/app/get_commitment_opening')
         .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
 
       client = new AVClient('http://localhost:3000/test/app');
@@ -84,12 +85,11 @@ describe('AVClient functions call order', () => {
     });
 
     it('throws an error if trying to register voter without validated OTP', async () => {
-      try {
-        await client.registerVoter();
-        throw new Error('Should have thrown InvalidStateError');
-      } catch(e) {
-        expect(e).to.be.instanceOf(InvalidStateError)
-      }
+      await expectError(
+        client.registerVoter(),
+        InvalidStateError,
+        'Cannot register voter without identity confirmation. User has not validated access code.'
+      );
     });
   });
 });

@@ -1,49 +1,68 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
-import { InvalidConfigError, InvalidStateError } from '../lib/av_client/errors'
+import {
+  expectError,
+  readJSON
+} from './test_helpers';
+import {
+  InvalidConfigError,
+  InvalidStateError
+} from '../lib/av_client/errors';
 
-describe('AVClient#getAuthorizationMethod', function() {
+describe('AVClient#getAuthorizationMethod', () => {
+  let electionConfig: any;
   let client: AVClient;
 
-  beforeEach(async function() {
+  beforeEach(() => {
+    electionConfig = readJSON('./replies/otp_flow/get_test_app_config.json');
     client = new AVClient('http://localhost:3000/test/app');
-    let electionConfig = require('./replies/otp_flow/get_test_app_config.json');
-    await client.initialize(electionConfig)
   });
 
-  context('bulletin board returns a config, mode is election codes', function() {
-    it('returns the appropriate method name', function() {
-      client.getElectionConfig().authorizationMode = 'election codes';
+  context('bulletin board returns a config, mode is election codes', () => {
+    it('returns the appropriate method name', async () => {
+      electionConfig.authorizationMode = 'election codes';
+
+      await client.initialize(electionConfig);
+
       const result = client.getAuthorizationMethod();
       expect(result.methodName).to.equal('authenticateWithCodes');
       expect(result.method).to.equal(client.authenticateWithCodes);
     });
   });
 
-  context('bulletin board returns a config, mode is OTPs', function() {
-    it('returns the appropriate method name', function() {
-      client.getElectionConfig().authorizationMode = 'otps';
+  context('bulletin board returns a config, mode is OTPs', () => {
+    it('returns the appropriate method name', async () => {
+      electionConfig.authorizationMode = 'otps';
+
+      await client.initialize(electionConfig);
+
       const result = client.getAuthorizationMethod();
       expect(result.methodName).to.equal('requestAccessCode');
       expect(result.method).to.equal(client.requestAccessCode);
-    })
+    });
   });
 
-  context('election config is not available', function() {
-    it('returns an error', function() {
-      client = new AVClient('http://localhost:3000/test/app');
-      expect(() => client.getAuthorizationMethod()).to.throw(InvalidStateError, 'No configuration loaded. Did you call initialize()?');
-    })
+  context('election config is not available', () => {
+    it('returns an error', async () => {
+      await expectError(
+        () => client.getAuthorizationMethod(),
+        InvalidStateError,
+        'No configuration loaded. Did you call initialize()?'
+      );
+    });
   });
 
-  context('election config value for authorization mode is not available', function() {
-    it('returns an error', async function() {
-      let electionConfig = require('./replies/otp_flow/get_test_app_config.json')
-      delete electionConfig['authorizationMode']
+  context('election config value for authorization mode is not available', () => {
+    it('returns an error', async () => {
+      delete electionConfig['authorizationMode'];
 
-      await client.initialize(electionConfig)
+      await client.initialize(electionConfig);
 
-      expect(() => client.getAuthorizationMethod()).to.throw(InvalidConfigError, 'Authorization method not found in election config');
-    })
+      await expectError(
+        () => client.getAuthorizationMethod(),
+        InvalidConfigError,
+        'Authorization method not found in election config'
+      );
+    });
   });
 });

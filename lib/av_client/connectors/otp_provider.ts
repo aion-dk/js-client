@@ -21,13 +21,13 @@ export class OTPProvider {
 
         // The request was made but no response was received
         if (error.request && !response) {
-          throw new NetworkError('Network error');
+          throw new NetworkError('Network error. Could not connect to OTP Provider.');
         }
 
         // If we get errors from the provider, we wrap in custom errors
         if (response && response.status === 403 && response.data) {
           if (!response.data.errorCode) {
-            throw new UnsupportedServerReplyError(`Unsupported server error message: ${JSON.stringify(error.response.data)}`)
+            throw new UnsupportedServerReplyError(`Unsupported OTP Provider error message: ${JSON.stringify(error.response.data)}`)
           }
 
           const errorCode = response.data.errorCode;
@@ -40,7 +40,7 @@ export class OTPProvider {
             case 'EMAIL_DOES_NOT_MATCH_LIVE_SESSION':
               throw new AccessCodeInvalid('OTP code invalid');
             default:
-              throw new UnsupportedServerReplyError(`Unsupported server error: ${errorMessage}`);
+              throw new UnsupportedServerReplyError(`Unsupported OTP Provider error message: ${errorMessage}`);
           }
         }
 

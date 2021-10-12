@@ -1,9 +1,17 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
-import { deterministicRandomWords, deterministicMathRandom, resetDeterministicOffset } from './test_helpers';
+import {
+  deterministicRandomWords,
+  deterministicMathRandom,
+  expectError,
+  resetDeterministicOffset,
+  bulletinBoardHost,
+  OTPProviderHost,
+  voterAuthorizerHost
+} from './test_helpers';
 import sinon = require('sinon');
-const sjcl = require('../lib/av_client/sjcl')
+const sjcl = require('../lib/av_client/sjcl');
 
 describe('AVClient#constructBallotCryptograms', () => {
   let client: AVClient;
@@ -15,21 +23,21 @@ describe('AVClient#constructBallotCryptograms', () => {
     sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
     resetDeterministicOffset();
 
-    nock('http://localhost:3000/').get('/test/app/config')
+    nock(bulletinBoardHost).get('/test/app/config')
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
-    nock('http://localhost:1234/').post('/create_session')
+    nock(voterAuthorizerHost).post('/create_session')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
-    nock('http://localhost:1234/').post('/request_authorization')
+    nock(voterAuthorizerHost).post('/request_authorization')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
 
-    nock('http://localhost:1111/').post('/authorize')
+    nock(OTPProviderHost).post('/authorize')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
 
-    nock('http://localhost:3000/').post('/test/app/register')
+    nock(bulletinBoardHost).post('/test/app/register')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_register.json');
-    nock('http://localhost:3000/').post('/test/app/challenge_empty_cryptograms')
+    nock(bulletinBoardHost).post('/test/app/challenge_empty_cryptograms')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_challenge_empty_cryptograms.json');
-    nock('http://localhost:3000/').get('/test/app/get_latest_board_hash')
+    nock(bulletinBoardHost).get('/test/app/get_latest_board_hash')
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_get_latest_board_hash.json');
 
     client = new AVClient('http://localhost:3000/test/app');
@@ -39,7 +47,7 @@ describe('AVClient#constructBallotCryptograms', () => {
   afterEach(() => {
     sandbox.restore();
     nock.cleanAll();
-  })
+  });
 
   context('given previous steps succeeded, and it receives valid values', () => {
     it('encrypts correctly', async () => {
@@ -63,12 +71,11 @@ describe('AVClient#constructBallotCryptograms', () => {
 
       const cvr = { '1': 'option1', '3': 'optiona' };
 
-      try {
-        await client.constructBallotCryptograms(cvr);
-        expect.fail('Expected an error to be thrown');
-      } catch(error) {
-        expect(error.message).to.equal('Corrupt CVR: Contains invalid contest');
-      }
+      await expectError(
+        client.constructBallotCryptograms(cvr),
+        Error,
+        'Corrupt CVR: Contains invalid contest'
+      );
     });
 
     it('encryption fails when voting on invalid option', async () => {
@@ -78,12 +85,11 @@ describe('AVClient#constructBallotCryptograms', () => {
 
       const cvr = { '1': 'option1', '2': 'wrong_option' };
 
-      try {
-        await client.constructBallotCryptograms(cvr);
-        expect.fail('Expected error to be thrown');
-      } catch(error) {
-        expect(error.message).to.equal('Corrupt CVR: Contains invalid option');
-      }
+      await expectError(
+        client.constructBallotCryptograms(cvr),
+        Error,
+        'Corrupt CVR: Contains invalid option'
+      );
     });
   });
 });

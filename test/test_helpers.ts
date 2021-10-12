@@ -1,5 +1,10 @@
-const fs = require('fs');
+import { expect } from 'chai';
 import nock = require('nock');
+const fs = require('fs');
+
+export const bulletinBoardHost = 'http://localhost:3000/';
+export const OTPProviderHost = 'http://localhost:1111/';
+export const voterAuthorizerHost = 'http://localhost:1234/';
 
 export function deterministicRandomWords(nwords, _paranoia) {
   const lowestValidNumber = -2147483648;
@@ -45,6 +50,21 @@ export async function recordResponses(callback) {
   stopRecording();
   saveFiles();
   cleanup();
+}
+
+export async function expectError(promise: (Promise<any>|Function), errorType: any, message: string): Promise<any> {
+  if (typeof promise == 'object') { // Async promise
+    return promise
+      .then(() => expect.fail('Expected promise to be rejected'))
+      .catch(error => {
+        expect(error).to.be.an.instanceof(errorType);
+        expect(error.message).to.equal(message);
+      });
+  } else if (typeof promise == 'function') { // Synchronous function
+    expect(
+      () => promise()
+    ).to.throw(errorType, message);
+  }
 }
 
 function setupRecording() {
