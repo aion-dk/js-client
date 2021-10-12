@@ -1,4 +1,4 @@
-import { ContestMap, OpenableEnvelope, Affidavit, BallotBoxReceipt } from './types'
+import { ContestMap, OpenableEnvelope, SealedEnvelope, Affidavit, BallotBoxReceipt } from './types'
 import { AcknowledgedBoardHash, signVotes, sealEnvelopes, assertValidReceipt, encryptAES, fingerprint } from './sign'
 import { BulletinBoard } from './connectors/bulletin_board'
 
@@ -8,6 +8,13 @@ type SignAndSubmitArguments = {
   encryptedVotes: ContestMap<OpenableEnvelope>;
   voterPrivateKey: string;
   electionSigningPublicKey: string,
+  encryptedAffidavit: string
+}
+
+type SubmitArgs = {
+  contentHash: string, 
+  voterSignature: string,
+  cryptogramsWithProofs: ContestMap<SealedEnvelope>
   encryptedAffidavit: string
 }
 
@@ -27,7 +34,7 @@ export default class SubmitVotes {
     return encryptAES(affidavit, affidavitConfig)
   }
 
-  async signAndSubmitVotes(args: SignAndSubmitArguments): Promise<BallotBoxReceipt> {
+  public async signAndSubmitVotes(args: SignAndSubmitArguments): Promise<BallotBoxReceipt> {
     const { voterIdentifier, electionId, encryptedVotes, voterPrivateKey, electionSigningPublicKey, encryptedAffidavit } = args
 
     const acknowledgeResponse = await this.acknowledge()
@@ -50,7 +57,7 @@ export default class SubmitVotes {
     return ballotBoxReceipt
   }
 
-  private async submit({ contentHash, voterSignature, cryptogramsWithProofs, encryptedAffidavit }) {
+  private async submit({ contentHash, voterSignature, cryptogramsWithProofs, encryptedAffidavit }: SubmitArgs) {
     const { data } = await this.bulletinBoard.submitVotes(contentHash, voterSignature, cryptogramsWithProofs, encryptedAffidavit)
 
     if (data.error) {
@@ -82,16 +89,3 @@ export default class SubmitVotes {
     return acknowledgedBoard
   }
 }
-
-// interface BulletinBoard {
-//   getBoardHash: () => any;
-//   submitVotes: (contentHash: HashValue, signature: Signature, cryptogramsWithProofs: ContestMap<CryptogramWithProof>, encryptedAffidavit: HashValue) => any
-// }
-
-type CryptogramWithProof = {
-  cryptogram: Cryptogram;
-  proof: Proof;
-}
-
-type Proof = string
-type Cryptogram = string
