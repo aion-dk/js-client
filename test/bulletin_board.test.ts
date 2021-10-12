@@ -2,7 +2,10 @@ import { expect } from 'chai';
 import nock = require('nock');
 
 import { BulletinBoard } from '../lib/av_client/connectors/bulletin_board';
-import { bulletinBoardHost } from './test_helpers';
+import {
+  bulletinBoardHost,
+  expectError
+} from './test_helpers';
 import {
   BulletinBoardError,
   NetworkError,
@@ -25,12 +28,10 @@ describe('BulletinBoard#registerVoter', () => {
       nock(bulletinBoardHost).post('/test/app/register')
         .reply(403, { error: { code: 13, description: 'Public key error' }});
 
-      return bulletinBoard.registerVoter('registrationToken', 'publicKeyToken', 'signature').then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error).to.be.an.instanceof(BulletinBoardError);
-          expect(error.message).to.equal('Public key error');
-        }
+      await expectError(
+        bulletinBoard.registerVoter('registrationToken', 'publicKeyToken', 'signature'),
+        BulletinBoardError,
+        'Public key error'
       );
     });
   });
@@ -40,12 +41,10 @@ describe('BulletinBoard#registerVoter', () => {
       nock(bulletinBoardHost).post('/test/app/register')
         .reply(500, { foo: 'bar' });
 
-      return bulletinBoard.registerVoter('registrationToken', 'publicKeyToken', 'signature').then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error).to.be.an.instanceof(UnsupportedServerReplyError);
-          expect(error.message).to.equal('Unsupported Bulletin Board server error message: {"foo":"bar"}');
-        }
+      await expectError(
+        bulletinBoard.registerVoter('registrationToken', 'publicKeyToken', 'signature'),
+        UnsupportedServerReplyError,
+        'Unsupported Bulletin Board server error message: {"foo":"bar"}'
       );
     });
   });
@@ -55,13 +54,11 @@ describe('BulletinBoard#registerVoter', () => {
       nock(bulletinBoardHost).post('/test/app/register')
         .replyWithError('Some network error');
 
-      return bulletinBoard.registerVoter('registrationToken', 'publicKeyToken', 'signature').then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error).to.be.an.instanceof(NetworkError);
-          expect(error.message).to.equal('Network error. Could not connect to Bulletin Board.');
-        }
-      )
+      await expectError(
+        bulletinBoard.registerVoter('registrationToken', 'publicKeyToken', 'signature'),
+        NetworkError,
+        'Network error. Could not connect to Bulletin Board.'
+      );
     });
   });
 });

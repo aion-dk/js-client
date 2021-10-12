@@ -2,15 +2,16 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
 import {
+  bulletinBoardHost,
   deterministicRandomWords,
   deterministicMathRandom,
-  resetDeterministicOffset,
-  bulletinBoardHost
+  expectError,
+  resetDeterministicOffset
 } from './test_helpers';
 import sinon = require('sinon');
 const sjcl = require('../lib/av_client/sjcl')
 
-describe('AVClient#authenticateWithCodes', function() {
+describe('AVClient#authenticateWithCodes', () => {
   let client: AVClient;
   let sandbox;
 
@@ -29,38 +30,35 @@ describe('AVClient#authenticateWithCodes', function() {
     await client.initialize()
   });
 
-  afterEach( function() {
+  afterEach(() => {
     sandbox.restore();
     nock.cleanAll();
-  })
+  });
 
-  context('given valid election codes', function() {
-    beforeEach(() => {
+  context('given valid election codes', () => {
+    it('resolves without errors', async () => {
       nock(bulletinBoardHost).post('/test/app/sign_in')
         .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
       nock(bulletinBoardHost).post('/test/app/challenge_empty_cryptograms')
         .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
-    });
 
-    it('resolves without errors', async function() {
       const validCodes = ['aAjEuD64Fo2143'];
       const result = await client.authenticateWithCodes(validCodes);
       expect(result).to.equal(undefined);
     });
   });
 
-  context('given invalid election codes', function() {
-    beforeEach(function() {
+  context('given invalid election codes', () => {
+    it('returns an error', async () => {
       nock(bulletinBoardHost).post('/test/app/sign_in')
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_3.json');
-    });
 
-    it('returns an error', async function() {
       const invalidCodes = ['no', 'no'];
-      return client.authenticateWithCodes(invalidCodes).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => expect(error.message).to.equal('No ballots found for the submitted election codes')
-      )
+      await expectError(
+        client.authenticateWithCodes(invalidCodes),
+        Error,
+        'No ballots found for the submitted election codes'
+      );
     });
   });
 });

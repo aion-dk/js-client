@@ -4,6 +4,7 @@ import nock = require('nock');
 import {
   deterministicRandomWords,
   deterministicMathRandom,
+  expectError,
   resetDeterministicOffset,
   bulletinBoardHost,
   OTPProviderHost,
@@ -67,10 +68,10 @@ describe('AVClient#submitBallotCryptograms', () => {
         'registeredAt',
         'serverSignature',
         'voteSubmissionId'
-      )
-      expect(receipt.previousBoardHash).to.eql('b8c006ae94b5f98d684317beaf4784938fc6cf2921d856cc3c8416ea4b510a30')
-      expect(receipt.registeredAt).to.eql('2020-03-01T10:00:00.000+01:00')
-      expect(receipt.voteSubmissionId).to.eql(7)
+      );
+      expect(receipt.previousBoardHash).to.eql('b8c006ae94b5f98d684317beaf4784938fc6cf2921d856cc3c8416ea4b510a30');
+      expect(receipt.registeredAt).to.eql('2020-03-01T10:00:00.000+01:00');
+      expect(receipt.voteSubmissionId).to.eql(7);
     });
   });
 
@@ -78,21 +79,22 @@ describe('AVClient#submitBallotCryptograms', () => {
     it('fails with an error message', async () => {
       await client.requestAccessCode('voter123', 'voter@foo.bar');
       await client.validateAccessCode('1234');
-      await client.registerVoter()
+      await client.registerVoter();
 
       const cvr = { '1': 'option1', '2': 'optiona' };
-      await client.constructBallotCryptograms(cvr)
+      await client.constructBallotCryptograms(cvr);
 
       // change the proof of ballot 1
       const randomness = 'corrupted_randomness!';
 
       // TODO: Refactor to avoid manipulation of internal state
-      (client as any ).voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(randomness)
+      (client as any ).voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(randomness);
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
-      return await client.submitBallotCryptograms(affidavit).then(
-        () => expect.fail('Expected exception to be thrown'),
-        (error: Error) => expect(error.message).to.equal('Invalid vote receipt: corrupt board hash')
+      await expectError(
+        client.submitBallotCryptograms(affidavit),
+        Error,
+        'Invalid vote receipt: corrupt board hash'
       );
     });
   });

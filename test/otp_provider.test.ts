@@ -2,7 +2,10 @@ import { expect } from 'chai';
 import nock = require('nock');
 
 import { OTPProvider } from '../lib/av_client/connectors/otp_provider';
-import { OTPProviderHost } from './test_helpers';
+import {
+  expectError,
+  OTPProviderHost
+} from './test_helpers';
 import {
   AccessCodeInvalid,
   NetworkError,
@@ -28,13 +31,11 @@ describe('OTPProvider#requestOTPAuthorization', () => {
       nock(OTPProviderHost).post('/authorize')
         .reply(403, { errorCode: 'OTP_DOES_NOT_MATCH' });
 
-      return provider.requestOTPAuthorization(incorrectOTP, correctEmail).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error).to.be.an.instanceof(AccessCodeInvalid)
-          expect(error.message).to.equal('OTP code invalid')
-        }
-      )
+      await expectError(
+        provider.requestOTPAuthorization(incorrectOTP, correctEmail),
+        AccessCodeInvalid,
+        'OTP code invalid'
+      );
     });
   });
 
@@ -43,12 +44,10 @@ describe('OTPProvider#requestOTPAuthorization', () => {
       nock(OTPProviderHost).post('/authorize')
         .reply(403, { garbage: 'nonsense' });
 
-      return provider.requestOTPAuthorization(correctOTP, correctEmail).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error).to.be.an.instanceof(UnsupportedServerReplyError);
-          expect(error.message).to.equal('Unsupported OTP Provider error message: {"garbage":"nonsense"}')
-        }
+      await expectError(
+        provider.requestOTPAuthorization(correctOTP, correctEmail),
+        UnsupportedServerReplyError,
+        'Unsupported OTP Provider error message: {"garbage":"nonsense"}'
       );
     });
   });
@@ -58,12 +57,10 @@ describe('OTPProvider#requestOTPAuthorization', () => {
       nock(OTPProviderHost).post('/authorize')
         .reply(403, { errorCode: 'UNKNOWN_ERROR_CODE', errorMessage: 'Not supported yet' });
 
-      return provider.requestOTPAuthorization(correctOTP, correctEmail).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error).to.be.an.instanceof(UnsupportedServerReplyError);
-          expect(error.message).to.equal('Unsupported OTP Provider error message: Not supported yet')
-        }
+      await expectError(
+        provider.requestOTPAuthorization(correctOTP, correctEmail),
+        UnsupportedServerReplyError,
+        'Unsupported OTP Provider error message: Not supported yet'
       );
     });
   });
@@ -73,11 +70,10 @@ describe('OTPProvider#requestOTPAuthorization', () => {
       nock(OTPProviderHost).post('/authorize')
         .reply(404);
 
-      return provider.requestOTPAuthorization(correctOTP, correctEmail).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error.message).to.equal('Request failed with status code 404');
-        }
+      await expectError(
+        provider.requestOTPAuthorization(correctOTP, correctEmail),
+        Error,
+        'Request failed with status code 404'
       );
     });
   });
@@ -87,12 +83,10 @@ describe('OTPProvider#requestOTPAuthorization', () => {
       nock(OTPProviderHost).post('/authorize')
         .replyWithError({code: 'ETIMEDOUT'});
 
-      return provider.requestOTPAuthorization(correctOTP, correctEmail).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error).to.be.an.instanceof(NetworkError);
-          expect(error.message).to.equal('Network error. Could not connect to OTP Provider.')
-        }
+      await expectError(
+        provider.requestOTPAuthorization(correctOTP, correctEmail),
+        NetworkError,
+        'Network error. Could not connect to OTP Provider.'
       );
     });
   });
@@ -102,12 +96,10 @@ describe('OTPProvider#requestOTPAuthorization', () => {
       const unreachableHost = 'http://sdguet432t4tjsdjf.does-not-exist';
       provider = new OTPProvider(unreachableHost);
 
-      return provider.requestOTPAuthorization(correctOTP, correctEmail).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error).to.be.an.instanceof(NetworkError);
-          expect(error.message).to.equal('Network error. Could not connect to OTP Provider.')
-        }
+      await expectError(
+        provider.requestOTPAuthorization(correctOTP, correctEmail),
+        NetworkError,
+        'Network error. Could not connect to OTP Provider.'
       );
     })
   });

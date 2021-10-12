@@ -1,8 +1,12 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
-import { readJSON } from './test_helpers';
+import {
+  expectError,
+  readJSON
+} from './test_helpers';
+import { InvalidConfigError } from '../lib/av_client/errors';
 
-describe('election configuration validation', function() {
+describe('election configuration validation', () => {
   let client: AVClient;
   let electionConfig: any;
 
@@ -15,45 +19,35 @@ describe('election configuration validation', function() {
     it('fails with an error', async () => {
       electionConfig.services.otp_provider.url = '';
 
-      try {
-        await client.initialize(electionConfig);
-        expect.fail('Expected an InvalidConfigError, got no error');
-      } catch (e) {
-        expect(e.name).to.eql('InvalidConfigError');
-        expect(e.message).to.include('Received invalid election configuration');
-        expect(e.message).to.include('Configuration is missing OTP Provider URL');
-      }
-    })
+      await expectError(
+        client.initialize(electionConfig),
+        InvalidConfigError,
+        'Received invalid election configuration. Errors: Configuration is missing OTP Provider URL'
+      );
+    });
   });
 
   context('Voter Authorizer URL is empty', () => {
     it('fails with an error', async () => {
       electionConfig.services.voter_authorizer.url = '';
 
-      try {
-        await client.initialize(electionConfig);
-        expect.fail('Expected an InvalidConfigError, got no error');
-      } catch (e) {
-        expect(e.name).to.eql('InvalidConfigError');
-        expect(e.message).to.include('Received invalid election configuration');
-        expect(e.message).to.include('Configuration is missing Voter Authorizer URL');
-      }
-    })
+      await expectError(
+        client.initialize(electionConfig),
+        InvalidConfigError,
+        'Received invalid election configuration. Errors: Configuration is missing Voter Authorizer URL'
+      );
+    });
   });
 
   context('services key is missing', () => {
     it('fails with an error', async () => {
       delete electionConfig.services;
 
-      try {
-        await client.initialize(electionConfig);
-        expect.fail('Expected an InvalidConfigError, got no error');
-      } catch (e) {
-        expect(e.name).to.eql('InvalidConfigError');
-        expect(e.message).to.include('Received invalid election configuration');
-        expect(e.message).to.include('Configuration is missing OTP Provider URL');
-        expect(e.message).to.include('Configuration is missing Voter Authorizer URL');
-      }
-    })
+      await expectError(
+        client.initialize(electionConfig),
+        InvalidConfigError,
+        'Received invalid election configuration. Errors: Configuration is missing OTP Provider URL,\nConfiguration is missing Voter Authorizer URL'
+      );
+    });
   });
 });

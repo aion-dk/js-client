@@ -5,13 +5,6 @@ describe('Sign', () => {
   const lastestBoardHash = { currentBoardHash: 'abc', currentTime: '2019-09-05 12:19:34' }
   const votes = { 1: { cryptogram: 'a', randomness: 'b', proof: 'c' } }
 
-  beforeEach(async () => {
-
-  });
-
-  afterEach( () => {
-  })
-
   context('sign votes', () => {
     it('signing votes yields new board hash', async () => {
       const { contentHash } = signVotes(
@@ -49,11 +42,5 @@ describe('Sign', () => {
 
       expect(correctVoterHash).to.not.eq(badVoterHash)
     });
-
-    // it('corrupted voter id yields different content hash', async () => {
-    //   console.log(Crypto.hashString("sune123"))
-    //   console.log(Crypto.hashString("sune123"))
-    //   console.log(Crypto.hashString("sune123"))
-    // });
   });
 });

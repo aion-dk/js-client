@@ -52,13 +52,19 @@ export async function recordResponses(callback) {
   cleanup();
 }
 
-export async function expectError(promise: Promise<any>, errorType: any, message: string) {
-  promise
-    .then(() => expect.fail('Expected promise to be rejected'))
-    .catch(error => {
-      expect(error).to.be.an.instanceof(errorType);
-      expect(error.message).to.equal(message);
-    })
+export async function expectError(promise: Promise<any>, errorType: any, message: string): Promise<any> {
+  if (typeof promise == 'object') { // Async promise
+    return promise
+      .then(() => expect.fail('Expected promise to be rejected'))
+      .catch(error => {
+        expect(error).to.be.an.instanceof(errorType);
+        expect(error.message).to.equal(message);
+      });
+  } else if (typeof promise == 'function') { // Synchronous function
+    expect(
+      () => promise()
+    ).to.throw(errorType, message);
+  }
 }
 
 function setupRecording() {

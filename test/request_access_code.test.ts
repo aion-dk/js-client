@@ -3,8 +3,15 @@ import { expect } from 'chai';
 import nock = require('nock');
 import {
   bulletinBoardHost,
+  expectError,
   voterAuthorizerHost
 } from './test_helpers';
+import {
+  EmailDoesNotMatchVoterRecordError,
+  NetworkError,
+  UnsupportedServerReplyError
+} from '../lib/av_client/errors';
+
 
 describe('AVClient#requestAccessCode', () => {
   let client: AVClient;
@@ -38,7 +45,6 @@ describe('AVClient#requestAccessCode', () => {
           expectedNetworkRequests.forEach((mock) => mock.done());
         },
         (error) => {
-          console.error(error);
           expect.fail('Expected a resolved promise');
         }
       );
@@ -52,13 +58,12 @@ describe('AVClient#requestAccessCode', () => {
           .reply(500, { error_code: 'EMAIL_DOES_NOT_MATCH_VOTER_RECORD', error_message: 'Error message from VAC.' })
       );
 
-      return await client.requestAccessCode('voter123', 'test@test.dk').then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error.message).to.equal('Error message from VAC.');
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
+      await expectError(
+        client.requestAccessCode('voter123', 'test@test.dk'),
+        EmailDoesNotMatchVoterRecordError,
+        'Error message from VAC.'
       );
+      expectedNetworkRequests.forEach((mock) => mock.done());
     });
   });
 
@@ -69,13 +74,12 @@ describe('AVClient#requestAccessCode', () => {
           .replyWithError('Some network error')
       );
 
-      return await client.requestAccessCode('voter123', 'test@test.dk').then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error.message).to.equal('Network error. Could not connect to Voter Authorization Coordinator.');
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
+      await expectError(
+        client.requestAccessCode('voter123', 'test@test.dk'),
+        NetworkError,
+        'Network error. Could not connect to Voter Authorization Coordinator.'
       );
+      expectedNetworkRequests.forEach((mock) => mock.done());
     });
   });
 
@@ -86,13 +90,12 @@ describe('AVClient#requestAccessCode', () => {
           .reply(500, { error_code: 'COULD_NOT_CONNECT_TO_OTP_PROVIDER', error_message: 'Error message from VAC.' })
       );
 
-      return await client.requestAccessCode('voter123', 'test@test.dk').then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error.message).to.equal('Error message from VAC.');
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
+      await expectError(
+        client.requestAccessCode('voter123', 'test@test.dk'),
+        NetworkError,
+        'Error message from VAC.'
       );
+      expectedNetworkRequests.forEach((mock) => mock.done());
     });
   });
 
@@ -103,13 +106,12 @@ describe('AVClient#requestAccessCode', () => {
           .reply(403, { error_code: 'UNSUPPORTED_NOISE', error_message: 'Expect the unexpected.' })
       );
 
-      return await client.requestAccessCode('voter123', 'test@test.dk').then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error.message).to.equal('Unsupported server error: Expect the unexpected.');
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
+      await expectError(
+        client.requestAccessCode('voter123', 'test@test.dk'),
+        UnsupportedServerReplyError,
+        'Unsupported server error: Expect the unexpected.'
       );
+      expectedNetworkRequests.forEach((mock) => mock.done());
     });
   });
 
@@ -120,13 +122,12 @@ describe('AVClient#requestAccessCode', () => {
           .reply(404)
       );
 
-      return await client.requestAccessCode('voter123', 'test@test.dk').then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error.message).to.equal('Request failed with status code 404');
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
+      await expectError(
+        client.requestAccessCode('voter123', 'test@test.dk'),
+        Error,
+        'Request failed with status code 404'
       );
+      expectedNetworkRequests.forEach((mock) => mock.done());
     });
   });
 });

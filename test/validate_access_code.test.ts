@@ -4,6 +4,7 @@ import nock = require('nock');
 import {
   deterministicRandomWords,
   deterministicMathRandom,
+  expectError,
   resetDeterministicOffset,
   bulletinBoardHost,
   OTPProviderHost,
@@ -86,14 +87,12 @@ describe('AVClient#validateAccessCode', () => {
 
       await client.requestAccessCode('voter123', email);
 
-      return client.validateAccessCode(otp).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error).to.be.an.instanceof(AccessCodeExpired);
-          expect(error.message).to.equal('OTP code expired')
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
+      await expectError(
+        client.validateAccessCode(otp),
+        AccessCodeExpired,
+        'OTP code expired'
       );
+      expectedNetworkRequests.forEach((mock) => mock.done());
     });
   });
 
@@ -117,14 +116,13 @@ describe('AVClient#validateAccessCode', () => {
 
       await client.requestAccessCode('voter123', email);
       const result = await client.validateAccessCode(otp);
-      return client.registerVoter().then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error).to.be.an.instanceof(Error);
-          expect(error.message).to.equal('Request failed with status code 404');
-          expectedNetworkRequests.forEach((mock) => mock.done());
-        }
-      )
+
+      await expectError(
+        client.registerVoter(),
+        Error,
+        'Request failed with status code 404'
+      );
+      expectedNetworkRequests.forEach((mock) => mock.done());
     })
   });
 });

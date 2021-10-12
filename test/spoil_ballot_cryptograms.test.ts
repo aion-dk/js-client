@@ -4,6 +4,7 @@ import nock = require('nock');
 import {
   deterministicRandomWords,
   deterministicMathRandom,
+  expectError,
   resetDeterministicOffset,
   bulletinBoardHost,
   OTPProviderHost,
@@ -80,9 +81,10 @@ describe('AVClient#spoilBallotCryptograms', () => {
         await client.constructBallotCryptograms(cvr);
         client.generateTestCode();
 
-        return await client.spoilBallotCryptograms().then(
-          () => expect.fail('Expected a rejected promise'),
-          (error) => expect(error.message).to.equal('Request failed with status code 404')
+        await expectError(
+          client.spoilBallotCryptograms(),
+          Error,
+          'Request failed with status code 404'
         );
       });
 
@@ -97,9 +99,10 @@ describe('AVClient#spoilBallotCryptograms', () => {
         await client.constructBallotCryptograms(cvr);
         client.generateTestCode();
 
-        return await client.spoilBallotCryptograms().then(
-          () => expect.fail('Expected a rejected promise'),
-          (error) => expect(error.message).to.equal('Request failed with status code 500')
+        await expectError(
+          client.spoilBallotCryptograms(),
+          Error,
+          'Request failed with status code 500'
         );
       });
     });
@@ -145,12 +148,11 @@ describe('AVClient#spoilBallotCryptograms', () => {
         .replyWithFile(403, __dirname + '/replies/avx_error.invalid_2.json');
 
       const affidavit = Buffer.from('fake affidavit data').toString('base64');
-      return await client.submitBallotCryptograms(affidavit).then(
-        () => expect.fail('Expected promise to be rejected'),
-        (error) => {
-          expect(error.message).to.eql('Request failed with status code 403')
-        }
-      )
+      await expectError(
+        client.submitBallotCryptograms(affidavit),
+        Error,
+        'Request failed with status code 403'
+      );
     });
   });
 });

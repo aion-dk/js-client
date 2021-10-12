@@ -4,13 +4,14 @@ import nock = require('nock');
 import {
   deterministicRandomWords,
   deterministicMathRandom,
+  expectError,
   resetDeterministicOffset,
   bulletinBoardHost,
   OTPProviderHost,
   voterAuthorizerHost
 } from './test_helpers';
 import sinon = require('sinon');
-const sjcl = require('../lib/av_client/sjcl')
+const sjcl = require('../lib/av_client/sjcl');
 
 describe('AVClient#constructBallotCryptograms', () => {
   let client: AVClient;
@@ -46,7 +47,7 @@ describe('AVClient#constructBallotCryptograms', () => {
   afterEach(() => {
     sandbox.restore();
     nock.cleanAll();
-  })
+  });
 
   context('given previous steps succeeded, and it receives valid values', () => {
     it('encrypts correctly', async () => {
@@ -70,12 +71,11 @@ describe('AVClient#constructBallotCryptograms', () => {
 
       const cvr = { '1': 'option1', '3': 'optiona' };
 
-      try {
-        await client.constructBallotCryptograms(cvr);
-        expect.fail('Expected an error to be thrown');
-      } catch(error) {
-        expect(error.message).to.equal('Corrupt CVR: Contains invalid contest');
-      }
+      await expectError(
+        client.constructBallotCryptograms(cvr),
+        Error,
+        'Corrupt CVR: Contains invalid contest'
+      );
     });
 
     it('encryption fails when voting on invalid option', async () => {
@@ -85,12 +85,11 @@ describe('AVClient#constructBallotCryptograms', () => {
 
       const cvr = { '1': 'option1', '2': 'wrong_option' };
 
-      try {
-        await client.constructBallotCryptograms(cvr);
-        expect.fail('Expected error to be thrown');
-      } catch(error) {
-        expect(error.message).to.equal('Corrupt CVR: Contains invalid option');
-      }
+      await expectError(
+        client.constructBallotCryptograms(cvr),
+        Error,
+        'Corrupt CVR: Contains invalid option'
+      );
     });
   });
 });
