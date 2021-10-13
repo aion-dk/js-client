@@ -9,7 +9,7 @@ import {
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 
-const USE_MOCK = true
+const USE_MOCK = true;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;
@@ -82,9 +82,7 @@ describe('entire voter flow using OTP authorization', () => {
         'serverSignature',
         'voteSubmissionId'
       )
-      expect(receipt.previousBoardHash).to.eql('b8c006ae94b5f98d684317beaf4784938fc6cf2921d856cc3c8416ea4b510a30')
-      expect(receipt.registeredAt).to.eql('2020-03-01T10:00:00.000+01:00')
-      expect(receipt.voteSubmissionId).to.eql(7)
+      expect(receipt.previousBoardHash.length).to.eql(64)
 
       if(USE_MOCK)
         expectedNetworkRequests.forEach((mock) => mock.done());
