@@ -2,15 +2,11 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
 import {
-  deterministicRandomWords,
-  deterministicMathRandom,
-  resetDeterministicOffset,
+  resetDeterminism,
   bulletinBoardHost,
   OTPProviderHost,
   voterAuthorizerHost
 } from './test_helpers';
-import sinon = require('sinon');
-const sjcl = require('../lib/av_client/sjcl')
 import { recordResponses } from './test_helpers'
 
 const USE_MOCK = true
@@ -20,10 +16,7 @@ describe('entire voter flow using OTP authorization', () => {
   let expectedNetworkRequests : any[] = [];
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
-    sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
-    sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
-    resetDeterministicOffset();
+    sandbox = resetDeterminism();
 
     if(USE_MOCK) {
       expectedNetworkRequests = [];

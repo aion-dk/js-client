@@ -1,22 +1,14 @@
 import nock = require('nock');
 import {
-  deterministicRandomWords,
-  deterministicMathRandom,
-  resetDeterministicOffset,
+  resetDeterminism,
   bulletinBoardHost,
   OTPProviderHost,
   voterAuthorizerHost
 } from './test_helpers';
-import sinon = require('sinon');
-const sjcl = require('../lib/av_client/sjcl')
-
 let sandbox;
 
 export function readmeTestSetup() {
-  sandbox = sinon.createSandbox();
-  sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
-  sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
-  resetDeterministicOffset();
+  sandbox = resetDeterminism();
 
   nock(bulletinBoardHost).get('/test/app/config')
     .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
