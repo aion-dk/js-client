@@ -3,26 +3,16 @@ import { expect } from 'chai';
 import nock = require('nock');
 import {
   bulletinBoardHost,
-  deterministicRandomWords,
-  deterministicMathRandom,
   expectError,
-  resetDeterministicOffset
+  resetDeterminism
 } from './test_helpers';
-import sinon = require('sinon');
-const sjcl = require('../lib/av_client/sjcl')
 
 describe('AVClient#authenticateWithCodes', () => {
   let client: AVClient;
   let sandbox;
 
   beforeEach(async () => {
-    client = new AVClient('http://localhost:3000/test/app');
-
-    sandbox = sinon.createSandbox();
-    sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
-    sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
-    resetDeterministicOffset();
-
+    sandbox = resetDeterminism();
     nock(bulletinBoardHost).get('/test/app/config')
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
 

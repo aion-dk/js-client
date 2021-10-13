@@ -2,26 +2,19 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
 import {
-  deterministicRandomWords,
-  deterministicMathRandom,
   expectError,
-  resetDeterministicOffset,
+  resetDeterminism,
   bulletinBoardHost,
   OTPProviderHost,
   voterAuthorizerHost
 } from './test_helpers';
-import sinon = require('sinon');
-const sjcl = require('../lib/av_client/sjcl');
 
 describe('AVClient#constructBallotCryptograms', () => {
   let client: AVClient;
   let sandbox;
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox();
-    sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
-    sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
-    resetDeterministicOffset();
+    sandbox = resetDeterminism();
 
     nock(bulletinBoardHost).get('/test/app/config')
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');

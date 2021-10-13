@@ -1,10 +1,20 @@
 import { expect } from 'chai';
 import nock = require('nock');
+import sinon = require('sinon');
 const fs = require('fs');
+const sjcl = require('../lib/av_client/sjcl');
 
 export const bulletinBoardHost = 'http://localhost:3000/';
 export const OTPProviderHost = 'http://localhost:1111/';
 export const voterAuthorizerHost = 'http://localhost:1234/';
+
+export function resetDeterminism() {
+  const sandbox = sinon.createSandbox();
+  sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
+  sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
+  resetDeterministicOffset();
+  return sandbox;
+}
 
 export function deterministicRandomWords(nwords, _paranoia) {
   const lowestValidNumber = -2147483648;

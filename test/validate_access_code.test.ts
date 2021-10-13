@@ -2,18 +2,14 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
 import {
-  deterministicRandomWords,
-  deterministicMathRandom,
   expectError,
-  resetDeterministicOffset,
+  resetDeterminism,
   bulletinBoardHost,
   OTPProviderHost,
   voterAuthorizerHost
 } from './test_helpers';
-import sinon = require('sinon');
 import { AccessCodeExpired, AccessCodeInvalid, BulletinBoardError, NetworkError, UnsupportedServerReplyError } from '../lib/av_client/errors';
 
-const sjcl = require('../lib/av_client/sjcl')
 
 describe('AVClient#validateAccessCode', () => {
   let client: AVClient;
@@ -21,10 +17,7 @@ describe('AVClient#validateAccessCode', () => {
   const expectedNetworkRequests : any[] = [];
 
   beforeEach(async () => {
-    sandbox = sinon.createSandbox();
-    sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
-    sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
-    resetDeterministicOffset();
+    sandbox = resetDeterminism();
 
     expectedNetworkRequests.push(
       nock(bulletinBoardHost).get('/test/app/config')

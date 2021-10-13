@@ -15,7 +15,6 @@ import {
 
 describe('AVClient#requestAccessCode', () => {
   let client: AVClient;
-  let sandbox;
   const expectedNetworkRequests : any[] = [];
 
   beforeEach(async () => {

@@ -2,17 +2,13 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
 import {
-  deterministicRandomWords,
-  deterministicMathRandom,
   expectError,
-  resetDeterministicOffset,
+  resetDeterminism,
   bulletinBoardHost,
   OTPProviderHost,
   voterAuthorizerHost
 } from './test_helpers';
-import sinon = require('sinon');
 import { InvalidStateError } from '../lib/av_client/errors';
-const sjcl = require('../lib/av_client/sjcl');
 
 describe('AVClient functions call order', () => {
   let client: AVClient;
@@ -49,6 +45,8 @@ describe('AVClient functions call order', () => {
     let sandbox;
 
     beforeEach(async () => {
+      sandbox = resetDeterminism();
+
       nock(bulletinBoardHost).get('/test/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
 
@@ -71,12 +69,7 @@ describe('AVClient functions call order', () => {
         .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
 
       client = new AVClient('http://localhost:3000/test/app');
-      await client.initialize()
-
-      sandbox = sinon.createSandbox();
-      sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);
-      sandbox.stub(sjcl.prng.prototype, 'randomWords').callsFake(deterministicRandomWords);
-      resetDeterministicOffset();
+      await client.initialize();
     });
 
     afterEach(() => {
