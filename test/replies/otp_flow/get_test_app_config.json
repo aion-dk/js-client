@@ -54,7 +54,7 @@
       "collapse_default": true,
       "collapsable": false,
       "description": {},
-      "options": [
+      "options_tree": [
         {
           "id": 1,
           "handle": "option1",
@@ -67,7 +67,8 @@
           "video_url": {},
           "image": null,
           "ancestry": null,
-          "selectable": true
+          "selectable": true,
+          "options": []
         },
         {
           "id": 2,
@@ -81,7 +82,26 @@
           "video_url": {},
           "image": null,
           "ancestry": null,
-          "selectable": true
+          "selectable": true,
+          "options": []
+        }
+      ],
+      "options": [
+        {
+          "id": 1,
+          "handle": "option1",
+          "title": {
+            "en": "Option 1"
+          },
+          "image": null
+        },
+        {
+          "id": 2,
+          "handle": "option2",
+          "title": {
+            "en": "Option 2"
+          },
+          "image": null
         }
       ],
       "write_in": false
@@ -98,7 +118,7 @@
       "collapse_default": true,
       "collapsable": false,
       "description": {},
-      "options": [
+      "options_tree": [
         {
           "id": 3,
           "handle": "optiona",
@@ -111,7 +131,8 @@
           "video_url": {},
           "image": null,
           "ancestry": null,
-          "selectable": true
+          "selectable": true,
+          "options": []
         },
         {
           "id": 4,
@@ -125,7 +146,8 @@
           "video_url": {},
           "image": null,
           "ancestry": null,
-          "selectable": true
+          "selectable": true,
+          "options": []
         },
         {
           "id": 5,
@@ -139,7 +161,34 @@
           "video_url": {},
           "image": null,
           "ancestry": null,
-          "selectable": true
+          "selectable": true,
+          "options": []
+        }
+      ],
+      "options": [
+        {
+          "id": 3,
+          "handle": "optiona",
+          "title": {
+            "en": "Option A"
+          },
+          "image": null
+        },
+        {
+          "id": 4,
+          "handle": "optionb",
+          "title": {
+            "en": "Option B"
+          },
+          "image": null
+        },
+        {
+          "id": 5,
+          "handle": "optionc",
+          "title": {
+            "en": "Option C"
+          },
+          "image": null
         }
       ],
       "write_in": false
