@@ -1,7 +1,7 @@
 {
-  "previousBoardHash": "06b59938e08c2c0b046556cc90ca331de69bb52b92a4525dca06584a8c9d300b",
-  "boardHash": "96d717883bfcd50ae6c9a93b7c69bd8e889360400e34534e61cac37c26f3b4c8",
-  "registeredAt": "2021-10-13T09:16:43.795+02:00",
-  "serverSignature": "01ec78d3eaa8f5e1ac38a7b28ff875df0d2e80b3ec1f5a63ba872f722d4767cc,bc9bde78f00470148eef38b799c7be9102d054324695c8426dc6804508cabd32",
+  "previousBoardHash": "592a33af0f8ac7cdffa61e4cfe84147d6ff898fc17d4f49126a15be30de07c37",
+  "boardHash": "e1d5ed727b869401fd0167a1708e3322d3ad3cda5bcac949196b1c57c9bcd9ef",
+  "registeredAt": "2021-10-14T09:57:56.678+02:00",
+  "serverSignature": "77679ec594807195fcf95f7cbc79d502bf93000fa4843ca38c9ae927cc6ce1e5,eaefe5dc587c717951b8d33ce61e85e297d907805a83e281c7ceed6621596f16",
   "voteSubmissionId": 12
 }

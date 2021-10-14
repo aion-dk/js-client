@@ -1,4 +1,3 @@
-import { randomKeyPair} from './generate_key_pair';
 import { ContestMap, EmptyCryptogram, KeyPair } from "./types";
 import { BulletinBoard } from './connectors/bulletin_board';
 import * as crypto from './aion_crypto'
@@ -31,8 +30,6 @@ export async function registerVoter(bulletinBoard: BulletinBoard, keyPair: KeyPa
       } as RegisterVoterResponse
     }
   )
-
-  randomKeyPair(); // TODO: remove, this just increases deterministic randomness offset for tests
 
   const { contestIds, emptyCryptograms, voterSessionUuid } = registerVoterResponse
 
