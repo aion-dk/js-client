@@ -10,6 +10,7 @@ import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/o
 import { InvalidConfigError, InvalidStateError } from './av_client/errors'
 import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
 import { validateCvr } from './av_client/cvr_validation';
+import { randomKeyPair} from './av_client/generate_key_pair';
 
 /** @internal */
 export const sjcl = require('./av_client/sjcl');
@@ -191,11 +192,7 @@ export class AVClient {
     if(!this.identityConfirmationToken)
       throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
 
-    // FIXME this needs to be generated
-    this.keyPair = {
-      privateKey: '70d161fe8546c88b719c3e511d113a864013cda166f289ff6de9aba3eb4e8a4d',
-      publicKey: '039490ed35e0cabb39592792d69b5d4bf2104f20df8c4bbf36ee6b705595e776d2'
-    }
+    this.keyPair = randomKeyPair();
 
     const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
