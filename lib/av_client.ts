@@ -7,7 +7,15 @@ import EncryptVotes from './av_client/encrypt_votes';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
-import { InvalidConfigError, InvalidStateError } from './av_client/errors'
+import {
+  AccessCodeExpired,
+  AccessCodeInvalid,
+  BulletinBoardError,
+  CorruptCvrError,
+  EmailDoesNotMatchVoterRecordError,
+  InvalidConfigError,
+  InvalidStateError,
+  NetworkError } from './av_client/errors'
 import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
 import { validateCvr } from './av_client/cvr_validation';
 import { randomKeyPair} from './av_client/generate_key_pair';
@@ -70,7 +78,7 @@ export class AVClient {
    *
    * @param electionConfig Allows injection of an election configuration for testing purposes
    * @returns Returns undefined if succeeded or throws an error
-   * @throws NetworkError if any request failed to get a response
+   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   async initialize(electionConfig: ElectionConfig): Promise<void>
   async initialize(): Promise<void>
@@ -91,7 +99,7 @@ export class AVClient {
    * Available method names are
    * * {@link AVClient.authenticateWithCodes | authenticateWithCodes} for authentication via election codes.
    * * {@link AVClient.requestAccessCode | requestAccessCode} for authorization via OTPs.
-   * @throws InvalidConfigError if the config does not specify a supported authorizationMode
+   * @throws {@link InvalidConfigError | InvalidConfigError } if the config does not specify a supported authorizationMode
    */
   public getAuthorizationMethod(): { methodName: string; method: Function } {
     switch(this.getElectionConfig().authorizationMode) {
@@ -139,7 +147,7 @@ export class AVClient {
    * @param email where the voter expects to receive otp code.
    * @returns Returns undefined or throws an error.
    * @throws VoterRecordNotFound if no voter was found
-   * @throws NetworkError if any request failed to get a response
+   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
     const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
@@ -168,10 +176,10 @@ export class AVClient {
    * @param   code An access code string.
    * @param   email Voter email.
    * @returns Returns undefined if authorization succeeded or throws an error
-   * @throws InvalidStateError if called before required data is available
-   * @throws AccessCodeExpired if an OTP code has expired
-   * @throws AccessCodeInvalid if an OTP code is invalid
-   * @throws NetworkError if any request failed to get a response
+   * @throws {@link InvalidStateError | InvalidStateError } if called before required data is available
+   * @throws {@link AccessCodeExpired | AccessCodeExpired } if an OTP code has expired
+   * @throws {@link AccessCodeInvalid | AccessCodeInvalid } if an OTP code is invalid
+   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   async validateAccessCode(code: string): Promise<void> {
     if(!this.email)
@@ -235,9 +243,9 @@ export class AVClient {
    * ```javascript
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
    * ```
-   * @throws InvalidStateError if called before required data is available
-   * @throws CorruptCVRError if the cast vote record is invalid
-   * @throws NetworkError if any request failed to get a response
+   * @throws {@link InvalidStateError | InvalidStateError } if called before required data is available
+   * @throws {@link CorruptCvrError | CorruptCvrError } if the cast vote record is invalid
+   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
     if(!(this.voterIdentifier || this.emptyCryptograms || this.contestIds)) {
@@ -247,8 +255,8 @@ export class AVClient {
     const contests = this.getElectionConfig().ballots
 
     switch(validateCvr(cvr, contests)) {
-      case ":invalid_contest": throw new Error('Corrupt CVR: Contains invalid contest');
-      case ":invalid_option": throw new Error('Corrupt CVR: Contains invalid option');
+      case ":invalid_contest": throw new CorruptCvrError('Corrupt CVR: Contains invalid contest');
+      case ":invalid_option": throw new CorruptCvrError('Corrupt CVR: Contains invalid option');
       case ":okay":
     }
 
@@ -297,9 +305,9 @@ export class AVClient {
    * Gets commitment opening of the digital ballot box and validates it.
    *
    * @returns Returns undefined if the validation succeeds or throws an error
-   * @throws InvalidStateError if called before required data is available
+   * @throws {@link InvalidStateError | InvalidStateError } if called before required data is available
    * @throws ServerCommitmentError if the server commitment is invalid
-   * @throws NetworkError if any request failed to get a response
+   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async spoilBallotCryptograms(): Promise<void> {
     // TODO: encrypt the vote cryptograms one more time with a key derived from `this.generateTestCode`.
@@ -329,7 +337,7 @@ export class AVClient {
    *    voteSubmissionId: 6
       }
    * ```
-   * @throws NetworkError if any request failed to get a response
+   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async submitBallotCryptograms(affidavit: Affidavit): Promise<BallotBoxReceipt> {
     if(!(this.voterIdentifier || this.voteEncryptions)) {
@@ -420,3 +428,14 @@ type AffidavitConfig = {
 }
 
 export type { CastVoteRecord, Affidavit, BallotBoxReceipt }
+
+export type {
+  AccessCodeExpired,
+  AccessCodeInvalid,
+  BulletinBoardError,
+  CorruptCvrError,
+  EmailDoesNotMatchVoterRecordError,
+  InvalidConfigError,
+  InvalidStateError,
+  NetworkError
+}

@@ -1,4 +1,5 @@
 import { AVClient } from '../lib/av_client';
+import { CorruptCvrError } from '../lib/av_client/errors';
 import { expect } from 'chai';
 import nock = require('nock');
 import {
@@ -66,7 +67,7 @@ describe('AVClient#constructBallotCryptograms', () => {
 
       await expectError(
         client.constructBallotCryptograms(cvr),
-        Error,
+        CorruptCvrError,
         'Corrupt CVR: Contains invalid contest'
       );
     });
@@ -80,7 +81,7 @@ describe('AVClient#constructBallotCryptograms', () => {
 
       await expectError(
         client.constructBallotCryptograms(cvr),
-        Error,
+        CorruptCvrError,
         'Corrupt CVR: Contains invalid option'
       );
     });
