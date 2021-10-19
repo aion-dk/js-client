@@ -14,65 +14,82 @@ export class AvClientError extends Error {
 }
 
 export class AccessCodeInvalid extends AvClientError {
+  readonly name = "AccessCodeInvalid";
+
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, AccessCodeInvalid.prototype);
-    this.name = "AccessCodeInvalid";
   }
 }
 
 export class AccessCodeExpired extends AvClientError {
+  readonly name = "AccessCodeExpired";
+
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, AccessCodeExpired.prototype);
-    this.name = "AccessCodeExpired";
   }
 }
 
 export class NetworkError extends AvClientError {
+  readonly name = "NetworkError";
+
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, NetworkError.prototype);
-    this.name = "NetworkError";
   }
 }
 
 export class InvalidConfigError extends AvClientError {
+  readonly name = "InvalidConfigError";
+
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, InvalidConfigError.prototype);
-    this.name = "InvalidConfigError";
   }
 }
 
 export class InvalidStateError extends AvClientError {
+  readonly name = "InvalidStateError";
+
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, InvalidStateError.prototype);
-    this.name = "InvalidStateError";
   }
 }
 
 export class BulletinBoardError extends AvClientError {
+  readonly name = "BulletinBoardError";
+
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, BulletinBoardError.prototype);
-    this.name = "BulletinBoardError";
   }
 }
 
 export class EmailDoesNotMatchVoterRecordError extends AvClientError {
+  readonly name = "EmailDoesNotMatchVoterRecordError";
+
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, EmailDoesNotMatchVoterRecordError.prototype);
-    this.name = "EmailDoesNotMatchVoterRecordError";
   }
 }
 
 export class UnsupportedServerReplyError extends AvClientError {
+  readonly name = "UnsupportedServerReplyError";
+
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, UnsupportedServerReplyError.prototype);
-    this.name = "UnsupportedServerReplyError";
+  }
+}
+
+export class CorruptCvrError extends AvClientError {
+  readonly name = "CorruptCvrError";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, CorruptCvrError.prototype);
   }
 }
