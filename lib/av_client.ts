@@ -24,7 +24,7 @@ import { randomKeyPair} from './av_client/generate_key_pair';
 export const sjcl = require('./av_client/sjcl');
 
 /**
- * # Assembly Voting Client API.
+ * # Assembly Voting Client API
  *
  * The API is responsible for handling all the cryptographic operations and all network communication with:
  * * the Digital Ballot Box
