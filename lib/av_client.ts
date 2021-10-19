@@ -284,6 +284,8 @@ export class AVClient {
   }
 
   /**
+   * @deprecated
+   *
    * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
    * Should be called before {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}.
    *
