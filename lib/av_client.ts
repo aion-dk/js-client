@@ -60,7 +60,7 @@ export class AVClient {
   private electionConfig?: ElectionConfig;
   private emptyCryptograms: ContestMap<EmptyCryptogram>;
   private keyPair: KeyPair;
-  private testCode: string;
+
   private voteEncryptions: ContestMap<OpenableEnvelope>;
   private voterIdentifier: string;
   private contestIds: number[];
@@ -297,7 +297,7 @@ export class AVClient {
    * ```
    */
   public generateTestCode(): void {
-    this.testCode = EncryptVotes.generateTestCode()
+    throw new Error('Not implemented yet');
   }
 
   /**
