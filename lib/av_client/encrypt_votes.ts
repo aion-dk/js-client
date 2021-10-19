@@ -24,10 +24,6 @@ const encrypt = (
   return response;
 }
 
-const generateTestCode = (): BigNum => {
-  return Crypto.generateRandomNumber()
-}
-
 const fingerprint = (cryptograms: ContestMap<Cryptogram>) => {
   const string = JSON.stringify(cryptograms)
 
@@ -36,9 +32,7 @@ const fingerprint = (cryptograms: ContestMap<Cryptogram>) => {
 
 export default {
   encrypt,
-  generateTestCode,
   fingerprint
 }
 
 type Cryptogram = string;
-type BigNum = string;
