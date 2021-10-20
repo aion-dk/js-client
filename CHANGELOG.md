@@ -1,5 +1,20 @@
 # AV Client Library Changelog
 
+## 0.1.3
+
+### New
+* Documentation updates
+* Exporting error types for improved error handling in consuming code
+* Upgrading 3rd party libraries, including security patching
+* Improved error handling
+* Transpilation target downgraded from ES2020 to ES2018
+
+### Changed
+
+* Type Receipt renamed to BallotBoxReceipt. Content is unchanged.
+* Method generateTestCode() marked as deprecated. This will be replaced when the new Benaloh challenge is in place.
+
+
 ## 0.1.2
 
 ### New
