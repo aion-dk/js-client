@@ -431,7 +431,7 @@ type AffidavitConfig = {
 
 export type { CastVoteRecord, Affidavit, BallotBoxReceipt }
 
-export type {
+export {
   AccessCodeExpired,
   AccessCodeInvalid,
   BulletinBoardError,
