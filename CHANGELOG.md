@@ -11,7 +11,7 @@
 
 ### Changed
 
-* Type `Receipt` renamed to `BallotBoxReceip`. Content is unchanged.
+* Type `Receipt` renamed to `BallotBoxReceipt`. Content is unchanged.
 * Method `generateTestCode()` marked as deprecated. This will be replaced when the new Benaloh challenge is in place.
 
 
