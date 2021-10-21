@@ -1,13 +1,13 @@
 # Assembly Voting JS Client
 
-![Code coverage](./.github/coverage_badge.svg)
+![Code coverage](https://raw.githubusercontent.com/aion-dk/js-client/main/.github/coverage_badge.svg)
 
 Javascript API for building voter-facing election applications.
 
 ## Installing
 Install directly from Github into your Javascript project.
 ```
-npm install aion-dk/js-client#v0.1.2
+npm install aion-dk/js-client
 ```
 
 ## Documentation
