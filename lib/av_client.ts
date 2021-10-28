@@ -386,8 +386,7 @@ export class AVClient {
     return Object.fromEntries(Object.keys(envelopes).map(contestId =>  [contestId, envelopes[contestId].cryptogram ]))
   }
 
-
-  public getElectionConfig(): ElectionConfig {
+  private getElectionConfig(): ElectionConfig {
     if(!this.electionConfig){
       throw new InvalidStateError('No configuration loaded. Did you call initialize()?')
     }
