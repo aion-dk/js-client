@@ -106,5 +106,5 @@ export interface Election {
   voteSubmissionId: any
 }
 
-type Signature = string;
-type HashValue = string;
+export type Signature = string;
+export type HashValue = string;

@@ -1,6 +1,6 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig, validateElectionConfig } from './av_client/election_config';
-import { ContestMap, OpenableEnvelope, EmptyCryptogram, BallotBoxReceipt } from './av_client/types'
+import { ContestMap, OpenableEnvelope, EmptyCryptogram, BallotBoxReceipt, HashValue, Signature } from './av_client/types'
 import AuthenticateWithCodes from './av_client/authenticate_with_codes';
 import { registerVoter } from './av_client/register_voter';
 import EncryptVotes from './av_client/encrypt_votes';
@@ -428,7 +428,14 @@ type AffidavitConfig = {
   encryptionKey: string;
 }
 
-export type { CastVoteRecord, Affidavit, BallotBoxReceipt }
+export type {
+  ContestMap,
+  CastVoteRecord,
+  Affidavit,
+  BallotBoxReceipt,
+  HashValue,
+  Signature
+}
 
 export {
   AccessCodeExpired,
