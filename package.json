@@ -1,6 +1,6 @@
 {
   "name": "@aion-dk/js-client",
-  "version": "0.1.4",
+  "version": "0.1.8",
   "description": "Assembly Voting JS client",
   "main": "dist/lib/av_client.js",
   "types": "dist/lib/av_client.d.ts",
@@ -9,8 +9,8 @@
     "coverage": "tsc && nyc --reporter=json-summary --reporter=text npm run test",
     "tdd": "mocha --require ts-node/register/transpile-only --require source-map-support/register --extension ts ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
     "docs": "typedoc --plugin none --out docs --includes test/",
-    "prepublish": "tsc",
     "build": "tsc && cp lib/av_client/*.js dist/lib/av_client",
+    "prepublish": "tsc && cp lib/av_client/*.js dist/lib/av_client",
     "lint": "eslint lib/"
   },
   "dependencies": {

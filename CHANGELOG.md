@@ -1,5 +1,8 @@
 # AV Client Library Changelog
 
+## 0.1.8
+* Fix problem with 3rd party libs not being contained in package.
+
 ## 0.1.3
 
 ### New
