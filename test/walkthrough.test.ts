@@ -9,9 +9,9 @@ import {
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
-describe('entire voter flow using OTP authorization', () => {
+describe.only('entire voter flow using OTP authorization', () => {
   let sandbox;
   let expectedNetworkRequests : any[] = [];
 
@@ -50,7 +50,7 @@ describe('entire voter flow using OTP authorization', () => {
       const client = new AVClient('http://localhost:3000/test/app');
       await client.initialize()
 
-      await client.requestAccessCode('123', 'us-voter-123@aion.dk').catch((e) => {
+      await client.requestAccessCode('1111', 'us-voter-1111@aion.dk').catch((e) => {
         console.error(e);
         expect.fail('AVClient#requestAccessCode failed.');
       });

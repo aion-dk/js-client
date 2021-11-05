@@ -8,6 +8,7 @@ import {
 } from './test_helpers';
 import {
   EmailDoesNotMatchVoterRecordError,
+  VoterRecordNotFoundError,
   NetworkError,
   UnsupportedServerReplyError
 } from '../lib/av_client/errors';
@@ -60,6 +61,22 @@ describe('AVClient#requestAccessCode', () => {
       await expectError(
         client.requestAccessCode('voter123', 'test@test.dk'),
         EmailDoesNotMatchVoterRecordError,
+        'Error message from VAC.'
+      );
+      expectedNetworkRequests.forEach((mock) => mock.done());
+    });
+  });
+
+  context('voter id does not match voter record on Voter Authorization Coordinator', () => {
+    it('returns an error', async () => {
+      expectedNetworkRequests.push(
+        nock(voterAuthorizerHost).post('/create_session')
+          .reply(500, { error_code: 'VOTER_RECORD_NOT_FOUND_ERROR', error_message: 'Error message from VAC.' })
+      );
+
+      await expectError(
+        client.requestAccessCode('voter123', 'test@test.dk'),
+        VoterRecordNotFoundError,
         'Error message from VAC.'
       );
       expectedNetworkRequests.forEach((mock) => mock.done());
