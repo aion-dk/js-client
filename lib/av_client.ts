@@ -23,6 +23,18 @@ import { randomKeyPair} from './av_client/generate_key_pair';
 /** @internal */
 export const sjcl = require('./av_client/sjcl');
 
+export interface IAVClient {
+  initialize(electionConfig: ElectionConfig): Promise<void>
+  initialize(): Promise<void>
+  requestAccessCode(opaqueVoterId: string, email: string): Promise<void>
+  validateAccessCode(code: string): Promise<void>
+  registerVoter(): Promise<void>
+  constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
+  spoilBallotCryptograms(): Promise<void>
+  submitBallotCryptograms(affidavit: Affidavit): Promise<BallotBoxReceipt>
+  purgeData(): void
+}
+
 /**
  * # Assembly Voting Client API
  *
@@ -51,7 +63,7 @@ export const sjcl = require('./av_client/sjcl');
  * ```
  */
 
-export class AVClient {
+export class AVClient implements IAVClient {
   private authorizationSessionId: string;
   private email: string;
   private identityConfirmationToken: IdentityConfirmationToken;
