@@ -1,6 +1,7 @@
 export class AvClientError extends Error {
   public code: number;
   public statusCode: number;
+  override readonly name;
 
   constructor(message: string, code = 0, statusCode = 0) {
     super(message);

@@ -244,6 +244,26 @@ export class AVClient implements IAVClient {
    * const trackingCode = await client.constructBallotCryptograms(cvr);
    * ```
    *
+   * Example of handling errors:
+   * ```
+   * try {
+   *   await client.constructBallotCryptograms({});
+   * } catch(error) {
+   *   if(error instanceof AvClientError) {
+   *     switch(error.name) {
+   *       case 'InvalidStateError':
+   *         console.log("State is not valid for this call");
+   *         break;
+   *       case 'NetworkError':
+   *         console.log("It's a network error");
+   *         break;
+   *       default:
+   *         console.log('Something else was wrong');
+   *      }
+   *   }
+   * }
+   * ```
+   *
    * Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
    * values internal to the AV election config.
    *

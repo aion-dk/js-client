@@ -8,6 +8,7 @@ import {
   voterAuthorizerHost
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
+import { AvClientError } from '../lib/av_client/errors';
 
 const USE_MOCK = true;
 
@@ -43,6 +44,30 @@ describe('entire voter flow using OTP authorization', () => {
     sandbox.restore();
     if(USE_MOCK)
       nock.cleanAll();
+  });
+
+  context('Error handling example', () => {
+    it.only('returns an error', async () => {
+      const client = new AVClient('http://localhost:3000/test/app');
+      await client.initialize();
+
+      try {
+        await client.constructBallotCryptograms({});
+      } catch(error) {
+        if(error instanceof AvClientError) {
+          switch(error.name) {
+            case 'InvalidStateError':
+              console.log("State is not valid for this call");
+              break;
+            case 'NetworkError':
+              console.log("It's a network error");
+              break;
+            default:
+              console.log('Something else was wrong');
+          }
+        }
+      }
+    });
   });
 
   it('returns a receipt', async () => {
