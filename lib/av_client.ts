@@ -461,6 +461,7 @@ type AffidavitConfig = {
 }
 
 export type {
+  IAVClient,
   ContestMap,
   CastVoteRecord,
   Affidavit,
