@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CastVoteRecordReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://itl.nist.gov/ns/voting/1500-103/v1 ../../../../../CastVoteRecords/NIST_V0_cast_vote_records.xsd"
+ xmlns="http://itl.nist.gov/ns/voting/1500-103/v1">
+  <CVR>
+    <BallotStyleId>???</BallotStyleId>
+    <CurrentSnapshotId>cvr-001</CurrentSnapshotId>
+    <CVRSnapshot ObjectId="cvr-001">
+      <CVRContest>
+        <ContestId>1</ContestId>
+        <CVRContestSelection>
+          <ContestSelectionId>option1</ContestSelectionId>
+          <SelectionPosition>
+            <HasIndication>yes</HasIndication>
+            <IsAllocable>yes</IsAllocable>
+            <NumberVotes>1</NumberVotes>
+          </SelectionPosition>
+          <TotalNumberVotes>1</TotalNumberVotes>
+        </CVRContestSelection>
+      </CVRContest>
+      <CVRContest>
+        <ContestId>2</ContestId>
+        <CVRContestSelection>
+          <ContestSelectionId>optiona</ContestSelectionId>
+          <SelectionPosition>
+            <HasIndication>yes</HasIndication>
+            <IsAllocable>yes</IsAllocable>
+            <NumberVotes>1</NumberVotes>
+          </SelectionPosition>
+          <TotalNumberVotes>1</TotalNumberVotes>
+        </CVRContestSelection>
+      </CVRContest>
+      <Type>original</Type>
+    </CVRSnapshot>
+    <ElectionId>1</ElectionId>
+    <UniqueId>1</UniqueId>
+  </CVR>
+</CastVoteRecordReport>

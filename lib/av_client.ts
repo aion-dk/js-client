@@ -6,6 +6,7 @@ import EncryptVotes from './av_client/encrypt_votes';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
+import * as NistConverter from './util/nist_converter';
 
 import {
   IAVClient,
@@ -471,6 +472,7 @@ export type {
 }
 
 export {
+  NistConverter,
   AvClientError,
   AccessCodeExpired,
   AccessCodeInvalid,
