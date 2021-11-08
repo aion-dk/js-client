@@ -201,17 +201,20 @@ export class AVClient {
       throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
 
     this.keyPair = randomKeyPair();
+
     const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
+
     const authorizationResponse = await coordinator.requestPublicKeyAuthorization(
       this.authorizationSessionId,
       this.identityConfirmationToken,
       this.keyPair.publicKey
     )
+
     const { registrationToken, publicKeyToken } = authorizationResponse.data
-    
+
     const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, registrationToken, publicKeyToken)
-    console.log(registerVoterResponse)
+
     this.voterIdentifier = registerVoterResponse.voterIdentifier
     this.emptyCryptograms = registerVoterResponse.emptyCryptograms
     this.contestIds = registerVoterResponse.contestIds
