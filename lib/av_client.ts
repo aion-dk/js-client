@@ -1,12 +1,22 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig, validateElectionConfig } from './av_client/election_config';
-import { IAVClient, ContestMap, OpenableEnvelope, EmptyCryptogram, BallotBoxReceipt, HashValue, Signature } from './av_client/types'
 import AuthenticateWithCodes from './av_client/authenticate_with_codes';
 import { registerVoter } from './av_client/register_voter';
 import EncryptVotes from './av_client/encrypt_votes';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
+
+import {
+  IAVClient,
+  ContestMap,
+  OpenableEnvelope,
+  EmptyCryptogram,
+  BallotBoxReceipt,
+  HashValue,
+  Signature
+} from './av_client/types';
+
 import {
   AvClientError,
   AccessCodeExpired,
@@ -16,7 +26,8 @@ import {
   EmailDoesNotMatchVoterRecordError,
   InvalidConfigError,
   InvalidStateError,
-  NetworkError } from './av_client/errors'
+  NetworkError } from './av_client/errors';
+
 import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
 import { validateCvr } from './av_client/cvr_validation';
 import { randomKeyPair} from './av_client/generate_key_pair';
