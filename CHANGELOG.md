@@ -1,5 +1,8 @@
 # AV Client Library Changelog
 
+## 0.1.10
+* Export type IAVClient
+
 ## 0.1.9
 * Added IAVClient interface for easier mocking by consumers.
 
