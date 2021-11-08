@@ -1,6 +1,6 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig, validateElectionConfig } from './av_client/election_config';
-import { ContestMap, OpenableEnvelope, EmptyCryptogram, BallotBoxReceipt, HashValue, Signature } from './av_client/types'
+import { IAVClient, ContestMap, OpenableEnvelope, EmptyCryptogram, BallotBoxReceipt, HashValue, Signature } from './av_client/types'
 import AuthenticateWithCodes from './av_client/authenticate_with_codes';
 import { registerVoter } from './av_client/register_voter';
 import EncryptVotes from './av_client/encrypt_votes';
@@ -8,6 +8,7 @@ import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import {
+  AvClientError,
   AccessCodeExpired,
   AccessCodeInvalid,
   BulletinBoardError,
@@ -22,18 +23,6 @@ import { randomKeyPair} from './av_client/generate_key_pair';
 
 /** @internal */
 export const sjcl = require('./av_client/sjcl');
-
-export interface IAVClient {
-  initialize(electionConfig: ElectionConfig): Promise<void>
-  initialize(): Promise<void>
-  requestAccessCode(opaqueVoterId: string, email: string): Promise<void>
-  validateAccessCode(code: string): Promise<void>
-  registerVoter(): Promise<void>
-  constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
-  spoilBallotCryptograms(): Promise<void>
-  submitBallotCryptograms(affidavit: Affidavit): Promise<BallotBoxReceipt>
-  purgeData(): void
-}
 
 /**
  * # Assembly Voting Client API
@@ -470,6 +459,7 @@ export type {
 }
 
 export {
+  AvClientError,
   AccessCodeExpired,
   AccessCodeInvalid,
   BulletinBoardError,
