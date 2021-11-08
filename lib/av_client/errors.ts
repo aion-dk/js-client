@@ -1,6 +1,7 @@
-export class AvClientError extends Error {
+export abstract class AvClientError extends Error {
   public code: number;
   public statusCode: number;
+  public abstract readonly name: string;
 
   constructor(message: string, code = 0, statusCode = 0) {
     super(message);

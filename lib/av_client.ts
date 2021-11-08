@@ -1,13 +1,24 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig, validateElectionConfig } from './av_client/election_config';
-import { ContestMap, OpenableEnvelope, EmptyCryptogram, BallotBoxReceipt, HashValue, Signature } from './av_client/types'
 import AuthenticateWithCodes from './av_client/authenticate_with_codes';
 import { registerVoter } from './av_client/register_voter';
 import EncryptVotes from './av_client/encrypt_votes';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
+
 import {
+  IAVClient,
+  ContestMap,
+  OpenableEnvelope,
+  EmptyCryptogram,
+  BallotBoxReceipt,
+  HashValue,
+  Signature
+} from './av_client/types';
+
+import {
+  AvClientError,
   AccessCodeExpired,
   AccessCodeInvalid,
   BulletinBoardError,
@@ -15,7 +26,8 @@ import {
   EmailDoesNotMatchVoterRecordError,
   InvalidConfigError,
   InvalidStateError,
-  NetworkError } from './av_client/errors'
+  NetworkError } from './av_client/errors';
+
 import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
 import { validateCvr } from './av_client/cvr_validation';
 import { randomKeyPair} from './av_client/generate_key_pair';
@@ -51,7 +63,7 @@ export const sjcl = require('./av_client/sjcl');
  * ```
  */
 
-export class AVClient {
+export class AVClient implements IAVClient {
   private authorizationSessionId: string;
   private email: string;
   private identityConfirmationToken: IdentityConfirmationToken;
@@ -230,6 +242,26 @@ export class AVClient {
    * const client = new AVClient(url);
    * const cvr = { '1': 'option1', '2': 'optiona' };
    * const trackingCode = await client.constructBallotCryptograms(cvr);
+   * ```
+   *
+   * Example of handling errors:
+   * ```
+   * try {
+   *   await client.constructBallotCryptograms({});
+   * } catch(error) {
+   *   if(error instanceof AvClientError) {
+   *     switch(error.name) {
+   *       case 'InvalidStateError':
+   *         console.log("State is not valid for this call");
+   *         break;
+   *       case 'NetworkError':
+   *         console.log("It's a network error");
+   *         break;
+   *       default:
+   *         console.log('Something else was wrong');
+   *      }
+   *   }
+   * }
    * ```
    *
    * Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
@@ -438,6 +470,7 @@ export type {
 }
 
 export {
+  AvClientError,
   AccessCodeExpired,
   AccessCodeInvalid,
   BulletinBoardError,

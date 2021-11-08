@@ -1,5 +1,9 @@
 # AV Client Library Changelog
 
+## 0.1.9
+* Added IAVClient interface for easier mocking by consumers.
+
+
 ## 0.1.8
 * Fix problem with 3rd party libs not being contained in package.
 

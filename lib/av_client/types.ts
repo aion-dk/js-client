@@ -1,3 +1,17 @@
+import { ElectionConfig } from "./election_config";
+
+export interface IAVClient {
+  initialize(electionConfig: ElectionConfig): Promise<void>
+  initialize(): Promise<void>
+  requestAccessCode(opaqueVoterId: string, email: string): Promise<void>
+  validateAccessCode(code: string): Promise<void>
+  registerVoter(): Promise<void>
+  constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
+  spoilBallotCryptograms(): Promise<void>
+  submitBallotCryptograms(affidavit: Affidavit): Promise<BallotBoxReceipt>
+  purgeData(): void
+}
+
 /**
  * This is an index, with contest ids for keys, and arbitrary values that belong to matching contests.
  *
