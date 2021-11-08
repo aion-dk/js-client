@@ -20,7 +20,7 @@ describe('entire voter flow using OTP authorization', () => {
 
     if(USE_MOCK) {
       expectedNetworkRequests = [];
-      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/test/app/config')
+      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/us/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json'));
       expectedNetworkRequests.push(nock(voterAuthorizerHost).post('/create_session')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json'));
@@ -28,13 +28,13 @@ describe('entire voter flow using OTP authorization', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json'));
       expectedNetworkRequests.push(nock(OTPProviderHost).post('/authorize')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/test/app/register')
+      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/us/app/register')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_register.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/test/app/challenge_empty_cryptograms')
+      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/us/app/challenge_empty_cryptograms')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_challenge_empty_cryptograms.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/test/app/get_latest_board_hash')
+      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/us/app/get_latest_board_hash')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_get_latest_board_hash.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/test/app/submit_votes')
+      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/us/app/submit_votes')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_submit_votes.json'));
     }
   });
@@ -47,10 +47,10 @@ describe('entire voter flow using OTP authorization', () => {
 
   it('returns a receipt', async () => {
     // return await recordResponses(async function() {
-      const client = new AVClient('http://localhost:3000/test/app');
+      const client = new AVClient('http://us-avx:3000/us/app');
       await client.initialize()
 
-      await client.requestAccessCode('1111', 'us-voter-1111@aion.dk').catch((e) => {
+      await client.requestAccessCode('123456789012', 'us-voter-123456789012@aion.dk').catch((e) => {
         console.error(e);
         expect.fail('AVClient#requestAccessCode failed.');
       });

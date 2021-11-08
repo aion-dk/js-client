@@ -11,7 +11,7 @@ describe('election configuration validation', () => {
   let electionConfig: any;
 
   beforeEach(async () => {
-    client = new AVClient('http://localhost:3000/test/app');
+    client = new AVClient('http://us-avx:3000/us/app');
     electionConfig = readJSON('./replies/otp_flow/get_test_app_config.json');
   });
 

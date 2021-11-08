@@ -17,7 +17,7 @@ describe('AVClient#constructBallotCryptograms', () => {
   beforeEach(async () => {
     sandbox = resetDeterminism();
 
-    nock(bulletinBoardHost).get('/test/app/config')
+    nock(bulletinBoardHost).get('/us/app/config')
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
     nock(voterAuthorizerHost).post('/create_session')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
@@ -27,14 +27,14 @@ describe('AVClient#constructBallotCryptograms', () => {
     nock(OTPProviderHost).post('/authorize')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
 
-    nock(bulletinBoardHost).post('/test/app/register')
+    nock(bulletinBoardHost).post('/us/app/register')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_register.json');
-    nock(bulletinBoardHost).post('/test/app/challenge_empty_cryptograms')
+    nock(bulletinBoardHost).post('/us/app/challenge_empty_cryptograms')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_challenge_empty_cryptograms.json');
-    nock(bulletinBoardHost).get('/test/app/get_latest_board_hash')
+    nock(bulletinBoardHost).get('/us/app/get_latest_board_hash')
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_get_latest_board_hash.json');
 
-    client = new AVClient('http://localhost:3000/test/app');
+    client = new AVClient('http://us-avx:3000/us/app');
     await client.initialize()
   });
 

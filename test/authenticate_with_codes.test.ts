@@ -13,10 +13,10 @@ describe('AVClient#authenticateWithCodes', () => {
 
   beforeEach(async () => {
     sandbox = resetDeterminism();
-    nock(bulletinBoardHost).get('/test/app/config')
+    nock(bulletinBoardHost).get('/us/app/config')
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
 
-    client = new AVClient('http://localhost:3000/test/app');
+    client = new AVClient('http://us-avx:3000/us/app');
     await client.initialize()
   });
 
@@ -27,9 +27,9 @@ describe('AVClient#authenticateWithCodes', () => {
 
   context('given valid election codes', () => {
     it('resolves without errors', async () => {
-      nock(bulletinBoardHost).post('/test/app/sign_in')
+      nock(bulletinBoardHost).post('/us/app/sign_in')
         .replyWithFile(200, __dirname + '/replies/sign_in.valid.json');
-      nock(bulletinBoardHost).post('/test/app/challenge_empty_cryptograms')
+      nock(bulletinBoardHost).post('/us/app/challenge_empty_cryptograms')
         .replyWithFile(200, __dirname + '/replies/challenge_empty_cryptograms.valid.json');
 
       const validCodes = ['aAjEuD64Fo2143'];
@@ -40,7 +40,7 @@ describe('AVClient#authenticateWithCodes', () => {
 
   context('given invalid election codes', () => {
     it('returns an error', async () => {
-      nock(bulletinBoardHost).post('/test/app/sign_in')
+      nock(bulletinBoardHost).post('/us/app/sign_in')
         .replyWithFile(200, __dirname + '/replies/avx_error.invalid_3.json');
 
       const invalidCodes = ['no', 'no'];

@@ -4,7 +4,7 @@ import sinon = require('sinon');
 const fs = require('fs');
 const sjcl = require('../lib/av_client/sjcl');
 
-export const bulletinBoardHost = 'http://localhost:3000/';
+export const bulletinBoardHost = 'http://us-avx:3000/';
 export const OTPProviderHost = 'http://localhost:1111/';
 export const voterAuthorizerHost = 'http://localhost:1234/';
 

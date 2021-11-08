@@ -33,7 +33,6 @@ export class BulletinBoard {
       signature: signature
     }).catch(error => {
       const response = error.response;
-
       if (error.request && !response) {
         throw new NetworkError('Network error. Could not connect to Bulletin Board.');
       }
