@@ -49,7 +49,6 @@ describe('entire voter flow using OTP authorization', () => {
     // return await recordResponses(async function() {
       const client = new AVClient('http://us-avx:3000/us/app');
       await client.initialize()
-      console.log(client)
 
       await client.requestAccessCode('123456789012', 'us-voter-123456789012@aion.dk').catch((e) => {
         console.error(e);
