@@ -50,7 +50,7 @@ describe('entire voter flow using OTP authorization', () => {
       const client = new AVClient('http://localhost:3000/test/app');
       await client.initialize()
 
-      await client.requestAccessCode('123', 'us-voter-123@aion.dk').catch((e) => {
+      await client.requestAccessCode('1111', 'us-voter-1111@aion.dk').catch((e) => {
         console.error(e);
         expect.fail('AVClient#requestAccessCode failed.');
       });

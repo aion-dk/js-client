@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { IdentityConfirmationToken } from "./otp_provider";
-import { EmailDoesNotMatchVoterRecordError, NetworkError, UnsupportedServerReplyError } from "../errors";
+import { EmailDoesNotMatchVoterRecordError, NetworkError, UnsupportedServerReplyError, VoterRecordNotFoundError } from "../errors";
 
 export default class VoterAuthorizationCoordinator {
   private backend: AxiosInstance;
@@ -33,6 +33,8 @@ export default class VoterAuthorizationCoordinator {
             throw new EmailDoesNotMatchVoterRecordError(errorMessage);
           case 'COULD_NOT_CONNECT_TO_OTP_PROVIDER':
             throw new NetworkError(errorMessage);
+          case 'VOTER_RECORD_NOT_FOUND_ERROR':
+            throw new VoterRecordNotFoundError(errorMessage)
           default: throw new UnsupportedServerReplyError(`Unsupported server error: ${errorMessage}`);
         }
       }
