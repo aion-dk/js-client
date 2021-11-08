@@ -1,9 +1,15 @@
 {
   "name": "@aion-dk/js-client",
   "version": "0.1.9",
+  "license": "MIT",
   "description": "Assembly Voting JS client",
   "main": "dist/lib/av_client.js",
   "types": "dist/lib/av_client.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aion-dk/js-client.git"
+  },
+  "homepage": "https://aion-dk.github.io/js-client/",
   "scripts": {
     "test": "mocha --require ts-node/register/transpile-only --require source-map-support/register --recursive --extension ts ./test/*.test.ts",
     "coverage": "tsc && nyc --reporter=json-summary --reporter=text npm run test",
