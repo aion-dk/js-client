@@ -27,13 +27,14 @@ export class BulletinBoard {
   }
 
   registerVoter(registrationToken: string, publicKeyToken: string, signature: string): Promise<AxiosResponse> {
+    console.log('------------------')
     return this.backend.post('register', {
       registration_token: registrationToken,
       public_key_token: publicKeyToken,
       signature: signature
     }).catch(error => {
       const response = error.response;
-
+      console.log(response)
       if (error.request && !response) {
         throw new NetworkError('Network error. Could not connect to Bulletin Board.');
       }

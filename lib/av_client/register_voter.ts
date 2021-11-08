@@ -16,7 +16,6 @@ interface RegisterVoterResponse {
 
 export async function registerVoter(bulletinBoard: BulletinBoard, keyPair: KeyPair, electionEncryptionKey: string, registrationToken: string, publicKeyToken: string): Promise<RegisterVoterResponse> {
   const signature = Crypto.generateSchnorrSignature('', keyPair.privateKey)
-
   // TODO make this call send all relevant values to the connector
   const registerVoterResponse: RegisterVoterResponse = await bulletinBoard.registerVoter(registrationToken, publicKeyToken, signature).then(
     ({ data }) => {

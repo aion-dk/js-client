@@ -402,7 +402,7 @@
       }
     }
   },
-  "app_url": "http://localhost:3000/test",
+  "app_url": "http://us-avx:3000/us",
   "services": {
     "otp_provider": {
       "url": "http://localhost:1111"

@@ -20,7 +20,7 @@ describe('AVClient#validateAccessCode', () => {
     sandbox = resetDeterminism();
 
     expectedNetworkRequests.push(
-      nock(bulletinBoardHost).get('/test/app/config')
+      nock(bulletinBoardHost).get('/us/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json')
     );
     expectedNetworkRequests.push(
@@ -28,7 +28,7 @@ describe('AVClient#validateAccessCode', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json')
     );
 
-    client = new AVClient('http://localhost:3000/test/app');
+    client = new AVClient('http://us-avx:3000/us/app');
     await client.initialize()
   });
 
@@ -48,11 +48,11 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
-        nock(bulletinBoardHost).post('/test/app/register')
+        nock(bulletinBoardHost).post('/us/app/register')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_register.json')
       );
       expectedNetworkRequests.push(
-        nock(bulletinBoardHost).post('/test/app/challenge_empty_cryptograms')
+        nock(bulletinBoardHost).post('/us/app/challenge_empty_cryptograms')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_challenge_empty_cryptograms.json')
       );
 
@@ -100,7 +100,7 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
-        nock(bulletinBoardHost).post('/test/app/register')
+        nock(bulletinBoardHost).post('/us/app/register')
           .reply(404)
       );
 

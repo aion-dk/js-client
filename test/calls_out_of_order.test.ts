@@ -14,7 +14,7 @@ describe('AVClient functions call order', () => {
   let client: AVClient;
 
   beforeEach(() => {
-    client = new AVClient('http://localhost:3000/test/app');
+    client = new AVClient('http://us-avx:3000/us/app');
   });
 
   it('throws an error when validateAccessCode is called first', async () => {
@@ -47,7 +47,7 @@ describe('AVClient functions call order', () => {
     beforeEach(async () => {
       sandbox = resetDeterminism();
 
-      nock(bulletinBoardHost).get('/test/app/config')
+      nock(bulletinBoardHost).get('/us/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json');
 
       nock(voterAuthorizerHost).post('/create_session')
@@ -58,17 +58,17 @@ describe('AVClient functions call order', () => {
       nock(OTPProviderHost).post('/authorize')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
 
-      nock(bulletinBoardHost).post('/test/app/register')
+      nock(bulletinBoardHost).post('/us/app/register')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_register.json');
       nock(bulletinBoardHost).post('/test/app/challenge_empty_cryptograms')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_challenge_empty_cryptograms.json');
-      nock(bulletinBoardHost).get('/test/app/get_latest_board_hash')
+      nock(bulletinBoardHost).get('/us/app/get_latest_board_hash')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_get_latest_board_hash.json');
 
-      nock(bulletinBoardHost).post('/test/app/get_commitment_opening')
+      nock(bulletinBoardHost).post('/us/app/get_commitment_opening')
         .replyWithFile(200, __dirname + '/replies/get_commitment_opening.valid.json');
 
-      client = new AVClient('http://localhost:3000/test/app');
+      client = new AVClient('http://us-avx:3000/us/app');
       await client.initialize();
     });
 
