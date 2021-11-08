@@ -7,7 +7,6 @@ import {
   expectError
 } from './test_helpers';
 import {
-  AvClientError,
   BulletinBoardError,
   NetworkError,
   UnsupportedServerReplyError
