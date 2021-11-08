@@ -7,7 +7,7 @@ Javascript API for building voter-facing election applications.
 ## Installing
 Install directly from Github into your Javascript project.
 ```
-npm install aion-dk/js-client
+npm install @aion-dk/js-client
 ```
 
 ## Documentation
