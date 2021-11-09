@@ -3,13 +3,13 @@ export interface CastVoteRecordReport {
 }
 
 export interface CVR {
-  CurrentSnapshotId: string
+  CurrentSnapshotId: TextElement
   CVRSnapshot: CVRSnapshot | CVRSnapshot[]
-  ElectionId: string
+  ElectionId: TextElement
 }
 
 export interface CVRSnapshot {
-  Type: string
+  Type: TextElement
   _attributes: { ObjectId: string }
   CVRContest: undefined | CVRContest | CVRContest[]
 }
@@ -25,9 +25,9 @@ interface CVRContestSelection {
 }
 
 interface SelectionPosition {
-  HasIndication: string
-  IsAllocable: string
-  NumberVotes: number
+  HasIndication: TextElement
+  IsAllocable: TextElement
+  NumberVotes: TextElement
 }
 
 interface TextElement {

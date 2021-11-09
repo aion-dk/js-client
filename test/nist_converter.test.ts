@@ -20,7 +20,7 @@ describe('Util#nistCvrToAvCvr', () => {
       });
     });
 
-    it('Convert simple selection for two contests', async () => {
+    it('Convert simple selection for two contests', () => {
       var xml = readFile('./cvrs/sample1.xml');
 
       const result = NistConverter.nistCvrToAvCvr(xml);
@@ -47,6 +47,15 @@ describe('Util#nistCvrToAvCvr', () => {
         Error,
         'No CVRContestSelection found'
       );
+    });
+
+    it('Extracts correct snapshot', () => {
+      var xml = readFile('./cvrs/sample2.xml');
+
+      const result = NistConverter.nistCvrToAvCvr(xml);
+
+      expect(result['1']).to.eq('option2');
+      expect(result['2']).to.eq('optionb');
     });
   });
 });
