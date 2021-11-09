@@ -117,7 +117,7 @@ export interface Election {
   boardHash: HashValue
   registeredAt: string
   serverSignature: Signature
-  voteSubmissionId: any
+  voteSubmissionId: string
 }
 
 export type Signature = string;
