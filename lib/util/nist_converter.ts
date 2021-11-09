@@ -29,7 +29,7 @@ function xmlToJson(xml: string) {
 function getCurrentSnapshot(cvr: CVR): CVRSnapshot {
   if(Array.isArray(cvr.CVRSnapshot)) {
     const current = cvr.CVRSnapshot
-      .find(s => s._attributes.ObjectId === cvr.CurrentSnapshotId);
+      .find(s => s._attributes.ObjectId === cvr.CurrentSnapshotId['text']);
 
     if(current === undefined)
       throw new Error('No CVRSnapshot found');
