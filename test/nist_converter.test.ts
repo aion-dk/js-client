@@ -3,7 +3,6 @@ import * as fs from 'fs'
 import { expectError } from './test_helpers';
 import NistConverter from '../lib/util/nist_converter';
 
-
 describe('Util#nistCvrToAvCvr', () => {
   const readFile = (fileName) => {
     return fs.readFileSync(require.resolve(fileName), 'utf8');
@@ -56,6 +55,22 @@ describe('Util#nistCvrToAvCvr', () => {
 
       expect(result['1']).to.eq('option2');
       expect(result['2']).to.eq('optionb');
+    });
+
+    it('Fails on missing input', async () => {
+      await expectError(
+        () => NistConverter.nistCvrToAvCvr(''),
+        Error,
+        'Failure converting empty NIST CVR'
+      )
+    });
+
+    it('Fails on malformed input', async () => {
+      await expectError(
+        () => NistConverter.nistCvrToAvCvr('hello world'),
+        Error,
+        'Failure converting malformed NIST CVR'
+      )
     });
   });
 });
