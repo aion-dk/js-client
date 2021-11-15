@@ -1,5 +1,8 @@
 # AV Client Library Changelog
 
+## 0.1.11
+* Add initial NIST 1500-103 converter
+
 ## 0.1.10
 * Export type IAVClient
 
