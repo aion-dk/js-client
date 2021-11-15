@@ -4,11 +4,20 @@ import type { ContestMap } from '../av_client/types';
 import type { CastVoteRecordReport, CVRContest, CVR, CVRSnapshot } from './nist_types';
 
 function nistCvrToAvCvr(xml: string): ContestMap<string> {
-  const content = xmlToJson(xml);
+  let content: any;
 
-  const castVoteRecord = content.CastVoteRecordReport as CastVoteRecordReport;
+  try {
+    content = xmlToJson(xml);
+  } catch(error) {
+    throw new Error('Failure converting malformed NIST CVR');
+  }
 
-  const snapshot = getCurrentSnapshot(castVoteRecord.CVR);
+  const castVoteRecordReport = content.CastVoteRecordReport as CastVoteRecordReport;
+
+  if(castVoteRecordReport === undefined)
+    throw new Error('Failure converting empty NIST CVR');
+
+  const snapshot = getCurrentSnapshot(castVoteRecordReport.CVR);
   const contests = getContests(snapshot);
 
   const result = contests.reduce(combineSelectionsToMap, {});
@@ -16,7 +25,7 @@ function nistCvrToAvCvr(xml: string): ContestMap<string> {
 }
 
 // Helpers
-function xmlToJson(xml: string) {
+function xmlToJson(xml: string): any {
   const parseOptions = {
     compact: true,
     spaces: 4,
