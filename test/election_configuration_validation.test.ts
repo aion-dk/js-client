@@ -12,7 +12,7 @@ describe('election configuration validation', () => {
 
   beforeEach(async () => {
     client = new AVClient('http://us-avx:3000/us/app');
-    electionConfig = readJSON('./replies/otp_flow/get_test_app_config.json');
+    electionConfig = readJSON('./replies/otp_flow/get_us_app_config.json');
   });
 
   context('OTP provider URL is empty', () => {

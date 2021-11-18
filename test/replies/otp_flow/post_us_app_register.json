@@ -1,0 +1,19 @@
+{
+  "voterSessionUuid": "edf66adc-94fd-4408-b4a8-872292ba2312",
+  "voterIdentifier": "d6516e7e34ca401f4f027c685adbcec5fdb76768",
+  "ballotIds": [
+    1,
+    2
+  ],
+  "emptyCryptograms": {
+    "1": {
+      "empty_cryptogram": "03dfcfe23022c6d60d307c3baaf300d26208f845cf8c08cc65c4399991debbbceb,02095dd1569936b4842de5e2427b843a29ebf1167bd50dc902cc6183270c55a2b7",
+      "commitment_point": "024214db82e22220ced190f1277bd51a98304bd17d1999f40ff12c2c71f52f282e"
+    },
+    "2": {
+      "empty_cryptogram": "02f8e6df69fa1cae77453106d2ef78cc0a2aaf7fe1c844b6d698973e8a5a68c39f,0353ccc215eccac96c1632b6187283b0dc706d6372dd2ab65eda4a4cd4e28158d9",
+      "commitment_point": "023db9dadc9c7ddcadcb6a69d3732c24d936f414eb36fa707443c7cc472dda39e9"
+    }
+  },
+  "signInWarning": null
+}

@@ -93,6 +93,10 @@ function stopRecording() {
 function saveFiles() {
   const indentationSpaces = 2;
   nock.recorder.play().forEach(function(record) {
+    // Exclude getting OTP code from email requests
+    if (record.scope == 'http://localhost:1080') {
+      return;
+    }
     const filePath = filenameFromRequest(record.method, record.path);
     const json = JSON.stringify(record.response, null, indentationSpaces);
     try {
