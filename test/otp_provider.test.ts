@@ -4,7 +4,8 @@ import nock = require('nock');
 import { OTPProvider } from '../lib/av_client/connectors/otp_provider';
 import {
   expectError,
-  OTPProviderHost
+  OTPProviderHost,
+  OTPProviderElectionContextId
 } from './test_helpers';
 import {
   AccessCodeInvalid,
@@ -19,7 +20,7 @@ describe('OTPProvider#requestOTPAuthorization', () => {
   const incorrectOTP = '0000';
 
   beforeEach(() => {
-    provider = new OTPProvider(OTPProviderHost);
+    provider = new OTPProvider(OTPProviderHost, OTPProviderElectionContextId);
   });
 
   afterEach(() => {
@@ -94,7 +95,7 @@ describe('OTPProvider#requestOTPAuthorization', () => {
   context('OTP Provider host unavailable', () => {
     it('returns network error', async () => {
       const unreachableHost = 'http://sdguet432t4tjsdjf.does-not-exist';
-      provider = new OTPProvider(unreachableHost);
+      provider = new OTPProvider(unreachableHost, OTPProviderElectionContextId);
 
       await expectError(
         provider.requestOTPAuthorization(correctOTP, correctEmail),

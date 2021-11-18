@@ -153,8 +153,10 @@ export class AVClient implements IAVClient {
     if(!this.email)
       throw new InvalidStateError('Cannot validate access code. Access code was not requested.');
 
-    const provider = new OTPProvider(this.getElectionConfig().services.otp_provider.url)
-    
+    const otpProviderUrl = this.getElectionConfig().services.otp_provider.url;
+    const otpProviderElectionContextUuid = this.getElectionConfig().services.otp_provider.election_context_uuid;
+    const provider = new OTPProvider(otpProviderUrl, otpProviderElectionContextUuid)
+
     this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email);
   }
 
