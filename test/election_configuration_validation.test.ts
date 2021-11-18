@@ -46,7 +46,12 @@ describe('election configuration validation', () => {
       await expectError(
         client.initialize(electionConfig),
         InvalidConfigError,
-        'Received invalid election configuration. Errors: Configuration is missing OTP Provider URL,\nConfiguration is missing Voter Authorizer URL'
+        "Received invalid election configuration. Errors: Configuration is missing OTP Provider URL,\n" +
+        "Configuration is missing OTP Provider election context uuid,\n" +
+        "Configuration is missing OTP Provider public key,\n" +
+        "Configuration is missing Voter Authorizer URL,\n" +
+        "Configuration is missing Voter Authorizer election context uuid,\n" +
+        "Configuration is missing Voter Authorizer public key"
       );
     });
   });

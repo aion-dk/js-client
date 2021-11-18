@@ -35,7 +35,7 @@
       }
     }
   },
-  "encryptionKey": "03c671299f4ffd3e985879d39b3b988f7809393142c2e4cfdf4ff210612934553c",
+  "encryptionKey": "02768ab6734d6a91599e6bca4ffbc67b76ab9a2b381f799b9757e0da645a34edb9",
   "signingPublicKey": "021cfae00341ec5630deb42dc24ddd5c932ebdd9da18bc516cfc15097ab5c0b501",
   "availableLocales": [
     "en"
@@ -416,10 +416,14 @@
   "app_url": "http://us-avx:3000/us",
   "services": {
     "otp_provider": {
-      "url": "http://localhost:1111"
+      "url": "http://localhost:1111",
+      "election_context_uuid": "cca2b217-cedd-4d58-a103-d101ba472eb8",
+      "public_key": "02c894341413b7619a0988c78b126257e0f627e2f1347e6c057801c2c6cf9a3111"
     },
     "voter_authorizer": {
-      "url": "http://localhost:1234"
+      "url": "http://localhost:1234",
+      "election_context_uuid": "4ddbcfff-cb22-450b-86df-eeb579693079",
+      "public_key": "0350b5c5cdd3974c3183b0ab5b2f7f0270c7df1f03ffef3e4e40ad74c16a1d4a05"
     }
   },
   "affidavit": {

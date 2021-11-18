@@ -15,8 +15,6 @@ export interface ElectionConfig {
   // appended data:
   affidavit: AffidavitConfig;
 
-  authorizationMode: 'election codes' | 'otps';
-
   services: {
     'voter_authorizer': Service,
     'otp_provider': Service
@@ -25,6 +23,8 @@ export interface ElectionConfig {
 
 interface Service {
   url: string;
+  election_context_uuid: string;
+  public_key: string;
 }
 
 interface AffidavitConfig {
@@ -54,8 +54,20 @@ export function validateElectionConfig(config: ElectionConfig): void {
   if (!containsOTPProviderURL(config)) {
     errors.push("Configuration is missing OTP Provider URL")
   }
+  if (!containsOTPProviderContextId(config)) {
+    errors.push("Configuration is missing OTP Provider election context uuid")
+  }
+  if (!containsOTPProviderPublicKey(config)) {
+    errors.push("Configuration is missing OTP Provider public key")
+  }
   if (!containsVoterAuthorizerURL(config)) {
     errors.push("Configuration is missing Voter Authorizer URL")
+  }
+  if (!containsVoterAuthorizerContextId(config)) {
+    errors.push("Configuration is missing Voter Authorizer election context uuid")
+  }
+  if (!containsVoterAuthorizerPublicKey(config)) {
+    errors.push("Configuration is missing Voter Authorizer public key")
   }
 
   if (errors.length > 0)
@@ -66,6 +78,23 @@ function containsOTPProviderURL(config: ElectionConfig) {
   return config?.services?.otp_provider?.url?.length > 0;
 }
 
+function containsOTPProviderContextId(config: ElectionConfig) {
+  return config?.services?.otp_provider?.election_context_uuid?.length > 0;
+}
+
+function containsOTPProviderPublicKey(config: ElectionConfig) {
+  return config?.services?.otp_provider?.public_key?.length > 0;
+}
+
 function containsVoterAuthorizerURL(config: ElectionConfig) {
   return config?.services?.voter_authorizer?.url?.length > 0;
 }
+
+function containsVoterAuthorizerContextId(config: ElectionConfig) {
+  return config?.services?.voter_authorizer?.election_context_uuid?.length > 0;
+}
+
+function containsVoterAuthorizerPublicKey(config: ElectionConfig) {
+  return config?.services?.voter_authorizer?.public_key?.length > 0;
+}
+
