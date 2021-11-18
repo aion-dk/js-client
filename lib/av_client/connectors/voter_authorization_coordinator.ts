@@ -4,9 +4,11 @@ import { EmailDoesNotMatchVoterRecordError, NetworkError, UnsupportedServerReply
 
 export default class VoterAuthorizationCoordinator {
   private backend: AxiosInstance;
+  private electionContextUuid: string;
 
-  constructor(baseURL: string, timeout = 10000) {
+  constructor(baseURL: string, electionContextUuid: string, timeout = 10000) {
     this.createBackendClient(baseURL, timeout);
+    this.electionContextUuid = electionContextUuid;
   }
 
   /**
@@ -16,6 +18,7 @@ export default class VoterAuthorizationCoordinator {
    */
   createSession(opaqueVoterId: string, email: string): Promise<AxiosResponse> {
     return this.backend.post('create_session', {
+      electionContextUuid: this.electionContextUuid,
       opaqueVoterId: opaqueVoterId,
       email
     }).catch(error => {
@@ -45,6 +48,7 @@ export default class VoterAuthorizationCoordinator {
 
   requestPublicKeyAuthorization(sessionId: string, identityConfirmationToken: IdentityConfirmationToken, publicKey: string): Promise<AxiosResponse> {
     return this.backend.post('request_authorization', {
+      electionContextUuid: this.electionContextUuid,
       sessionId: sessionId,
       emailConfirmationToken: identityConfirmationToken,
       publicKey: publicKey

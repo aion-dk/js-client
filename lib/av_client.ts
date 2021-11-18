@@ -118,7 +118,8 @@ export class AVClient implements IAVClient {
    */
   public async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
     const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
-    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
+    const voterAuthorizerContextUuid = this.getElectionConfig().services.voter_authorizer.election_context_uuid;
+    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
 
     return coordinator.createSession(opaqueVoterId, email)
       .then(({ data: { sessionId } }) => {
@@ -170,7 +171,8 @@ export class AVClient implements IAVClient {
     this.keyPair = randomKeyPair();
 
     const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
-    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL);
+    const voterAuthorizerContextUuid = this.getElectionConfig().services.voter_authorizer.election_context_uuid;
+    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
 
     const authorizationResponse = await coordinator.requestPublicKeyAuthorization(
       this.authorizationSessionId,
