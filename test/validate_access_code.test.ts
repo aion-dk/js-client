@@ -21,7 +21,7 @@ describe('AVClient#validateAccessCode', () => {
 
     expectedNetworkRequests.push(
       nock(bulletinBoardHost).get('/us/app/config')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_config.json')
     );
     expectedNetworkRequests.push(
       nock(voterAuthorizerHost).post('/create_session')
@@ -49,11 +49,11 @@ describe('AVClient#validateAccessCode', () => {
       );
       expectedNetworkRequests.push(
         nock(bulletinBoardHost).post('/us/app/register')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_register.json')
+          .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_register.json')
       );
       expectedNetworkRequests.push(
         nock(bulletinBoardHost).post('/us/app/challenge_empty_cryptograms')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_test_app_challenge_empty_cryptograms.json')
+          .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_challenge_empty_cryptograms.json')
       );
 
       const otp = '1234';

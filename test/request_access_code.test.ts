@@ -21,7 +21,7 @@ describe('AVClient#requestAccessCode', () => {
   beforeEach(async () => {
     expectedNetworkRequests.push(
       nock(bulletinBoardHost).get('/us/app/config')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_test_app_config.json')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_config.json')
     );
 
     client = new AVClient('http://us-avx:3000/us/app');

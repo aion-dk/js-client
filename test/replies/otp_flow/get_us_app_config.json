@@ -8,7 +8,7 @@
     },
     "id": 1,
     "title": {
-      "en": "Some election 2018"
+      "en": "Some US Election"
     },
     "subtitle": {},
     "description": {},
@@ -35,7 +35,7 @@
       }
     }
   },
-  "encryptionKey": "02d42cd8ad2e32aa23abba171b8b3a3e44c67ad559b4f74976bf9538ce04f9a2d7",
+  "encryptionKey": "03c671299f4ffd3e985879d39b3b988f7809393142c2e4cfdf4ff210612934553c",
   "signingPublicKey": "021cfae00341ec5630deb42dc24ddd5c932ebdd9da18bc516cfc15097ab5c0b501",
   "availableLocales": [
     "en"
@@ -68,7 +68,8 @@
           "image": null,
           "ancestry": null,
           "selectable": true,
-          "options": []
+          "options": [],
+          "exclusive": null
         },
         {
           "id": 2,
@@ -83,7 +84,8 @@
           "image": null,
           "ancestry": null,
           "selectable": true,
-          "options": []
+          "options": [],
+          "exclusive": null
         }
       ],
       "options": [
@@ -93,7 +95,8 @@
           "title": {
             "en": "Option 1"
           },
-          "image": null
+          "image": null,
+          "exclusive": null
         },
         {
           "id": 2,
@@ -101,7 +104,8 @@
           "title": {
             "en": "Option 2"
           },
-          "image": null
+          "image": null,
+          "exclusive": null
         }
       ],
       "write_in": false
@@ -132,7 +136,8 @@
           "image": null,
           "ancestry": null,
           "selectable": true,
-          "options": []
+          "options": [],
+          "exclusive": null
         },
         {
           "id": 4,
@@ -147,7 +152,8 @@
           "image": null,
           "ancestry": null,
           "selectable": true,
-          "options": []
+          "options": [],
+          "exclusive": null
         },
         {
           "id": 5,
@@ -162,7 +168,8 @@
           "image": null,
           "ancestry": null,
           "selectable": true,
-          "options": []
+          "options": [],
+          "exclusive": null
         }
       ],
       "options": [
@@ -172,7 +179,8 @@
           "title": {
             "en": "Option A"
           },
-          "image": null
+          "image": null,
+          "exclusive": null
         },
         {
           "id": 4,
@@ -180,7 +188,8 @@
           "title": {
             "en": "Option B"
           },
-          "image": null
+          "image": null,
+          "exclusive": null
         },
         {
           "id": 5,
@@ -188,7 +197,8 @@
           "title": {
             "en": "Option C"
           },
-          "image": null
+          "image": null,
+          "exclusive": null
         }
       ],
       "write_in": false
@@ -375,7 +385,8 @@
           "blank_is_exclusive": "Blank is exclusive and cannot be combined with other options.",
           "too_many": "Too many options selected",
           "write_in_required": "You are required to specify at least a party when 'Write in' is selected.",
-          "write_in_too_long": "The write in value is too long. Try to reduce its length."
+          "write_in_too_long": "The write in value is too long. Try to reduce its length.",
+          "exclusive": "Invalid combination of options"
         }
       },
       "write_in": {

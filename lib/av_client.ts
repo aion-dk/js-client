@@ -1,6 +1,5 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig, validateElectionConfig } from './av_client/election_config';
-import AuthenticateWithCodes from './av_client/authenticate_with_codes';
 import { registerVoter } from './av_client/register_voter';
 import EncryptVotes from './av_client/encrypt_votes';
 import SubmitVotes from './av_client/submit_votes';
@@ -102,51 +101,6 @@ export class AVClient implements IAVClient {
 
     validateElectionConfig(electionConfig);
     this.electionConfig = electionConfig;
-  }
-
-  /**
-   * Returns voter authorization mode from the election configuration.
-   *
-   * @internal
-   * @returns Returns an object with the method name, and the reference to the function.
-   * Available method names are
-   * * {@link AVClient.authenticateWithCodes | authenticateWithCodes} for authentication via election codes.
-   * * {@link AVClient.requestAccessCode | requestAccessCode} for authorization via OTPs.
-   * @throws {@link InvalidConfigError | InvalidConfigError } if the config does not specify a supported authorizationMode
-   */
-  public getAuthorizationMethod(): { methodName: string; method: Function } {
-    switch(this.getElectionConfig().authorizationMode) {
-      case 'election codes':
-        return {
-          methodName: 'authenticateWithCodes',
-          method: this.authenticateWithCodes
-        }
-      case 'otps':
-        return {
-          methodName: 'requestAccessCode',
-          method: this.requestAccessCode
-        }
-      default:
-        throw new InvalidConfigError('Authorization method not found in election config')
-    }
-  }
-
-  /**
-   * Should only be used when election authorization mode is 'election codes'.
-   *
-   * Authenticates or rejects voter, based on their submitted election codes.
-   *
-   * @internal
-   * @param   codes Array of election code strings.
-   * @returns Returns undefined if authentication succeeded or throws an error
-   */
-  public async authenticateWithCodes(codes: string[]): Promise<void> {
-    const authenticationResponse = await new AuthenticateWithCodes(this.bulletinBoard)
-      .authenticate(codes, this.electionId(), this.electionEncryptionKey());
-
-    this.voterIdentifier = authenticationResponse.voterIdentifier;
-    this.keyPair = authenticationResponse.keyPair;
-    this.emptyCryptograms = authenticationResponse.emptyCryptograms;
   }
 
   /**

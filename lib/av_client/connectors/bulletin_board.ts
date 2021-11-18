@@ -18,14 +18,6 @@ export class BulletinBoard {
     return this.backend.get('config');
   }
 
-  // TODO: Never used?
-  createSession(publicKey: string, signature: string): Promise<AxiosResponse> {
-    return this.backend.post('sign_in', {
-      public_key: publicKey,
-      signature: signature
-    });
-  }
-
   registerVoter(registrationToken: string, publicKeyToken: string, signature: string): Promise<AxiosResponse> {
     return this.backend.post('register', {
       registration_token: registrationToken,
@@ -59,25 +51,6 @@ export class BulletinBoard {
           'X-Voter-Session': this.voterSessionUuid
         }
       });
-  }
-
-  getRandomizers(): Promise<AxiosResponse> {
-    return this.backend.post('get_randomizers', {}, {
-      headers: {
-        'X-Voter-Session': this.voterSessionUuid
-      }
-    });
-  }
-
-  getCommitmentOpening(voterCommitmentOpening: ContestMap<string[]>, encryptedBallotCryptograms: ContestMap<string>): Promise<AxiosResponse> {
-    return this.backend.post('get_commitment_opening', {
-      voter_commitment_opening: voterCommitmentOpening,
-      encrypted_ballot_cryptograms: encryptedBallotCryptograms
-    }, {
-      headers: {
-        'X-Voter-Session': this.voterSessionUuid
-      }
-    });
   }
 
   getBoardHash(): Promise<AxiosResponse> {
