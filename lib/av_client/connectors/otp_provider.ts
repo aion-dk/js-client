@@ -5,13 +5,16 @@ export type IdentityConfirmationToken = string;
 
 export class OTPProvider {
   private backend: AxiosInstance;
+  private electionContextUuid: string;
 
-  constructor(baseURL: string, timeout = 10000) {
+  constructor(baseURL: string, electionContextUuid: string, timeout = 10000) {
     this.createBackendClient(baseURL, timeout);
+    this.electionContextUuid = electionContextUuid;
   }
 
   requestOTPAuthorization(otpCode: string, email: string): Promise<IdentityConfirmationToken> {
     return this.backend.post('authorize', {
+      electionContextUuid: this.electionContextUuid,
       otpCode: otpCode,
       email: email
     }).then(res => res.data.emailConfirmationToken)

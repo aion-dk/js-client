@@ -6,6 +6,7 @@ const sjcl = require('../lib/av_client/sjcl');
 
 export const bulletinBoardHost = 'http://us-avx:3000/';
 export const OTPProviderHost = 'http://localhost:1111/';
+export const OTPProviderElectionContextId = 'cca2b217-cedd-4d58-a103-d101ba472eb8';
 export const voterAuthorizerHost = 'http://localhost:1234/';
 
 export function resetDeterminism() {
