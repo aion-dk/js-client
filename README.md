@@ -27,6 +27,17 @@ To run the tests in watch mode:
 npm run tdd
 ```
 
+To record the responses
+
+In the `js-client` go to `walkthrough.test.ts` and disable mocks by changing `const USE_MOCK = true;` -> `false`. 
+
+Uncomment `// return await recordResponses(async function() {` in `returns a receipt` test. Remember the closing brackets at the end of the test.  
+
+The recorded responses should be saved the the `test/replies/otp_flow`-folder.  
+
+The folder can be copy pasted to the `ionic-app`-repo by replacing the folder `tests/e2e/fixtures/otp_flow`  
+
+
 To generate HTML documentation for external usage:
 
 ```
