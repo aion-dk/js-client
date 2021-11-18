@@ -15,8 +15,6 @@ export interface ElectionConfig {
   // appended data:
   affidavit: AffidavitConfig;
 
-  authorizationMode: 'election codes' | 'otps';
-
   services: {
     'voter_authorizer': Service,
     'otp_provider': Service
