@@ -32,8 +32,10 @@ import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
 import { validateCvr } from './av_client/cvr_validation';
 import { randomKeyPair} from './av_client/generate_key_pair';
 
+import * as sjclLib from './av_client/sjcl';
+
 /** @internal */
-export const sjcl = require('./av_client/sjcl');
+export const sjcl = sjclLib;
 
 /**
  * # Assembly Voting Client API

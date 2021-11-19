@@ -3,16 +3,19 @@ import * as convert from 'xml-js'
 import type { ContestMap } from '../av_client/types';
 import type { CastVoteRecordReport, CVRContest, CVR, CVRSnapshot } from './nist_types';
 
+type NistDocument = {
+  CastVoteRecordReport: CastVoteRecordReport
+}
+
 function nistCvrToAvCvr(xml: string): ContestMap<string> {
-  let content: any;
+  let castVoteRecordReport: CastVoteRecordReport;
 
   try {
-    content = xmlToJson(xml);
+    const content = xmlToJson(xml);
+    castVoteRecordReport = (content as NistDocument).CastVoteRecordReport;
   } catch(error) {
     throw new Error('Failure converting malformed NIST CVR');
   }
-
-  const castVoteRecordReport = content.CastVoteRecordReport as CastVoteRecordReport;
 
   if(castVoteRecordReport === undefined)
     throw new Error('Failure converting empty NIST CVR');
@@ -25,7 +28,7 @@ function nistCvrToAvCvr(xml: string): ContestMap<string> {
 }
 
 // Helpers
-function xmlToJson(xml: string): any {
+function xmlToJson(xml: string): unknown {
   const parseOptions = {
     compact: true,
     spaces: 4,

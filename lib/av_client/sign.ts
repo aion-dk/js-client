@@ -1,6 +1,6 @@
-import { ContestMap, OpenableEnvelope, SealedEnvelope } from './types'
+import { BallotBoxReceipt, ContestMap, OpenableEnvelope, SealedEnvelope } from './types'
 import * as crypto from './aion_crypto'
-const sjcl = require('./sjcl')
+import * as sjcl from './sjcl';
 const Crypto = crypto();
 
 export type AcknowledgedBoardHash = {
@@ -26,7 +26,10 @@ export function fingerprint(encryptedAffidavid: string): string {
   return Crypto.hashString(encryptedAffidavid)
 }
 
-export function signVotes(encryptedVotes: ContestMap<OpenableEnvelope>, privateKey: string, contentToSign: object) {
+export function signVotes(encryptedVotes: ContestMap<OpenableEnvelope>, privateKey: string, contentToSign: Record<string, unknown>): {
+  contentHash: string,
+  voterSignature: string
+} {
   const votes: ContestMap<string> = {};
 
   for (const contestId in encryptedVotes) {
@@ -52,36 +55,41 @@ export const sealEnvelopes = (encryptedVotes: ContestMap<OpenableEnvelope>): Con
   return Object.fromEntries(Object.keys(encryptedVotes).map(k => [k, sealEnvelope(encryptedVotes[k])]))
 }
 
-export function assertValidReceipt({ contentHash, voterSignature, receipt, electionSigningPublicKey }): void {
-  // verify board hash computation
+export function assertValidReceipt(contentHash: string, voterSignature: string, receipt: BallotBoxReceipt, electionSigningPublicKey: string): void {
+  assertBoardHashComputation(contentHash, receipt);
+  assertValidServerSignature(receipt, voterSignature, electionSigningPublicKey);
+}
+
+function assertValidServerSignature(receipt: BallotBoxReceipt, voterSignature: string, electionSigningPublicKey: string) {
+  const receiptHashObject = {
+    board_hash: receipt.boardHash,
+    signature: voterSignature
+  };
+
+  const receiptHashString = JSON.stringify(receiptHashObject);
+  const receiptHash = Crypto.hashString(receiptHashString);
+
+  if (!Crypto.verifySchnorrSignature(receipt.serverSignature, receiptHash, electionSigningPublicKey)) {
+    throw new Error('Invalid vote receipt: corrupt server signature');
+  }
+}
+
+function assertBoardHashComputation(contentHash: string, receipt: BallotBoxReceipt) {
   const boardHashObject = {
     content_hash: contentHash,
     previous_board_hash: receipt.previousBoardHash,
     registered_at: receipt.registeredAt
-  }
+  };
 
-  const boardHashString = JSON.stringify(boardHashObject)
-  const computedBoardHash = Crypto.hashString(boardHashString)
+  const boardHashString = JSON.stringify(boardHashObject);
+  const computedBoardHash = Crypto.hashString(boardHashString);
 
   if (computedBoardHash != receipt.boardHash) {
-    throw new Error('Invalid vote receipt: corrupt board hash')
-  }
-
-  // verify server signature
-  const receiptHashObject = {
-    board_hash: receipt.boardHash,
-    signature: voterSignature
-  }
-
-  const receiptHashString = JSON.stringify(receiptHashObject)
-  const receiptHash = Crypto.hashString(receiptHashString)
-
-  if (!Crypto.verifySchnorrSignature(receipt.serverSignature, receiptHash, electionSigningPublicKey)) {
-    throw new Error('Invalid vote receipt: corrupt server signature')
+    throw new Error('Invalid vote receipt: corrupt board hash');
   }
 }
 
-function computeNextBoardHash(content: object) {
+function computeNextBoardHash(content: Record<string, unknown>) {
   const contentString = JSON.stringify(content);
   const contentHash = Crypto.hashString(contentString);
   return contentHash;

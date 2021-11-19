@@ -52,7 +52,7 @@ export default class SubmitVotes {
 
     const ballotBoxReceipt = await this.submit({ contentHash, voterSignature, cryptogramsWithProofs, encryptedAffidavit })
     //console.log(ballotBoxReceipt, voterSignature)
-    assertValidReceipt({ contentHash, voterSignature, receipt: ballotBoxReceipt, electionSigningPublicKey });
+    assertValidReceipt(contentHash, voterSignature, ballotBoxReceipt, electionSigningPublicKey);
 
     return ballotBoxReceipt
   }
