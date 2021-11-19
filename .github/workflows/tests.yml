@@ -13,6 +13,8 @@ jobs:
           cache: 'npm'
       - name: Install NPM packages
         run: npm ci
+      - name: Run linter
+        run: npm run lint
       - name: Run tests with coverage report
         run: npm run coverage
       - name: Generate code coverage badge and commit it

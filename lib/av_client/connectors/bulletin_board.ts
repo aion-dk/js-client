@@ -2,6 +2,13 @@ import { ContestMap, SealedEnvelope } from '../types';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { BulletinBoardError, NetworkError, UnsupportedServerReplyError } from "../errors";
 
+interface BulletinBoardData {
+  error: undefined | {
+    code: string;
+    description: string
+  };
+}
+
 export class BulletinBoard {
   private backend: AxiosInstance;
   voterSessionUuid: string;
@@ -24,7 +31,7 @@ export class BulletinBoard {
       public_key_token: publicKeyToken,
       signature: signature
     }).catch(error => {
-      const response = error.response;
+      const response = error.response as AxiosResponse<BulletinBoardData>;
       if (error.request && !response) {
         throw new NetworkError('Network error. Could not connect to Bulletin Board.');
       }
@@ -34,7 +41,6 @@ export class BulletinBoard {
           throw new UnsupportedServerReplyError(`Unsupported Bulletin Board server error message: ${JSON.stringify(error.response.data)}`)
         }
 
-        const errorCode = response.data.error.code;
         const errorMessage = response.data.error.description;
         throw new BulletinBoardError(errorMessage);
       }

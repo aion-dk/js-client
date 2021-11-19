@@ -24,7 +24,7 @@ const encrypt = (
   return response;
 }
 
-const fingerprint = (cryptograms: ContestMap<Cryptogram>) => {
+const fingerprint = (cryptograms: ContestMap<Cryptogram>): string => {
   const string = JSON.stringify(cryptograms)
 
   return Crypto.hashString(string)
