@@ -379,7 +379,7 @@ export class AVClient implements IAVClient {
     return Object.fromEntries(Object.keys(envelopes).map(contestId =>  [contestId, envelopes[contestId].cryptogram ]))
   }
 
-  private getElectionConfig(): ElectionConfig {
+  public getElectionConfig(): ElectionConfig {
     if(!this.electionConfig){
       throw new InvalidStateError('No configuration loaded. Did you call initialize()?')
     }
@@ -428,7 +428,8 @@ export type {
   Affidavit,
   BallotBoxReceipt,
   HashValue,
-  Signature
+  Signature,
+  ElectionConfig
 }
 
 export {
