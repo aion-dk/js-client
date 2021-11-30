@@ -1,5 +1,9 @@
 # AV Client Library Changelog
 
+## 0.1.13
+* Expose getElectionConfig() as a public method.
+Can be used for debugging, testing and enumerating ballots.
+
 ## 0.1.11
 * Add initial NIST 1500-103 converter
 
