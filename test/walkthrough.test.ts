@@ -17,9 +17,8 @@ describe('entire voter flow using OTP authorization', () => {
   let expectedNetworkRequests : any[] = [];
 
   beforeEach(() => {
-    sandbox = resetDeterminism();
-
     if(USE_MOCK) {
+      sandbox = resetDeterminism();
       expectedNetworkRequests = [];
       expectedNetworkRequests.push(nock(bulletinBoardHost).get('/us/app/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_config.json'));
@@ -41,9 +40,10 @@ describe('entire voter flow using OTP authorization', () => {
   });
 
   afterEach(() => {
-    sandbox.restore();
-    if(USE_MOCK)
+    if (USE_MOCK) {
+      sandbox.restore();
       nock.cleanAll();
+    }
   });
 
   it('returns a receipt', async () => {
@@ -52,14 +52,15 @@ describe('entire voter flow using OTP authorization', () => {
       const client = new AVClient('http://us-avx:3000/us/app');
       await client.initialize()
 
-      await client.requestAccessCode('123456789012', 'us-voter-123456789012@aion.dk').catch((e) => {
+      const voterId = Date.now().toString().substr(0, 12);
+      await client.requestAccessCode(voterId, `us-voter-${voterId}@aion.dk`).catch((e) => {
         console.error(e);
         expect.fail('AVClient#requestAccessCode failed.');
       });
 
       let oneTimePassword: string;
       if (USE_MOCK) {
-        oneTimePassword = '87976'; // Keep this up to date with recorded value from OTP Provider
+        oneTimePassword = '12345';
       } else {
         oneTimePassword = await extractOTPFromEmail();
       }
@@ -74,8 +75,15 @@ describe('entire voter flow using OTP authorization', () => {
         expect.fail('AVClient#registerVoter failed');
       })
 
-      const cvr = { '1': 'option1', '2': 'optiona' };
-      const trackingCode = await client.constructBallotCryptograms(cvr).catch((e) => {
+      // We expect CVR value to look something like this: { '1': 'option1', '2': 'optiona' }
+      const firstChoicesAsCVR = Object.fromEntries(client.electionConfig.ballots.map((ballot: any) =>
+        [
+          ballot.id,
+          ballot.options[0].handle
+        ]
+      ));
+
+      const trackingCode = await client.constructBallotCryptograms(firstChoicesAsCVR).catch((e) => {
         console.error(e);
         expect.fail('AVClient#constructBallotCryptograms failed');
       });
@@ -115,7 +123,6 @@ describe('entire voter flow using OTP authorization', () => {
       throw 'OTP code pattern not found in the email';
     }
     const code = patternMatches[0];
-    console.log(`Reminder: update mock value of oneTimePassword with ${code}`);
     return code;
   }
 
