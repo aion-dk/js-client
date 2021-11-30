@@ -76,7 +76,7 @@ describe('entire voter flow using OTP authorization', () => {
       })
 
       // We expect CVR value to look something like this: { '1': 'option1', '2': 'optiona' }
-      const firstChoicesAsCVR = Object.fromEntries(client.electionConfig.ballots.map((ballot: any) =>
+      const firstChoicesAsCVR = Object.fromEntries(client.getElectionConfig().ballots.map((ballot: any) =>
         [
           ballot.id,
           ballot.options[0].handle
