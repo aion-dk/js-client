@@ -10,6 +10,7 @@ import {
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 
+const USE_MOCK = true;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;
@@ -45,6 +46,7 @@ describe('entire voter flow using OTP authorization', () => {
     }
   });
 
+  it('returns a receipt', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     // return await recordResponses(async function() {
       const client = new AVClient('http://us-avx:3000/mobile-api/us');
