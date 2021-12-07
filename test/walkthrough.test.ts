@@ -10,7 +10,6 @@ import {
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 
-const USE_MOCK = true;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;
@@ -46,14 +45,14 @@ describe('entire voter flow using OTP authorization', () => {
     }
   });
 
-  it('returns a receipt', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     // return await recordResponses(async function() {
       const client = new AVClient('http://us-avx:3000/mobile-api/us');
       await client.initialize()
 
-      const voterId = Date.now().toString().substr(0, 12);
-      await client.requestAccessCode(voterId, `us-voter-${voterId}@aion.dk`).catch((e) => {
+      const voterId = 'C01234567890' // A00000000006
+      const voterEmail = 'emersonb@spiff.com' // mvptuser@yahoo.com
+      await client.requestAccessCode(voterId, voterEmail).catch((e) => {
         console.error(e);
         expect.fail('AVClient#requestAccessCode failed.');
       });
