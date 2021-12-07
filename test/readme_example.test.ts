@@ -7,7 +7,7 @@ describe('entire voter flow using OTP authorization', () => {
   afterEach(() => readmeTestTeardown());
 
   it('returns a receipt', async () => {
-    const client = new AVClient('http://us-avx:3000/us/app');
+    const client = new AVClient('http://us-avx:3000/mobile-api/us');
     await client.initialize()
 
     await client.requestAccessCode('123', 'us-voter-123@aion.dk');
