@@ -105,7 +105,7 @@ describe('entire voter flow using OTP authorization', () => {
       if(USE_MOCK)
         expectedNetworkRequests.forEach((mock) => mock.done());
     // });
-  });
+  }).timeout(10000);
 
   async function extractOTPFromEmail() {
     await sleep(500);
