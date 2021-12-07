@@ -20,7 +20,7 @@ describe('entire voter flow using OTP authorization', () => {
     if(USE_MOCK) {
       sandbox = resetDeterminism();
       expectedNetworkRequests = [];
-      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/us/app/config')
+      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/mobile-api/us/config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_config.json'));
       expectedNetworkRequests.push(nock(voterAuthorizerHost).post('/create_session')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json'));
@@ -28,13 +28,13 @@ describe('entire voter flow using OTP authorization', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json'));
       expectedNetworkRequests.push(nock(OTPProviderHost).post('/authorize')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/us/app/register')
+      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/register')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_register.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/us/app/challenge_empty_cryptograms')
+      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/challenge_empty_cryptograms')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_challenge_empty_cryptograms.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/us/app/get_latest_board_hash')
+      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/mobile-api/us/get_latest_board_hash')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_get_latest_board_hash.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/us/app/submit_votes')
+      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/submit_votes')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_submit_votes.json'));
     }
   });
@@ -49,7 +49,7 @@ describe('entire voter flow using OTP authorization', () => {
   it('returns a receipt', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     // return await recordResponses(async function() {
-      const client = new AVClient('http://us-avx:3000/us/app');
+      const client = new AVClient('http://us-avx:3000/mobile-api/us');
       await client.initialize()
 
       const voterId = Date.now().toString().substr(0, 12);
