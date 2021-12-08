@@ -52,8 +52,8 @@ describe('entire voter flow using OTP authorization', () => {
       const client = new AVClient('http://us-avx:3000/mobile-api/us');
       await client.initialize()
 
-      const voterId = 'C01234567890' // A00000000006
-      const voterEmail = 'emersonb@spiff.com' // mvptuser@yahoo.com
+      const voterId = 'A00000000006'
+      const voterEmail = 'mvptuser@yahoo.com'
       await client.requestAccessCode(voterId, voterEmail).catch((e) => {
         console.error(e);
         expect.fail('AVClient#requestAccessCode failed.');
