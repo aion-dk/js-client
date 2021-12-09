@@ -1,6 +1,7 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import axios from 'axios';
+const { execSync } = require('child_process');
 import nock = require('nock');
 import {
   resetDeterminism,
@@ -36,6 +37,8 @@ describe('entire voter flow using OTP authorization', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_get_latest_board_hash.json'));
       expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/submit_votes')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_submit_votes.json'));
+    } else {
+      resetBackendData();
     }
   });
 
@@ -52,7 +55,7 @@ describe('entire voter flow using OTP authorization', () => {
       const client = new AVClient('http://us-avx:3000/mobile-api/us');
       await client.initialize()
 
-      const voterId = Date.now().toString().substr(0, 12);
+      const voterId = '123456789012';
       await client.requestAccessCode(voterId, `us-voter-${voterId}@aion.dk`).catch((e) => {
         console.error(e);
         expect.fail('AVClient#requestAccessCode failed.');
@@ -128,5 +131,15 @@ describe('entire voter flow using OTP authorization', () => {
 
   async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function resetBackendData() {
+    execSync(
+      './reset_us_seed.sh',
+      {
+        cwd: '../avx/db/development',
+        stdio: 'inherit'
+      }
+    );
   }
 });
