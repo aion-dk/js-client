@@ -2,6 +2,8 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import axios from 'axios';
 const { execSync } = require('child_process');
+require('dotenv').config();
+import * as path from 'path';
 import nock = require('nock');
 import {
   resetDeterminism,
@@ -134,10 +136,18 @@ describe('entire voter flow using OTP authorization', () => {
   }
 
   function resetBackendData() {
+    if (!process.env['AVX_DIRECTORY']) {
+      throw new Error('Check .env.example on how to provide AVX_DIRECTORY environment variable');
+    }
+    const scriptPath = path.join(
+      process.env.AVX_DIRECTORY,
+      'db',
+      'development'
+    )
     execSync(
       './reset_us_seed.sh',
       {
-        cwd: '../avx/db/development',
+        cwd: scriptPath,
         stdio: 'inherit'
       }
     );
