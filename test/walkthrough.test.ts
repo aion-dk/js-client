@@ -52,8 +52,9 @@ describe('entire voter flow using OTP authorization', () => {
       const client = new AVClient('http://us-avx:3000/mobile-api/us');
       await client.initialize()
 
-      const voterId = Date.now().toString().substr(0, 12);
-      await client.requestAccessCode(voterId, `us-voter-${voterId}@aion.dk`).catch((e) => {
+      const voterId = 'A00000000006'
+      const voterEmail = 'mvptuser@yahoo.com'
+      await client.requestAccessCode(voterId, voterEmail).catch((e) => {
         console.error(e);
         expect.fail('AVClient#requestAccessCode failed.');
       });
@@ -104,7 +105,7 @@ describe('entire voter flow using OTP authorization', () => {
       if(USE_MOCK)
         expectedNetworkRequests.forEach((mock) => mock.done());
     // });
-  });
+  }).timeout(10000);
 
   async function extractOTPFromEmail() {
     await sleep(500);
