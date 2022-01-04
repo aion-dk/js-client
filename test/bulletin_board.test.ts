@@ -29,7 +29,7 @@ describe('BulletinBoard#registerVoter', () => {
         .reply(403, { error: { code: 13, description: 'Public key error' }});
 
       await expectError(
-        bulletinBoard.registerVoter('registrationToken', 'publicKeyToken', 'signature'),
+        bulletinBoard.registerVoter('authToken', 'signature'),
         BulletinBoardError,
         'Public key error'
       );
@@ -42,7 +42,7 @@ describe('BulletinBoard#registerVoter', () => {
         .reply(500, { foo: 'bar' });
 
       await expectError(
-        bulletinBoard.registerVoter('registrationToken', 'publicKeyToken', 'signature'),
+        bulletinBoard.registerVoter('authToken', 'signature'),
         UnsupportedServerReplyError,
         'Unsupported Bulletin Board server error message: {"foo":"bar"}'
       );
@@ -55,7 +55,7 @@ describe('BulletinBoard#registerVoter', () => {
         .replyWithError('Some network error');
 
       await expectError(
-        bulletinBoard.registerVoter('registrationToken', 'publicKeyToken', 'signature'),
+        bulletinBoard.registerVoter('authToken', 'signature'),
         NetworkError,
         'Network error. Could not connect to Bulletin Board.'
       );
