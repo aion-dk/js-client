@@ -14,10 +14,10 @@ interface RegisterVoterResponse {
    */
 }
 
-export async function registerVoter(bulletinBoard: BulletinBoard, keyPair: KeyPair, electionEncryptionKey: string, registrationToken: string, publicKeyToken: string): Promise<RegisterVoterResponse> {
+export async function registerVoter(bulletinBoard: BulletinBoard, keyPair: KeyPair, electionEncryptionKey: string, authToken: string): Promise<RegisterVoterResponse> {
   const signature = Crypto.generateSchnorrSignature('', keyPair.privateKey)
   // TODO make this call send all relevant values to the connector
-  const registerVoterResponse: RegisterVoterResponse = await bulletinBoard.registerVoter(registrationToken, publicKeyToken, signature).then(
+  const registerVoterResponse: RegisterVoterResponse = await bulletinBoard.registerVoter(authToken, signature).then(
     ({ data }) => {
       // this.bulletinBoard.setVoterSessionUuid(data.voterSessionUuid)
       // FIXME we need to make sure that the bulletinBoard gets info about its voterSessionUuid another way
