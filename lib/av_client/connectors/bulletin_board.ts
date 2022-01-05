@@ -25,10 +25,9 @@ export class BulletinBoard {
     return this.backend.get('config');
   }
 
-  registerVoter(registrationToken: string, publicKeyToken: string, signature: string): Promise<AxiosResponse> {
+  registerVoter(authToken: string, signature: string): Promise<AxiosResponse> {
     return this.backend.post('register', {
-      registration_token: registrationToken,
-      public_key_token: publicKeyToken,
+      auth_token: authToken,
       signature: signature
     }).catch(error => {
       const response = error.response as AxiosResponse<BulletinBoardData>;

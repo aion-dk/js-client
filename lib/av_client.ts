@@ -184,9 +184,9 @@ export class AVClient implements IAVClient {
       this.keyPair.publicKey
     )
 
-    const { registrationToken, publicKeyToken } = authorizationResponse.data
+    const { authToken } = authorizationResponse.data
 
-    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, registrationToken, publicKeyToken)
+    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, authToken)
 
     this.voterIdentifier = registerVoterResponse.voterIdentifier
     this.emptyCryptograms = registerVoterResponse.emptyCryptograms

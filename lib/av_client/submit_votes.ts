@@ -51,7 +51,6 @@ export default class SubmitVotes {
     const cryptogramsWithProofs = sealEnvelopes(encryptedVotes)
 
     const ballotBoxReceipt = await this.submit({ contentHash, voterSignature, cryptogramsWithProofs, encryptedAffidavit })
-    //console.log(ballotBoxReceipt, voterSignature)
     assertValidReceipt(contentHash, voterSignature, ballotBoxReceipt, electionSigningPublicKey);
 
     return ballotBoxReceipt
