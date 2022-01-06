@@ -54,4 +54,15 @@ describe.only('Uniformer', () => {
         .to.equal(JSON.stringify([[ 'time', '2020-06-08T21:59:30.849Z']]));
     });
   });
+
+
+  it('allows integers, booleans and null', () => {
+    const uniformer = new Uniformer();
+
+    const values = [42, -1, true, false, null];
+    values.forEach((value) => {
+      expect(new Uniformer().formString(value))
+        .to.equal(JSON.stringify(value));
+    })
+  });
 });
