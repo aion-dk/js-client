@@ -1,9 +1,22 @@
 type KeyValueTuple = [ string, any ];
 type Primitive = string | number | symbol | boolean | null;
+
 export default class Uniformer {
+
   public formString(obj: {} | Primitive ): string {
     const sortedEntries = this.walk(obj);
     return JSON.stringify(sortedEntries);
+  }
+
+  private toSortedKeyValuePairs(obj: {}) {
+    const toKeyValueTuple = ([k, v]): KeyValueTuple => [k, this.walk(v)];
+    const sortByKey = (a: KeyValueTuple, b: KeyValueTuple) => ("" + a[0]).localeCompare(b[0]);
+
+    const properties = Object.entries(obj);
+
+    return properties
+      .map(toKeyValueTuple)
+      .sort(sortByKey);
   }
 
   private walk(obj: {} | Primitive ): KeyValueTuple[] | Primitive {
@@ -18,15 +31,10 @@ export default class Uniformer {
 
         if(obj === null)
           return null;
+
+        return this.toSortedKeyValuePairs(obj);
+      default:
+        throw new Error(`Unknown parameter type '${typeof obj}.`);
     }
-
-    const toKeyValueTuple = ([k, v]): KeyValueTuple => [k, this.walk(v)];
-    const sortByKey = (a: KeyValueTuple, b: KeyValueTuple) => ("" + a[0]).localeCompare(b[0]);
-
-    const properties = Object.entries(obj);
-
-    return properties
-      .map(toKeyValueTuple)
-      .sort(sortByKey);
   }
 }
