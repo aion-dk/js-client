@@ -79,8 +79,6 @@ describe('entire voter flow using OTP authorization', () => {
         console.error(e);
         expect.fail('AVClient#registerVoter failed');
       })
-      //if(USE_MOCK)
-      //expectedNetworkRequests.forEach((mock) => mock.done());
     //});
   }).timeout(10000);
   
@@ -140,9 +138,6 @@ describe('entire voter flow using OTP authorization', () => {
         'voteSubmissionId'
       )
       expect(receipt.previousBoardHash.length).to.eql(64)
-
-      if(USE_MOCK)
-        expectedNetworkRequests.forEach((mock) => mock.done());
      //});
   }).timeout(10000);
 
