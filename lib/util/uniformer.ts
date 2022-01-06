@@ -11,6 +11,9 @@ export default class Uniformer {
       case "string": return obj;
       case "number": return obj;
       case "symbol": return obj.toString().match(/Symbol\((.*?)\)/)![1];
+      case "object":
+        if(obj instanceof Date)
+          return obj.toISOString();
     }
 
     const toKeyValueTuple = ([k, v]): KeyValueTuple => [k, this.walk(v)];

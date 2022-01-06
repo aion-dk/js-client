@@ -43,4 +43,15 @@ describe.only('Uniformer', () => {
         .to.equal(JSON.stringify([[ 'test', 'foobar']]));
     });
   });
+
+  context('when object is a DateTime', () => {
+    it('converts to a string in ISO8601 UTC using milliseconds', () => {
+      const someDate = new Date("2020-06-08T23:59:30.849+0200");
+
+      const withDate = { time: someDate };
+
+      expect(new Uniformer().formString(withDate))
+        .to.equal(JSON.stringify([[ 'time', '2020-06-08T21:59:30.849Z']]));
+    });
+  });
 });
