@@ -162,10 +162,35 @@ export class AVClient implements IAVClient {
     this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email);
   }
 
+  /**
+   * Compatible with new DBB structure
+   * (WIP)
+   */
+  public async createVoterRegistration(): Promise<void> {
+    if(!this.identityConfirmationToken)
+      throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
+
+    this.keyPair = randomKeyPair();
+
+    const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
+    const voterAuthorizerContextUuid = this.getElectionConfig().services.voter_authorizer.election_context_uuid;
+    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
+    const servicesBoardAddress = this.getElectionConfig().services.address
+
+    const authorizationResponse = await coordinator.requestPublicKeyAuthorization(
+      this.authorizationSessionId,
+      this.identityConfirmationToken,
+      this.keyPair.publicKey
+    )
+
+    const { authToken } = authorizationResponse.data
+
+    const voterRegistrationItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress)
+  }
 
   /**
    * Registers a voter
-   *
+   * // TODO: Remove when new dbb structure is in place
    * @returns undefined or throws an error
    */
   public async registerVoter(): Promise<void> {
