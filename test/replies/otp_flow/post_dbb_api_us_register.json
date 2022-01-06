@@ -1,0 +1,40 @@
+[
+  {
+    "id": 10,
+    "election_id": 1,
+    "address": "2ef086d42664f96ea37fa603ffc089002c9a2d48bdd1cb2f0665db987697a623",
+    "type": "VoterRegistrationItem",
+    "content": {
+      "identifier": "b656c010121e16feddcdf3d2c5a6d793baf3ce34",
+      "voterGroup": "4",
+      "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiYjY1NmMwMTAxMjFlMTZmZWRkY2RmM2QyYzVhNmQ3OTNiYWYzY2UzNCIsInB1YmxpY19rZXkiOiIwMjVjNGQ0OTNhNmRlYTZlM2FiNjNkM2FkOWY2OGU5YjlmYjY4N2U3NDE0Mjg2NGI0MjlmN2QzY2RlOTk5OTUzOWUiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiI2MDgyYzg2YTMzY2Y5YjkxOTk4MGUwODU3OWUyOGI2NzFkOGZiOWM1IiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0MTQ3MTY5OSwiZXhwIjoxNjQxNDczNDk5fQ.kKSbrvHZg4pwCtvOib6c2aYP0Q5nf5xiNB9C9VQDXzpnql2Ar85cR1zmlQ805cb1cluHslbXCSpWAaxyyzLreQ"
+    },
+    "author": "03756bdfefc0c403eef47c9544f693a74022094ab1aa617340d0e3edfecdf52b2e",
+    "parent_address": "9137fb535bc855747ce34827a49522fb4afd492861d24fca48627b911ca407bb",
+    "registered_at": "2022-01-06T13:21:39.638+01:00",
+    "signature": "e3c1be8efd22fe1675175caf64da7cf454722e85c341ead3d1b02b47cf9a53bf,30c63e44010b577cc68c04b340a1febb5d155c94944875eae990e6f566bd67c0",
+    "attachment": null,
+    "resource_id": "b656c010121e16feddcdf3d2c5a6d793baf3ce34",
+    "created_at": "2022-01-06T13:21:39.638+01:00",
+    "updated_at": "2022-01-06T13:21:39.638+01:00"
+  },
+  {
+    "id": 11,
+    "election_id": 1,
+    "address": "03a77376f3e5b313203fde2ee945fc6667ebb4f369db9221dc643c50439879c6",
+    "type": "VoterSessionItem",
+    "content": {
+      "identifier": "b656c010121e16feddcdf3d2c5a6d793baf3ce34",
+      "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiYjY1NmMwMTAxMjFlMTZmZWRkY2RmM2QyYzVhNmQ3OTNiYWYzY2UzNCIsInB1YmxpY19rZXkiOiIwMjVjNGQ0OTNhNmRlYTZlM2FiNjNkM2FkOWY2OGU5YjlmYjY4N2U3NDE0Mjg2NGI0MjlmN2QzY2RlOTk5OTUzOWUiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiI2MDgyYzg2YTMzY2Y5YjkxOTk4MGUwODU3OWUyOGI2NzFkOGZiOWM1IiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0MTQ3MTY5OSwiZXhwIjoxNjQxNDczNDk5fQ.kKSbrvHZg4pwCtvOib6c2aYP0Q5nf5xiNB9C9VQDXzpnql2Ar85cR1zmlQ805cb1cluHslbXCSpWAaxyyzLreQ",
+      "publicKey": "025c4d493a6dea6e3ab63d3ad9f68e9b9fb687e74142864b429f7d3cde9999539e"
+    },
+    "author": "03756bdfefc0c403eef47c9544f693a74022094ab1aa617340d0e3edfecdf52b2e",
+    "parent_address": "2ef086d42664f96ea37fa603ffc089002c9a2d48bdd1cb2f0665db987697a623",
+    "registered_at": "2022-01-06T13:21:39.653+01:00",
+    "signature": "02c62285b2d0a5750323558eec2dea52b64e5c17f5184fbb0dd7764732e074e3,594f737ee84f0896f0a032a0d17ee5b98aa066bcae59d1ba149774d0c08e5bd4",
+    "attachment": null,
+    "resource_id": "b656c010121e16feddcdf3d2c5a6d793baf3ce34",
+    "created_at": "2022-01-06T13:21:39.653+01:00",
+    "updated_at": "2022-01-06T13:21:39.653+01:00"
+  }
+]

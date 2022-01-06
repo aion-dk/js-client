@@ -36,6 +36,10 @@ describe('entire voter flow using OTP authorization', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_get_latest_board_hash.json'));
       expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/submit_votes')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_submit_votes.json'));
+      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/dbb/api/us/config')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json')); 
+      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/api/us/register')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json')); 
     }
   });
 
@@ -46,9 +50,44 @@ describe('entire voter flow using OTP authorization', () => {
     }
   });
 
+  it.only('returns a receipt using new dbb structure', async () => {
+    //return await recordResponses(async function() {
+    const client = new AVClient('http://us-avx:3000/dbb/api/us');
+      await client.initialize()
+
+      const voterId = 'A00000000006'
+      const voterEmail = 'mvptuser@yahoo.com'
+      await client.requestAccessCode(voterId, voterEmail).catch((e) => {
+        console.error(e);
+        expect.fail('AVClient#requestAccessCode failed.');
+      });
+
+      let oneTimePassword: string;
+      if (USE_MOCK) {
+        oneTimePassword = '12345';
+      } else {
+        oneTimePassword = await extractOTPFromEmail();
+      }
+
+      const confirmationToken = await client.validateAccessCode(oneTimePassword).catch((e) => {
+        console.error(e);
+        expect.fail('AVClient#validateAccessCode failed');
+      });
+
+      
+      await client.createVoterRegistration().catch((e) => {
+        console.error(e);
+        expect.fail('AVClient#registerVoter failed');
+      })
+      //if(USE_MOCK)
+      //expectedNetworkRequests.forEach((mock) => mock.done());
+    //});
+  }).timeout(10000);
+  
+
   it('returns a receipt', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
-    // return await recordResponses(async function() {
+    //return await recordResponses(async function() {
       const client = new AVClient('http://us-avx:3000/mobile-api/us');
       await client.initialize()
 
@@ -104,7 +143,7 @@ describe('entire voter flow using OTP authorization', () => {
 
       if(USE_MOCK)
         expectedNetworkRequests.forEach((mock) => mock.done());
-    // });
+     //});
   }).timeout(10000);
 
   async function extractOTPFromEmail() {

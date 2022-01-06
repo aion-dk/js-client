@@ -1,0 +1,434 @@
+{
+  "election": {
+    "uuid": "bc1b1ed0-943e-4647-bfc1-0633ba08c05e",
+    "enabled": true,
+    "schedule": {
+      "scheduledFor": null,
+      "enableAt": null,
+      "disableAt": null
+    },
+    "id": 1,
+    "title": {
+      "en": "Some US Election"
+    },
+    "subtitle": {},
+    "description": {},
+    "footer": {},
+    "verification": {
+      "allow_voter_verification_mode": true,
+      "allow_receipt_download": true,
+      "board_private": false
+    },
+    "redirect": {
+      "redirect_method": "disabled",
+      "redirect_timer": 15,
+      "redirect_url": {}
+    },
+    "theme": {
+      "logo": null
+    },
+    "factors": {
+      "factor1": {
+        "name": {},
+        "placeholder": {},
+        "help": {},
+        "visibility": "force_visible"
+      }
+    }
+  },
+  "encryptionKey": "02c69f35502223889f20b08c9c283307aa511362b09f8216ccdedf6a9614a5d8d6",
+  "signingPublicKey": "021cfae00341ec5630deb42dc24ddd5c932ebdd9da18bc516cfc15097ab5c0b501",
+  "availableLocales": [
+    "en"
+  ],
+  "currentLocale": "en",
+  "ballots": [
+    {
+      "id": 1,
+      "type": "BallotNormal",
+      "vote_encoding_type": 1,
+      "submission_helper": true,
+      "blank_option": "active_choice",
+      "title": {
+        "en": "First ballot"
+      },
+      "collapse_default": true,
+      "collapsable": false,
+      "description": {},
+      "options_tree": [
+        {
+          "id": 1,
+          "handle": "1",
+          "title": {
+            "en": "Option 1"
+          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
+          "image": null,
+          "ancestry": null,
+          "selectable": true,
+          "options": [],
+          "exclusive": null
+        },
+        {
+          "id": 2,
+          "handle": "2",
+          "title": {
+            "en": "Option 2"
+          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
+          "image": null,
+          "ancestry": null,
+          "selectable": true,
+          "options": [],
+          "exclusive": null
+        }
+      ],
+      "options": [
+        {
+          "id": 1,
+          "handle": "1",
+          "title": {
+            "en": "Option 1"
+          },
+          "image": null,
+          "exclusive": null
+        },
+        {
+          "id": 2,
+          "handle": "2",
+          "title": {
+            "en": "Option 2"
+          },
+          "image": null,
+          "exclusive": null
+        }
+      ],
+      "write_in": false
+    },
+    {
+      "id": 2,
+      "type": "BallotNormal",
+      "vote_encoding_type": 1,
+      "submission_helper": true,
+      "blank_option": "active_choice",
+      "title": {
+        "en": "Second ballot"
+      },
+      "collapse_default": true,
+      "collapsable": false,
+      "description": {},
+      "options_tree": [
+        {
+          "id": 3,
+          "handle": "3",
+          "title": {
+            "en": "Option 3"
+          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
+          "image": null,
+          "ancestry": null,
+          "selectable": true,
+          "options": [],
+          "exclusive": null
+        },
+        {
+          "id": 4,
+          "handle": "4",
+          "title": {
+            "en": "Option 4"
+          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
+          "image": null,
+          "ancestry": null,
+          "selectable": true,
+          "options": [],
+          "exclusive": null
+        },
+        {
+          "id": 5,
+          "handle": "5",
+          "title": {
+            "en": "Option 5"
+          },
+          "subtitle": {},
+          "description": {},
+          "url": {},
+          "video_url": {},
+          "image": null,
+          "ancestry": null,
+          "selectable": true,
+          "options": [],
+          "exclusive": null
+        }
+      ],
+      "options": [
+        {
+          "id": 3,
+          "handle": "3",
+          "title": {
+            "en": "Option 3"
+          },
+          "image": null,
+          "exclusive": null
+        },
+        {
+          "id": 4,
+          "handle": "4",
+          "title": {
+            "en": "Option 4"
+          },
+          "image": null,
+          "exclusive": null
+        },
+        {
+          "id": 5,
+          "handle": "5",
+          "title": {
+            "en": "Option 5"
+          },
+          "image": null,
+          "exclusive": null
+        }
+      ],
+      "write_in": false
+    }
+  ],
+  "translations": {
+    "en": {
+      "accessibility": {
+        "alt": {
+          "election_logo": "Election logo",
+          "option_image": "Option image"
+        },
+        "aria": {
+          "label": {
+            "back_to_previous_ballot": "Go back to previous ballot",
+            "ballot": "Ballot",
+            "ballot_actions": "Ballot actions.",
+            "ballot_cryptogram_actions": "Cryptogram actions.",
+            "ballot_cryptograms": "Ballot cryptograms.",
+            "ballot_options": "Ballot options.",
+            "blank_option": "Blank vote option",
+            "change_locale_to": "Change locale to %{language}",
+            "continue_to_next_ballot": "Continue to next ballot",
+            "current_locale_is": "Current locale is %{language}",
+            "exit_technical": "Exit voter verification mode",
+            "handle": "The text \"%{handle}\" will be encrypted if you decide to vote for this option.",
+            "localization_switcher": "Localization switcher",
+            "option": "Option",
+            "qr_code": "QR code",
+            "ranked_rank": "Ranked %{rank}",
+            "receipt_actions": "Receipt actions.",
+            "receipt_technical": "Technical information.",
+            "technical": "Voter verification mode information.",
+            "write_in_candidate": "Name of candidate",
+            "write_in_party": "Party"
+          }
+        }
+      },
+      "actions": {
+        "back": "Back",
+        "continue": "Continue",
+        "hide": "Hide",
+        "show": "Show",
+        "sign_out": "Sign out"
+      },
+      "authenticate": {
+        "default_factor1": "Election code 1",
+        "default_factor2": "Election code 2",
+        "default_factor3": "Election code 3",
+        "default_header": "Sign in with your credentials to vote",
+        "show_password": "Show password",
+        "submit": "Go to ballot"
+      },
+      "ballot": {
+        "not_assigned_any_ballot": {
+          "body": "You have not been assigned to any ballots. If you believe this to be a mistake, please contact your electoral responsible.",
+          "header": "No assigned ballots"
+        }
+      },
+      "blank_option": {
+        "title": "Blank vote"
+      },
+      "challenge": {
+        "encryption_key_purpose": "This encryption key, together with the 'Randomness' of each ballot, was used to generate each envelope. Use the 'Ballot Opener' app to verify that the content of each envelope corresponds to your vote.",
+        "header": "Your envelopes have been opened",
+        "revote": "Revote",
+        "your_encryption_key": "The encryption key used to encrypt your votes was:"
+      },
+      "cryptograms": {
+        "cryptogram": "Cryptogram",
+        "envelope": "Envelope",
+        "header": "Submit or open your envelopes",
+        "open_ballot": "Open envelopes",
+        "submit_vote": "Submit envelopes"
+      },
+      "election_status": {
+        "closed": "The election is closed",
+        "is_running_from_to_html": "The election is running from <strong>%{from}</strong> to <strong>%{to}</strong>",
+        "not_yet_open": "The election is not yet open",
+        "now_closed": "The election is now closed",
+        "was_running_from_to_html": "The election was running from <strong>%{from}</strong> to <strong>%{to}</strong>"
+      },
+      "error": {
+        "challenge_proof_invalid": "A technical error happened (proof of empty cryptograms did not validate).<br>Reload the page and try again. If the problem persists, please contact support.",
+        "election_not_running": "Election is closed.",
+        "unknown_error": "A technical error happened.<br>Reload the page and try again. If the problem persists, please contact support.",
+        "vote_overwriting_disabled": "You have already cast your vote.",
+        "voter_disabled": "Your access has been revoked.<br>Please contact support to resolve the issue.",
+        "voter_not_found": "Election code is invalid.<br>Please verify that the election code is correct before you try again.",
+        "voter_session_expired": "Your session is expired."
+      },
+      "footer": {
+        "section1": {
+          "header": "About the system",
+          "link": "https://www.assemblyvoting.dk/voting-x",
+          "link_text": "Read more",
+          "text": "Information regarding documentation, privacy policy and system provider."
+        },
+        "section2": {
+          "header": "Election information",
+          "link_text": "Go to board",
+          "text": "Information regarding the election process can be found on the bulletin board of the election."
+        },
+        "section3": {
+          "header": "Voter verification",
+          "label": "Show cryptograms for validation of cast vote."
+        }
+      },
+      "general": {
+        "support_text": "Support information",
+        "vote_overwriting_header": "Vote already cast!",
+        "vote_overwriting_warning": "You have already cast your vote. Be advised that only your last cast vote will be applicable."
+      },
+      "language_name": "English",
+      "network_error": {
+        "body_html": "<p>\n  Could not connect to server.\n</p>\n<p>\n  Please ensure that you are connected to the internet and try again.\n</p>\n",
+        "close": "Close",
+        "title": "Connection error"
+      },
+      "open_ballot": {
+        "encryption_key": "Encryption key",
+        "randomness": "Randomness"
+      },
+      "option": {
+        "info_link_text_html": "Info",
+        "video_link_text_html": "Video",
+        "expand-text": "Click to expand",
+        "collapse-text": "Collapse",
+        "sub_options_select": "<strong>%{options_count}</strong> selected"
+      },
+      "receipt": {
+        "acknowledgement_body": "The server acknowledged your submission, registered it and sent back a server signature as a proof of registration.",
+        "acknowledgement_header": "Acknowledgement and registration",
+        "back_to_sign_in": "Back to sign in",
+        "board_after_registration": "Board hash after submission registered",
+        "board_at_acknowledgement": "Board hash at acknowledgement time",
+        "board_at_registration": "Board hash at registration time",
+        "body_html": "<p>Your vote has been registered. Thank you for your participation.</p>",
+        "download_receipt_file": "Download receipt file",
+        "election_board": "Election board",
+        "finish": "Finish",
+        "go_to_board": "Go to election board",
+        "header": "Receipt",
+        "receipt_comment": "// -- VOTING RECEIPT --\n// This is a receipt file for a vote cast at '%{election}'.\n// You can find your vote on the election's bulletin board, by uploading the receipt.\n// This receipt was generated at '%{generatedAt}'.\n// By Assembly Voting X\n\n",
+        "redirected_in": "You will be redirected in %{countdown}",
+        "redirected_in_seconds": "You will be redirected in %{countdown} seconds",
+        "server_signature": "Server signature",
+        "signing_body": "These were signed with your public signing key and sent to the server:",
+        "signing_public_key": "Election's public signing key",
+        "voter_public_key": "Voter's public signing key",
+        "voter_signature": "Voter signature",
+        "your_envelopes": "Your envelopes"
+      },
+      "submission_helper": {
+        "select_exactly": "Select {value} options",
+        "select_multiple": "Select between {min} and {max} options",
+        "select_single": "Select one (1) option",
+        "selected": "Selected:"
+      },
+      "summary": {
+        "encrypt_vote": "Encrypt vote",
+        "header": "Please confirm your vote",
+        "submit_vote": "Submit vote"
+      },
+      "technical": {
+        "authenticate_html": "<p class=\"card-text\">\n  You have activated voter verification. In order to verify your vote, you need to download Assembly Voting “Ballot Opener” on your smartphone from App Store or Google Play.\n</p>\n",
+        "ballot_html": "<p class=\"card-text\">\n  The colored texts below the available options represents the value that will be encrypted if you decide to vote for this option.\n</p>\n",
+        "challenge_html": "<p class=\"card-text\">Use the Ballot Opener app to scan the QR-code of each envelope. You can also insert the cryptographic values in the application to reveal the content of your ballot.</p>\n<p class=\"card-text\">If the content of the envelope is identical with the vote you casted for, it means the system correctly encrypted your vote. Otherwise, it is an evidence that the system has been corrupted. In such case, please contact support.</p>\n<p class=\"card-text\"><strong>Please note:</strong> These votes will NOT be included in the result. You have to vote again!</p>\n",
+        "cryptograms_html": "<p class=\"card-text\">\n  This is your encrypted ballots.\n</p>\n<p class=\"card-text\">\n  If you want to verify the content that was encrypted by the system, you can click on “Open envelopes”.\n  This verification ensures that the system is encrypting the casted votes as intended by the voter.\n  After opening an envelope for verification of its content, you will need to recast your vote.\n</p>\n",
+        "exit_mode": "Exit mode",
+        "header": "Voter verification mode",
+        "receipt_html": "<p class=\"card-text\">\n  This is your voting receipt.\n</p>\n<p class=\"card-text\">\n  You can download it and save it for verification purposes.\n  You can, at any time, check your vote by accessing the bulletin board of the election, where all activities are registered during the election.\n  By uploading the voting receipt, you can verify that you vote has been registered and included in the final result.\n</p>\n",
+        "receipt_no_board_html": "<p class=\"card-text\">\n  This is your voting receipt.\n</p>\n<p class=\"card-text\">\n  You can download it and save it for verification purposes.\n</p>\n",
+        "summary_html": "<p class=\"card-text\">\n  The colored text below the selected option represents the value that will be encrypted. It is also the value that you should see, if you decide to open your ballot for verification of its content.\n</p>\n"
+      },
+      "validation": {
+        "multiple": {
+          "too_many": "Too many options selected"
+        },
+        "ranked": {
+          "too_many": "Too many options selected"
+        },
+        "single_vote": {
+          "blank_is_exclusive": "Blank is exclusive and cannot be combined with other options.",
+          "too_many": "Too many options selected",
+          "write_in_required": "You are required to specify at least a party when 'Write in' is selected.",
+          "write_in_too_long": "The write in value is too long. Try to reduce its length.",
+          "exclusive": "Invalid combination of options"
+        }
+      },
+      "write_in": {
+        "candidate_input_placeholder": "Name of candidate...",
+        "choose_party": "Choose a party...",
+        "title": "Write in"
+      }
+    }
+  },
+  "date_time_formats": {
+    "en": {
+      "short": {
+        "year": "numeric",
+        "month": "short",
+        "day": "numeric"
+      },
+      "long": {
+        "year": "numeric",
+        "month": "short",
+        "day": "numeric",
+        "weekday": "short",
+        "hour": "numeric",
+        "minute": "numeric"
+      }
+    }
+  },
+  "app_url": "http://us-avx:3000/us",
+  "services": {
+    "otp_provider": {
+      "url": "http://localhost:1111",
+      "election_context_uuid": "d197a5f8-dcc7-4461-9d82-ad87d456994a",
+      "public_key": "036811739c1a291827cf986ac8c49aa5086dad504045a2256093ca1322ac9ffba4"
+    },
+    "voter_authorizer": {
+      "url": "http://localhost:1234",
+      "election_context_uuid": "34f02338-ad2a-4531-aa46-8f5641facea3",
+      "public_key": "0209b468266cc02403fd5cac42337885f5f5de445df963f143919ef9836a053498"
+    }
+  },
+  "affidavit": {
+    "curve": "k256",
+    "encryption_key": "03e9858b6e48eb93d8f27aa76b60806298c4c7dd94077ad6c3ff97c44937888647"
+  }
+}

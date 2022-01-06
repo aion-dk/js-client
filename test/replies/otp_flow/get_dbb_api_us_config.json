@@ -1,0 +1,15 @@
+{
+  "services": {
+    "address": "9137fb535bc855747ce34827a49522fb4afd492861d24fca48627b911ca407bb",
+    "voter_authorizer": {
+      "election_context_uuid": "34f02338-ad2a-4531-aa46-8f5641facea3",
+      "public_key": "0209b468266cc02403fd5cac42337885f5f5de445df963f143919ef9836a053498",
+      "url": "http://localhost:1234"
+    },
+    "otp_provider": {
+      "election_context_uuid": "d197a5f8-dcc7-4461-9d82-ad87d456994a",
+      "public_key": "036811739c1a291827cf986ac8c49aa5086dad504045a2256093ca1322ac9ffba4",
+      "url": "http://localhost:1111"
+    }
+  }
+}
