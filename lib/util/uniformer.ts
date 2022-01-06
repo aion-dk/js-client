@@ -8,10 +8,10 @@ export default class Uniformer {
 
   private walk(obj: {} | Primitive ): KeyValueTuple[] | Primitive {
     switch(typeof obj) {
-      case "string": return obj;
-      case "number": return obj;
-      case "symbol": return obj.toString().match(/Symbol\((.*?)\)/)![1];
+      case "string":
+      case "number":
       case "boolean": return obj;
+      case "symbol": return obj.toString().match(/Symbol\((.*?)\)/)![1];
       case "object":
         if(obj instanceof Date)
           return obj.toISOString();
