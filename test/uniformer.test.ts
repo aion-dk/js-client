@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import Uniformer from '../lib/util/uniformer';
 
-describe.only('Uniformer', () => {
+describe('Uniformer', () => {
   context('when object is a Hash', () => {
     it('(deep) sorts hashes by keys and converts keys to string', async () => {
       const unsortedProperties = {
