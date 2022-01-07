@@ -16,7 +16,7 @@ export interface ElectionConfig {
   affidavit: AffidavitConfig;
 
   services: {
-    address: string
+    'address': string
     'voter_authorizer': Service,
     'otp_provider': Service
   };
