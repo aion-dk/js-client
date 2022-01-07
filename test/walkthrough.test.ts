@@ -50,7 +50,7 @@ describe('entire voter flow using OTP authorization', () => {
     }
   });
 
-  it.only('returns a receipt using new dbb structure', async () => {
+  it('returns a receipt using new dbb structure', async () => {
     //return await recordResponses(async function() {
     const client = new AVClient('http://us-avx:3000/dbb/api/us');
       await client.initialize()
