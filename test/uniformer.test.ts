@@ -1,6 +1,4 @@
 import { expect } from 'chai';
-import { expectError } from './test_helpers';
-
 import Uniformer from '../lib/util/uniformer';
 
 describe.only('Uniformer', () => {
