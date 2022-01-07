@@ -20,12 +20,7 @@ export default class Uniformer {
   }
 
   private getSymbolName(symbol: string) {
-    const matches = symbol.match(/Symbol\((.*?)\)/);
-
-    if(matches === null)
-      throw new Error('Unable to extract symbol name.')
-
-    return matches[1];
+    return symbol.slice("Symbol(".length, -1);    // Extracts 'foo' from 'Symbol(foo)'
   }
 
   private walk(obj: unknown | Primitive ): KeyValuePair[] | Primitive {
