@@ -1,36 +1,48 @@
-type KeyValueTuple = [ string, any ];
-type Primitive = string | number | symbol | boolean | null;
+type KeyValuePair = [ string, unknown ];
+type Primitive = Array<unknown> | string | number | symbol | boolean | null;
 
 export default class Uniformer {
 
-  public formString(obj: {} | Primitive ): string {
+  public formString(obj: unknown | Primitive ): string {
     const sortedEntries = this.walk(obj);
     return JSON.stringify(sortedEntries);
   }
 
-  private toSortedKeyValuePairs(obj: {}) {
-    const toKeyValueTuple = ([k, v]): KeyValueTuple => [k, this.walk(v)];
-    const sortByKey = (a: KeyValueTuple, b: KeyValueTuple) => ("" + a[0]).localeCompare(b[0]);
+  private toSortedKeyValuePairs(obj: unknown) {
+    const toKeyValueTuple = ([k, v]): KeyValuePair => [k, this.walk(v)];
+    const sortByKey = (a: KeyValuePair, b: KeyValuePair) => ("" + a[0]).localeCompare(b[0]);
 
-    const properties = Object.entries(obj);
+    const properties = Object.entries(obj as Record<string, unknown>);
 
     return properties
       .map(toKeyValueTuple)
       .sort(sortByKey);
   }
 
-  private walk(obj: {} | Primitive ): KeyValueTuple[] | Primitive {
+  private getSymbolName(symbol: string) {
+    const matches = symbol.match(/Symbol\((.*?)\)/);
+
+    if(matches === null)
+      throw new Error('Unable to extract symbol name.')
+
+    return matches[1];
+  }
+
+  private walk(obj: unknown | Primitive ): KeyValuePair[] | Primitive {
     switch(typeof obj) {
       case "string":
       case "number":
       case "boolean": return obj;
-      case "symbol": return obj.toString().match(/Symbol\((.*?)\)/)![1];
+      case "symbol": return this.getSymbolName(obj.toString());
       case "object":
-        if(obj instanceof Date)
-          return obj.toISOString();
-
         if(obj === null)
           return null;
+
+        if(obj instanceof Array)
+          return obj.map(e => this.walk(e));
+
+        if(obj instanceof Date)
+          return obj.toISOString();
 
         return this.toSortedKeyValuePairs(obj);
       default:

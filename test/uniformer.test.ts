@@ -48,13 +48,10 @@ describe.only('Uniformer', () => {
     it('converts to a string in ISO8601 UTC using milliseconds', () => {
       const someDate = new Date("2020-06-08T23:59:30.849+0200");
 
-      const withDate = { time: someDate };
-
-      expect(new Uniformer().formString(withDate))
-        .to.equal(JSON.stringify([[ 'time', '2020-06-08T21:59:30.849Z']]));
+      expect(new Uniformer().formString(someDate))
+        .to.equal(JSON.stringify('2020-06-08T21:59:30.849Z'));
     });
   });
-
 
   it('allows integers, booleans and null', () => {
     const uniformer = new Uniformer();
@@ -64,5 +61,40 @@ describe.only('Uniformer', () => {
       expect(new Uniformer().formString(value))
         .to.equal(JSON.stringify(value));
     })
+  });
+
+  context('when object is an Array', () => {
+    it('allows arrays', () => {
+      const input = ['1', 2, 3];
+
+      expect(new Uniformer().formString(input))
+        .to.equal('[\"1\",2,3]');
+    });
+  });
+
+  it('applies rules to nested objects', () => {
+    const input = {
+      string: 'a string',
+      array: [
+        new Date('2000-01-01T00:00:00+0100'),
+        { date: new Date('2000-01-01T00:00:00+0500') },
+        Symbol('test'),
+        true,
+      ],
+      hash: {  '2': 'two', '1': Symbol('one') },
+    }
+
+    expect(new Uniformer().formString(input)).to.equal(
+      JSON.stringify([
+        ['array', [
+          '1999-12-31T23:00:00.000Z',
+          [[ 'date', '1999-12-31T19:00:00.000Z']],
+          'test',
+          true
+        ]],
+        ['hash', [['1', 'one'], ['2', 'two']]],
+        ['string', 'a string']
+      ]
+    ));
   });
 });
