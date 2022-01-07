@@ -56,7 +56,7 @@ describe('Uniformer', () => {
 
     const values = [42, -1, true, false, null];
     values.forEach((value) => {
-      expect(new Uniformer().formString(value))
+      expect(uniformer.formString(value))
         .to.equal(JSON.stringify(value));
     })
   });
