@@ -53,6 +53,8 @@ class PedersenCommitment {
 
 /**
  * @description Generates an encryption commitment
+ * @param messages An array of hex strings
+ * @param options Optional options object. Allows caller to specify randomizer
  * @returns Commitment point and randomizer, both as hex.
  */
 const generatePedersenCommitment = (messages: string[], options?: { randomizer: string }) => {
@@ -82,7 +84,6 @@ const isValidPedersenCommitment = (commitment: string, messages: string[], rando
 }
 
 export {
-  PedersenCommitment,
   generatePedersenCommitment,
   isValidPedersenCommitment,
 }
