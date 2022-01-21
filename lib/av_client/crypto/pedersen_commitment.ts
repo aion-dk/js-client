@@ -1,15 +1,15 @@
 import {
-  Bignum,
-  Point,
-  pointToHex,
-  pointFromHex,
-  Curve,
-  pointFromX,
-  hashToBignum,
-  bignumFromHex,
   addPoints,
-  generateRandomBignum,
+  Bignum,
+  bignumFromHex,
   bignumToHex,
+  Curve,
+  generateRandomBignum,
+  hashToBignum,
+  Point,
+  pointFromHex,
+  pointFromX,
+  pointToHex,
 } from "./util";
 
 class PedersenCommitment {
