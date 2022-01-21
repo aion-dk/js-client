@@ -10,7 +10,7 @@ describe("Pedersen Commitments", () => {
 
     expect(result.commitment).to.eq("021600f61b9d347e249b4a2d08b95458ba8e17504b5481d04165cd492cadf242fc");
     expect(result.randomizer).to.eq("01");
-    
+
     const isValid = isValidPedersenCommitment(result.commitment, messages, randomizer)
     expect(isValid).to.be.true;
   })
@@ -23,7 +23,7 @@ describe("Pedersen Commitments", () => {
 
     expect(result.commitment).to.eq("02c62f4fb334f5a43d96a9c3b652cf7c930922f1627ef29349fcb2085d2f2f9aed");
     expect(result.randomizer).to.eq("01");
-    
+
     const isValid = isValidPedersenCommitment(result.commitment, messages, randomizer)
     expect(isValid).to.be.true;
   });
@@ -36,7 +36,7 @@ describe("Pedersen Commitments", () => {
 
     expect(result.commitment).to.eq("027c5c17a18f5e671a9c9f09b90fa69bb8fcb52a753d8a69959cd329fe7570f366");
     expect(result.randomizer).to.eq("d05bc90d9108d486835030e1374bcef4a73dc456888444f6b16aeffbc6b32391");
-    
+
     const isValid = isValidPedersenCommitment(result.commitment, messages, randomizer)
     expect(isValid).to.be.true;
   });
