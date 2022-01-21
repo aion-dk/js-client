@@ -1,16 +1,12 @@
 import * as crypto from "../aion_crypto";
-const sjcl = require('../sjcl');
+import * as sjcl from "../sjcl";
+
+// As this is working with untyped SJCL classes,
+// we need the _any_ type in this wrapper.
+/*eslint-disable @typescript-eslint/no-explicit-any*/
+
 
 export const Curve = crypto.Curve;
-
-export const addPoints = (a: Point, b: Point): Point => {
-  return new Point(crypto.addPoints(a.toEccPoint(), b.toEccPoint()));
-}
-
-export const generateRandomBignum = () => new Bignum(crypto.randomBN());
-
-export const hashToBignum = (hash: BitArray): Bignum => new Bignum(crypto.hashToBn(hash));
-
 
 // Converter functions
 // --------------------------
@@ -22,9 +18,12 @@ export const pointToHex = (point: Point): string => sjcl.codec.hex.fromBits(poin
 export const bignumFromHex = (hex: string): Bignum => new Bignum(sjcl.bn.fromBits(sjcl.codec.hex.toBits(hex)));
 export const bignumToHex = (bignum: Bignum): string => sjcl.codec.hex.fromBits(bignum.toBits());
 
+export const hashToBignum = (hash: BitArray): Bignum => new Bignum(crypto.hashToBn(hash));
 
 // Other
 // --------------------------
+export const generateRandomBignum = () => new Bignum(crypto.randomBN());
+
 export const pointFromX = (x: Bignum): Point => {
   const flag = !x.isEven() ? 2 : 3;
   const flagBignum = new sjcl.bn(flag);
@@ -34,10 +33,14 @@ export const pointFromX = (x: Bignum): Point => {
   return new Point(pointFromBits(encodedPoint));
 }
 
+export const addPoints = (a: Point, b: Point): Point => {
+  return new Point(crypto.addPoints(a.toEccPoint(), b.toEccPoint()));
+}
+
 // Types
 // --------------------------
 export class Bignum {
-  private bn: any;
+  private bn: any; 
 
   constructor(data: any) {
     this.bn = new sjcl.bn(data);
@@ -69,4 +72,4 @@ export class Point {
   toEccPoint = () => this.eccPoint;
 }
 
-type BitArray = {}
+type BitArray = unknown;

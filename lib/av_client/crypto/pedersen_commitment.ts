@@ -20,6 +20,7 @@ class PedersenCommitment {
     const target = [baseGeneratorPrefix(), index].join(',');
     let x = hashToBignum(target).mod(secp256k1_curve_prime);
 
+    /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
     while(true) {
       try {
         return pointFromX(x);
@@ -40,8 +41,8 @@ class PedersenCommitment {
     let commitment = new Point(Curve.G).mult(randomizer);
 
     messages.forEach((message, index) => {
-      let generator = PedersenCommitment.computeGenerator(index);
-      let term = generator.mult(message);
+      const generator = PedersenCommitment.computeGenerator(index);
+      const term = generator.mult(message);
 
       commitment = addPoints(commitment, term);
     });
