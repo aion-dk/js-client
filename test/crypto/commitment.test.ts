@@ -70,6 +70,10 @@ describe("Pedersen Commitments", () => {
     expect(isValid).to.be.true;
   });
 
+  it("fail validity check on invalid commitment", () => {
+    expect(() => isValidPedersenCommitment("ABCD", ["ABCD1234"], "123456")).to.throw("not on the curve!");
+  });
+
   it("fail on generation for non-hex messages", () => {
     expect(() => generatePedersenCommitment(["XYZ"])).to.throw(Error, "Input is not a valid hex string");
     expect(() => generatePedersenCommitment(["A"])).to.throw(Error, "Input is not a valid hex string");
