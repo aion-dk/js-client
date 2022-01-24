@@ -32,7 +32,7 @@ export const pointFromX = (x: Bignum): Point | null => {
     return new Point(pointFromBits(encodedPoint));
   } catch(err) {
     if(err instanceof sjcl.exception.corrupt) {
-      return null;
+      return null;    // No point found on the curve
     }
 
     throw err;
