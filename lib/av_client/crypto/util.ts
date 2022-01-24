@@ -40,7 +40,7 @@ export const addPoints = (a: Point, b: Point): Point => {
 // Types
 // --------------------------
 export class Bignum {
-  private bn: any; 
+  private bn: any;
 
   constructor(data: any) {
     this.bn = new sjcl.bn(data);

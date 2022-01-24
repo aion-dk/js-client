@@ -75,7 +75,7 @@ const generatePedersenCommitment = (messages: string[], options?: { randomizer: 
  * @description Checks if a commitment is valid, given a set of messages and a randomizer
  * @returns true if commitment passes validity check. Otherwise false.
  */
-const isValidPedersenCommitment = (commitment: string, messages: string[], randomizer: string) => {  
+const isValidPedersenCommitment = (commitment: string, messages: string[], randomizer: string) => {
   const pointCommitment = pointFromHex(commitment);
   const bnMessages = messages.map(m => bignumFromHex(m));
   const bnRandomizer = bignumFromHex(randomizer);
