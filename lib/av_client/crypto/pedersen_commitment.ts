@@ -14,7 +14,7 @@ import {
 } from "./util";
 
 class PedersenCommitment {
-  static computeGenerator(index): Point {
+  static computeGenerator(index: number): Point {
     const baseGeneratorPrefix = () => pointToHex(new Point(Curve.G));
     const secp256k1_curve_prime = new Bignum(Curve.field.modulus);
 

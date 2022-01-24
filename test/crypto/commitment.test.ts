@@ -43,9 +43,10 @@ describe("Pedersen Commitments", () => {
 
   it("generate commitment using built-in randomizer", () => {
     const messages = [
-      "d70d319fd1c7867af1ca477878d381e4",
-      "ef5b373b279ed26cf774d7e3376ac549",
-      "3c2e2bdcc29734c7e06d53b37cc2724c"
+      "d70d319fd1c7867af1ca477878d381e4d70d319fd1c7867af1ca477878d381e4",
+      "ef5b373b279ed26cf774d7e3376ac549ef5b373b279ed26cf774d7e3376ac549",
+      "3c2e2bdcc29734c7e06d53b37cc2724c3c2e2bdcc29734c7e06d53b37cc2724c",
+      "000000dcc29734c7e06d53b37cc2724c000000dcc29734c7e06d53b37cc2724c"
     ];
 
     const result = generatePedersenCommitment(messages);
