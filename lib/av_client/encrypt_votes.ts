@@ -1,6 +1,5 @@
 import { CastVoteRecord, ContestMap, OpenableEnvelope } from "./types";
-import * as crypto from './aion_crypto'
-const Crypto = crypto();
+import { encryptVote, hashString } from './aion_crypto'
 
 const encrypt = (
   contestSelections: CastVoteRecord,
@@ -11,7 +10,7 @@ const encrypt = (
   const response = {}
 
   Object.keys(contestSelections).forEach(function(contestId) {
-    const { cryptogram, randomness } = Crypto.encryptVote(
+    const { cryptogram, randomness } = encryptVote(
       contestEncodingTypes[contestId],
       contestSelections[contestId],
       emptyCryptograms[contestId],
@@ -27,7 +26,7 @@ const encrypt = (
 const fingerprint = (cryptograms: ContestMap<Cryptogram>): string => {
   const string = JSON.stringify(cryptograms)
 
-  return Crypto.hashString(string)
+  return hashString(string)
 }
 
 export default {
