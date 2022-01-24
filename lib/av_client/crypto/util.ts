@@ -1,10 +1,12 @@
 import * as crypto from "../aion_crypto";
 import * as sjcl from "../sjcl";
+import Bignum from "./bignum";
+import Point from "./point";
+import type { BitArray } from "./bitarray";
 
 // As this is working with untyped SJCL classes,
 // we need the _any_ type in this wrapper.
 /*eslint-disable @typescript-eslint/no-explicit-any*/
-
 
 export const Curve = crypto.Curve;
 
@@ -37,39 +39,9 @@ export const addPoints = (a: Point, b: Point): Point => {
   return new Point(crypto.addPoints(a.toEccPoint(), b.toEccPoint()));
 }
 
-// Types
-// --------------------------
-export class Bignum {
-  private bn: any;
+export const isValidHexString = (test: string): boolean => {
+  if(test.length % 2 !== 0)
+    return false;   // Hex string must be even length
 
-  constructor(data: any) {
-    this.bn = new sjcl.bn(data);
-  }
-
-  isEven = () => this.bn.limbs[0] % 2 === 0;
-  equals = (other: Bignum): boolean => !!this.bn.equals(other.bn);
-
-  mod = (operand: Bignum): Bignum => new Bignum(this.bn.mod(operand.bn));
-  add = (operand: Bignum): Bignum => new Bignum(this.bn.add(operand.bn))
-
-  toBits = () => this.bn.toBits();
-  toBn = () => this.bn;
+  return test.match(/^[0-9A-Fa-f]+$/) !== null;
 }
-
-
-export class Point {
-  private eccPoint: any;
-
-  constructor(point: any) {
-    this.eccPoint = point;
-  }
-
-  equals = (other: Point) => !!crypto.pointEquals(this.eccPoint, other.eccPoint);
-
-  mult = (k: Bignum): Point => new Point(this.eccPoint.mult(k.toBn()));
-
-  toBits = (compressed: boolean): BitArray => crypto.pointToBits(this.eccPoint, compressed);
-  toEccPoint = () => this.eccPoint;
-}
-
-type BitArray = unknown;

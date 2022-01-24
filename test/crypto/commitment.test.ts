@@ -52,4 +52,34 @@ describe("Pedersen Commitments", () => {
     const isValid = isValidPedersenCommitment(result.commitment, messages, result.randomizer)
     expect(isValid).to.be.true;
   });
+
+  it("generator/verifier ignores casing of messages", () => {
+    const lowerCaseMessages = [ "d70d319fd1c7867af1ca477878d381e4" ];
+    const upperCaseMessages = lowerCaseMessages.map(m => m.toUpperCase());
+
+    const result = generatePedersenCommitment(lowerCaseMessages);
+    const isValid = isValidPedersenCommitment(result.commitment, upperCaseMessages, result.randomizer)
+    expect(isValid).to.be.true;
+  });
+
+  it("generate commitment for empty set of messages", () => {
+    const messages = [];
+
+    const result = generatePedersenCommitment(messages);
+    const isValid = isValidPedersenCommitment(result.commitment, messages, result.randomizer)
+    expect(isValid).to.be.true;
+  });
+
+  it("fail on generation for non-hex messages", () => {
+    expect(() => generatePedersenCommitment(["XYZ"])).to.throw(Error, "Input is not a valid hex string");
+    expect(() => generatePedersenCommitment(["A"])).to.throw(Error, "Input is not a valid hex string");
+
+  });
+
+  it("fail on validation for non-hex messages", () => {
+    expect(() => isValidPedersenCommitment("", ["XYZ"], "")).to.throw(Error, "Input is not a valid hex string");
+    expect(() => isValidPedersenCommitment("XX", ["AA"], "")).to.throw(Error, "Input is not a valid hex string");
+    expect(() => isValidPedersenCommitment("AA", ["AA"], "XX")).to.throw(Error, "Input is not a valid hex string");
+    expect(() => isValidPedersenCommitment("A", ["AA"], "AA")).to.throw(Error, "Input is not a valid hex string");
+  });
 });

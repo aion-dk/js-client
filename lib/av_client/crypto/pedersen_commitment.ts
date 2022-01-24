@@ -1,15 +1,16 @@
+import Bignum from "./bignum";
+import Point from "./point";
 import {
   addPoints,
-  Bignum,
   bignumFromHex,
   bignumToHex,
   Curve,
   generateRandomBignum,
   hashToBignum,
-  Point,
   pointFromHex,
   pointFromX,
   pointToHex,
+  isValidHexString
 } from "./util";
 
 class PedersenCommitment {
@@ -58,6 +59,9 @@ class PedersenCommitment {
  * @returns Commitment point and randomizer, both as hex.
  */
 const generatePedersenCommitment = (messages: string[], options?: { randomizer: string }) => {
+  if(messages.some(m => !isValidHexString(m)))
+    throw new Error("Input is not a valid hex string");
+
   const bnMessages: Bignum[] = messages.map(m => bignumFromHex(m));
 
   const randomizer = options && options.randomizer ?
@@ -76,6 +80,9 @@ const generatePedersenCommitment = (messages: string[], options?: { randomizer: 
  * @returns true if commitment passes validity check. Otherwise false.
  */
 const isValidPedersenCommitment = (commitment: string, messages: string[], randomizer: string) => {
+  if([...messages, commitment, randomizer].some(m => !isValidHexString(m)))
+    throw new Error("Input is not a valid hex string");
+
   const pointCommitment = pointFromHex(commitment);
   const bnMessages = messages.map(m => bignumFromHex(m));
   const bnRandomizer = bignumFromHex(randomizer);
@@ -86,4 +93,4 @@ const isValidPedersenCommitment = (commitment: string, messages: string[], rando
 export {
   generatePedersenCommitment,
   isValidPedersenCommitment,
-}
+};
