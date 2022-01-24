@@ -22,13 +22,21 @@ export const hashToBignum = (hash: BitArray): Bignum => new Bignum(crypto.hashTo
 // --------------------------
 export const generateRandomBignum = () => new Bignum(crypto.randomBN());
 
-export const pointFromX = (x: Bignum): Point => {
+export const pointFromX = (x: Bignum): Point | null => {
   const flag = !x.isEven() ? 2 : 3;
   const flagBignum = new sjcl.bn(flag);
 
   const encodedPoint = sjcl.bitArray.concat(flagBignum.toBits(), x.toBits());
 
-  return new Point(pointFromBits(encodedPoint));
+  try {
+    return new Point(pointFromBits(encodedPoint));
+  } catch(err) {
+    if(err instanceof sjcl.exception.corrupt) {
+      return null;
+    }
+
+    throw err;
+  }
 }
 
 export const addPoints = (a: Point, b: Point): Point => {

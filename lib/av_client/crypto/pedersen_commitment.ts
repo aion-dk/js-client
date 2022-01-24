@@ -14,24 +14,25 @@ import {
 } from "./util";
 
 class PedersenCommitment {
-  static computeGenerator(index) {
+  static computeGenerator(index): Point {
     const baseGeneratorPrefix = () => pointToHex(new Point(Curve.G));
     const secp256k1_curve_prime = new Bignum(Curve.field.modulus);
 
     const target = [baseGeneratorPrefix(), index].join(',');
     let x = hashToBignum(target).mod(secp256k1_curve_prime);
 
-    /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
-    while(true) {
-      try {
-        return pointFromX(x);
-      }
-      catch(err) {
-        // Skip to next iteration
-      }
+    let point: Point | null = null;
+
+    while(point === null) {
+      point = pointFromX(x);
+
+      if(point)
+        return point;
 
       x = x.add(new Bignum(1)).mod(secp256k1_curve_prime);
     }
+
+    throw new Error("Unreachable code reached");
   }
 
   static verify(commitment: Point, messages, randomizer: Bignum) {
