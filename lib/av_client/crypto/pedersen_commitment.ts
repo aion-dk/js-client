@@ -40,14 +40,14 @@ class PedersenCommitment {
   }
 
   static generate(messages: Bignum[], randomizer: Bignum): Point {
-    let commitment = new Point(Curve.G).mult(randomizer);
+    const initialPoint = new Point(Curve.G).mult(randomizer);
 
-    messages.forEach((message, index) => {
+    const commitment = messages.reduce((acc, message, index) => {
       const generator = PedersenCommitment.computeGenerator(index);
       const term = generator.mult(message);
 
-      commitment = addPoints(commitment, term);
-    });
+      return addPoints(acc, term);
+    }, initialPoint);
 
     return commitment;
   }
