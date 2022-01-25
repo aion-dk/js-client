@@ -71,7 +71,7 @@ describe("Pedersen Commitments", () => {
     expect(isValid).to.be.true;
   });
 
-  it.only("backend counterparty test", () => {
+  it("Ensure generated commitment is identical to one generated on the backed", () => {
     const messages = ["60555da4264ac93be14a57ac8eb8a9721479955b62fb9fc9bc0e2148204734be",
     "49087997fbb2bf9b9f6a960dbefcf10197aae7662be851353665a5769afd5fc7",
     "78b1ae220fc1d8189d07ffd51afe3eeb9b3d9f9930eedea36966fdd8aa239969",
