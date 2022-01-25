@@ -29,6 +29,7 @@ class PedersenCommitment {
       if(point)
         return point;
 
+      // No point was found for x. Attempt x+1
       x = x.add(new Bignum(1)).mod(secp256k1_curve_prime);
     }
 

@@ -22,6 +22,12 @@ export const hashToBignum = (hash: BitArray): Bignum => new Bignum(crypto.hashTo
 // --------------------------
 export const generateRandomBignum = () => new Bignum(crypto.randomBN());
 
+
+/**
+ *
+ * @param x x-value from with to derive y-value on the elliptic curve
+ * @returns A valid point, if one exists for x. Otherwise null
+ */
 export const pointFromX = (x: Bignum): Point | null => {
   const flag = !x.isEven() ? 2 : 3;
   const flagBignum = new sjcl.bn(flag);
