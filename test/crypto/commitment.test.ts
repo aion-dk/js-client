@@ -71,6 +71,26 @@ describe("Pedersen Commitments", () => {
     expect(isValid).to.be.true;
   });
 
+  it.only("backend counterparty test", () => {
+    const messages = ["60555da4264ac93be14a57ac8eb8a9721479955b62fb9fc9bc0e2148204734be",
+    "49087997fbb2bf9b9f6a960dbefcf10197aae7662be851353665a5769afd5fc7",
+    "78b1ae220fc1d8189d07ffd51afe3eeb9b3d9f9930eedea36966fdd8aa239969",
+    "d9492309709b97fa9278b8b00ec00e08744e07549570d0951da17c97cad72a12",
+    "6c984df612c2be71043125ce7657170772e66fcb0c54bf5ba1f7ee10537e46bc",
+    "207e5e08b7aa49ce664c107a16def239c0fedd85266364fc0513b4785d975a62",
+    "e5f87812e630bd4512300fab740cb2d0ed0d9df1ecbd2189df6dc86b2a4ded63",
+    "7cd5768b2f178bf82a6a805a86c1079d048a5da414fb37fddaf28995db233e78",
+    "550ad30e4bc121c6d20eb680b0f9b09b0d9fcf4500be9d92ac82a54790d80e57",
+    "343366aadf06230a43cbee0872a711129940fcb0ab0016383a4006deaa4b82e0"];
+
+    const randomizer = "e05f475e8c19504301735c8411541dee2d5f154e51c99d080ddd0278ec27ea05";
+
+    const result = generatePedersenCommitment(messages, { randomizer });
+    const isValid = isValidPedersenCommitment(result.commitment, messages, result.randomizer)
+    expect(isValid).to.be.true;
+    expect(result.commitment).to.eq("03c1bb8d0986b1ce0c28d4df6e3e339c813873e03df1d4bab1a7140690674e45ca");
+  });
+
   it("fail validity check on invalid commitment", () => {
     expect(() => isValidPedersenCommitment("ABCD", ["ABCD1234"], "123456")).to.throw("not on the curve!");
   });
