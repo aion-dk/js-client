@@ -91,7 +91,7 @@ describe("Pedersen Commitments", () => {
     expect(result.commitment).to.eq("03c1bb8d0986b1ce0c28d4df6e3e339c813873e03df1d4bab1a7140690674e45ca");
   });
 
-  it("fail validity check on invalid commitment", () => {
+  it("fail validity check on invalid commitment (not a point on the curve)", () => {
     expect(() => isValidPedersenCommitment("ABCD", ["ABCD1234"], "123456")).to.throw("not on the curve!");
   });
 
