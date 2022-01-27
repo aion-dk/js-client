@@ -1,5 +1,8 @@
 # AV Client Library Changelog
 
+## 0.1.14
+* Auth token replaces registration token and session token.
+
 ## 0.1.13
 * Expose getElectionConfig() as a public method.
 Can be used for debugging, testing and enumerating ballots.

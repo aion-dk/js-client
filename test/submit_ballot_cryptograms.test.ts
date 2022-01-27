@@ -8,7 +8,8 @@ import {
   OTPProviderHost,
   voterAuthorizerHost
 } from './test_helpers';
-const Crypto = require('../lib/av_client/aion_crypto.js')()
+import * as Crypto from '../lib/av_client/aion_crypto';
+
 const fs = require('fs')
 
 describe('AVClient#submitBallotCryptograms', () => {

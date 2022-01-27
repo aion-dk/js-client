@@ -1,9 +1,8 @@
 import { KeyPair } from './types';
-import * as crypto from './aion_crypto'
-const Crypto = crypto();
+import { generateKeyPair  } from './aion_crypto';
 
 export function randomKeyPair(): KeyPair {
-  const keyPair = Crypto.generateKeyPair();
+  const keyPair = generateKeyPair();
 
   return {
     privateKey: keyPair.private_key,

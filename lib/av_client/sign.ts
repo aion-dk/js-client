@@ -1,7 +1,7 @@
 import { BallotBoxReceipt, ContestMap, OpenableEnvelope, SealedEnvelope } from './types'
-import * as crypto from './aion_crypto'
+import * as Crypto from './aion_crypto';
 import * as sjcl from './sjcl';
-const Crypto = crypto();
+
 
 export type AcknowledgedBoardHash = {
   currentBoardHash: string;
