@@ -257,7 +257,7 @@ export class AVClient implements IAVClient {
 
     const { voterGroup } = this.voterSession.content;
 
-    const { contestConfigs, ballotConfigs } = this.getElectionConfig();
+    const { contestConfigs, ballotConfigs, thresholdConfig } = this.getElectionConfig();
 
     switch(checkEligibility(voterGroup, cvr, ballotConfigs)) {
       case ":not_eligible":  throw new CorruptCvrError('Corrupt CVR: Not eligible');
@@ -270,18 +270,17 @@ export class AVClient implements IAVClient {
       case ":okay":
     }
 
-    const contestEncodingTypes = Object.fromEntries(Object.keys(cvr).map((contestId) => {
-      const contest = ballots.find(b => b.id.toString() == contestId)
-
-      // We can use non-null assertion for contest because selections have been validated
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return [contestId, contest!.vote_encoding_type];
-    }))
+    const DEFAULT_MARKING_TYPE = {
+      style: "regular",
+      handleSize: 1,
+      minMarks: 1,
+      maxMarks: 1
+    };
 
     const envelopes = EncryptVotes.encrypt(
       cvr,
-      contestEncodingTypes,
-      this.electionEncryptionKey()
+      DEFAULT_MARKING_TYPE,
+      thresholdConfig.encryptionKey
     );
     
 
@@ -418,7 +417,7 @@ export class AVClient implements IAVClient {
   }
 
   private electionEncryptionKey(): ECPoint {
-    return this.getElectionConfig().encryptionKey
+    return this.getElectionConfig().thresholdConfig.encryptionKey;
   }
 
   private electionSigningPublicKey(): ECPoint {

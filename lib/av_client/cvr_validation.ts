@@ -6,12 +6,13 @@ const validateCvr = (cvr: CastVoteRecord, contests: ContestConfig[]) : Validatio
   // TODO: Assuming that the voter has access to - exactly - all contests from election config.
   const hasVotedForAllContests = JSON.stringify(Object.keys(cvr).map(k => k)) === JSON.stringify(contests.map(c => c.uuid))
 
-  const areSelectedOptionsValid = Object.keys(cvr).every(contestId => {
-    const contest = contests.find(_contest => _contest.uuid == contestId)
+  const areSelectedOptionsValid = Object.keys(cvr).every(contestUuid => {
+    const contest = contests.find(_contest => _contest.uuid == contestUuid)
     if (!contest) return false;
 
     const validOptions = contest.options.map(option => option.handle);
-    const selectedOption = cvr[contestId];
+    const selectedOption = cvr[contestUuid];
+
     return validOptions.includes(selectedOption);
   });
 

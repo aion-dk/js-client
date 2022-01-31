@@ -147,10 +147,7 @@ export type BallotConfig = {
 export type ContestConfig = {
   uuid: string
   options: Option[]
-  markingType: {
-    style: string
-    handleSize: number
-  }
+  markingType: MarkingType
   resultType: {
     name: string
   }
@@ -159,3 +156,9 @@ export type ContestConfig = {
   description: LocalString
 }
 
+export type MarkingType = {
+  style: string
+  handleSize: number
+  minMarks: number
+  maxMarks: number
+}

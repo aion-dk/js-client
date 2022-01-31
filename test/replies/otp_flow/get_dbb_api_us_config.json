@@ -1,4 +1,73 @@
 {
+  "ballotConfigs": [
+    {
+      "voterGroup": "4",
+      "contestUuids": [
+        "50422d0f-e795-4324-8289-50e3d3459196",
+        "d866a7d7-15df-4765-9950-651c0ca1313d"
+      ]
+    }
+  ],
+  "contestConfigs": [
+    {
+      "uuid": "50422d0f-e795-4324-8289-50e3d3459196",
+      "markingType": {
+        "style": "regular",
+        "handleSize": 1,
+        "minMarks": 1,
+        "maxMarks": 1
+      },
+      "options": [
+        {
+          "handle": "1",
+          "title": {
+            "en": "Contest 1. Number 1"
+          }
+        },
+        {
+          "handle": "2",
+          "title": {
+            "en": "Contest 1. Number 2"
+          }
+        }
+      ],
+      "resultType": {
+        "name": "Some name"
+      },
+      "title": {
+        "en": "The Title"
+      }
+    },
+    {
+      "uuid": "d866a7d7-15df-4765-9950-651c0ca1313d",
+      "markingType": {
+        "style": "regular",
+        "handleSize": 1,
+        "minMarks": 1,
+        "maxMarks": 1
+      },
+      "options": [
+        {
+          "handle": "1",
+          "title": {
+            "en": "Contest 2. Number 1"
+          }
+        },
+        {
+          "handle": "2",
+          "title": {
+            "en": "Contest 2. Number 2"
+          }
+        }
+      ],
+      "resultType": {
+        "name": "Some name"
+      },
+      "title": {
+        "en": "The Title"
+      }
+    }
+  ],
   "services": {
     "address": "9137fb535bc855747ce34827a49522fb4afd492861d24fca48627b911ca407bb",
     "voter_authorizer": {
@@ -11,5 +80,8 @@
       "public_key": "036811739c1a291827cf986ac8c49aa5086dad504045a2256093ca1322ac9ffba4",
       "url": "http://localhost:1111"
     }
+  },
+  "thresholdConfig": {
+    "encryptionKey": "028eaf66e4f69b83f841714704431c5e88dabe81022540f6eb5b2de8939c61f4ae"
   }
 }

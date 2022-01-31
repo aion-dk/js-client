@@ -7,7 +7,9 @@ export const checkEligibility = (
 ): ":okay" | ":not_eligible" => {
 
   const ballotConfig = ballotConfigs.find(bc => bc.voterGroup === voterGroup);
-  // TODO: Null-check ballot
+
+  if(!ballotConfig)
+    throw new Error(`Ballot config not found for voter group: ${voterGroup}`);
 
   const cvrKeys = Object.keys(cvr).sort();
   const contestUuids = [...ballotConfig!.contestUuids].sort();

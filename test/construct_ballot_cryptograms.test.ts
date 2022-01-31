@@ -48,7 +48,10 @@ describe('AVClient#constructBallotCryptograms', () => {
       await client.validateAccessCode('1234');
       await client.registerVoter()
 
-      const cvr = { '1': 'option1', '2': 'optiona' };
+      const cvr = {
+        '50422d0f-e795-4324-8289-50e3d3459196': '1',
+        'd866a7d7-15df-4765-9950-651c0ca1313d': '2'
+      };
 
       const trackingCode = await client.constructBallotCryptograms(cvr);
 

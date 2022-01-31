@@ -1,5 +1,6 @@
 const sjcl = require("../sjcl");
 import * as crypto from "../aion_crypto";
+import { MarkingType } from "../types";
 
 // encoding vote methods
 const VOTE_ENCODING_TYPE = Object.freeze({
@@ -20,17 +21,31 @@ const VOTE_ENCODING_TYPE = Object.freeze({
   // 0xf0 - 0xff must not be used to ensure that x coordinate of point P is less than the prime of the curve
 })
 
+const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
+  const { minMarks, maxMarks } = markingType;
+
+  if(markingType.style === "regular" &&
+    minMarks === 1 &&
+    maxMarks === 1) {
+    return VOTE_ENCODING_TYPE.TEXT_UTF8
+  }
+
+  throw new Error("Marking type not supported");
+}
+
 /**
  * @param {encodingType} integer representing the encoding type (available encoding type at VOTE_ENCODING_TYPE)
  * @param {vote} the vote to be encoded as a point, either a string or and array of ids.
  * @return {sjcl.ecc.point} The point representing the vote
  */
- export const voteToPoint = (encodingType, vote) => {
+ export const voteToPoint = (markingType: MarkingType, vote) => {
   // turn vote into bignum (used as x coordinate of the point) by:
   // [encoding type bits] + [padding bits] + [vote bits] + [0x00 bits] (last byte is the
   // adjusting byte)
   // prepend the flag bits and try to decode point
   // if not on the curve, increment the x bignum and retry
+
+  const encodingType = getEncodingTypeFromMarkingType(markingType);
 
   if (encodingType == VOTE_ENCODING_TYPE.BLANK) {
     return new sjcl.ecc.point(crypto.Curve)

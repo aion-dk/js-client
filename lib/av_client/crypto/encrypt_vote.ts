@@ -17,9 +17,10 @@ import {
 import { voteToPoint } from "./vote_converter";
 
 import * as crypto from "../aion_crypto";
+import { MarkingType } from "../types";
 
-export const encryptVote = (encoding_type, vote, encryption_key_string: string) => {
-  let vote_point = voteToPoint(encoding_type, vote)
+export const encryptVote = (markingType: MarkingType, vote, encryption_key_string: string) => {
+  let vote_point = voteToPoint(markingType, vote)
   return encryptVotePoint(vote_point, encryption_key_string)
 }
 
