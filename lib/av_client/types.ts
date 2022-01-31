@@ -143,3 +143,19 @@ export type BallotConfig = {
   contestUuids: string[]
   voterGroup: string
 };
+
+export type ContestConfig = {
+  uuid: string
+  options: Option[]
+  markingType: {
+    style: string
+    handleSize: number
+  }
+  resultType: {
+    name: string
+  }
+  title: LocalString
+  subtitle: LocalString
+  description: LocalString
+}
+

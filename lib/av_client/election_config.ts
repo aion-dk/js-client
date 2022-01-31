@@ -1,5 +1,5 @@
 import { BulletinBoard } from "./connectors/bulletin_board";
-import { Ballot, Election } from "./types";
+import { Ballot, BallotConfig, ContestConfig, Election } from "./types";
 import { InvalidConfigError } from "./errors";
 
 export interface ElectionConfig {
@@ -10,6 +10,9 @@ export interface ElectionConfig {
   ballots: Ballot[];
   availableLocales: string[];
   currentLocale: string;
+
+  contestConfigs: ContestConfig[]
+  ballotConfigs: BallotConfig[];
   //...
 
   // appended data:

@@ -16,7 +16,7 @@ import {
   Ballot,
   VoterSessionItem,
   HashValue,
-  Signature
+  Signature,
 } from './av_client/types';
 
 import {
@@ -257,14 +257,14 @@ export class AVClient implements IAVClient {
 
     const { voterGroup } = this.voterSession.content;
 
-    const { ballots, _contests, ballotConfigs } = this.getElectionConfig();
+    const { contestConfigs, ballotConfigs } = this.getElectionConfig();
 
     switch(checkEligibility(voterGroup, cvr, ballotConfigs)) {
       case ":not_eligible":  throw new CorruptCvrError('Corrupt CVR: Not eligible');
       case ":okay":
     }
 
-    switch(validateCvr(cvr, ballots)) {
+    switch(validateCvr(cvr, contestConfigs)) {
       case ":invalid_contest": throw new CorruptCvrError('Corrupt CVR: Contains invalid contest');
       case ":invalid_option": throw new CorruptCvrError('Corrupt CVR: Contains invalid option');
       case ":okay":
