@@ -4,7 +4,7 @@ import * as Crypto from './aion_crypto';
 
 interface RegisterVoterResponse {
   voterSessionUuid: string;
-  voterIdentifier: string;
+  identifier: string;
   emptyCryptograms: ContestMap<EmptyCryptogram>;
   contestIds: number[];
   /*
@@ -22,7 +22,7 @@ export async function registerVoter(bulletinBoard: BulletinBoard, keyPair: KeyPa
       // FIXME we need to make sure that the bulletinBoard gets info about its voterSessionUuid another way
       return {
         voterSessionUuid: data.voterSessionUuid,
-        voterIdentifier: data.voterIdentifier,
+        identifier: data.voterIdentifier,
         emptyCryptograms: data.emptyCryptograms,
         contestIds: data.ballotIds
       } as RegisterVoterResponse

@@ -13,6 +13,8 @@ import {
   OpenableEnvelope,
   EmptyCryptogram,
   BallotBoxReceipt,
+  Ballot,
+  VoterSessionItem,
   HashValue,
   Signature
 } from './av_client/types';
@@ -33,6 +35,8 @@ import { validateCvr } from './av_client/cvr_validation';
 import { randomKeyPair} from './av_client/generate_key_pair';
 
 import * as sjclLib from './av_client/sjcl';
+import { generatePedersenCommitment } from './av_client/crypto/pedersen_commitment';
+import { checkEligibility } from './av_client/eligibility_check';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -76,7 +80,8 @@ export class AVClient implements IAVClient {
   private keyPair: KeyPair;
 
   private voteEncryptions: ContestMap<OpenableEnvelope>;
-  private voterIdentifier: string;
+  //private voterIdentifier: string;
+  private voterSession: VoterSessionItem;
   private contestIds: number[];
 
   /**
@@ -185,37 +190,17 @@ export class AVClient implements IAVClient {
 
     const { authToken } = authorizationResponse.data
 
-    const voterRegistrationItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress)
+    const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
+
+    this.voterSession = voterSessionItem;
   }
 
   /**
    * Registers a voter
-   * // TODO: Remove when new dbb structure is in place
    * @returns undefined or throws an error
    */
   public async registerVoter(): Promise<void> {
-    if(!this.identityConfirmationToken)
-      throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
-
-    this.keyPair = randomKeyPair();
-
-    const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
-    const voterAuthorizerContextUuid = this.getElectionConfig().services.voter_authorizer.election_context_uuid;
-    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
-
-    const authorizationResponse = await coordinator.requestPublicKeyAuthorization(
-      this.authorizationSessionId,
-      this.identityConfirmationToken,
-      this.keyPair.publicKey
-    )
-
-    const { authToken } = authorizationResponse.data
-
-    const registerVoterResponse = await registerVoter(this.bulletinBoard, this.keyPair, this.getElectionConfig().encryptionKey, authToken)
-
-    this.voterIdentifier = registerVoterResponse.voterIdentifier
-    this.emptyCryptograms = registerVoterResponse.emptyCryptograms
-    this.contestIds = registerVoterResponse.contestIds
+    return this.createVoterRegistration();
   }
 
   /**
@@ -266,21 +251,27 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
-    if(!(this.voterIdentifier || this.emptyCryptograms || this.contestIds)) {
+    if(!this.voterSession) {
       throw new InvalidStateError('Cannot construct ballot cryptograms. Voter registration not completed successfully')
     }
 
-    const contests = this.getElectionConfig().ballots
+    const { voterGroup } = this.voterSession.content;
 
-    switch(validateCvr(cvr, contests)) {
+    const { ballots, _contests, ballotConfigs } = this.getElectionConfig();
+
+    switch(checkEligibility(voterGroup, cvr, ballotConfigs)) {
+      case ":not_eligible":  throw new CorruptCvrError('Corrupt CVR: Not eligible');
+      case ":okay":
+    }
+
+    switch(validateCvr(cvr, ballots)) {
       case ":invalid_contest": throw new CorruptCvrError('Corrupt CVR: Contains invalid contest');
       case ":invalid_option": throw new CorruptCvrError('Corrupt CVR: Contains invalid option');
       case ":okay":
     }
 
-    const emptyCryptograms = Object.fromEntries(Object.keys(cvr).map((contestId) => [contestId, this.emptyCryptograms[contestId].empty_cryptogram ]))
     const contestEncodingTypes = Object.fromEntries(Object.keys(cvr).map((contestId) => {
-      const contest = contests.find(b => b.id.toString() == contestId)
+      const contest = ballots.find(b => b.id.toString() == contestId)
 
       // We can use non-null assertion for contest because selections have been validated
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -289,11 +280,21 @@ export class AVClient implements IAVClient {
 
     const envelopes = EncryptVotes.encrypt(
       cvr,
-      emptyCryptograms,
       contestEncodingTypes,
       this.electionEncryptionKey()
     );
+    
 
+    // TODO:
+    //const numberOfCryptogramsNeeded = this.calculateNumberOfRequiredCryptograms(cvr, ballots[voterGroup]);
+
+    // generate commitment
+    //const result = generatePedersenCommitment(messages);
+    
+    // Submit commitment
+    //result.commitment
+
+    // get empty cryptograms
     const trackingCode = EncryptVotes.fingerprint(this.extractCryptograms(envelopes));
 
     this.voteEncryptions = envelopes
@@ -360,11 +361,11 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async submitBallotCryptograms(affidavit: Affidavit): Promise<BallotBoxReceipt> {
-    if(!(this.voterIdentifier || this.voteEncryptions)) {
+    if(!(this.voterSession || this.voteEncryptions)) {
       throw new InvalidStateError('Cannot submit cryptograms. Voter identity unknown or no open envelopes')
     }
 
-    const voterIdentifier = this.voterIdentifier
+    const voterIdentifier = this.voterSession.identifier;
     const electionId = this.electionId()
     const encryptedVotes = this.voteEncryptions
     const voterPrivateKey = this.privateKey();

@@ -1,4 +1,4 @@
-import { ContestMap, SealedEnvelope } from '../types';
+import { ContestMap, SealedEnvelope, VoterSessionItem } from '../types';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { BulletinBoardError, NetworkError, UnsupportedServerReplyError } from "../errors";
 
@@ -25,8 +25,8 @@ export class BulletinBoard {
     return this.backend.get('config');
   }
 
-  createVoterRegistration(authToken: string, parentAddress: string): Promise<AxiosResponse> {
-    return this.backend.post('register', {
+  async createVoterRegistration(authToken: string, parentAddress: string): Promise<VoterSessionItem> {
+    const response = await this.backend.post('register', {
       auth_token: authToken,
       parent_address: parentAddress
     }).catch(error => {
@@ -46,6 +46,8 @@ export class BulletinBoard {
 
       throw error;
     });
+
+    return (response.data as VoterSessionItem)
   }
 
   registerVoter(authToken: string, signature: string): Promise<AxiosResponse> {

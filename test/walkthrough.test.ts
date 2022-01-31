@@ -61,7 +61,7 @@ describe('entire voter flow using OTP authorization', () => {
         oneTimePassword = await extractOTPFromEmail();
       }
 
-      const confirmationToken = await client.validateAccessCode(oneTimePassword).catch((e) => {
+      await client.validateAccessCode(oneTimePassword).catch((e) => {
         console.error(e);
         expect.fail('AVClient#validateAccessCode failed');
       });

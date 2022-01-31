@@ -64,7 +64,6 @@ export interface Ballot {
 }
 
 export interface Option {
-  id: number;
   handle: string;
   title: LocalString;
   subtitle: LocalString;
@@ -120,5 +119,27 @@ export interface Election {
   voteSubmissionId: string
 }
 
+export interface VoterSessionItem {
+  content: {
+    authToken: string
+    identifier: string
+    voterGroup: string
+    publicKey: string
+  }
+  author: string
+  signature: string
+  // Segments...
+}
+
+export interface ClientState {
+  electionConfig?: ElectionConfig
+  voterSession?: VoterSessionItem
+}
+
 export type Signature = string;
 export type HashValue = string;
+
+export type BallotConfig = {
+  contestUuids: string[]
+  voterGroup: string
+};

@@ -26,16 +26,10 @@ describe('validateCvr', () => {
   const createOptions = (optionHandles: string[]): Option[] => {
     return optionHandles.map((handle, i) => {
       return {
-        "id": i,
         "handle": handle,
         "title": {},
         "subtitle": {},
         "description": {},
-        "url": {},
-        "video_url": {},
-        "image": null,
-        "ancestry": null,
-        "selectable": true
       }
     })
   }
