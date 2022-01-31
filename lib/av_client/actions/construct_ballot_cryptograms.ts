@@ -48,34 +48,5 @@ const getEncodingTypes = (cvr: CastVoteRecord, ballots: Ballot[]) => {
 export const constructBallotCryptograms = async (state: ClientState, cvr: CastVoteRecord) => { // TODO: Return type
   assertValidState(state);
 
-  const { voterGroup } = state.voterSession!;
-
-  const { ballots, encryptionKey } = state.electionConfig!;
-
-  switch(validateCvr(cvr, ballots)) {
-    case ":invalid_contest": throw new CorruptCvrError('Corrupt CVR: Contains invalid contest');
-    case ":invalid_option": throw new CorruptCvrError('Corrupt CVR: Contains invalid option');
-    case ":okay":
-  }
-
-  const encodingTypes = getEncodingTypes(cvr, ballots);
-  const numberOfCryptogramsNeeded = calculateNumberOfRequiredCryptograms(cvr, ballots[voterGroup]); // TODO: Use?
-
-  const envelopes = EncryptVotes.encrypt(cvr, encodingTypes, encryptionKey);
-
-  const randomizers = getSortedEnvelopeRandomizers(envelopes);    // Get cryptogram randomizers sorted by contest
-
-  // generate commitment
-  const result = generatePedersenCommitment(randomizers);
-  
-  // Submit commitment // TODO: Move imperative side-effect to parent (caller method)
-  result.commitment;
-
-  // get empty cryptograms
-  //const trackingCode = EncryptVotes.fingerprint(this.extractCryptograms(envelopes));
-
-  //voteEncryptions = envelopes
-
-  //return trackingCode;
-  return result;
+  // TODO: Extract from av_client
 }

@@ -60,7 +60,7 @@ describe('AVClient#constructBallotCryptograms', () => {
   });
 
   context('given invalid CVR', () => {
-    it('encryption fails when voting on invalid contest', async () => {
+    it('cvr not matching voter group eligibility', async () => {
       await client.requestAccessCode('voter123', 'voter@foo.bar');
       await client.validateAccessCode('1234');
       await client.registerVoter()
@@ -70,7 +70,7 @@ describe('AVClient#constructBallotCryptograms', () => {
       await expectError(
         client.constructBallotCryptograms(cvr),
         CorruptCvrError,
-        'Corrupt CVR: Contains invalid contest'
+        'Corrupt CVR: Not eligible'
       );
     });
 
@@ -79,7 +79,10 @@ describe('AVClient#constructBallotCryptograms', () => {
       await client.validateAccessCode('1234');
       await client.registerVoter()
 
-      const cvr = { '1': 'option1', '2': 'wrong_option' };
+      const cvr = {
+        '50422d0f-e795-4324-8289-50e3d3459196': '1',
+        'd866a7d7-15df-4765-9950-651c0ca1313d': '3'
+      };
 
       await expectError(
         client.constructBallotCryptograms(cvr),

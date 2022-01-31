@@ -20,15 +20,15 @@ describe('AVClient#validateAccessCode', () => {
     sandbox = resetDeterminism();
 
     expectedNetworkRequests.push(
-      nock(bulletinBoardHost).get('/mobile-api/us/config')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_config.json')
+      nock(bulletinBoardHost).get('/dbb/api/us/config')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json')
     );
     expectedNetworkRequests.push(
       nock(voterAuthorizerHost).post('/create_session')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json')
     );
 
-    client = new AVClient('http://us-avx:3000/mobile-api/us');
+    client = new AVClient('http://us-avx:3000/dbb/api/us');
     await client.initialize()
   });
 
@@ -48,13 +48,15 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
-        nock(bulletinBoardHost).post('/mobile-api/us/register')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_register.json')
+        nock(bulletinBoardHost).post('/dbb/api/us/register')
+          .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json')
       );
-      expectedNetworkRequests.push(
-        nock(bulletinBoardHost).post('/mobile-api/us/challenge_empty_cryptograms')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_challenge_empty_cryptograms.json')
-      );
+
+      // TODO: DEPRECATED DUE TO NEW STRUCTURE?
+      // expectedNetworkRequests.push(
+      //   nock(bulletinBoardHost).post('/mobile-api/us/challenge_empty_cryptograms')
+      //     .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_challenge_empty_cryptograms.json')
+      // );
 
       const otp = '1234';
       const email = 'blabla@aion.dk';
@@ -100,7 +102,7 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
-        nock(bulletinBoardHost).post('/mobile-api/us/register')
+        nock(bulletinBoardHost).post('/dbb/api/us/register')
           .reply(404)
       );
 

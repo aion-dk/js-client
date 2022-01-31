@@ -11,13 +11,16 @@ describe('validateCvr', () => {
         write_in: false,
         markingType: {
           style: "regular",
-          handleSize: 1
+          handleSize: 1,
+          minMarks: 1,
+          maxMarks: 1
         },
         resultType: {
           name: "Something"
         },
         subtitle: { en: "Some subtitle" },
-        title: { en: "Some title" }
+        title: { en: "Some title" },
+        
       }
 
       const contest1 = { ...template, uuid: 'a', options: createOptions(['1', '2']) };

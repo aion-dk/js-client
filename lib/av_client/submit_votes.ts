@@ -4,7 +4,6 @@ import { BulletinBoard } from './connectors/bulletin_board'
 
 type SignAndSubmitArguments = {
   voterIdentifier: string;
-  electionId: number;
   encryptedVotes: ContestMap<OpenableEnvelope>;
   voterPrivateKey: string;
   electionSigningPublicKey: string,
@@ -35,14 +34,13 @@ export default class SubmitVotes {
   }
 
   public async signAndSubmitVotes(args: SignAndSubmitArguments): Promise<BallotBoxReceipt> {
-    const { voterIdentifier, electionId, encryptedVotes, voterPrivateKey, electionSigningPublicKey, encryptedAffidavit } = args
+    const { voterIdentifier, encryptedVotes, voterPrivateKey, electionSigningPublicKey, encryptedAffidavit } = args
 
     const acknowledgeResponse = await this.acknowledge()
 
     const contentToSign = {
       acknowledged_at: acknowledgeResponse.currentTime,
       acknowledged_board_hash: acknowledgeResponse.currentBoardHash,
-      election_id: electionId,
       ...(typeof encryptedAffidavit !== 'undefined') && {encrypted_affidavit_hash: fingerprint(encryptedAffidavit)},
       voter_identifier: voterIdentifier
     };

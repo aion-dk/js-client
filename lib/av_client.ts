@@ -364,8 +364,7 @@ export class AVClient implements IAVClient {
       throw new InvalidStateError('Cannot submit cryptograms. Voter identity unknown or no open envelopes')
     }
 
-    const voterIdentifier = this.voterSession.identifier;
-    const electionId = this.electionId()
+    const voterIdentifier = this.voterSession.content.identifier;
     const encryptedVotes = this.voteEncryptions
     const voterPrivateKey = this.privateKey();
     const electionSigningPublicKey = this.electionSigningPublicKey();
@@ -379,7 +378,6 @@ export class AVClient implements IAVClient {
 
     return await votesSubmitter.signAndSubmitVotes({
         voterIdentifier,
-        electionId,
         encryptedVotes,
         voterPrivateKey,
         electionSigningPublicKey,
@@ -410,14 +408,6 @@ export class AVClient implements IAVClient {
     }
 
     return this.electionConfig
-  }
-
-  private electionId(): number {
-    return this.getElectionConfig().election.id;
-  }
-
-  private electionEncryptionKey(): ECPoint {
-    return this.getElectionConfig().thresholdConfig.encryptionKey;
   }
 
   private electionSigningPublicKey(): ECPoint {

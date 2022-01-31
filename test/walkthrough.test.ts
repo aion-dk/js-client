@@ -79,20 +79,22 @@ describe('entire voter flow using OTP authorization', () => {
   
 
   it('returns a receipt', async () => {
-    expectedNetworkRequests.push(nock(bulletinBoardHost).get('/mobile-api/us/config')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_config.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/register')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_register.json'));
-    expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/challenge_empty_cryptograms')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_challenge_empty_cryptograms.json'));
-    expectedNetworkRequests.push(nock(bulletinBoardHost).get('/mobile-api/us/get_latest_board_hash')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_get_latest_board_hash.json'));
-    expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/submit_votes')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_submit_votes.json'));
+    expectedNetworkRequests.push(nock(bulletinBoardHost).get('/dbb/api/us/config')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json'));
+      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/api/us/register')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json'));
+
+    // TODO: DEPRECATED?
+    // expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/challenge_empty_cryptograms')
+    //   .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_challenge_empty_cryptograms.json'));
+    // expectedNetworkRequests.push(nock(bulletinBoardHost).get('/mobile-api/us/get_latest_board_hash')
+    //   .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_get_latest_board_hash.json'));
+    // expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/submit_votes')
+    //   .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_submit_votes.json'));
 
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     //return await recordResponses(async function() {
-      const client = new AVClient('http://us-avx:3000/mobile-api/us');
+      const client = new AVClient('http://us-avx:3000/dbb/api/us');
       await client.initialize()
 
       const voterId = 'A00000000006'

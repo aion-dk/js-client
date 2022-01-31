@@ -11,8 +11,8 @@ describe('election configuration validation', () => {
   let electionConfig: any;
 
   beforeEach(async () => {
-    client = new AVClient('http://us-avx:3000/mobile-api/us');
-    electionConfig = readJSON('./replies/otp_flow/get_us_app_config.json');
+    client = new AVClient('http://nothing.local');
+    electionConfig = readJSON('./replies/otp_flow/get_dbb_api_us_config.json');
   });
 
   context('OTP provider URL is empty', () => {
