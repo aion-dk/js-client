@@ -6,10 +6,10 @@ describe('Eligibility Check', () => {
     it('fails when voting on non-eligible contest', async () => {
       const voterGroup = "4";
 
-      const ballotConfigs = [
-        { contestUuids: ['1', '2'], voterGroup: "4" },
-        { contestUuids: ['3', '4'], voterGroup: "5" }
-      ];
+      const ballotConfigs = {
+        "4": { contestUuids: ['1', '2'] },
+        "5": { contestUuids: ['3', '4'] }
+      };
 
       const cvr1 = { '1': '1', '2': '4' };
       const cvr2 = { '3': '5', '2': '4' };

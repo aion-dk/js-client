@@ -140,8 +140,9 @@ export type Signature = string;
 export type HashValue = string;
 
 export type BallotConfig = {
-  contestUuids: string[]
-  voterGroup: string
+  [k: string]: {
+    contestUuids: string[]
+  }
 };
 
 export type ContestConfig = {
