@@ -1,10 +1,10 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig, validateElectionConfig } from './av_client/election_config';
-import EncryptVotes from './av_client/encrypt_votes';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
+import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
 
 import {
   IAVClient,
@@ -29,11 +29,9 @@ import {
   NetworkError } from './av_client/errors';
 
 import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
-import { validateCvr } from './av_client/cvr_validation';
 import { randomKeyPair} from './av_client/generate_key_pair';
 
 import * as sjclLib from './av_client/sjcl';
-import { checkEligibility } from './av_client/eligibility_check';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -249,50 +247,12 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
-    if(!this.voterSession) {
-      throw new InvalidStateError('Cannot construct ballot cryptograms. Voter registration not completed successfully')
-    }
-
-    const { voterGroup } = this.voterSession.content;
-
-    const { contestConfigs, ballotConfigs, thresholdConfig } = this.getElectionConfig();
-
-    switch(checkEligibility(voterGroup, cvr, ballotConfigs)) {
-      case ":not_eligible":  throw new CorruptCvrError('Corrupt CVR: Not eligible');
-      case ":okay":
-    }
-
-    switch(validateCvr(cvr, contestConfigs)) {
-      case ":invalid_contest": throw new CorruptCvrError('Corrupt CVR: Contains invalid contest');
-      case ":invalid_option": throw new CorruptCvrError('Corrupt CVR: Contains invalid option');
-      case ":okay":
-    }
-
-    const DEFAULT_MARKING_TYPE = {
-      style: "regular",
-      handleSize: 1,
-      minMarks: 1,
-      maxMarks: 1
+    const state = {
+      voterSession: this.voterSession,
+      electionConfig: this.electionConfig,
     };
 
-    const envelopes = EncryptVotes.encrypt(
-      cvr,
-      DEFAULT_MARKING_TYPE,
-      thresholdConfig.encryptionKey
-    );
-    
-
-    // TODO:
-    //const numberOfCryptogramsNeeded = this.calculateNumberOfRequiredCryptograms(cvr, ballots[voterGroup]);
-
-    // generate commitment
-    //const result = generatePedersenCommitment(messages);
-    
-    // Submit commitment
-    //result.commitment
-
-    // get empty cryptograms
-    const trackingCode = EncryptVotes.fingerprint(this.extractCryptograms(envelopes));
+    const { envelopes, trackingCode } = constructBallotCryptograms(state, cvr);
 
     this.voteEncryptions = envelopes
 
@@ -391,15 +351,6 @@ export class AVClient implements IAVClient {
     return
   }
 
-  /**
-   * Returns data for rendering the list of cryptograms of the ballot
-   * @param Map of openable envelopes with cryptograms
-   * @return Object containing a cryptogram for each contest
-   */
-  private extractCryptograms(envelopes: ContestMap<OpenableEnvelope>): ContestMap<Cryptogram> {
-    return Object.fromEntries(Object.keys(envelopes).map(contestId =>  [contestId, envelopes[contestId].cryptogram ]))
-  }
-
   public getElectionConfig(): ElectionConfig {
     if(!this.electionConfig){
       throw new InvalidStateError('No configuration loaded. Did you call initialize()?')
@@ -427,7 +378,6 @@ export class AVClient implements IAVClient {
 
 type BigNum = string;
 type ECPoint = string;
-type Cryptogram = string;
 
 type AffidavitConfig = {
   curve: string;
