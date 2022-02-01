@@ -12,7 +12,7 @@ export const checkEligibility = (
     throw new Error(`Ballot config not found for voter group: ${voterGroup}`);
 
   const cvrKeys = Object.keys(cvr).sort();
-  const contestUuids = [...ballotConfig!.contestUuids].sort();
+  const contestUuids = [...ballotConfig.contestUuids].sort();
 
   if(cvrKeys.length === contestUuids.length
     && cvrKeys.every((key, i) => key === contestUuids[i])) {

@@ -1,6 +1,5 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { fetchElectionConfig, ElectionConfig, validateElectionConfig } from './av_client/election_config';
-import { registerVoter } from './av_client/register_voter';
 import EncryptVotes from './av_client/encrypt_votes';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
@@ -13,7 +12,6 @@ import {
   OpenableEnvelope,
   EmptyCryptogram,
   BallotBoxReceipt,
-  Ballot,
   VoterSessionItem,
   HashValue,
   Signature,
@@ -35,7 +33,6 @@ import { validateCvr } from './av_client/cvr_validation';
 import { randomKeyPair} from './av_client/generate_key_pair';
 
 import * as sjclLib from './av_client/sjcl';
-import { generatePedersenCommitment } from './av_client/crypto/pedersen_commitment';
 import { checkEligibility } from './av_client/eligibility_check';
 
 /** @internal */
@@ -193,6 +190,7 @@ export class AVClient implements IAVClient {
     const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
 
     this.voterSession = voterSessionItem;
+    this.bulletinBoard.setVoterSessionUuid(voterSessionItem.content.identifier);
   }
 
   /**

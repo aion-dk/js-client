@@ -1,4 +1,4 @@
-const sjcl = require("../sjcl");
+import * as sjcl from '../sjcl';
 import * as crypto from "../aion_crypto";
 import { MarkingType } from "../types";
 
@@ -52,10 +52,9 @@ const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
   }
 
   let voteBN
-  let encodingBN
 
   switch (encodingType) {
-    case VOTE_ENCODING_TYPE.TEXT_UTF8:
+    case VOTE_ENCODING_TYPE.TEXT_UTF8: {
       // the vote is a text
       if (typeof vote !== 'string') {
         throw new sjcl.exception.invalid("vote is not a string")
@@ -64,7 +63,7 @@ const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
         throw new sjcl.exception.invalid("vote cannot be empty")
       }
 
-      let voteBits = sjcl.codec.utf8String.toBits(vote)
+      const voteBits = sjcl.codec.utf8String.toBits(vote)
 
       if (sjcl.bitArray.bitLength(voteBits) > 30 * 8) {
         throw new sjcl.exception.invalid("vote text is too long")
@@ -72,6 +71,7 @@ const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
 
       voteBN = sjcl.bn.fromBits(voteBits)
       break
+    }
     case VOTE_ENCODING_TYPE.LIST_1B:
     case VOTE_ENCODING_TYPE.RANKED_1B:
       // the vote is an array of ids
@@ -121,17 +121,17 @@ const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
   }
 
   // Set the 33rd byte to 02 or 03
-  let flag = Math.floor(Math.random() * 2) + 2  // 2 or 3
+  const flag = Math.floor(Math.random() * 2) + 2  // 2 or 3
   let flagBN = new sjcl.bn(flag)
   flagBN = flagBN.mul(new sjcl.bn(256).power(32))
 
   // Set the 32nd byte according to the vote encoding type
-  encodingBN = new sjcl.bn(encodingType).mul(new sjcl.bn(256).power(31))
+  const encodingBN = new sjcl.bn(encodingType).mul(new sjcl.bn(256).power(31))
 
   // Set the right most byte to 00 as the adjusting byte
   voteBN = voteBN.mul(256)
   // Construct the point encoding
-  let pointBN = voteBN.add(encodingBN).add(flagBN)
+  const pointBN = voteBN.add(encodingBN).add(flagBN)
 
   let point
   let found = false
@@ -172,9 +172,9 @@ const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
 
   let vote
 
-  let xBits = point.x.toBits()
-  let encodingType = sjcl.bitArray.extract(xBits, 0, 8)
-  let voteBits = sjcl.bitArray.bitSlice(xBits, 8 * 1, 8 * 31)
+  const xBits = point.x.toBits()
+  const encodingType = sjcl.bitArray.extract(xBits, 0, 8)
+  const voteBits = sjcl.bitArray.bitSlice(xBits, 8 * 1, 8 * 31)
   let voteBN = sjcl.bn.fromBits(voteBits).trim()
 
   switch (encodingType) {
@@ -198,7 +198,7 @@ const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
       if (voteBN.equals(0)) {
         vote = []
       } else {
-        let voteHex = sjcl.codec.hex.fromBits(voteBN.toBits())
+        const voteHex = sjcl.codec.hex.fromBits(voteBN.toBits())
         vote = voteHex.match(/.{2}/g).map(s => parseInt(s, 16))
       }
       break
