@@ -1,4 +1,4 @@
-import { CastVoteRecord, Ballot, ContestConfig } from './types';
+import { CastVoteRecord, ContestConfig } from './types';
 
 type ValidationResult = ':okay' | ':invalid_option' | ':invalid_contest'
 

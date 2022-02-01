@@ -161,7 +161,7 @@ const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
  * or an array of ids)
  */
  export const pointToVote = (pointString) => {
-  let point = crypto.pointFromBits(sjcl.codec.hex.toBits(pointString))
+  const point = crypto.pointFromBits(sjcl.codec.hex.toBits(pointString))
 
   if (point.isIdentity){
     return {
@@ -175,7 +175,7 @@ const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
   const xBits = point.x.toBits()
   const encodingType = sjcl.bitArray.extract(xBits, 0, 8)
   const voteBits = sjcl.bitArray.bitSlice(xBits, 8 * 1, 8 * 31)
-  let voteBN = sjcl.bn.fromBits(voteBits).trim()
+  const voteBN = sjcl.bn.fromBits(voteBits).trim()
 
   switch (encodingType) {
     case VOTE_ENCODING_TYPE.TEXT_UTF8:

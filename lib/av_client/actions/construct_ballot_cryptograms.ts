@@ -5,19 +5,8 @@ import {
 } from '../types';
 
 import {
-  CorruptCvrError,
   InvalidStateError,
 } from '../errors';
-
-import { validateCvr } from '../cvr_validation';
-
-import EncryptVotes from '../encrypt_votes';
-
-import { generatePedersenCommitment } from '../crypto/pedersen_commitment';
-
-const calculateNumberOfRequiredCryptograms = (cvr: CastVoteRecord, ballot: Ballot): number => {
-  return 2;
-}
 
 const assertValidState = (state: ClientState) => {
   if(!state.voterSession) {
