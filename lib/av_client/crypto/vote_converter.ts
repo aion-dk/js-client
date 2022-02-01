@@ -189,6 +189,38 @@ const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
         vote = sjcl.codec.utf8String.fromBits(voteBN.toBits())
       }
       break
+    case VOTE_ENCODING_TYPE.LIST_1B:
+    case VOTE_ENCODING_TYPE.RANKED_1B:
+      // vote is encoded as array of ids
+
+      // in case voteBN is zero (0), sjcl encoding outputs '0x000000'
+      // therefore, the case need to be handled differently
+      if (voteBN.equals(0)) {
+        vote = []
+      } else {
+        const voteHex = sjcl.codec.hex.fromBits(voteBN.toBits())
+        vote = voteHex.match(/.{2}/g).map(s => parseInt(s, 16))
+      }
+      break
+    case VOTE_ENCODING_TYPE.LIST_2B:
+    case VOTE_ENCODING_TYPE.RANKED_2B:
+      // vote is encoded as array of ids
+
+      // in case voteBN is zero (0), sjcl encoding outputs '0x000000'
+      // therefore, the case need to be handled differently
+      if (voteBN.equals(0)) {
+        vote = []
+      } else {
+        let voteHex = sjcl.codec.hex.fromBits(voteBN.toBits())
+
+        // Prepend '00' in case the first integer takes only 1 byte space
+        if(voteHex.length % 4 != 0) {
+          voteHex = '00' + voteHex
+        }
+
+        vote = voteHex.match(/.{4}/g).map(s => parseInt(s, 16))
+      }
+      break
     default:
       throw new sjcl.exception.corrupt("point does not have a valid vote encoding")
   }
