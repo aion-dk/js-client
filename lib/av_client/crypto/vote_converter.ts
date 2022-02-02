@@ -72,50 +72,6 @@ const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
       voteBN = sjcl.bn.fromBits(voteBits)
       break
     }
-    case VOTE_ENCODING_TYPE.LIST_1B:
-    case VOTE_ENCODING_TYPE.RANKED_1B:
-      // the vote is an array of ids
-      if (!(Array.isArray(vote))) {
-        throw new sjcl.exception.invalid("vote is not an array")
-      }
-      if (vote.length == 0) {
-        throw new sjcl.exception.invalid("vote cannot be empty")
-      }
-      if (vote.some(id => id < 1 || id > 256 - 1)) {
-        throw new sjcl.exception.invalid("vote array value is out of bound")
-      }
-      if (vote.length > 30) {
-        throw new sjcl.exception.invalid("vote array is too long")
-      }
-
-      voteBN = new sjcl.bn(0)
-      vote.forEach(v => {
-        voteBN = voteBN.mul(256)
-        voteBN = voteBN.add(v)
-      })
-      break
-    case VOTE_ENCODING_TYPE.LIST_2B:
-    case VOTE_ENCODING_TYPE.RANKED_2B:
-      // the vote is an array of ids
-      if (!(Array.isArray(vote))) {
-        throw new sjcl.exception.invalid("vote is not an array")
-      }
-      if (vote.length == 0) {
-        throw new sjcl.exception.invalid("vote cannot be empty")
-      }
-      if (vote.some(id => id < 1 || id > 256 ** 2 - 1)) {
-        throw new sjcl.exception.invalid("vote array value is out of bound")
-      }
-      if (vote.length > 15) {
-        throw new sjcl.exception.invalid("vote array is too long")
-      }
-
-      voteBN = new sjcl.bn(0)
-      vote.forEach(v => {
-        voteBN = voteBN.mul(256 ** 2)
-        voteBN = voteBN.add(v)
-      })
-      break
     default:
       throw new sjcl.exception.invalid("vote encoding not supported")
   }
@@ -187,38 +143,6 @@ const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
         vote = ''
       } else {
         vote = sjcl.codec.utf8String.fromBits(voteBN.toBits())
-      }
-      break
-    case VOTE_ENCODING_TYPE.LIST_1B:
-    case VOTE_ENCODING_TYPE.RANKED_1B:
-      // vote is encoded as array of ids
-
-      // in case voteBN is zero (0), sjcl encoding outputs '0x000000'
-      // therefore, the case need to be handled differently
-      if (voteBN.equals(0)) {
-        vote = []
-      } else {
-        const voteHex = sjcl.codec.hex.fromBits(voteBN.toBits())
-        vote = voteHex.match(/.{2}/g).map(s => parseInt(s, 16))
-      }
-      break
-    case VOTE_ENCODING_TYPE.LIST_2B:
-    case VOTE_ENCODING_TYPE.RANKED_2B:
-      // vote is encoded as array of ids
-
-      // in case voteBN is zero (0), sjcl encoding outputs '0x000000'
-      // therefore, the case need to be handled differently
-      if (voteBN.equals(0)) {
-        vote = []
-      } else {
-        let voteHex = sjcl.codec.hex.fromBits(voteBN.toBits())
-
-        // Prepend '00' in case the first integer takes only 1 byte space
-        if(voteHex.length % 4 != 0) {
-          voteHex = '00' + voteHex
-        }
-
-        vote = voteHex.match(/.{4}/g).map(s => parseInt(s, 16))
       }
       break
     default:
