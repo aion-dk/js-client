@@ -48,7 +48,7 @@ describe('AVClient#submitBallotCryptograms', () => {
   })
 
   context('given valid values', () => {
-    it('successfully submits encrypted votes', async () => {
+    it.skip('successfully submits encrypted votes', async () => {
       await client.requestAccessCode('voter123', 'voter@foo.bar');
       await client.validateAccessCode('1234');
       await client.registerVoter();
