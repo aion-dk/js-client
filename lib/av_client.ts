@@ -71,13 +71,10 @@ export class AVClient implements IAVClient {
 
   private bulletinBoard: BulletinBoard;
   private electionConfig?: ElectionConfig;
-  private emptyCryptograms: ContestMap<EmptyCryptogram>;
   private keyPair: KeyPair;
 
   private voteEncryptions: ContestMap<OpenableEnvelope>;
-  //private voterIdentifier: string;
   private voterSession: VoterSessionItem;
-  private contestIds: number[];
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -252,9 +249,18 @@ export class AVClient implements IAVClient {
       electionConfig: this.electionConfig,
     };
 
-    const { envelopes, trackingCode } = constructBallotCryptograms(state, cvr);
+    const {
+      commitment,
+      envelopeRandomizers,
+      envelopes,
+      trackingCode,
+    } = constructBallotCryptograms(state, cvr);
 
-    this.voteEncryptions = envelopes
+    // Submit commitment
+
+    // Keep randomizer throughout the session
+
+    this.voteEncryptions = envelopes;
 
     return trackingCode;
   }

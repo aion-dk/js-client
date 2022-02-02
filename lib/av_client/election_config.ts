@@ -13,7 +13,6 @@ export interface ElectionConfig {
 
   contestConfigs: ContestConfig
   ballotConfigs: BallotConfig;
-  thresholdConfig: ThresholdConfig;
 
   // appended data:
   affidavit: AffidavitConfig;
@@ -23,10 +22,6 @@ export interface ElectionConfig {
     'voter_authorizer': Service,
     'otp_provider': Service
   };
-}
-
-interface ThresholdConfig {
-  encryptionKey: string
 }
 
 interface Service {

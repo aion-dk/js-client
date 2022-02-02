@@ -18,15 +18,22 @@ import {
 import {
   InvalidStateError,
 } from '../errors';
+import { generatePedersenCommitment } from '../crypto/pedersen_commitment';
 
+const DEFAULT_MARKING_TYPE = {
+  style: "regular",
+  handleSize: 1,
+  minMarks: 1,
+  maxMarks: 1
+};
 
-const getSortedEnvelopeRandomizers = (envelopes) => {
+const getSortedEnvelopeRandomizers = (envelopes: ContestMap<OpenableEnvelope>): string[] => {
   return Object.keys(envelopes)
     .sort((a,b) => ('' + a).localeCompare(b))
     .map(key => envelopes[key].randomness)
 };
 
-const getEncodingTypes = (cvr: CastVoteRecord, ballots: Ballot[]) => {
+const _getEncodingTypes = (cvr: CastVoteRecord, ballots: Ballot[]) => {
   return Object.fromEntries(Object.keys(cvr).map((contestId) => {
     const contest = ballots.find(b => b.id.toString() == contestId)
 
@@ -46,7 +53,7 @@ export const constructBallotCryptograms = (state: ClientState, cvr: CastVoteReco
   }
 
   const { voterGroup } = state.voterSession.content;
-  const { contestConfigs, ballotConfigs, thresholdConfig } = state.electionConfig;
+  const { contestConfigs, ballotConfigs, encryptionKey } = state.electionConfig;
 
   switch(checkEligibility(voterGroup, cvr, ballotConfigs)) {
     case ":not_eligible":  throw new CorruptCvrError('Corrupt CVR: Not eligible');
@@ -59,35 +66,29 @@ export const constructBallotCryptograms = (state: ClientState, cvr: CastVoteReco
     case ":okay":
   }
 
-  const DEFAULT_MARKING_TYPE = {
-    style: "regular",
-    handleSize: 1,
-    minMarks: 1,
-    maxMarks: 1
-  };
-
   const envelopes = EncryptVotes.encrypt(
     cvr,
     DEFAULT_MARKING_TYPE,
-    thresholdConfig.encryptionKey
+    encryptionKey
   );
 
+  const randomizers = getSortedEnvelopeRandomizers(envelopes);
 
   // TODO:
-  //const numberOfCryptogramsNeeded = this.calculateNumberOfRequiredCryptograms(cvr, ballots[voterGroup]);
+  // Do we need: const numberOfCryptogramsNeeded = this.calculateNumberOfRequiredCryptograms(cvr, ballots[voterGroup]);
 
-  // generate commitment
-  //const result = generatePedersenCommitment(messages);
+  const result = generatePedersenCommitment(randomizers);
 
-  // Submit commitment
-  //result.commitment
-
-  // get empty cryptograms
   const trackingCode = EncryptVotes.fingerprint(extractCryptograms(envelopes));
 
   return {
+    commitment: {
+      result: result.commitment,
+      randomizer: result.randomizer
+    },
+    envelopeRandomizers: randomizers,
     envelopes,
-    trackingCode
+    trackingCode,
   }
 }
 
@@ -103,6 +104,11 @@ const extractCryptograms = (envelopes: ContestMap<OpenableEnvelope>): ContestMap
 type Cryptogram = string;
 
 type ConstructResult = {
-  envelopes: any,
-  trackingCode: string
+  commitment: {
+    result: string,
+    randomizer: string
+  }
+  envelopeRandomizers: string[]
+  envelopes: ContestMap<OpenableEnvelope>,
+  trackingCode: string,
 }
