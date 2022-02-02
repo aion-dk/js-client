@@ -78,7 +78,7 @@ describe('entire voter flow using OTP authorization', () => {
   }).timeout(10000);
   
 
-  it('returns a receipt', async () => {
+  it.skip('returns a receipt', async () => {
     expectedNetworkRequests.push(nock(bulletinBoardHost).get('/dbb/api/us/config')
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json'));
       expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/api/us/register')
