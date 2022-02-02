@@ -20,8 +20,10 @@ const validateCvr = (
   const hasVotedForAllContests = ballotConfig.contestUuids.every(uuid => cvr[uuid] !== undefined);
 
   const areSelectedOptionsValid = Object.keys(cvr).every(contestUuid => {
-    const contest = allContests[contestUuid]
-    if (!contest) return false;
+    const contest = allContests[contestUuid];
+
+    if (!contest)
+      return false;
 
     const validOptions = contest.options.map(option => option.handle);
     const selectedOption = cvr[contestUuid];
