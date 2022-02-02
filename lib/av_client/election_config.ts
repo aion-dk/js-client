@@ -11,7 +11,7 @@ export interface ElectionConfig {
   availableLocales: string[];
   currentLocale: string;
 
-  contestConfigs: ContestConfig[]
+  contestConfigs: ContestConfig
   ballotConfigs: BallotConfig;
   thresholdConfig: ThresholdConfig;
 

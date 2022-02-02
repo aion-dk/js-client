@@ -1,41 +1,54 @@
 import { validateCvr } from '../lib/av_client/cvr_validation';
-import { ContestConfig, Option } from '../lib/av_client/types';
+import { Option } from '../lib/av_client/types';
 import { expect } from 'chai';
+
+const template = {
+  vote_encoding_type: 0,
+  description: {},
+  write_in: false,
+  markingType: {
+    style: "regular",
+    handleSize: 1,
+    minMarks: 1,
+    maxMarks: 1
+  },
+  resultType: {
+    name: "Something"
+  },
+  subtitle: { en: "Some subtitle" },
+  title: { en: "Some title" },
+};
 
 describe('validateCvr', () => {
   context('given invalid CVR', () => {
     it('fails when voting on invalid contests or invalid options', async () => {
-      const template = {
-        vote_encoding_type: 0,
-        description: {},
-        write_in: false,
-        markingType: {
-          style: "regular",
-          handleSize: 1,
-          minMarks: 1,
-          maxMarks: 1
-        },
-        resultType: {
-          name: "Something"
-        },
-        subtitle: { en: "Some subtitle" },
-        title: { en: "Some title" },
-        
-      }
+      const contest1 = { ...template, options: createOptions(['1', '2']) };
+      const contest2 = { ...template, options: createOptions(['3', '4']) };
+      const contest3 = { ...template, options: createOptions(['5', '6']) };
 
-      const contest1 = { ...template, uuid: 'a', options: createOptions(['1', '2']) };
-      const contest2 = { ...template, uuid: 'b', options: createOptions(['3', '4']) };
-      const contest3 = { ...template, uuid: 'c', options: createOptions(['5', '6']) };
+      const allContests = {a: contest1, b: contest2, c: contest3 };
 
-      const contests1 = [contest1, contest2];
-      const contests2 = [contest1, contest3];
+      const cvr_invalidcontest = { 'a': '1', 'c': '5' };
+      const cvr_invalidoption = { 'a': '1', 'b': '7' };
+      const cvr_missingcontest = { 'a': '2' };
+      const cvr_valid = { 'a': '1', 'b': '4' };
 
-      const cvr1 = { 'a': '1', 'c': '5' };
-      const cvr2 = { 'a': '1', 'c': '7' };
+      const VOTER_GROUP = "4";
 
-      expect(validateCvr(cvr2, contests2)).to.be.equal(':invalid_option')
-      expect(validateCvr(cvr2, contests1)).to.be.equal(':invalid_contest')
-      expect(validateCvr(cvr1, contests2)).to.be.equal(':okay')
+      const ballotConfigs = {
+        [VOTER_GROUP]: {
+          contestUuids: [ "a", "b" ]
+        }
+      };
+
+      expect(validateCvr(cvr_invalidoption, VOTER_GROUP, ballotConfigs, allContests)).to.be.equal(':invalid_option')
+      expect(validateCvr(cvr_invalidcontest, VOTER_GROUP, ballotConfigs, allContests)).to.be.equal(':invalid_contest')
+      expect(validateCvr(cvr_missingcontest, VOTER_GROUP, ballotConfigs, allContests)).to.be.equal(':missing_contest_in_cvr')
+      expect(validateCvr(cvr_valid, VOTER_GROUP, ballotConfigs, allContests)).to.be.equal(':okay')
+
+      expect(
+        () => validateCvr(cvr_invalidcontest, "non_existing_ballot_config", ballotConfigs, allContests)
+      ).to.throw();
     });
   });
 

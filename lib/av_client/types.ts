@@ -140,21 +140,22 @@ export type Signature = string;
 export type HashValue = string;
 
 export type BallotConfig = {
-  [k: string]: {
+  [voterGroupId: string]: {
     contestUuids: string[]
   }
 };
 
 export type ContestConfig = {
-  uuid: string
-  options: Option[]
-  markingType: MarkingType
-  resultType: {
-    name: string
+  [contestUuid: string]: {
+    options: Option[]
+    markingType: MarkingType
+    resultType: {
+      name: string
+    }
+    title: LocalString
+    subtitle: LocalString
+    description: LocalString
   }
-  title: LocalString
-  subtitle: LocalString
-  description: LocalString
 }
 
 export type MarkingType = {

@@ -1,13 +1,26 @@
-import { CastVoteRecord, ContestConfig } from './types';
+import { BallotConfig, CastVoteRecord, ContestConfig } from './types';
 
-type ValidationResult = ':okay' | ':invalid_option' | ':invalid_contest'
+type ValidationResult = ':okay'
+  | ':invalid_option'
+  | ':invalid_contest'
+  | ':missing_contest_in_cvr'
 
-const validateCvr = (cvr: CastVoteRecord, contests: ContestConfig[]) : ValidationResult => {
-  // TODO: Assuming that the voter has access to - exactly - all contests from election config.
-  const hasVotedForAllContests = JSON.stringify(Object.keys(cvr).map(k => k)) === JSON.stringify(contests.map(c => c.uuid))
+const validateCvr = (
+  cvr: CastVoteRecord,
+  voterGroup: string,
+  ballotConfigs: BallotConfig,
+  allContests: ContestConfig) : ValidationResult => {
+
+  const ballotConfig = ballotConfigs[voterGroup];
+
+  const hasOnlyVotedForValidContests = Object.keys(cvr)
+    .map(cvrUuid => ballotConfig.contestUuids.includes(cvrUuid))
+    .every(found => found);
+
+  const hasVotedForAllContests = ballotConfig.contestUuids.every(uuid => cvr[uuid] !== undefined);
 
   const areSelectedOptionsValid = Object.keys(cvr).every(contestUuid => {
-    const contest = contests.find(_contest => _contest.uuid == contestUuid)
+    const contest = allContests[contestUuid]
     if (!contest) return false;
 
     const validOptions = contest.options.map(option => option.handle);
@@ -16,9 +29,11 @@ const validateCvr = (cvr: CastVoteRecord, contests: ContestConfig[]) : Validatio
     return validOptions.includes(selectedOption);
   });
 
-  if(!hasVotedForAllContests) return ':invalid_contest'
-  if(!areSelectedOptionsValid) return ':invalid_option'
-  return ':okay'
+  if(!hasOnlyVotedForValidContests) return ':invalid_contest';
+  if(!hasVotedForAllContests) return ':missing_contest_in_cvr';
+  if(!areSelectedOptionsValid) return ':invalid_option';
+
+  return ':okay';
 }
 
 export {

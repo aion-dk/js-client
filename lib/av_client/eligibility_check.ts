@@ -6,9 +6,7 @@ export const checkEligibility = (
   ballotConfigs: BallotConfig
 ): ":okay" | ":not_eligible" => {
 
-  const voterGroupConfig = ballotConfigs["4"];
-
-  console.log(`Voter group '${voterGroup}'`, JSON.stringify(ballotConfigs), voterGroupConfig);
+  const voterGroupConfig = ballotConfigs[voterGroup];
 
   if(!voterGroupConfig)
     throw new Error(`Ballot config not found for voter group: ${voterGroup}`);

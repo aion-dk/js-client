@@ -53,7 +53,7 @@ export const constructBallotCryptograms = (state: ClientState, cvr: CastVoteReco
     case ":okay":
   }
 
-  switch(validateCvr(cvr, contestConfigs)) {
+  switch(validateCvr(cvr, voterGroup, ballotConfigs, contestConfigs)) {
     case ":invalid_contest": throw new CorruptCvrError('Corrupt CVR: Contains invalid contest');
     case ":invalid_option": throw new CorruptCvrError('Corrupt CVR: Contains invalid option');
     case ":okay":
