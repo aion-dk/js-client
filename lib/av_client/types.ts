@@ -128,6 +128,7 @@ export interface VoterSessionItem {
   }
   author: string
   signature: string
+  parent_address: string
   // Segments...
 }
 
