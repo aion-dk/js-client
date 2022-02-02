@@ -1,16 +1,22 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
-import { fetchElectionConfig, ElectionConfig, validateElectionConfig } from './av_client/election_config';
 import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
+import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
+import { randomKeyPair } from './av_client/generate_key_pair';
+
+import {
+  fetchElectionConfig,
+  ElectionConfig,
+  validateElectionConfig
+} from './av_client/election_config';
 
 import {
   IAVClient,
   ContestMap,
   OpenableEnvelope,
-  EmptyCryptogram,
   BallotBoxReceipt,
   VoterSessionItem,
   HashValue,
@@ -26,10 +32,8 @@ import {
   EmailDoesNotMatchVoterRecordError,
   InvalidConfigError,
   InvalidStateError,
-  NetworkError } from './av_client/errors';
-
-import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
-import { randomKeyPair} from './av_client/generate_key_pair';
+  NetworkError
+} from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
 
@@ -172,15 +176,15 @@ export class AVClient implements IAVClient {
     const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
     const voterAuthorizerContextUuid = this.getElectionConfig().services.voter_authorizer.election_context_uuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
-    const servicesBoardAddress = this.getElectionConfig().services.address
+    const servicesBoardAddress = this.getElectionConfig().services.address;
 
     const authorizationResponse = await coordinator.requestPublicKeyAuthorization(
       this.authorizationSessionId,
       this.identityConfirmationToken,
       this.keyPair.publicKey
-    )
+    );
 
-    const { authToken } = authorizationResponse.data
+    const { authToken } = authorizationResponse.data;
 
     const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
 

@@ -22,7 +22,7 @@ const validateCvr = (
   const areSelectedOptionsValid = Object.keys(cvr).every(contestUuid => {
     const contest = allContests[contestUuid];
 
-    if (!contest)
+    if(!contest)
       return false;
 
     const validOptions = contest.options.map(option => option.handle);
