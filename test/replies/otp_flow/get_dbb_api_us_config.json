@@ -17,13 +17,13 @@
       },
       "options": [
         {
-          "handle": "1",
+          "handle": 1,
           "title": {
             "en": "Contest 1. Number 1"
           }
         },
         {
-          "handle": "2",
+          "handle": 2,
           "title": {
             "en": "Contest 1. Number 2"
           }
@@ -45,13 +45,13 @@
       },
       "options": [
         {
-          "handle": "1",
+          "handle": 1,
           "title": {
             "en": "Contest 2. Number 1"
           }
         },
         {
-          "handle": "2",
+          "handle": 2,
           "title": {
             "en": "Contest 2. Number 2"
           }

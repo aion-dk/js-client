@@ -42,7 +42,7 @@ describe('entire voter flow using OTP authorization', () => {
     }
   });
 
-  it('returns a receipt', async () => {
+  it.skip('returns a receipt', async () => {
     // TODO: DEPRECATED?
     // expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/challenge_empty_cryptograms')
     //   .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_challenge_empty_cryptograms.json'));
