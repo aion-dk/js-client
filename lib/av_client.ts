@@ -36,6 +36,7 @@ import {
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
+import { signPayload } from './av_client/sign';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -260,9 +261,20 @@ export class AVClient implements IAVClient {
       trackingCode,
     } = constructBallotCryptograms(state, cvr);
 
-    // Submit commitment
+    // 1. Create and submit commitment item
+    //this.commitment = {}
 
-    // Keep randomizer throughout the session
+    const signedCommitment = signPayload({
+      parent_address: this.voterSession.address,
+      type: "VoterEncryptionCommitmentItem",
+      content: {
+        commitment
+      }
+    }, this.privateKey());
+
+    this.bulletinBoard.submitCommitment(signedCommitment);
+
+    // 2. Keep randomizer(s) throughout the session
 
     this.voteEncryptions = envelopes;
 

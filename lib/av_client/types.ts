@@ -126,6 +126,7 @@ export interface VoterSessionItem {
     voterGroup: string
     publicKey: string
   }
+  address: string
   author: string
   signature: string
   parent_address: string

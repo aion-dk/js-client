@@ -1,6 +1,7 @@
 import { BallotBoxReceipt, ContestMap, OpenableEnvelope, SealedEnvelope } from './types'
 import * as Crypto from './aion_crypto';
 import * as sjcl from './sjcl';
+import Uniformer from '../util/uniformer';
 
 
 export type AcknowledgedBoardHash = {
@@ -24,6 +25,18 @@ export function encryptAES(payload: string, encryptionConfig: AffidavitConfig): 
 
 export function fingerprint(encryptedAffidavid: string): string {
   return Crypto.hashString(encryptedAffidavid)
+}
+
+export const signPayload = (obj: any, privateKey: string) => {
+  const uniformer = new Uniformer();
+  const uniformPayload = uniformer.formString(obj);
+
+  const signature = Crypto.generateSchnorrSignature(uniformPayload, privateKey);
+
+  return {
+    ...obj,
+    signature
+  }
 }
 
 export function signVotes(encryptedVotes: ContestMap<OpenableEnvelope>, privateKey: string, contentToSign: Record<string, unknown>): {

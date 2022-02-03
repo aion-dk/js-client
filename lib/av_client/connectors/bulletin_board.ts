@@ -81,6 +81,14 @@ export class BulletinBoard {
     });
   }
 
+  submitCommitment(signedCommit): Promise<AxiosResponse> {
+    return this.backend.post('commitments', signedCommit, {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
+  }
+
   private createBackendClient(baseURL: string, timeout: number) {
     this.backend = axios.create({
       baseURL: baseURL,
