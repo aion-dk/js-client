@@ -7,13 +7,13 @@ describe('Eligibility Check', () => {
       const voterGroup = "4";
 
       const ballotConfigs = {
-        "4": { contestUuids: ['1', '2'] },
-        "5": { contestUuids: ['3', '4'] }
+        "4": { contestUuids: ['a', 'b'] },
+        "5": { contestUuids: ['c', 'd'] }
       };
 
-      const cvr1 = { '1': '1', '2': '4' };
-      const cvr2 = { '3': '5', '2': '4' };
-      const cvr3 = { '2': '4' };
+      const cvr1 = { 'a': 1, 'b': 4 };
+      const cvr2 = { 'c': 5, 'd': 4 };
+      const cvr3 = { 'b': 4 };
 
       expect(checkEligibility(voterGroup, cvr1, ballotConfigs)).to.be.equal(':okay');
       expect(checkEligibility(voterGroup, cvr2, ballotConfigs)).to.be.equal(':not_eligible');

@@ -27,7 +27,7 @@ describe('AVClient functions call order', () => {
 
   it('throws an error when constructBallotCryptograms is called first', async () => {
     await expectError(
-      client.constructBallotCryptograms({ '1': 'option1', '2': 'optiona' }),
+      client.constructBallotCryptograms({ '1': 1, '2': 4 }),
       InvalidStateError,
       'Cannot construct ballot cryptograms. Voter registration not completed successfully'
     );

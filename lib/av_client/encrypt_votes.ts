@@ -12,7 +12,7 @@ const encrypt = (
   Object.keys(contestSelections).forEach(function(contestId) {
     const { cryptogram, randomness } = encryptVote(
       markingType,
-      contestSelections[contestId],
+      contestSelections[contestId].toString(),
       encryptionKey
     );
 

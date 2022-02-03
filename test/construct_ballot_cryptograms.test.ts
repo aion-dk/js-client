@@ -49,8 +49,8 @@ describe('AVClient#constructBallotCryptograms', () => {
       await client.registerVoter()
 
       const cvr = {
-        '50422d0f-e795-4324-8289-50e3d3459196': '1',
-        'd866a7d7-15df-4765-9950-651c0ca1313d': '2'
+        '50422d0f-e795-4324-8289-50e3d3459196': 1,
+        'd866a7d7-15df-4765-9950-651c0ca1313d': 2
       };
 
       const trackingCode = await client.constructBallotCryptograms(cvr);
@@ -65,7 +65,7 @@ describe('AVClient#constructBallotCryptograms', () => {
       await client.validateAccessCode('1234');
       await client.registerVoter()
 
-      const cvr = { '1': 'option1', '3': 'optiona' };
+      const cvr = { '1': 1, '3': 4 };
 
       await expectError(
         client.constructBallotCryptograms(cvr),
@@ -80,8 +80,8 @@ describe('AVClient#constructBallotCryptograms', () => {
       await client.registerVoter()
 
       const cvr = {
-        '50422d0f-e795-4324-8289-50e3d3459196': '1',
-        'd866a7d7-15df-4765-9950-651c0ca1313d': '3'
+        '50422d0f-e795-4324-8289-50e3d3459196': 1,
+        'd866a7d7-15df-4765-9950-651c0ca1313d': 3
       };
 
       await expectError(

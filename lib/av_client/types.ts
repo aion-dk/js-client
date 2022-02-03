@@ -64,7 +64,7 @@ export interface Ballot {
 }
 
 export interface Option {
-  handle: string;
+  handle: number;
   title: LocalString;
   subtitle: LocalString;
   description: LocalString;
@@ -97,7 +97,7 @@ export interface Election {
  * }
  * ```
  */
- export type CastVoteRecord = ContestMap<string>
+ export type CastVoteRecord = ContestMap<number>
 
  /**
  * Example of a receipt:
