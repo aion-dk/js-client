@@ -262,20 +262,19 @@ export class AVClient implements IAVClient {
     } = constructBallotCryptograms(state, cvr);
 
     // 1. Create and submit commitment item
+    // 2. Keep randomizer(s) throughout the session
     //this.commitment = {}
 
-    const signedCommitment = signPayload({
+    const commitmentItem = {
       parent_address: this.voterSession.address,
       type: "VoterEncryptionCommitmentItem",
       content: {
-        commitment
+        commitment: commitment.result
       }
-    }, this.privateKey());
+    };
 
+    const signedCommitment = signPayload(commitmentItem, this.privateKey());
     this.bulletinBoard.submitCommitment(signedCommitment);
-
-    // 2. Keep randomizer(s) throughout the session
-
     this.voteEncryptions = envelopes;
 
     return trackingCode;
