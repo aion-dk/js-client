@@ -14,7 +14,7 @@ describe('AVClient functions call order', () => {
   let client: AVClient;
 
   beforeEach(() => {
-    client = new AVClient('http://us-avx:3000/dbb/api/us');
+    client = new AVClient('http://us-avx:3000/dbb/us/api');
   });
 
   it('throws an error when validateAccessCode is called first', async () => {

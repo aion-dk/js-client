@@ -20,7 +20,7 @@ describe('AVClient#validateAccessCode', () => {
     sandbox = resetDeterminism();
 
     expectedNetworkRequests.push(
-      nock(bulletinBoardHost).get('/dbb/api/us/config')
+      nock(bulletinBoardHost).get('/dbb/us/api/election_config')
         .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json')
     );
     expectedNetworkRequests.push(
@@ -28,7 +28,7 @@ describe('AVClient#validateAccessCode', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json')
     );
 
-    client = new AVClient('http://us-avx:3000/dbb/api/us');
+    client = new AVClient('http://us-avx:3000/dbb/us/api');
     await client.initialize()
   });
 
@@ -48,7 +48,7 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
-        nock(bulletinBoardHost).post('/dbb/api/us/register')
+        nock(bulletinBoardHost).post('/dbb/us/api/registrations')
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json')
       );
 
@@ -102,7 +102,7 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
-        nock(bulletinBoardHost).post('/dbb/api/us/register')
+        nock(bulletinBoardHost).post('/dbb/us/api/registrations')
           .reply(404)
       );
 

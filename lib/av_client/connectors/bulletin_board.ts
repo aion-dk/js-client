@@ -22,11 +22,11 @@ export class BulletinBoard {
   }
 
   getElectionConfig(): Promise<AxiosResponse> {
-    return this.backend.get('config');
+    return this.backend.get('election_config');
   }
 
   async createVoterRegistration(authToken: string, parentAddress: string): Promise<VoterSessionItem> {
-    const response = await this.backend.post('register', {
+    const response = await this.backend.post('registrations', {
       auth_token: authToken,
       parent_address: parentAddress
     }).catch(error => {
@@ -48,29 +48,6 @@ export class BulletinBoard {
     });
 
     return (response.data as VoterSessionItem)
-  }
-
-  registerVoter(authToken: string, signature: string): Promise<AxiosResponse> {
-    return this.backend.post('register', {
-      auth_token: authToken,
-      signature: signature
-    }).catch(error => {
-      const response = error.response as AxiosResponse<BulletinBoardData>;
-      if (error.request && !response) {
-        throw new NetworkError('Network error. Could not connect to Bulletin Board.');
-      }
-
-      if ([403, 500].includes(response.status) && response.data) {
-        if (!response.data.error || !response.data.error.code || !response.data.error.description) {
-          throw new UnsupportedServerReplyError(`Unsupported Bulletin Board server error message: ${JSON.stringify(error.response.data)}`)
-        }
-
-        const errorMessage = response.data.error.description;
-        throw new BulletinBoardError(errorMessage);
-      }
-
-      throw error;
-    });
   }
 
   challengeEmptyCryptograms(challenges: ContestMap<string>): Promise<AxiosResponse> {

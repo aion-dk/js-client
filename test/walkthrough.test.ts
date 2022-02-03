@@ -10,7 +10,7 @@ import {
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;
@@ -27,6 +27,11 @@ describe('entire voter flow using OTP authorization', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json'));
       expectedNetworkRequests.push(nock(OTPProviderHost).post('/authorize')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json'));
+
+      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/dbb/us/api/election_config')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json'));
+      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/us/api/registrations')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json'));
     }
   });
 
@@ -37,52 +42,8 @@ describe('entire voter flow using OTP authorization', () => {
     }
   });
 
-  it('returns a receipt using new dbb structure', async () => {
-    expectedNetworkRequests.push(nock(bulletinBoardHost).get('/dbb/api/us/config')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json')); 
-    expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/api/us/register')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json'));
+  it('returns a receipt', async () => {
 
-    //return await recordResponses(async function() {
-    const client = new AVClient('http://us-avx:3000/dbb/api/us');
-      await client.initialize()
-
-      const voterId = 'A00000000006'
-      const voterEmail = 'mvptuser@yahoo.com'
-      await client.requestAccessCode(voterId, voterEmail).catch((e) => {
-        console.error(e);
-        expect.fail('AVClient#requestAccessCode failed.');
-      });
-
-      let oneTimePassword: string;
-      if (USE_MOCK) {
-        oneTimePassword = '12345';
-      } else {
-        oneTimePassword = await extractOTPFromEmail();
-      }
-
-      await client.validateAccessCode(oneTimePassword).catch((e) => {
-        console.error(e);
-        expect.fail('AVClient#validateAccessCode failed');
-      });
-
-      
-      await client.createVoterRegistration().catch((e) => {
-        console.error(e);
-        expect.fail('AVClient#registerVoter failed');
-      })
-
-      if(USE_MOCK)
-        expectedNetworkRequests.forEach((mock) => mock.done());
-    //});
-  }).timeout(10000);
-  
-
-  it.skip('returns a receipt', async () => {
-    expectedNetworkRequests.push(nock(bulletinBoardHost).get('/dbb/api/us/config')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/api/us/register')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json'));
 
     // TODO: DEPRECATED?
     // expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/challenge_empty_cryptograms')
@@ -94,7 +55,7 @@ describe('entire voter flow using OTP authorization', () => {
 
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     //return await recordResponses(async function() {
-      const client = new AVClient('http://us-avx:3000/dbb/api/us');
+      const client = new AVClient('http://us-avx:3000/dbb/us/api');
       await client.initialize()
 
       const voterId = 'A00000000006'

@@ -17,7 +17,7 @@ describe('AVClient#constructBallotCryptograms', () => {
   beforeEach(async () => {
     sandbox = resetDeterminism();
 
-    nock(bulletinBoardHost).get('/dbb/api/us/config')
+    nock(bulletinBoardHost).get('/dbb/us/api/election_config')
       .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json');
 
     nock(voterAuthorizerHost).post('/create_session')
@@ -29,11 +29,11 @@ describe('AVClient#constructBallotCryptograms', () => {
     nock(OTPProviderHost).post('/authorize')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
 
-    nock(bulletinBoardHost).post('/dbb/api/us/register')
+    nock(bulletinBoardHost).post('/dbb/us/api/registrations')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json');
 
 
-    client = new AVClient('http://us-avx:3000/dbb/api/us');
+    client = new AVClient('http://us-avx:3000/dbb/us/api');
     await client.initialize()
   });
 
