@@ -68,13 +68,8 @@ export class BulletinBoard {
     });
   }
 
-  submitVotes(contentHash: string, signature: string, cryptogramsWithProofs: ContestMap<SealedEnvelope>, encryptedAffidavit: string): Promise<AxiosResponse> {
-    return this.backend.post('submit_votes', {
-      content_hash: contentHash,
-      encrypted_affidavit: encryptedAffidavit,
-      signature,
-      votes: cryptogramsWithProofs
-    }, {
+  submitVotes(signedBallotCryptogramsItem): Promise<AxiosResponse> {
+    return this.backend.post('votes', signedBallotCryptogramsItem, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }

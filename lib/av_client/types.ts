@@ -133,6 +133,16 @@ export interface VoterSessionItem {
   // Segments...
 }
 
+export interface BoardCommitmentItem {
+  content: {
+    commitment: string
+  } 
+  address: string
+  author: string
+  signature: string
+  parent_address: string
+}
+
 export interface ClientState {
   electionConfig?: ElectionConfig
   voterSession?: VoterSessionItem

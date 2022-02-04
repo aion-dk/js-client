@@ -19,6 +19,7 @@ import {
   OpenableEnvelope,
   BallotBoxReceipt,
   VoterSessionItem,
+  BoardCommitmentItem,
   HashValue,
   Signature,
 } from './av_client/types';
@@ -78,8 +79,10 @@ export class AVClient implements IAVClient {
   private electionConfig?: ElectionConfig;
   private keyPair: KeyPair;
 
-  private voteEncryptions: ContestMap<OpenableEnvelope>;
+  private clientEnvelopes: ContestMap<OpenableEnvelope>;
+  private serverEnvelopes: string[];
   private voterSession: VoterSessionItem;
+  private boardCommitment: BoardCommitmentItem;
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -273,10 +276,19 @@ export class AVClient implements IAVClient {
       }
     };
 
-    const signedCommitment = signPayload(commitmentItem, this.privateKey());
-    this.bulletinBoard.submitCommitment(signedCommitment);
-    this.voteEncryptions = envelopes;
+    this.clientEnvelopes = envelopes;
 
+    const signedCommitmentItem = signPayload(commitmentItem, this.privateKey());
+    const response = await this.bulletinBoard.submitCommitment(signedCommitmentItem);
+    this.boardCommitment = response.data.commitment;
+    this.serverEnvelopes = response.data.envelopes;
+
+// client envelopes
+// +
+// server envelopes
+// == asdfasdf?
+
+    
     return trackingCode;
   }
 
@@ -339,29 +351,58 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async submitBallotCryptograms(affidavit: Affidavit): Promise<BallotBoxReceipt> {
-    if(!(this.voterSession || this.voteEncryptions)) {
+    if(!(this.voterSession || this.clientEnvelopes)) {
       throw new InvalidStateError('Cannot submit cryptograms. Voter identity unknown or no open envelopes')
     }
 
-    const voterIdentifier = this.voterSession.content.identifier;
-    const encryptedVotes = this.voteEncryptions
-    const voterPrivateKey = this.privateKey();
-    const electionSigningPublicKey = this.electionSigningPublicKey();
-    const affidavitConfig = this.affidavitConfig();
+    const finalizedCryptograms = []; //this.clientEnvelopes + this.serverEnvelopes
 
-    const votesSubmitter = new SubmitVotes(this.bulletinBoard)
-    const encryptedAffidavit = votesSubmitter.encryptAffidavit(
-      affidavit,
-      affidavitConfig
-    )
+    const ballotCryptogramsItem = {
+      parent_address: this.boardCommitment.address,
+      type: "BallotCryptogramsItem",
+      content:
+        { cryptograms: finalizedCryptograms },
+    };
 
-    return await votesSubmitter.signAndSubmitVotes({
-        voterIdentifier,
-        encryptedVotes,
-        voterPrivateKey,
-        electionSigningPublicKey,
-        encryptedAffidavit
-    });
+    const signedBallotCryptogramsItem = signPayload(ballotCryptogramsItem, this.privateKey());
+    console.log('signed ballot', signedBallotCryptogramsItem)
+    const response = await this.bulletinBoard.submitVotes(signedBallotCryptogramsItem);
+
+    //console.log('response', response.data);
+
+    // const voterIdentifier = this.voterSession.content.identifier;
+    // const encryptedVotes = this.clientEnvelopes
+    // const voterPrivateKey = this.privateKey();
+    // const electionSigningPublicKey = this.electionSigningPublicKey();
+    // const affidavitConfig = this.affidavitConfig();
+
+    // const votesSubmitter = new SubmitVotes(this.bulletinBoard)
+    // const encryptedAffidavit = votesSubmitter.encryptAffidavit(
+    //   affidavit,
+    //   affidavitConfig
+    // )
+
+    // return await votesSubmitter.signAndSubmitVotes({
+    //     voterIdentifier,
+    //     encryptedVotes,
+    //     voterPrivateKey,
+    //     electionSigningPublicKey,
+    //     encryptedAffidavit
+    // });
+
+    return {
+      previousBoardHash: 'asdf',
+      boardHash: 'qwer',
+      registeredAt: 'asdf',
+      serverSignature: 'asdf',
+      voteSubmissionId: 'asdf'
+    }
+  }
+
+  public async submitCastRequest(affidavit: Affidavit): Promise<string> {
+    
+
+    return ''
   }
 
   /**
