@@ -355,7 +355,7 @@ export class AVClient implements IAVClient {
       throw new InvalidStateError('Cannot submit cryptograms. Voter identity unknown or no open envelopes')
     }
 
-    const finalizedCryptograms = []; //this.clientEnvelopes + this.serverEnvelopes
+    const finalizedCryptograms = {}; //this.clientEnvelopes + this.serverEnvelopes
 
     const ballotCryptogramsItem = {
       parent_address: this.boardCommitment.address,
