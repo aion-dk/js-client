@@ -1,0 +1,22 @@
+{
+  "vote": {
+    "id": 78,
+    "election_id": 1,
+    "address": "b84592bfb01aff99ca2455e1850caaec401e8995525b4243d0ccbaa6a8cdc506",
+    "type": "BallotCryptogramsItem",
+    "content": {
+      "cryptograms": {
+        "f7a04384-1458-5911-af38-7e08a46136e7": "02054452730595263e43f0f61b5ddb7a6574dbfd53e2b0c388c4f7c3323263564c,03972ec6e60ec6b395a36b2889d6d6aa66f21b8bcbc03b7cc0b0e99163ff21d58e",
+        "026ca870-537e-57b2-b313-9bb5d9fbe78b": "022edd0e265e3b44e2e82c3b051f78194f56f5c949c96c12662a11aedd8e9a098c,036b69b3115630630b4252ed9ba4461a7eb68355d4235577d0462a36010e1c7672"
+      }
+    },
+    "author": "025b99b833abbc4f65c08de90be6ce0ef5e966caf05bbff0fb4d1ecbb1068982cd",
+    "parent_address": "a329340324c61c4cd506ebeffdab5f7473b547d5ab9edefc1342009409977b25",
+    "registered_at": "2022-02-07T10:27:17.524+01:00",
+    "signature": "1efad0787de195bb347ed25795255388636c3e94d65097e729fae1313d70c8e0,a908fcb5dbaf7798fd75d981deac3a88aeeba2bb0675761ad5ba5dde2981f293",
+    "attachment": null,
+    "resource_id": null,
+    "created_at": "2022-02-07T10:27:17.526+01:00",
+    "updated_at": "2022-02-07T10:27:17.526+01:00"
+  }
+}

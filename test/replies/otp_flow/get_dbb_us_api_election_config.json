@@ -1,0 +1,94 @@
+{
+  "encryptionKey": "03d62ccb3f8816aa4f97285b46793a97e96979c1c936e24bc607566d0ce81db3a9",
+  "services": {
+    "address": "1d7ca1bc79567a5f85b7de0f249a43b62f32c3ba0b3778d7569c92f6da3fa53f",
+    "voter_authorizer": {
+      "election_context_uuid": "dd28836d-2855-44af-ac10-93998c2c3763",
+      "public_key": "02e10939b5f5d2c8cef15afc3e0e3742504c320b1d16cce955643058df92f948f0",
+      "url": "http://localhost:1234"
+    },
+    "otp_provider": {
+      "election_context_uuid": "d86bcf2b-f365-4c13-8225-6e375816bc72",
+      "public_key": "03c1414c2b2bb3463cab31d125ce804a08c96c97d9fd00cd60b05d15a406fdc82f",
+      "url": "http://localhost:1111"
+    }
+  },
+  "ballotConfigs": {
+    "3": {
+      "contestUuids": [
+        "f7a04384-1458-5911-af38-7e08a46136e7",
+        "026ca870-537e-57b2-b313-9bb5d9fbe78b"
+      ]
+    },
+    "4": {
+      "contestUuids": [
+        "f7a04384-1458-5911-af38-7e08a46136e7",
+        "026ca870-537e-57b2-b313-9bb5d9fbe78b"
+      ]
+    }
+  },
+  "contestConfigs": {
+    "f7a04384-1458-5911-af38-7e08a46136e7": {
+      "markingType": {
+        "style": "regular",
+        "handleSize": 1,
+        "minMarks": 1,
+        "maxMarks": 1
+      },
+      "options": [
+        {
+          "handle": 1,
+          "title": {
+            "en": "Option 1"
+          }
+        },
+        {
+          "handle": 2,
+          "title": {
+            "en": "Option 2"
+          }
+        }
+      ],
+      "title": {
+        "en": "First ballot"
+      },
+      "resultType": {
+        "name": "resultType name not matter right now"
+      }
+    },
+    "026ca870-537e-57b2-b313-9bb5d9fbe78b": {
+      "markingType": {
+        "style": "regular",
+        "handleSize": 1,
+        "minMarks": 1,
+        "maxMarks": 1
+      },
+      "options": [
+        {
+          "handle": 3,
+          "title": {
+            "en": "Option 3"
+          }
+        },
+        {
+          "handle": 4,
+          "title": {
+            "en": "Option 4"
+          }
+        },
+        {
+          "handle": 5,
+          "title": {
+            "en": "Option 5"
+          }
+        }
+      ],
+      "title": {
+        "en": "Second ballot"
+      },
+      "resultType": {
+        "name": "resultType name not matter right now"
+      }
+    }
+  }
+}

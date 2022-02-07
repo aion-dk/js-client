@@ -1,0 +1,21 @@
+{
+  "id": 75,
+  "election_id": 1,
+  "address": "c7565b40a2f3be6f85a62faed8e524d196752f13127e93be0fc5d86e67beffe3",
+  "type": "VoterSessionItem",
+  "content": {
+    "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiMGEzMmQ2YThmYjIzZjUwZmFmYTAzNmE3OTBlZDlmNTNlYWFlZWMzYiIsInB1YmxpY19rZXkiOiIwMjViOTliODMzYWJiYzRmNjVjMDhkZTkwYmU2Y2UwZWY1ZTk2NmNhZjA1YmJmZjBmYjRkMWVjYmIxMDY4OTgyY2QiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiIzOWRkOWM3YjU3MWJhMGI0YjZjYmMzYzQ3NWQ2MGQxNTlkZTkwNTIyIiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0NDIyNjAzNywiZXhwIjoxNjQ0MjI3ODM3fQ.f6qdfZAc5HAOQyPLx-dDjRWrP8KfRCPUvuzX58AF4nncZl77fZYLbvsgtAKZJzJ38FGTsGf0xp8lAAcx8fW0Qg",
+    "identifier": "0a32d6a8fb23f50fafa036a790ed9f53eaaeec3b",
+    "voterGroup": "4",
+    "publicKey": "025b99b833abbc4f65c08de90be6ce0ef5e966caf05bbff0fb4d1ecbb1068982cd",
+    "segment1": "4"
+  },
+  "author": "020e9318bbef691c6e4d8f244d04603da4ff46c9a81b6843abd85a1602c5c135f1",
+  "parent_address": "1d7ca1bc79567a5f85b7de0f249a43b62f32c3ba0b3778d7569c92f6da3fa53f",
+  "registered_at": "2022-02-07T10:27:17.236+01:00",
+  "signature": "f3db317fa58a38dbcb8eb3988341b931eec952615c90f5840a076e6a5dc5d9f0,63963ccaf5ee2cd3e5fe72fe1f09c42a33471b7c547e2760e05aa53378f3394d",
+  "attachment": null,
+  "resource_id": null,
+  "created_at": "2022-02-07T10:27:17.239+01:00",
+  "updated_at": "2022-02-07T10:27:17.239+01:00"
+}

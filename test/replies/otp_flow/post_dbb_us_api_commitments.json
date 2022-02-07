@@ -1,0 +1,23 @@
+{
+  "commitment": {
+    "id": 77,
+    "election_id": 1,
+    "address": "a329340324c61c4cd506ebeffdab5f7473b547d5ab9edefc1342009409977b25",
+    "type": "BoardEncryptionCommitmentItem",
+    "content": {
+      "commitment": "03910a09420bef165b3a3ae87e8f0795056eacac1f8d4f92c399fa250e3dacd7c3"
+    },
+    "author": "020e9318bbef691c6e4d8f244d04603da4ff46c9a81b6843abd85a1602c5c135f1",
+    "parent_address": "48e6fa498a9d8282070c9dd7995c3bda3929f227f9e91e8d8e8df0444fbce56b",
+    "registered_at": "2022-02-07T10:27:17.432+01:00",
+    "signature": "4a88514e34c2fb694257acc39ea4c4693631af6559ae053fab29473737dc89bc,7331fe216c516ae7de8179ad1a341ca0eb25c0275e7b2df9ff560c4a81f950f7",
+    "attachment": null,
+    "resource_id": null,
+    "created_at": "2022-02-07T10:27:17.434+01:00",
+    "updated_at": "2022-02-07T10:27:17.434+01:00"
+  },
+  "envelopes": [
+    "02666c77fee8f177b3a9781ca2ae626dd54b8731b0f0f96113eb4c89da4a019401,03e85c7ef6831969ae7c6e640c45d74a23901ee00d2e7e0f86f2876a0516553ee5",
+    "039583a8dbb6d4bb3cb9249a25ecf9b7385ba523af16ebb3fd1b6892a3a26ed263,030a005590d73c4cddbca176f2efeebe15483a320f445bbeb38bc5a7cfba904ac2"
+  ]
+}
