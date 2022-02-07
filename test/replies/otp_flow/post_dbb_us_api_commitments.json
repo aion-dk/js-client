@@ -1,23 +1,27 @@
 {
   "commitment": {
-    "id": 77,
+    "id": 23,
     "election_id": 1,
-    "address": "a329340324c61c4cd506ebeffdab5f7473b547d5ab9edefc1342009409977b25",
+    "address": "d3b7d0151971b7f8ea6bad7aa6536ad8d66bd5df0b142eb15aaf14e4df0b53f2",
     "type": "BoardEncryptionCommitmentItem",
     "content": {
-      "commitment": "03910a09420bef165b3a3ae87e8f0795056eacac1f8d4f92c399fa250e3dacd7c3"
+      "commitment": "021acde3700ea88e187c21c5ad6bd0de007d8c409ed010f993456b5944b7690a9f"
     },
-    "author": "020e9318bbef691c6e4d8f244d04603da4ff46c9a81b6843abd85a1602c5c135f1",
-    "parent_address": "48e6fa498a9d8282070c9dd7995c3bda3929f227f9e91e8d8e8df0444fbce56b",
-    "registered_at": "2022-02-07T10:27:17.432+01:00",
-    "signature": "4a88514e34c2fb694257acc39ea4c4693631af6559ae053fab29473737dc89bc,7331fe216c516ae7de8179ad1a341ca0eb25c0275e7b2df9ff560c4a81f950f7",
+    "author": "036bc9f386b3f5ba3f32e1e3e634077d356c0c565deb59b810a21dce85719886fa",
+    "parent_address": "8664002ac910cffdb1bb1a02b162b13196a1e61be3ea839fc3833d06290bd635",
+    "registered_at": "2022-02-07T15:24:58.339+01:00",
+    "signature": "bbce0de4b1c2cddca0147533b5e117952b3c94a961f1a17f36a926482ba4cbdf,6ec7ad01fb1408f477bba06ef5f4d26d7b82e55fc7c284c8af7fb937d98dd964",
     "attachment": null,
     "resource_id": null,
-    "created_at": "2022-02-07T10:27:17.434+01:00",
-    "updated_at": "2022-02-07T10:27:17.434+01:00"
+    "created_at": "2022-02-07T15:24:58.341+01:00",
+    "updated_at": "2022-02-07T15:24:58.341+01:00"
   },
-  "envelopes": [
-    "02666c77fee8f177b3a9781ca2ae626dd54b8731b0f0f96113eb4c89da4a019401,03e85c7ef6831969ae7c6e640c45d74a23901ee00d2e7e0f86f2876a0516553ee5",
-    "039583a8dbb6d4bb3cb9249a25ecf9b7385ba523af16ebb3fd1b6892a3a26ed263,030a005590d73c4cddbca176f2efeebe15483a320f445bbeb38bc5a7cfba904ac2"
-  ]
+  "envelopes": {
+    "f7a04384-1458-5911-af38-7e08a46136e7": [
+      "020a1ef7205af6af529e172d615effa4e4af664af7cec8506c96f50c7673a4ce7b,0230eafceec4e5b0a94bdd04b79c9ee15922cc1f4062a895a42f4547b6135d1855"
+    ],
+    "026ca870-537e-57b2-b313-9bb5d9fbe78b": [
+      "02e2d6bb5eaa542def3e9295c8257d617ab81a1333df416bb283f6d3cca308a7fb,02264a91aaf16a6c9e4dff65fdf16ad40daa809f862579b8466f7b9b9f47bad2be"
+    ]
+  }
 }
