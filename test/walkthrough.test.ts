@@ -10,7 +10,7 @@ import {
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;
@@ -46,14 +46,6 @@ describe('entire voter flow using OTP authorization', () => {
   });
 
   it('returns a receipt', async () => {
-    // TODO: DEPRECATED?
-    // expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/challenge_empty_cryptograms')
-    //   .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_challenge_empty_cryptograms.json'));
-    // expectedNetworkRequests.push(nock(bulletinBoardHost).get('/mobile-api/us/get_latest_board_hash')
-    //   .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_get_latest_board_hash.json'));
-    // expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/submit_votes')
-    //   .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_submit_votes.json'));
-
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     // return await recordResponses(async function() {
       const client = new AVClient('http://us-avx:3000/dbb/us/api');
@@ -140,3 +132,4 @@ describe('entire voter flow using OTP authorization', () => {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 });
+

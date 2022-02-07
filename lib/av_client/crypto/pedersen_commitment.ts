@@ -59,7 +59,6 @@ class PedersenCommitment {
 
 const stringMapToBignumMap = (stringMap: ContestMap<string[]>): ContestMap<Bignum[]> => {
   const entries = Object.entries(stringMap).map(([contestUuid, messages]) => {
-    console.log(messages)
     if(messages.some(m => !isValidHexString(m)))
       throw new Error("Input is not a valid hex string");
 
