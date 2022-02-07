@@ -55,7 +55,7 @@ describe('entire voter flow using OTP authorization', () => {
     //   .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_submit_votes.json'));
 
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
-    //return await recordResponses(async function() {
+    // return await recordResponses(async function() {
       const client = new AVClient('http://us-avx:3000/dbb/us/api');
       await client.initialize()
 
@@ -113,7 +113,7 @@ describe('entire voter flow using OTP authorization', () => {
       if(USE_MOCK)
         expectedNetworkRequests.forEach((mock) => mock.done());
     // });
-    //});
+    // });
   }).timeout(10000);
 
   async function extractOTPFromEmail() {
