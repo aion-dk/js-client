@@ -1,6 +1,6 @@
 import { CastVoteRecord, ContestMap, MarkingType, OpenableEnvelope } from "./types";
 import { encryptVote } from './crypto/encrypt_vote';
-import { hashString } from './aion_crypto';
+import { hashString, ElGamalPointCryptogram } from './aion_crypto';
 
 const encrypt = (
   contestSelections: CastVoteRecord,
@@ -28,9 +28,18 @@ const fingerprint = (cryptograms: ContestMap<Cryptogram>): string => {
   return hashString(string)
 }
 
+const homomorphicallyAddCryptograms = (cryptogram1: string, cryptogram2: string) => {
+  const point1 = ElGamalPointCryptogram.fromString(cryptogram1);
+  const point2 = ElGamalPointCryptogram.fromString(cryptogram2);
+  
+  point1.homomorphicallyAddCryptogram(point2);
+  return point1.toString();
+}
+
 export default {
   encrypt,
-  fingerprint
+  fingerprint,
+  homomorphicallyAddCryptograms
 }
 
 type Cryptogram = string;

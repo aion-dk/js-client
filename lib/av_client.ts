@@ -6,6 +6,7 @@ import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
 import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
+import * as EncryptVotes from './av_client/encrypt_votes';
 
 import {
   fetchElectionConfig,
@@ -355,46 +356,34 @@ export class AVClient implements IAVClient {
       throw new InvalidStateError('Cannot submit cryptograms. Voter identity unknown or no open envelopes')
     }
 
-    const finalizedCryptograms = {}; //this.clientEnvelopes + this.serverEnvelopes
+    const finalizedCryptograms = Object.keys(this.clientEnvelopes).map((contestUuid, i) => {
+      const finalizedCryptogram = EncryptVotes.default.homomorphicallyAddCryptograms(
+        this.clientEnvelopes[contestUuid].cryptogram,
+        // TODO: this should be a map rather than an array
+        this.serverEnvelopes[i]
+      );
+
+
+      return [ contestUuid, finalizedCryptogram]; 
+    });
+     
 
     const ballotCryptogramsItem = {
       parent_address: this.boardCommitment.address,
       type: "BallotCryptogramsItem",
       content:
-        { cryptograms: finalizedCryptograms },
+        { cryptograms: Object.fromEntries(finalizedCryptograms) },
     };
 
     const signedBallotCryptogramsItem = signPayload(ballotCryptogramsItem, this.privateKey());
-    console.log('signed ballot', signedBallotCryptogramsItem)
-    const response = await this.bulletinBoard.submitVotes(signedBallotCryptogramsItem);
-
-    //console.log('response', response.data);
-
-    // const voterIdentifier = this.voterSession.content.identifier;
-    // const encryptedVotes = this.clientEnvelopes
-    // const voterPrivateKey = this.privateKey();
-    // const electionSigningPublicKey = this.electionSigningPublicKey();
-    // const affidavitConfig = this.affidavitConfig();
-
-    // const votesSubmitter = new SubmitVotes(this.bulletinBoard)
-    // const encryptedAffidavit = votesSubmitter.encryptAffidavit(
-    //   affidavit,
-    //   affidavitConfig
-    // )
-
-    // return await votesSubmitter.signAndSubmitVotes({
-    //     voterIdentifier,
-    //     encryptedVotes,
-    //     voterPrivateKey,
-    //     electionSigningPublicKey,
-    //     encryptedAffidavit
-    // });
-
+    const receipt = (await this.bulletinBoard.submitVotes(signedBallotCryptogramsItem)).data;
+    
+    // TODO: clarify how the receipt should be strucuted.
     return {
-      previousBoardHash: 'asdf',
-      boardHash: 'qwer',
-      registeredAt: 'asdf',
-      serverSignature: 'asdf',
+      previousBoardHash: receipt.parent_address,
+      boardHash: receipt.address,
+      registeredAt: receipt.registered_at,
+      serverSignature: receipt.signature,
       voteSubmissionId: 'asdf'
     }
   }
