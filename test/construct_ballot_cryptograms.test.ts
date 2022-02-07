@@ -30,8 +30,10 @@ describe('AVClient#constructBallotCryptograms', () => {
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
 
     nock(bulletinBoardHost).post('/dbb/us/api/registrations')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json');
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_registrations.json');
 
+    nock(bulletinBoardHost).post('/dbb/us/api/commitments')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_commitments.json');
 
     client = new AVClient('http://us-avx:3000/dbb/us/api');
     await client.initialize()
