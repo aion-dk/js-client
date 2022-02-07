@@ -1,21 +1,21 @@
 {
-  "id": 33,
+  "id": 65,
   "election_id": 1,
-  "address": "cd794b5c498df37855bcce3dee0673fcfc1ea5ae172ed403a3824ce9f553d605",
+  "address": "4b9bd84253e2142e12905bbfb1f7f539da79b37f6e15a5f9e6953808e966fda5",
   "type": "VoterSessionItem",
   "content": {
-    "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiMjQzODQ1YTFiZmUyMzJjMjBmZmIxMGVmMGM0YjhhN2NkMTg4MmMzNSIsInB1YmxpY19rZXkiOiIwM2ZiODg1NGQwZjBmZmIzOWViOTFiNWI0NjM3MTAxZGQzNTkwZDg0YTBkOTY0NDI2NGY0ZWIxY2I3OTQ5ODVhNTkiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiJkMWQyY2QyMDE4ZTIzNWRmYmFhYmRjZGY1MWIyYjAwZWNlNmY1ZmM5IiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0NDI0NTcyNSwiZXhwIjoxNjQ0MjQ3NTI1fQ.OwXnYct4Z0RnMPPgZK1rdPdeRuo3N4x5UnUOX8ax7zYNuDRwvNome_TP1P81OV77Q5ksWMyl6aoG53RkXjRCCA",
+    "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiMjQzODQ1YTFiZmUyMzJjMjBmZmIxMGVmMGM0YjhhN2NkMTg4MmMzNSIsInB1YmxpY19rZXkiOiIwMjkxNzAxZTUyY2M1ZGQ5NWFhYWNiMWEyNDI5NzA2MTYxZTNlMDA3YmUyZWNmN2E2NWUyZDAxYjFmZGZkZTYzNzQiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiIyOGVjM2JlOWFhMTJkMWNlYTA4YmVlMzkxM2FlMmY5MWM5NGE3NzcyIiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0NDI0NjQyNiwiZXhwIjoxNjQ0MjQ4MjI2fQ.uwEpUdogliqW9KcYTqwH6hdJ3UUdr4hPqaDJxMxDLPLgMmhou2VguIkIEqbpGe6pe2-ueGmXzQcgd5YW3ofeqw",
     "identifier": "243845a1bfe232c20ffb10ef0c4b8a7cd1882c35",
     "voterGroup": "4",
-    "publicKey": "03fb8854d0f0ffb39eb91b5b4637101dd3590d84a0d9644264f4eb1cb794985a59",
+    "publicKey": "0291701e52cc5dd95aaacb1a2429706161e3e007be2ecf7a65e2d01b1fdfde6374",
     "segment1": "4"
   },
   "author": "036bc9f386b3f5ba3f32e1e3e634077d356c0c565deb59b810a21dce85719886fa",
   "parent_address": "fe7bd3564945462b0e23e75cbe184866157ade26646e8646871427edceb3c716",
-  "registered_at": "2022-02-07T15:55:25.127+01:00",
-  "signature": "3939d3373788e3acc6f2d21de7ed756698564211561ebbad74c4e23e6199b5f9,eb525154acf7a0f8d00ace3dec94cbfcf09582d31f49caadb2d5fcc8250caf7d",
+  "registered_at": "2022-02-07T16:07:06.193+01:00",
+  "signature": "194edce7a01d8f0b4a3ba08e0d013aceea63cb08d24d3b27352c3e6d60913d9a,ddce3ebd665adba8fed8af10662acffd05df23a5423bddf317d40e524f3b147f",
   "attachment": null,
   "resource_id": null,
-  "created_at": "2022-02-07T15:55:25.129+01:00",
-  "updated_at": "2022-02-07T15:55:25.129+01:00"
+  "created_at": "2022-02-07T16:07:06.194+01:00",
+  "updated_at": "2022-02-07T16:07:06.194+01:00"
 }

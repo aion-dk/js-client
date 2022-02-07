@@ -10,7 +10,7 @@ import {
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 
-const USE_MOCK = false;
+const USE_MOCK = true;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;
@@ -22,7 +22,7 @@ describe('entire voter flow using OTP authorization', () => {
       expectedNetworkRequests = [];
 
       expectedNetworkRequests.push(nock(bulletinBoardHost).get('/dbb/us/api/election_config')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json'));
+        .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_us_api_election_config.json'));
       expectedNetworkRequests.push(nock(voterAuthorizerHost).post('/create_session')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json'));
       expectedNetworkRequests.push(nock(voterAuthorizerHost).post('/request_authorization')
@@ -30,7 +30,7 @@ describe('entire voter flow using OTP authorization', () => {
       expectedNetworkRequests.push(nock(OTPProviderHost).post('/authorize')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json'));
       expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/us/api/registrations')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json'));
+        .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_registrations.json'));
       expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/us/api/commitments')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_commitments.json'));
       expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/us/api/votes')
@@ -47,7 +47,7 @@ describe('entire voter flow using OTP authorization', () => {
 
   it('returns a receipt', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
-    // return await recordResponses(async function() {
+    //return await recordResponses(async function() {
       const client = new AVClient('http://us-avx:3000/dbb/us/api');
       await client.initialize()
 
@@ -104,7 +104,7 @@ describe('entire voter flow using OTP authorization', () => {
 
       if(USE_MOCK)
         expectedNetworkRequests.forEach((mock) => mock.done());
-    // });
+    //});
     // });
   }).timeout(10000);
 

@@ -1,26 +1,26 @@
 {
   "vote": {
-    "id": 36,
+    "id": 68,
     "election_id": 1,
-    "address": "be4b88b18a1fc34f5dbe8038f43ca1a511f7fd26437e5777fa54e66885a5ad90",
+    "address": "835a61500441911cc9fb8efd93db66fdb96b7815d171d0b81686a6cfda98a716",
     "type": "BallotCryptogramsItem",
     "content": {
       "cryptograms": {
         "f7a04384-1458-5911-af38-7e08a46136e7": [
-          "021fe146c8af6776471924bf178ed3ee32900825385ea6668aeefe7cb5a735c51d,034084eb6c30429fefafa465e712cb4dc8a72f0d856a7a71d2637bd3a5d91209ef"
+          "02588a1b687a6bbeb4ed51e3780bc417c9f0098401aa00965d63066dc65221adf2,023477748114fdff85794565f5f38101bf98d1f4d8869ca8bb1aa7a7d07b033578"
         ],
         "026ca870-537e-57b2-b313-9bb5d9fbe78b": [
-          "02e8985b2195b0f22a96c341c71d8c0201f5767a16fddbcc19c5d6092eb03719a0,03ad0ec1d78b4599f4950ee1c0745e43e17ce5504771f0e08b94e7f50ea9efe956"
+          "02c45f3f330a637e8ade7d9fb6d575b038c4406cb86ebe8f17e98f6b47fe6d7b66,02150faa5e5a01bb1dd39ce0639a3b6643a3458413cf2622544986f10816f81618"
         ]
       }
     },
-    "author": "03fb8854d0f0ffb39eb91b5b4637101dd3590d84a0d9644264f4eb1cb794985a59",
-    "parent_address": "e3bffe88b63b04deb79237176726cae4ddd81d7087e2bc929342f785ea0e3a22",
-    "registered_at": "2022-02-07T15:55:25.549+01:00",
-    "signature": "22b61ef617d0cae4ab541cb0117bf1229907f6dbf30b6f59e51221c4053b4982,6fb5cf64df5406c7e628045821cee7e285d4be80e26b1c3c0590271d067940d4",
+    "author": "0291701e52cc5dd95aaacb1a2429706161e3e007be2ecf7a65e2d01b1fdfde6374",
+    "parent_address": "91f45795a20edea668a9c938e96d50a5ca8b3448c5a597df0aba6ccf1dfaa0ad",
+    "registered_at": "2022-02-07T16:07:06.586+01:00",
+    "signature": "b9178ef17df8a725560f4aaebf2e98fb35bb7064f31e082131bffd87146b8794,03b5ab636676741134d7bdc387159ae5ba81af1e1710b34580c7264a264fab65",
     "attachment": null,
     "resource_id": null,
-    "created_at": "2022-02-07T15:55:25.551+01:00",
-    "updated_at": "2022-02-07T15:55:25.551+01:00"
+    "created_at": "2022-02-07T16:07:06.587+01:00",
+    "updated_at": "2022-02-07T16:07:06.587+01:00"
   }
 }
