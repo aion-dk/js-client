@@ -1,6 +1,7 @@
 import { CastVoteRecord, ContestMap, MarkingType, OpenableEnvelope } from "./types";
 import { encryptVote } from './crypto/encrypt_vote';
 import { hashString, ElGamalPointCryptogram } from './aion_crypto';
+import Uniformer from "../util/uniformer";
 
 const encrypt = (
   contestSelections: CastVoteRecord,
@@ -10,22 +11,22 @@ const encrypt = (
   const response = {};
 
   Object.keys(contestSelections).forEach(function(contestId) {
-    const { cryptogram, randomness } = encryptVote(
+    const { cryptograms, randomness } = encryptVote(
       markingType,
       contestSelections[contestId].toString(),
       encryptionKey
     );
 
-    response[contestId] = { cryptogram, randomness }
+    response[contestId] = { cryptograms, randomness }
   })
 
   return response;
 }
 
-const fingerprint = (cryptograms: ContestMap<Cryptogram>): string => {
-  const string = JSON.stringify(cryptograms)
+const fingerprint = (cryptograms: ContestMap<Cryptogram[]>): string => {
+  const uniformedString = new Uniformer().formString(cryptograms)
 
-  return hashString(string)
+  return hashString(uniformedString)
 }
 
 const homomorphicallyAddCryptograms = (cryptogram1: string, cryptogram2: string) => {

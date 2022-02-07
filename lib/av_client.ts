@@ -6,7 +6,7 @@ import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
 import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
-import * as EncryptVotes from './av_client/encrypt_votes';
+import EncryptVotes from './av_client/encrypt_votes';
 
 import {
   fetchElectionConfig,
@@ -39,6 +39,7 @@ import {
 
 import * as sjclLib from './av_client/sjcl';
 import { signPayload } from './av_client/sign';
+import { finalizeBallotCryptograms } from './av_client/actions/finalize_ballot_cryptograms';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -81,7 +82,7 @@ export class AVClient implements IAVClient {
   private keyPair: KeyPair;
 
   private clientEnvelopes: ContestMap<OpenableEnvelope>;
-  private serverEnvelopes: string[];
+  private serverEnvelopes: ContestMap<string>;
   private voterSession: VoterSessionItem;
   private boardCommitment: BoardCommitmentItem;
 
@@ -356,23 +357,14 @@ export class AVClient implements IAVClient {
       throw new InvalidStateError('Cannot submit cryptograms. Voter identity unknown or no open envelopes')
     }
 
-    const finalizedCryptograms = Object.keys(this.clientEnvelopes).map((contestUuid, i) => {
-      const finalizedCryptogram = EncryptVotes.default.homomorphicallyAddCryptograms(
-        this.clientEnvelopes[contestUuid].cryptogram,
-        // TODO: this should be a map rather than an array
-        this.serverEnvelopes[i]
-      );
-
-
-      return [ contestUuid, finalizedCryptogram]; 
-    });
+    const finalizedCryptograms = finalizeBallotCryptograms(this.clientEnvelopes, this.serverEnvelopes)
      
 
     const ballotCryptogramsItem = {
       parent_address: this.boardCommitment.address,
       type: "BallotCryptogramsItem",
       content:
-        { cryptograms: Object.fromEntries(finalizedCryptograms) },
+        { cryptograms: finalizedCryptograms },
     };
 
     const signedBallotCryptogramsItem = signPayload(ballotCryptogramsItem, this.privateKey());

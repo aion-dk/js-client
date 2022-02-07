@@ -44,13 +44,13 @@ export interface EmptyCryptogram {
 export type Affidavit = string
 
 export interface OpenableEnvelope {
-  cryptogram: string
-  randomness: string
+  cryptograms: string[]
+  randomness: string[]
 }
 
 export interface SealedEnvelope {
-  cryptogram: string
-  proof: string
+  cryptograms: string[]
+  proofs: string[]
 }
 
 export interface Ballot {

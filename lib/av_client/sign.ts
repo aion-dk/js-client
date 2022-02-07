@@ -39,30 +39,11 @@ export const signPayload = (obj: any, privateKey: string) => {
   }
 }
 
-export function signVotes(encryptedVotes: ContestMap<OpenableEnvelope>, privateKey: string, contentToSign: Record<string, unknown>): {
-  contentHash: string,
-  voterSignature: string
-} {
-  const votes: ContestMap<string> = {};
-
-  for (const contestId in encryptedVotes) {
-    votes[contestId] =  encryptedVotes[contestId].cryptogram;
-  }
-
-  const contentHash = computeNextBoardHash({
-    ...contentToSign,
-    votes
-  });
-
-  const voterSignature = Crypto.generateSchnorrSignature(contentHash, privateKey);
-  return { contentHash, voterSignature };
-}
-
 export const sealEnvelopes = (encryptedVotes: ContestMap<OpenableEnvelope>): ContestMap<SealedEnvelope> => {
   const sealEnvelope = (envelope: OpenableEnvelope): SealedEnvelope => {
-    const { cryptogram, randomness } = envelope;
-    const proof = Crypto.generateDiscreteLogarithmProof(randomness)
-    return { cryptogram, proof }
+    const { cryptograms, randomness } = envelope;
+    const proofs = Crypto.generateDiscreteLogarithmProof(randomness)
+    return { cryptograms, proofs }
   }
 
   return Object.fromEntries(Object.keys(encryptedVotes).map(k => [k, sealEnvelope(encryptedVotes[k])]))

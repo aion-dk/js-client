@@ -19,7 +19,7 @@ function encryptVotePoint(vote_point, encryption_key_string: string) {
   const vote_cryptogram = crypto.ElGamalPointCryptogram.encrypt(vote_point, encryption_key, randomness_bn);
 
   return {
-    cryptogram: vote_cryptogram.toString(),
-    randomness: bignumToHex(randomness_bn)
+    cryptograms: [vote_cryptogram.toString()],
+    randomness: [bignumToHex(randomness_bn)]
   }
 }
