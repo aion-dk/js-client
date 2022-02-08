@@ -1,21 +1,21 @@
 {
-  "id": 65,
+  "id": 161,
   "election_id": 1,
-  "address": "4b9bd84253e2142e12905bbfb1f7f539da79b37f6e15a5f9e6953808e966fda5",
+  "address": "c3b9e79e0291cf1458195cfb9a219ecf5f47124be6b2ed5b1a77e42bbea7ee39",
   "type": "VoterSessionItem",
   "content": {
-    "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiMjQzODQ1YTFiZmUyMzJjMjBmZmIxMGVmMGM0YjhhN2NkMTg4MmMzNSIsInB1YmxpY19rZXkiOiIwMjkxNzAxZTUyY2M1ZGQ5NWFhYWNiMWEyNDI5NzA2MTYxZTNlMDA3YmUyZWNmN2E2NWUyZDAxYjFmZGZkZTYzNzQiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiIyOGVjM2JlOWFhMTJkMWNlYTA4YmVlMzkxM2FlMmY5MWM5NGE3NzcyIiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0NDI0NjQyNiwiZXhwIjoxNjQ0MjQ4MjI2fQ.uwEpUdogliqW9KcYTqwH6hdJ3UUdr4hPqaDJxMxDLPLgMmhou2VguIkIEqbpGe6pe2-ueGmXzQcgd5YW3ofeqw",
-    "identifier": "243845a1bfe232c20ffb10ef0c4b8a7cd1882c35",
+    "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiNjhjNjFhZTM0ODg0ZDUxN2UwODVmODIwNzk1YTNhZTRhMTBjYjVjNSIsInB1YmxpY19rZXkiOiIwMjM0N2E3MWI3ZGUwNzdhY2FiZGVhODkyZTJhNmJlMjBhN2FmYWRiZmMxNzc2ZDk2OTYxZmNjOGIwMjk1OWEyZjkiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiI2MTI3YzdhY2I0NzQwYzIyOWExMjIzYTA3NTMxNGQ4NTk5ZmYxMjBiIiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0NDMyMzAzOSwiZXhwIjoxNjQ0MzI0ODM5fQ.YP-SMdLlRFMS52IQA6VPp969827jnkZZ52vL_CdpE5ehah1gFr8HCe2yFvMIf6RJ8gws5C1ZUwzYxM7vysQYrQ",
+    "identifier": "68c61ae34884d517e085f820795a3ae4a10cb5c5",
     "voterGroup": "4",
-    "publicKey": "0291701e52cc5dd95aaacb1a2429706161e3e007be2ecf7a65e2d01b1fdfde6374",
+    "publicKey": "02347a71b7de077acabdea892e2a6be20a7afadbfc1776d96961fcc8b02959a2f9",
     "segment1": "4"
   },
-  "author": "036bc9f386b3f5ba3f32e1e3e634077d356c0c565deb59b810a21dce85719886fa",
-  "parent_address": "fe7bd3564945462b0e23e75cbe184866157ade26646e8646871427edceb3c716",
-  "registered_at": "2022-02-07T16:07:06.193+01:00",
-  "signature": "194edce7a01d8f0b4a3ba08e0d013aceea63cb08d24d3b27352c3e6d60913d9a,ddce3ebd665adba8fed8af10662acffd05df23a5423bddf317d40e524f3b147f",
+  "author": "0321763cb65348c37898d95dc3db83a70af62cb72140c65e629ee98303b7299127",
+  "parent_address": "936a00dcfd6018e8fe1d1946c2331a2cb2a49204c4e6cbd48ea7e33f3f35476a",
+  "registered_at": "2022-02-08T13:23:59.957+01:00",
+  "signature": "e7419dcd961c882b7785e199260d961e4cebcdfdf531ab2a7bc6f84ad0aebc9a,94b12ce42f05e53b684885b046bc864b5de7367e75220f22de13d122ddbf6e12",
   "attachment": null,
   "resource_id": null,
-  "created_at": "2022-02-07T16:07:06.194+01:00",
-  "updated_at": "2022-02-07T16:07:06.194+01:00"
+  "created_at": "2022-02-08T13:23:59.959+01:00",
+  "updated_at": "2022-02-08T13:23:59.959+01:00"
 }
