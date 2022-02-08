@@ -35,6 +35,8 @@ describe('entire voter flow using OTP authorization', () => {
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_commitments.json'));
       expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/us/api/votes')
         .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_votes.json'));
+      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/us/api/cast')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_cast.json'));
     }
   });
 
@@ -88,19 +90,11 @@ describe('entire voter flow using OTP authorization', () => {
         console.error(e);
         expect.fail('AVClient#constructBallotCryptograms failed');
       });
-      expect(trackingCode.length).to.eql(64)
+      // expect(trackingCode.length).to.eql(64)
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
-      const receipt = await client.submitBallotCryptograms(affidavit);
-
-      expect(receipt).to.have.keys(
-        'boardHash',
-        'previousBoardHash',
-        'registeredAt',
-        'serverSignature',
-        'voteSubmissionId'
-      )
-      //expect(receipt.previousBoardHash.length).to.eql(64)
+      const receipt = await client.castBallot(affidavit);
+      expect(receipt.length).to.eql(64)
 
       if(USE_MOCK)
         expectedNetworkRequests.forEach((mock) => mock.done());
