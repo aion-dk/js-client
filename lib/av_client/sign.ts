@@ -39,11 +39,11 @@ export const signPayload = (obj: any, privateKey: string) => {
   }
 }
 
-export const sealEnvelopes = (encryptedVotes: ContestMap<OpenableEnvelope>): ContestMap<SealedEnvelope> => {
-  const sealEnvelope = (envelope: OpenableEnvelope): SealedEnvelope => {
+export const sealEnvelopes = (encryptedVotes: ContestMap<OpenableEnvelope>): ContestMap<string[]> => {
+  const sealEnvelope = (envelope: OpenableEnvelope): string[] => {
     const { cryptograms, randomness } = envelope;
-    const proofs = Crypto.generateDiscreteLogarithmProof(randomness)
-    return { cryptograms, proofs }
+    const proofs = randomness.map(randomizer => Crypto.generateDiscreteLogarithmProof(randomizer)) 
+    return proofs
   }
 
   return Object.fromEntries(Object.keys(encryptedVotes).map(k => [k, sealEnvelope(encryptedVotes[k])]))

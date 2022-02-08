@@ -8,7 +8,7 @@ export interface IAVClient {
   registerVoter(): Promise<void>
   constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
   spoilBallotCryptograms(): Promise<void>
-  submitBallotCryptograms(affidavit: Affidavit): Promise<BallotBoxReceipt>
+  castBallot(affidavit: Affidavit): Promise<BallotBoxReceipt>
   purgeData(): void
 }
 
@@ -136,6 +136,16 @@ export interface VoterSessionItem {
 export interface BoardCommitmentItem {
   content: {
     commitment: string
+  } 
+  address: string
+  author: string
+  signature: string
+  parent_address: string
+}
+
+export interface BallotCryptogramItem {
+  content: {
+    cryptograms: ContestMap<string[]>
   } 
   address: string
   author: string
