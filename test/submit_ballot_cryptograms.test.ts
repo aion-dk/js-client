@@ -61,7 +61,7 @@ describe('AVClient#submitBallotCryptograms', () => {
       await client.constructBallotCryptograms(cvr)
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
-      const receipt = await client.submitBallotCryptograms(affidavit);
+      const receipt = await client.castBallot(affidavit);
       expect(receipt).to.have.keys(
         'boardHash',
         'previousBoardHash',
@@ -95,7 +95,7 @@ describe('AVClient#submitBallotCryptograms', () => {
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       await expectError(
-        client.submitBallotCryptograms(affidavit),
+        client.castBallot(affidavit),
         Error,
         'Invalid vote receipt: corrupt board hash'
       );

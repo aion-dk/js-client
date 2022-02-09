@@ -1,0 +1,17 @@
+{
+  "cast_request": {
+    "id": 165,
+    "election_id": 1,
+    "address": "25c78d990acb71686586e8bd5f05f336621bfc256ff4325ccc1ac7179b793c40",
+    "type": "CastRequestItem",
+    "content": {},
+    "author": "02347a71b7de077acabdea892e2a6be20a7afadbfc1776d96961fcc8b02959a2f9",
+    "parent_address": "804e4c187fa2d587c1eb5b3760a01f1882a6d50fccb52ac8dd6e9aa7bdf30087",
+    "registered_at": "2022-02-08T13:24:00.417+01:00",
+    "signature": "a867e242901a6b79b76219bc84704d3ccc9471d697d08cdb24d6b16527ac31d9,82342eec7a7d4ec56d15f73731bc474b293f3d53ca5af931c169980cf2828046",
+    "attachment": null,
+    "resource_id": null,
+    "created_at": "2022-02-08T13:24:00.420+01:00",
+    "updated_at": "2022-02-08T13:24:00.420+01:00"
+  }
+}

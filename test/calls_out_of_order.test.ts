@@ -29,15 +29,15 @@ describe('AVClient functions call order', () => {
     await expectError(
       client.constructBallotCryptograms({ '1': 1, '2': 4 }),
       InvalidStateError,
-      'Cannot construct ballot cryptograms. Voter registration not completed successfully'
+      'Cannot construct cryptograms. Voter identity unknown'
     );
   });
 
   it('throws an error when submitBallotCryptograms is called first', async () => {
     await expectError(
-      client.submitBallotCryptograms('affidavit bytes'),
+      client.castBallot('affidavit bytes'),
       InvalidStateError,
-      'Cannot submit cryptograms. Voter identity unknown or no open envelopes'
+      'Cannot create cast request cryptograms. Ballot cryptograms not present'
     );
   });
 });

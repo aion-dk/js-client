@@ -18,7 +18,7 @@ describe('AVClient#constructBallotCryptograms', () => {
     sandbox = resetDeterminism();
 
     nock(bulletinBoardHost).get('/dbb/us/api/election_config')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json');
+      .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_us_api_election_config.json');
 
     nock(voterAuthorizerHost).post('/create_session')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
@@ -34,6 +34,9 @@ describe('AVClient#constructBallotCryptograms', () => {
 
     nock(bulletinBoardHost).post('/dbb/us/api/commitments')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_commitments.json');
+
+    nock(bulletinBoardHost).post('/dbb/us/api/votes')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_votes.json');
 
     client = new AVClient('http://us-avx:3000/dbb/us/api');
     await client.initialize()
@@ -51,8 +54,8 @@ describe('AVClient#constructBallotCryptograms', () => {
       await client.registerVoter()
 
       const cvr = {
-        '50422d0f-e795-4324-8289-50e3d3459196': 1,
-        'd866a7d7-15df-4765-9950-651c0ca1313d': 2
+        'f7a04384-1458-5911-af38-7e08a46136e7': 1,
+        '026ca870-537e-57b2-b313-9bb5d9fbe78b': 3
       };
 
       const trackingCode = await client.constructBallotCryptograms(cvr);
@@ -82,8 +85,8 @@ describe('AVClient#constructBallotCryptograms', () => {
       await client.registerVoter()
 
       const cvr = {
-        '50422d0f-e795-4324-8289-50e3d3459196': 1,
-        'd866a7d7-15df-4765-9950-651c0ca1313d': 3
+        'f7a04384-1458-5911-af38-7e08a46136e7': 1,
+        '026ca870-537e-57b2-b313-9bb5d9fbe78b': 2
       };
 
       await expectError(

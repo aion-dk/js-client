@@ -27,12 +27,6 @@ const DEFAULT_MARKING_TYPE = {
   maxMarks: 1
 };
 
-const getSortedEnvelopeRandomizers = (envelopes: ContestMap<OpenableEnvelope>): string[] => {
-  return Object.keys(envelopes)
-    .sort((a,b) => ('' + a).localeCompare(b))
-    .map(key => envelopes[key].randomness[0])
-};
-
 const _getEncodingTypes = (cvr: CastVoteRecord, ballots: Ballot[]) => {
   return Object.fromEntries(Object.keys(cvr).map((contestId) => {
     const contest = ballots.find(b => b.id.toString() == contestId)
@@ -72,13 +66,10 @@ export const constructBallotCryptograms = (state: ClientState, cvr: CastVoteReco
     encryptionKey
   );
 
-  const randomizers = getSortedEnvelopeRandomizers(envelopes);
-
   // TODO:
   // Do we need: const numberOfCryptogramsNeeded = this.calculateNumberOfRequiredCryptograms(cvr, ballots[voterGroup]);
   
   const randomizersMap = Object.fromEntries(Object.entries(envelopes).map(([contestUuid, envelope]) => [contestUuid, envelope.randomness]));
-
   const result = generatePedersenCommitment(randomizersMap);
 
   const trackingCode = EncryptVotes.fingerprint(extractCryptograms(envelopes));
@@ -88,7 +79,7 @@ export const constructBallotCryptograms = (state: ClientState, cvr: CastVoteReco
       result: result.commitment,
       randomizer: result.randomizer
     },
-    envelopeRandomizers: randomizers,
+    envelopeRandomizers: randomizersMap,
     envelopes,
     trackingCode,
   }
@@ -110,7 +101,7 @@ type ConstructResult = {
     result: string,
     randomizer: string
   }
-  envelopeRandomizers: string[]
+  envelopeRandomizers: ContestMap<string[]>
   envelopes: ContestMap<OpenableEnvelope>,
   trackingCode: string,
 }

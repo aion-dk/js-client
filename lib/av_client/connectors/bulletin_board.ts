@@ -50,24 +50,6 @@ export class BulletinBoard {
     return (response.data as VoterSessionItem)
   }
 
-  challengeEmptyCryptograms(challenges: ContestMap<string>): Promise<AxiosResponse> {
-    return this.backend.post('challenge_empty_cryptograms', {
-        challenges
-      }, {
-        headers: {
-          'X-Voter-Session': this.voterSessionUuid
-        }
-      });
-  }
-
-  getBoardHash(): Promise<AxiosResponse> {
-    return this.backend.get('get_latest_board_hash', {
-      headers: {
-        'X-Voter-Session': this.voterSessionUuid
-      }
-    });
-  }
-
   submitVotes(signedBallotCryptogramsItem): Promise<AxiosResponse> {
     return this.backend.post('votes', signedBallotCryptogramsItem, {
       headers: {
@@ -78,6 +60,14 @@ export class BulletinBoard {
 
   submitCommitment(signedCommit): Promise<AxiosResponse> {
     return this.backend.post('commitments', signedCommit, {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
+  }
+
+  submitCastRequest(content): Promise<AxiosResponse> {
+    return this.backend.post('cast', content, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }

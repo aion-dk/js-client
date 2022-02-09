@@ -21,6 +21,7 @@ import {
   BallotBoxReceipt,
   VoterSessionItem,
   BoardCommitmentItem,
+  BallotCryptogramItem,
   HashValue,
   Signature,
 } from './av_client/types';
@@ -38,7 +39,7 @@ import {
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
-import { signPayload } from './av_client/sign';
+import { sealEnvelopes, signPayload } from './av_client/sign';
 import { finalizeBallotCryptograms } from './av_client/actions/finalize_ballot_cryptograms';
 
 /** @internal */
@@ -62,7 +63,7 @@ export const sjcl = sjclLib;
  * |{@link AVClient.registerVoter | registerVoter }                           | Registers the voter on the bulletin board |
  * |{@link AVClient.constructBallotCryptograms | constructBallotCryptograms } | Constructs voter ballot cryptograms. |
  * |{@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms }         | Optional. Initiates process of testing the ballot encryption. |
- * |{@link AVClient.submitBallotCryptograms | submitBallotCryptograms }       | Finalizes the voting process. |
+ * |{@link AVClient.castBallot | submitBallotCryptograms }       | Finalizes the voting process. |
  * |{@link AVClient.purgeData | purgeData }                                   | Optional. Explicitly purges internal data. |
  *
  * ## Example walkthrough test
@@ -82,9 +83,10 @@ export class AVClient implements IAVClient {
   private keyPair: KeyPair;
 
   private clientEnvelopes: ContestMap<OpenableEnvelope>;
-  private serverEnvelopes: ContestMap<string>;
+  private serverEnvelopes: ContestMap<string[]>;
   private voterSession: VoterSessionItem;
   private boardCommitment: BoardCommitmentItem;
+  private ballotCryptogramItem: BallotCryptogramItem;
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -242,7 +244,7 @@ export class AVClient implements IAVClient {
    * values internal to the AV election config.
    *
    * Should be followed by either {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}
-   * or {@link AVClient.submitBallotCryptograms | submitBallotCryptograms}.
+   * or {@link AVClient.castBallot | submitBallotCryptograms}.
    *
    * @param   cvr Object containing the selections for each contest.
    * @returns Returns the ballot tracking code. Example:
@@ -254,6 +256,10 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
+    if(!(this.voterSession)) {
+      throw new InvalidStateError('Cannot construct cryptograms. Voter identity unknown')
+    }
+
     const state = {
       voterSession: this.voterSession,
       electionConfig: this.electionConfig,
@@ -263,7 +269,6 @@ export class AVClient implements IAVClient {
       commitment,
       envelopeRandomizers,
       envelopes,
-      trackingCode,
     } = constructBallotCryptograms(state, cvr);
 
     // 1. Create and submit commitment item
@@ -284,15 +289,66 @@ export class AVClient implements IAVClient {
     const response = await this.bulletinBoard.submitCommitment(signedCommitmentItem);
     this.boardCommitment = response.data.commitment;
     this.serverEnvelopes = response.data.envelopes;
-
-// client envelopes
-// +
-// server envelopes
-// == asdfasdf?
-
     
-    return trackingCode;
+    // Submit ballot
+    const finalizedCryptograms = finalizeBallotCryptograms(this.clientEnvelopes, this.serverEnvelopes)
+     
+    const ballotCryptogramsItem = {
+      parent_address: this.boardCommitment.address,
+      type: "BallotCryptogramsItem",
+      content: {
+        cryptograms: finalizedCryptograms,
+      }
+    };
+
+    const signedBallotCryptogramsItem = signPayload(ballotCryptogramsItem, this.privateKey());
+    // TODO: clarify how the receipt should be strucuted.
+
+    const itemWithProofs = {
+      ...signedBallotCryptogramsItem,
+      proofs: sealEnvelopes(this.clientEnvelopes)
+    };
+
+    const submitVoteResponse = (await this.bulletinBoard.submitVotes(itemWithProofs)).data;
+    this.ballotCryptogramItem = submitVoteResponse.vote
+
+    return 'checking code/verification track start address';
   }
+
+    /**
+   * Should be the last call in the entire voting process.
+   *
+   * Submits encrypted ballot and the affidavit to the digital ballot box.
+   *
+   *
+   * @param affidavit The {@link Affidavit | affidavit} document.
+   * @return Returns the vote receipt. Example of a receipt:
+   * ```javascript
+   * {
+   *    previousBoardHash: 'd8d9742271592d1b212bbd4cbvobbe357aef8e00cdbdf312df95e9cf9a1a921465',
+   *    boardHash: '5a9175c2b3617298d78be7d0244a68f34bc8b2a37061bb4d3fdf97edc1424098',
+   *    registeredAt: '2020-03-01T10:00:00.000+01:00',
+   *    serverSignature: 'dbcce518142b8740a5c911f727f3c02829211a8ddfccabeb89297877e4198bc1,46826ddfccaac9ca105e39c8a2d015098479624c411b4783ca1a3600daf4e8fa',
+   *    voteSubmissionId: 6
+      }
+   * ```
+   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
+   */
+      public async castBallot(affidavit?: Affidavit): Promise<any> {
+        if(!(this.voterSession)) {
+          throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
+        }
+        const castRequestItem = {
+            parent_address: this.ballotCryptogramItem.address,
+            type: 'CastRequestItem',
+            content: {}
+        }
+
+        const signedPayload = signPayload(castRequestItem, this.privateKey())
+        
+        const receipt = (await this.bulletinBoard.submitCastRequest(signedPayload)).data
+        return receipt.cast_request.address
+      }
 
   /**
    * @deprecated
@@ -331,59 +387,6 @@ export class AVClient implements IAVClient {
     // TODO: verify the server commitment openings against server commitment and server empty cryptograms
 
     throw new Error('Not implemented yet');
-  }
-
-  /**
-   * Should be the last call in the entire voting process.
-   *
-   * Submits encrypted ballot and the affidavit to the digital ballot box.
-   *
-   *
-   * @param affidavit The {@link Affidavit | affidavit} document.
-   * @return Returns the vote receipt. Example of a receipt:
-   * ```javascript
-   * {
-   *    previousBoardHash: 'd8d9742271592d1b212bbd4cbvobbe357aef8e00cdbdf312df95e9cf9a1a921465',
-   *    boardHash: '5a9175c2b3617298d78be7d0244a68f34bc8b2a37061bb4d3fdf97edc1424098',
-   *    registeredAt: '2020-03-01T10:00:00.000+01:00',
-   *    serverSignature: 'dbcce518142b8740a5c911f727f3c02829211a8ddfccabeb89297877e4198bc1,46826ddfccaac9ca105e39c8a2d015098479624c411b4783ca1a3600daf4e8fa',
-   *    voteSubmissionId: 6
-      }
-   * ```
-   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
-   */
-  public async submitBallotCryptograms(affidavit: Affidavit): Promise<BallotBoxReceipt> {
-    if(!(this.voterSession || this.clientEnvelopes)) {
-      throw new InvalidStateError('Cannot submit cryptograms. Voter identity unknown or no open envelopes')
-    }
-
-    const finalizedCryptograms = finalizeBallotCryptograms(this.clientEnvelopes, this.serverEnvelopes)
-     
-
-    const ballotCryptogramsItem = {
-      parent_address: this.boardCommitment.address,
-      type: "BallotCryptogramsItem",
-      content:
-        { cryptograms: finalizedCryptograms },
-    };
-
-    const signedBallotCryptogramsItem = signPayload(ballotCryptogramsItem, this.privateKey());
-    const receipt = (await this.bulletinBoard.submitVotes(signedBallotCryptogramsItem)).data;
-    
-    // TODO: clarify how the receipt should be strucuted.
-    return {
-      previousBoardHash: receipt.parent_address,
-      boardHash: receipt.address,
-      registeredAt: receipt.registered_at,
-      serverSignature: receipt.signature,
-      voteSubmissionId: 'asdf'
-    }
-  }
-
-  public async submitCastRequest(affidavit: Affidavit): Promise<string> {
-    
-
-    return ''
   }
 
   /**

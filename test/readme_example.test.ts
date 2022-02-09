@@ -27,7 +27,7 @@ describe('entire voter flow using OTP authorization', () => {
     expect(trackingCode.length).to.eq(64);
 
     const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
-    const receipt = await client.submitBallotCryptograms(affidavit);
+    const receipt = await client.castBallot(affidavit);
     expect(receipt).to.have.keys(
       'boardHash',
       'previousBoardHash',
