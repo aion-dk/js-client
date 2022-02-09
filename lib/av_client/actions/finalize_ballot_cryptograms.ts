@@ -5,7 +5,7 @@ export const finalizeBallotCryptograms = (clientCryptograms: ContestMap<Openable
   const finalizedCryptograms = Object.fromEntries(Object.entries(clientCryptograms)
       .map(([contestUuid, crypto]) => [contestUuid, crypto.cryptograms.map((cryptogram, i) => EncryptVotes.homomorphicallyAddCryptograms(
         cryptogram,
-        serverCryptograms[contestUuid][i] // TODO: Can we assume the cryptograms are in the same order?
+        serverCryptograms[contestUuid][i]
       ))])
   );
   
