@@ -21,7 +21,7 @@ describe('AVClient#validateAccessCode', () => {
 
     expectedNetworkRequests.push(
       nock(bulletinBoardHost).get('/dbb/us/api/election_config')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json')
+        .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_us_api_election_config.json')
     );
     expectedNetworkRequests.push(
       nock(voterAuthorizerHost).post('/create_session')

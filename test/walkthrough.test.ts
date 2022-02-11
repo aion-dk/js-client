@@ -10,7 +10,7 @@ import {
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 
-const USE_MOCK = false;
+const USE_MOCK = true;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;

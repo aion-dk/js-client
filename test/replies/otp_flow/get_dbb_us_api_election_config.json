@@ -1,16 +1,16 @@
 {
-  "encryptionKey": "02fad9cf6ccc9a0a432fea197174d8ab46df493d233584d4c438e4c08b93bc6a67",
+  "encryptionKey": "03749c7912de7621ab43cdf6216fae08742ec56c289e67bee400cf7cd51ad0e1a2",
   "services": {
-    "address": "936a00dcfd6018e8fe1d1946c2331a2cb2a49204c4e6cbd48ea7e33f3f35476a",
+    "address": "dbcaded25dee5c4c81244120da5ba478ccced30410552d2700199768dd6fe213",
     "voter_authorizer": {
-      "election_context_uuid": "23c032fc-e32f-4d9b-9206-9a1b75f71fe9",
-      "public_key": "02db397468d924e9bef65b7ad169a0e5bc1be37349b599b6b1c990cc1e4b34ff1f",
-      "url": "http://localhost:1234"
+      "election_context_uuid": "03771e29-9f52-460e-9543-3c94944a8b86",
+      "public_key": "0347250d4d9184b8e21b1069e149dca5fb240648a2be66e4b7b3bf2c0e37a3137e",
+      "url": "http://authorizer:1234/"
     },
     "otp_provider": {
-      "election_context_uuid": "38f05ccf-9225-4638-9d63-4ab950ae8157",
-      "public_key": "02a465e37525e3cfec40c38b09786ebb333c0f1786afc64642e9707c716d6acfe5",
-      "url": "http://localhost:1111"
+      "election_context_uuid": "7eeae23a-406b-416f-a896-5e62d6abed75",
+      "public_key": "027220a61434a745742427822ff6269851480545a1122d0259a95a76b09a4bf468",
+      "url": "http://otp-provider:1111/"
     }
   },
   "ballotConfigs": {

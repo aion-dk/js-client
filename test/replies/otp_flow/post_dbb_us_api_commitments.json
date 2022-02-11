@@ -1,27 +1,28 @@
 {
   "commitment": {
-    "id": 67,
+    "id": 16,
     "election_id": 1,
-    "address": "91f45795a20edea668a9c938e96d50a5ca8b3448c5a597df0aba6ccf1dfaa0ad",
+    "address": "4b3f1ea88649721cf399913df761e3c3596940e1eb427415f72fc051592e8a71",
     "type": "BoardEncryptionCommitmentItem",
     "content": {
-      "commitment": "02c20cc8558b16eea361bb84d4789c5489833e48cfc788bc5f943926b2649f4c7d"
+      "commitment": "0225a7aae03c8d26832dae736ff9e161c3fb2141eeeee24813673dea7d27341998"
     },
-    "author": "036bc9f386b3f5ba3f32e1e3e634077d356c0c565deb59b810a21dce85719886fa",
-    "parent_address": "1ab8b98a6c51f801a554449266b5a6204347cdea405b76d95431d5ec31c07b5e",
-    "registered_at": "2022-02-07T16:07:06.496+01:00",
-    "signature": "b5ab0f101d71fd22ce600673d4891bd19cb9b632d6921b14c2b12184d0e7dc39,2bd37ecb89bfc4b7f583c1269841cc933a76d2bb1a7ac1cf0ea226c749dcf2df",
+    "author": "032e9d27e79d646a30f1a9bf522b741a99110a773a18f402f905cb9eb85dec93d9",
+    "parent_address": "060c65eabd18260938e32ce2116dbb0cd1d516a5efed715c1017f3cfa8095626",
+    "registered_at": "2022-02-11T10:33:03.725+01:00",
+    "signature": "779dd325b3b2138576918fbdea83a484a58aef41d996f7982e372bcf2e8973dc,43b16debb5bda175520189d8be42e9506cea13da7cb7f96df16a37c68ec88d02",
     "attachment": null,
     "resource_id": null,
-    "created_at": "2022-02-07T16:07:06.500+01:00",
-    "updated_at": "2022-02-07T16:07:06.500+01:00"
+    "created_at": "2022-02-11T10:33:03.729+01:00",
+    "updated_at": "2022-02-11T10:33:03.729+01:00",
+    "previous_address": "060c65eabd18260938e32ce2116dbb0cd1d516a5efed715c1017f3cfa8095626"
   },
   "envelopes": {
     "f7a04384-1458-5911-af38-7e08a46136e7": [
-      "03391d2850032fc42f6d65e269f3a7cdc1bc99fd4f0345a499ce7a74d4502374e2,027e159b6b7c53ba5247d3f828aa4014bb19d2c93749cbb2670119bd705c646ece"
+      "03ef7946a7beac9c202a1da859363fa8a4160a4aa3fef8f8a40ef371c6c3ff7af6,039e51c0e3a1c7a23e1cd61a1b7ece9546af8d928b1860c0753c0080e23b05b5cd"
     ],
     "026ca870-537e-57b2-b313-9bb5d9fbe78b": [
-      "0254f4a665cf3c080b007068ff0826def68d55a3de1734527ff6d613e7d4217aa9,02bffeff5037d114f6dcb700743877baef4ce9dee44746e8774b20bc640e5b1450"
+      "03ee8999eb2a72d679bc743fd991cc7bbe4ac335edf4365c6095027ada05a2e5fa,034506f447379bdce7e11e5c412cda1c2da02a43a355f0b5c3de323946ec7c5967"
     ]
   }
 }
