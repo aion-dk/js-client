@@ -3,15 +3,15 @@ import {
   resetDeterminism,
   bulletinBoardHost,
   OTPProviderHost,
-  voterAuthorizerHost
+  voterAuthorizerHost,
+  bbHost
 } from './test_helpers';
 let sandbox;
 
 export function readmeTestSetup() {
   sandbox = resetDeterminism();
 
-  nock(bulletinBoardHost).get('/dbb/us/api/election_config')
-    .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json');
+  bbHost.get_election_config();
 
   nock(voterAuthorizerHost).post('/create_session')
     .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
@@ -22,8 +22,8 @@ export function readmeTestSetup() {
   nock(OTPProviderHost).post('/authorize')
     .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
 
-  nock(bulletinBoardHost).post('/dbb/us/api/registrations')
-    .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json');
+
+  bbHost.post_registrations();
 
   // TODO: DEPRECATED?
   // nock(bulletinBoardHost).post('/mobile-api/us/challenge_empty_cryptograms')

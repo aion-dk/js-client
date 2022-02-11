@@ -5,9 +5,9 @@ const fs = require('fs');
 const sjcl = require('../lib/av_client/sjcl');
 
 export const bulletinBoardHost = 'http://us-avx:3000/';
-export const OTPProviderHost = 'http://otp-provider:1111/';
+export const OTPProviderHost = 'http://otp-provider.local.assemblyvoting.net:1111/';
 export const OTPProviderElectionContextId = 'cca2b217-cedd-4d58-a103-d101ba472eb8';
-export const voterAuthorizerHost = 'http://authorizer:1234/';
+export const voterAuthorizerHost = 'http://authorizer.local.assemblyvoting.net:1234/';
 
 export const bbHost = {
   get_election_config: () => nock(bulletinBoardHost)
