@@ -9,6 +9,44 @@ export const OTPProviderHost = 'http://otp-provider:1111/';
 export const OTPProviderElectionContextId = 'cca2b217-cedd-4d58-a103-d101ba472eb8';
 export const voterAuthorizerHost = 'http://authorizer:1234/';
 
+export const bbHost = {
+  get_election_config: () => nock(bulletinBoardHost)
+      .get('/dbb/us/api/election_config')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_us_api_election_config.json'),
+
+  post_registrations: () => nock(bulletinBoardHost)
+      .post('/dbb/us/api/registrations')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_registrations.json'),
+
+  post_commitments: () => nock(bulletinBoardHost)
+      .post('/dbb/us/api/commitments')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_commitments.json'),
+
+  post_votes: () => nock(bulletinBoardHost)
+      .post('/dbb/us/api/votes')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_votes.json'),
+
+  post_cast: () => nock(bulletinBoardHost)
+      .post('/dbb/us/api/cast')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_cast.json')
+};
+
+export const vaHost = {
+  post_create_session: () => nock(voterAuthorizerHost)
+      .post('/create_session')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json'),
+
+  post_request_authorization: () => nock(voterAuthorizerHost)
+      .post('/request_authorization')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
+}
+
+export const otpHost = {
+  post_authorize: () => nock(OTPProviderHost)
+      .post('/authorize')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json')
+};
+
 export function resetDeterminism() {
   const sandbox = sinon.createSandbox();
   sandbox.stub(Math, 'random').callsFake(deterministicMathRandom);

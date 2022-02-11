@@ -1,13 +1,12 @@
 import { AVClient } from '../lib/av_client';
 import { CorruptCvrError } from '../lib/av_client/errors';
-import { expect } from 'chai';
 import nock = require('nock');
 import {
   expectError,
   resetDeterminism,
-  bulletinBoardHost,
-  OTPProviderHost,
-  voterAuthorizerHost
+  bbHost,
+  vaHost,
+  otpHost
 } from './test_helpers';
 
 describe('AVClient#constructBallotCryptograms', () => {
@@ -17,26 +16,13 @@ describe('AVClient#constructBallotCryptograms', () => {
   beforeEach(async () => {
     sandbox = resetDeterminism();
 
-    nock(bulletinBoardHost).get('/dbb/us/api/election_config')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_us_api_election_config.json');
-
-    nock(voterAuthorizerHost).post('/create_session')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
-
-    nock(voterAuthorizerHost).post('/request_authorization')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
-
-    nock(OTPProviderHost).post('/authorize')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
-
-    nock(bulletinBoardHost).post('/dbb/us/api/registrations')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_registrations.json');
-
-    nock(bulletinBoardHost).post('/dbb/us/api/commitments')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_commitments.json');
-
-    nock(bulletinBoardHost).post('/dbb/us/api/votes')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_votes.json');
+    bbHost.get_election_config();
+    vaHost.post_create_session();
+    vaHost.post_request_authorization();
+    otpHost.post_authorize();
+    bbHost.post_registrations();
+    bbHost.post_commitments();
+    bbHost.post_votes();
 
     client = new AVClient('http://us-avx:3000/dbb/us/api');
     await client.initialize()
