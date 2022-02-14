@@ -60,16 +60,16 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation) 
   const addressHashSource = uniformer.formString({
     type: item.type,
     content: item.content,
-    parent_address: item.parent_address,
-    previous_address: item.previous_address,
-    registered_at: item.registered_at
+    parentAddress: item.parent_address,
+    previousAddress: item.previous_address,
+    registeredAt: item.registered_at
   });
 
   const expectedItemAddress = Crypto.hashString(addressHashSource);
 
-  // if(item.address != expectedItemAddress) {
-  //   throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
-  // }
+  if(item.address != expectedItemAddress) {
+    throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
+  }
 
   // TODO: Assert signature
   // const signature = Crypto.generateSchnorrSignature(uniformPayload, dbbPublicKey);
