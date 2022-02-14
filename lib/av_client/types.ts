@@ -119,7 +119,22 @@ export interface Election {
   voteSubmissionId: string
 }
 
-export interface VoterSessionItem {
+export type BoardItem =
+  VoterSessionItem |
+  BoardCommitmentItem |
+  BallotCryptogramItem
+
+export type BoardItemType =
+  "VoterSessionItem" |
+  "BoardCommitmentItem" |
+  "BallotCryptogramItem"
+
+
+interface BaseBoardItem {
+  previous_address: string
+  registered_at: string
+}
+export interface VoterSessionItem extends BaseBoardItem {
   content: {
     authToken: string
     identifier: string
@@ -130,10 +145,11 @@ export interface VoterSessionItem {
   author: string
   signature: string
   parent_address: string
+  type: "VoterSessionItem"
   // Segments...
 }
 
-export interface BoardCommitmentItem {
+export interface BoardCommitmentItem extends BaseBoardItem {
   content: {
     commitment: string
   } 
@@ -141,9 +157,10 @@ export interface BoardCommitmentItem {
   author: string
   signature: string
   parent_address: string
+  type: "BoardCommitmentItem"
 }
 
-export interface BallotCryptogramItem {
+export interface BallotCryptogramItem extends BaseBoardItem {
   content: {
     cryptograms: ContestMap<string[]>
   } 
@@ -151,8 +168,16 @@ export interface BallotCryptogramItem {
   author: string
   signature: string
   parent_address: string
+  type: "BallotCryptogramItem"
 }
 
+export interface ItemExpectation {
+  content: {
+    [k: string]: any
+  }
+  type: BoardItemType
+  parent_address: string
+}
 export interface ClientState {
   electionConfig?: ElectionConfig
   voterSession?: VoterSessionItem

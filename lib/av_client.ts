@@ -4,9 +4,11 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
-import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
+import { KeyPair, CastVoteRecord, Affidavit, BoardItemType } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import EncryptVotes from './av_client/encrypt_votes';
+import * as jwt from 'jsonwebtoken';
+
 
 import {
   fetchElectionConfig,
@@ -39,7 +41,7 @@ import {
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
-import { sealEnvelopes, signPayload } from './av_client/sign';
+import { sealEnvelopes, signPayload, validatePayload } from './av_client/sign';
 import { finalizeBallotCryptograms } from './av_client/actions/finalize_ballot_cryptograms';
 
 /** @internal */
@@ -194,7 +196,28 @@ export class AVClient implements IAVClient {
 
     const { authToken } = authorizationResponse.data;
 
+    const decoded = jwt.decode(authToken); //, this.getElectionConfig().services.voter_authorizer.public_key);
+
+    if(decoded === null)
+      throw new Error('Auth token could not be decoded');
+
+    //console.log('JWT decoded', test);
+
+    const voterSessionItemExpectation = {
+      type: 'VoterSessionItem' as BoardItemType,
+      parent_address: this.getElectionConfig().configAddress,
+      content: {
+        authToken: authToken,
+        identifier: decoded['identifier'],
+        publicKey: decoded['public_key'],
+        voterGroup: decoded['voter_group_key'],
+        segment1: decoded['segment1']
+      }
+    }
+
     const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
+
+    validatePayload(voterSessionItem, voterSessionItemExpectation);
 
     this.voterSession = voterSessionItem;
     this.bulletinBoard.setVoterSessionUuid(voterSessionItem.content.identifier);

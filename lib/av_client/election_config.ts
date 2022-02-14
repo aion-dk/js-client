@@ -14,6 +14,8 @@ export interface ElectionConfig {
   contestConfigs: ContestConfig
   ballotConfigs: BallotConfig;
 
+  configAddress: string
+
   // appended data:
   affidavit: AffidavitConfig;
 

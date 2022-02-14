@@ -1,4 +1,4 @@
-import { BallotBoxReceipt, ContestMap, OpenableEnvelope, SealedEnvelope } from './types'
+import { BallotBoxReceipt, BoardItem, ContestMap, ItemExpectation, OpenableEnvelope, SealedEnvelope } from './types'
 import * as Crypto from './aion_crypto';
 import * as sjcl from './sjcl';
 import Uniformer from '../util/uniformer';
@@ -37,6 +37,42 @@ export const signPayload = (obj: any, privateKey: string) => {
     ...obj,
     signature
   }
+}
+
+export const validatePayload = (item: BoardItem, expectations: ItemExpectation) => {
+  const uniformer = new Uniformer();
+
+  const expectedContent = uniformer.formString(expectations.content);
+  const actualContent = uniformer.formString(item.content);
+
+  if(expectedContent != actualContent) {
+    throw new Error('Item payload failed sanity check. Received item did not match expected');
+  }
+
+  if(expectations.type != item.type) {
+    throw new Error(`BoardItem did not match expected type '${expectations.type}'`);
+  }
+
+  if(expectations.parent_address != item.parent_address) {
+    throw new Error(`BoardItem did not match expected parent address ${expectations.parent_address}`);
+  }
+
+  const addressHashSource = uniformer.formString({
+    type: item.type,
+    content: item.content,
+    parent_address: item.parent_address,
+    previous_address: item.previous_address,
+    registered_at: item.registered_at
+  });
+
+  const expectedItemAddress = Crypto.hashString(addressHashSource);
+
+  // if(item.address != expectedItemAddress) {
+  //   throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
+  // }
+
+  // TODO: Assert signature
+  // const signature = Crypto.generateSchnorrSignature(uniformPayload, dbbPublicKey);
 }
 
 export const sealEnvelopes = (encryptedVotes: ContestMap<OpenableEnvelope>): ContestMap<string[]> => {
