@@ -133,6 +133,10 @@ export type BoardItemType =
 interface BaseBoardItem {
   previous_address: string
   registered_at: string
+  address: string
+  author: string
+  signature: string
+  parent_address: string
 }
 export interface VoterSessionItem extends BaseBoardItem {
   content: {
@@ -141,10 +145,7 @@ export interface VoterSessionItem extends BaseBoardItem {
     voterGroup: string
     publicKey: string
   }
-  address: string
-  author: string
-  signature: string
-  parent_address: string
+
   type: "VoterSessionItem"
   // Segments...
 }
@@ -153,10 +154,7 @@ export interface BoardCommitmentItem extends BaseBoardItem {
   content: {
     commitment: string
   } 
-  address: string
-  author: string
-  signature: string
-  parent_address: string
+
   type: "BoardCommitmentItem"
 }
 
