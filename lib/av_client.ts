@@ -1,12 +1,10 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
-import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
 import { KeyPair, CastVoteRecord, Affidavit, BoardItemType } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
-import EncryptVotes from './av_client/encrypt_votes';
 import * as jwt from 'jsonwebtoken';
 
 
