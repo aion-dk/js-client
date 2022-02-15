@@ -1,6 +1,7 @@
 {
   "configAddress": "b2ced8cee62f50ec444f73b4336b881c58485323fb9ccfb840d60bf778e4d407",
   "encryptionKey": "03851bd4877f31c6d3bc943683341862d10f28edb520bdca705635da318cf5d178",
+  "dbbPublicKey": "0210c6033e82afb25b0b2dd9fa2f310c6b095640b0c92d7e21a1495222b3833abc",
   "services": {
     "address": "b2ced8cee62f50ec444f73b4336b881c58485323fb9ccfb840d60bf778e4d407",
     "voter_authorizer": {

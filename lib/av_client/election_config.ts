@@ -11,6 +11,8 @@ export interface ElectionConfig {
   availableLocales: string[];
   currentLocale: string;
 
+  dbbPublicKey: string
+
   contestConfigs: ContestConfig
   ballotConfigs: BallotConfig;
 

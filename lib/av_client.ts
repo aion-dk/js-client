@@ -79,6 +79,7 @@ export class AVClient implements IAVClient {
   private authorizationSessionId: string;
   private email: string;
   private identityConfirmationToken: IdentityConfirmationToken;
+  private dbbPublicKey: string | undefined;
 
   private bulletinBoard: BulletinBoard;
   private electionConfig?: ElectionConfig;
@@ -93,8 +94,9 @@ export class AVClient implements IAVClient {
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
    */
-  constructor(bulletinBoardURL: string) {
+  constructor(bulletinBoardURL: string, dbbPublicKey?: string) {
     this.bulletinBoard = new BulletinBoard(bulletinBoardURL);
+    this.dbbPublicKey = dbbPublicKey;
   }
 
   /**
@@ -217,7 +219,7 @@ export class AVClient implements IAVClient {
 
     const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
 
-    validatePayload(voterSessionItem, voterSessionItemExpectation);
+    validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
 
     this.voterSession = voterSessionItem;
     this.bulletinBoard.setVoterSessionUuid(voterSessionItem.content.identifier);
@@ -428,8 +430,16 @@ export class AVClient implements IAVClient {
     return this.electionConfig
   }
 
-  private electionSigningPublicKey(): ECPoint {
-    return this.getElectionConfig().signingPublicKey
+  public getDbbPublicKey(): string {
+    const dbbPublicKeyFromConfig = this.getElectionConfig().dbbPublicKey;
+
+    if(this.dbbPublicKey) {
+      return this.dbbPublicKey;
+    } else if (dbbPublicKeyFromConfig) {
+      return dbbPublicKeyFromConfig;
+    } else {
+      throw new InvalidStateError('No DBB public key available')
+    }
   }
 
   private affidavitConfig(): AffidavitConfig {

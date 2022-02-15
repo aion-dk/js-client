@@ -24,7 +24,7 @@ describe('AVClient#constructBallotCryptograms', () => {
     bbHost.post_commitments();
     bbHost.post_votes();
 
-    client = new AVClient('http://us-avx:3000/dbb/us/api');
+    client = new AVClient('http://us-avx:3000/dbb/us/api', '0210c6033e82afb25b0b2dd9fa2f310c6b095640b0c92d7e21a1495222b3833abc');
     await client.initialize()
   });
 

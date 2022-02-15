@@ -39,7 +39,7 @@ export const signPayload = (obj: any, privateKey: string) => {
   }
 }
 
-export const validatePayload = (item: BoardItem, expectations: ItemExpectation) => {
+export const validatePayload = (item: BoardItem, expectations: ItemExpectation, dbbPublicKey: string) => {
   const uniformer = new Uniformer();
 
   const expectedContent = uniformer.formString(expectations.content);
@@ -71,8 +71,19 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation) 
     throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
   }
 
-  // TODO: Assert signature
-  // const signature = Crypto.generateSchnorrSignature(uniformPayload, dbbPublicKey);
+  const signedPayload = uniformer.formString({
+    content: item.content,
+    type: item.type,
+    parent_address: item.parent_address
+  });
+
+  // console.log('signedPayload', signedPayload);
+  // console.log('dbb public key', dbbPublicKey);
+  // console.log('item signature', item.signature);
+
+  if(!Crypto.verifySchnorrSignature(item.signature, signedPayload, dbbPublicKey)) {
+    throw new Error('Board signature verification failed');
+  }
 }
 
 export const sealEnvelopes = (encryptedVotes: ContestMap<OpenableEnvelope>): ContestMap<string[]> => {
