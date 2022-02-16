@@ -217,9 +217,9 @@ export class AVClient implements IAVClient {
     }
 
     const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
-    console.log('Actual', voterSessionItem);
+    // console.log('Actual', voterSessionItem);
 
-    console.log('Expected', voterSessionItemExpectation);
+    // console.log('Expected', voterSessionItemExpectation);
 
     validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
 

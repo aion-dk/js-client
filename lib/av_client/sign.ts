@@ -68,8 +68,6 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
   const expectedItemAddress = Crypto.hashString(addressHashSource);
 
   if(item.address != expectedItemAddress) {
-    console.log('expected', expectedItemAddress);
-    console.log('actual', item.address);
     throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
   }
 

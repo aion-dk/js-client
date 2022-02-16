@@ -97,7 +97,7 @@ describe('Uniformer', () => {
     ));
   });
 
-  it.only('random', () => {
+  it.skip('random', () => {
     const sample = {
       parentAddress: '24598ebf2abcc545c6b5e6ca0cd3057ca61aecf90100dfeaf97bfe1adcc13f9c',
       previousAddress: '5dbf737f8cecb4ed60f2e6fcc2e1e42c2c757b29c2904e5b648015ddf2ca6081',
@@ -118,6 +118,6 @@ describe('Uniformer', () => {
     };
 
     const uniformed = new Uniformer().formString(sample);
-    console.log('computed address', Crypto.hashString(uniformed));
+    //console.log('computed address', Crypto.hashString(uniformed));
   })
 });
