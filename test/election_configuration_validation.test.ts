@@ -12,7 +12,7 @@ describe('election configuration validation', () => {
 
   beforeEach(async () => {
     client = new AVClient('http://nothing.local');
-    electionConfig = readJSON('./replies/otp_flow/get_dbb_api_us_config.json');
+    electionConfig = readJSON('./replies/otp_flow/get_dbb_us_api_election_config.json');
   });
 
   context('OTP provider URL is empty', () => {

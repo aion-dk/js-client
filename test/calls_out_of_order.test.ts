@@ -3,10 +3,7 @@ import { expect } from 'chai';
 import nock = require('nock');
 import {
   expectError,
-  resetDeterminism,
   bulletinBoardHost,
-  OTPProviderHost,
-  voterAuthorizerHost
 } from './test_helpers';
 import { InvalidStateError } from '../lib/av_client/errors';
 
@@ -14,7 +11,7 @@ describe('AVClient functions call order', () => {
   let client: AVClient;
 
   beforeEach(() => {
-    client = new AVClient('http://us-avx:3000/dbb/us/api');
+    client = new AVClient(bulletinBoardHost + '/dbb/us/api');
   });
 
   it('throws an error when validateAccessCode is called first', async () => {

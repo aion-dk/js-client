@@ -4,9 +4,9 @@ import axios from 'axios';
 import nock = require('nock');
 import {
   resetDeterminism,
-  bulletinBoardHost,
-  OTPProviderHost,
-  voterAuthorizerHost
+  vaHost,
+  bbHost,
+  otpHost
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 
@@ -19,24 +19,17 @@ describe('entire voter flow using OTP authorization', () => {
   beforeEach(() => {
     if(USE_MOCK) {
       sandbox = resetDeterminism();
-      expectedNetworkRequests = [];
 
-      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/dbb/us/api/election_config')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_us_api_election_config.json'));
-      expectedNetworkRequests.push(nock(voterAuthorizerHost).post('/create_session')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json'));
-      expectedNetworkRequests.push(nock(voterAuthorizerHost).post('/request_authorization')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json'));
-      expectedNetworkRequests.push(nock(OTPProviderHost).post('/authorize')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/us/api/registrations')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_registrations.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/us/api/commitments')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_commitments.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/us/api/votes')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_votes.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/dbb/us/api/cast')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_cast.json'));
+      expectedNetworkRequests = [
+        bbHost.get_election_config(),
+        vaHost.post_create_session(),
+        vaHost.post_request_authorization(),
+        otpHost.post_authorize(),
+        bbHost.post_registrations(),
+        bbHost.post_commitments(),
+        bbHost.post_votes(),
+        bbHost.post_cast(),
+      ];
     }
   });
 
@@ -49,7 +42,7 @@ describe('entire voter flow using OTP authorization', () => {
 
   it('returns a receipt', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
-    //return await recordResponses(async function() {
+    const performTest = async () => {
       const client = new AVClient('http://us-avx:3000/dbb/us/api');
       await client.initialize()
 
@@ -98,7 +91,17 @@ describe('entire voter flow using OTP authorization', () => {
 
       if(USE_MOCK)
         expectedNetworkRequests.forEach((mock) => mock.done());
-    //});
+    };
+
+    if(USE_MOCK) {
+      await performTest();
+    } else {
+      return await recordResponses(async function() {
+        await performTest();
+      });
+    }
+
+
     // });
   }).timeout(10000);
 

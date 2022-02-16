@@ -1,26 +1,27 @@
 {
   "vote": {
-    "id": 164,
+    "id": 37,
     "election_id": 1,
-    "address": "804e4c187fa2d587c1eb5b3760a01f1882a6d50fccb52ac8dd6e9aa7bdf30087",
+    "address": "4cd8cc9c9d6a3f1037d4c2e056ac47131b8b92ce84dfbb1feaa43bf5ca1cd3db",
     "type": "BallotCryptogramsItem",
     "content": {
       "cryptograms": {
         "f7a04384-1458-5911-af38-7e08a46136e7": [
-          "0366f63c1fc865aa2ec6cf8a41553318f55831b0c21cb7698466d0c5b15e2e0698,02377c17ea278f37b3ead7d627214bc4c750c5be2312f27d377472d26bf358f1d8"
+          "0365d0cc1e0e3b6dee1119eec77c47ae653b85266de3547d88b2ba6170d000ec19,029ac034c5dc2325b9a28411f06b6af9f54aa8b0cecc3b3980ab1a514a9f2d0db6"
         ],
         "026ca870-537e-57b2-b313-9bb5d9fbe78b": [
-          "02ba6d2911dd79d098bf04a2751bc70738916ea0ca01e08ed77e9d99b4c5d4ee31,03542ac1a64dee02c693caaa63b718ea1093130a58b423ca7f4261ae9993a189a6"
+          "02b02b1433d2150e5bb112cf511caa664fb88fc24e332f2bb402d0bf9d2b301df2,02175d8314f1ec0808c6e0297b65cd20de808fbcdeb184444eacb4f4c7bb7d7ae5"
         ]
       }
     },
-    "author": "02347a71b7de077acabdea892e2a6be20a7afadbfc1776d96961fcc8b02959a2f9",
-    "parent_address": "f8986816aca1bee5890e54dcf6542fafef20435c2bafbc5f05a76ffee862d846",
-    "registered_at": "2022-02-08T13:24:00.369+01:00",
-    "signature": "880e7fd91ba3fa4824264f9cb4bfc43bdbd9bd9f13245216ec45a4ef7b8661d0,6eeb80742e5dd7dfa862f8e35773479e6ab737887693230f4a333c6144e7e219",
+    "author": "0219814530e73d8a3ca9b58599f6916961aa55177d0b044339a36d74f761f6051f",
+    "parent_address": "9d28cb26c016171b12cb3e4d924a97ee15b08b59022984d10cc281e694c0a824",
+    "registered_at": "2022-02-11T13:00:06.045+01:00",
+    "signature": "156d2f07b0cd2a37ded219cb9db899ba638c1912bd1d2d92da091210153ec576,dd385cc717fe0788f8e2efc4fa6172d2dd62c119235b96ea70828a46dca86715",
     "attachment": null,
     "resource_id": null,
-    "created_at": "2022-02-08T13:24:00.371+01:00",
-    "updated_at": "2022-02-08T13:24:00.371+01:00"
+    "created_at": "2022-02-11T13:00:06.049+01:00",
+    "updated_at": "2022-02-11T13:00:06.049+01:00",
+    "previous_address": "9d28cb26c016171b12cb3e4d924a97ee15b08b59022984d10cc281e694c0a824"
   }
 }

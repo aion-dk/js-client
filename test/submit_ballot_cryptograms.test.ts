@@ -4,9 +4,9 @@ import nock = require('nock');
 import {
   expectError,
   resetDeterminism,
-  bulletinBoardHost,
-  OTPProviderHost,
-  voterAuthorizerHost
+  bbHost,
+  vaHost,
+  otpHost
 } from './test_helpers';
 import * as Crypto from '../lib/av_client/aion_crypto';
 
@@ -19,16 +19,11 @@ describe('AVClient#submitBallotCryptograms', () => {
   beforeEach(async () => {
     sandbox = resetDeterminism();
 
-    nock(bulletinBoardHost).get('/dbb/us/api/election_config')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json');
-    nock(voterAuthorizerHost).post('/create_session')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
-    nock(voterAuthorizerHost).post('/request_authorization')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
-    nock(OTPProviderHost).post('/authorize')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
-    nock(bulletinBoardHost).post('/dbb/us/api/registrations')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json');
+    bbHost.get_election_config();
+    vaHost.post_create_session();
+    vaHost.post_request_authorization();
+    otpHost.post_authorize();
+    bbHost.post_registrations();
 
     // DEPRECATED
     // nock(bulletinBoardHost).post('/mobile-api/us/challenge_empty_cryptograms')

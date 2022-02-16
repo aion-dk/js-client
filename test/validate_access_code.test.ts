@@ -6,9 +6,12 @@ import {
   resetDeterminism,
   bulletinBoardHost,
   OTPProviderHost,
-  voterAuthorizerHost
+  voterAuthorizerHost,
+  bbHost,
+  otpHost,
+  vaHost
 } from './test_helpers';
-import { AccessCodeExpired, AccessCodeInvalid, BulletinBoardError, NetworkError, UnsupportedServerReplyError } from '../lib/av_client/errors';
+import { AccessCodeExpired } from '../lib/av_client/errors';
 
 
 describe('AVClient#validateAccessCode', () => {
@@ -19,14 +22,8 @@ describe('AVClient#validateAccessCode', () => {
   beforeEach(async () => {
     sandbox = resetDeterminism();
 
-    expectedNetworkRequests.push(
-      nock(bulletinBoardHost).get('/dbb/us/api/election_config')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_api_us_config.json')
-    );
-    expectedNetworkRequests.push(
-      nock(voterAuthorizerHost).post('/create_session')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json')
-    );
+    expectedNetworkRequests.push(bbHost.get_election_config());
+    expectedNetworkRequests.push(vaHost.post_create_session());
 
     client = new AVClient('http://us-avx:3000/dbb/us/api');
     await client.initialize()
@@ -39,18 +36,9 @@ describe('AVClient#validateAccessCode', () => {
 
   context('OTP services & Bulletin Board work as expected', () => {
     it('resolves without errors', async () => {
-      expectedNetworkRequests.push(
-        nock(OTPProviderHost).post('/authorize')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json')
-      );
-      expectedNetworkRequests.push(
-        nock(voterAuthorizerHost).post('/request_authorization')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
-      );
-      expectedNetworkRequests.push(
-        nock(bulletinBoardHost).post('/dbb/us/api/registrations')
-          .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_api_us_register.json')
-      );
+      expectedNetworkRequests.push(otpHost.post_authorize());
+      expectedNetworkRequests.push(vaHost.post_request_authorization());
+      expectedNetworkRequests.push(bbHost.post_registrations());
 
       // TODO: DEPRECATED DUE TO NEW STRUCTURE?
       // expectedNetworkRequests.push(
