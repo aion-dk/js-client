@@ -131,12 +131,12 @@ export type BoardItemType =
 
 
 interface BaseBoardItem {
-  previous_address: string
-  registered_at: string
   address: string
   author: string
+  parentAddress: string
+  previousAddress: string
+  registeredAt: string
   signature: string
-  parent_address: string
 }
 export interface VoterSessionItem extends BaseBoardItem {
   content: {
@@ -165,7 +165,7 @@ export interface BallotCryptogramItem extends BaseBoardItem {
   address: string
   author: string
   signature: string
-  parent_address: string
+  parentAddress: string
   type: "BallotCryptogramItem"
 }
 
@@ -174,7 +174,7 @@ export interface ItemExpectation {
     [k: string]: any
   }
   type: BoardItemType
-  parent_address: string
+  parentAddress: string
 }
 export interface ClientState {
   electionConfig?: ElectionConfig

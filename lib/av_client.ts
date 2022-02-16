@@ -130,8 +130,8 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
-    const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
-    const voterAuthorizerContextUuid = this.getElectionConfig().services.voter_authorizer.election_context_uuid;
+    const coordinatorURL = this.getElectionConfig().services.voterAuthorizer.url;
+    const voterAuthorizerContextUuid = this.getElectionConfig().services.voterAuthorizer.electionContextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
 
     return coordinator.createSession(opaqueVoterId, email)
@@ -166,8 +166,8 @@ export class AVClient implements IAVClient {
     if(!this.email)
       throw new InvalidStateError('Cannot validate access code. Access code was not requested.');
 
-    const otpProviderUrl = this.getElectionConfig().services.otp_provider.url;
-    const otpProviderElectionContextUuid = this.getElectionConfig().services.otp_provider.election_context_uuid;
+    const otpProviderUrl = this.getElectionConfig().services.otpProvider.url;
+    const otpProviderElectionContextUuid = this.getElectionConfig().services.otpProvider.electionContextUuid;
     const provider = new OTPProvider(otpProviderUrl, otpProviderElectionContextUuid)
 
     this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email);
@@ -183,8 +183,8 @@ export class AVClient implements IAVClient {
 
     this.keyPair = randomKeyPair();
 
-    const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
-    const voterAuthorizerContextUuid = this.getElectionConfig().services.voter_authorizer.election_context_uuid;
+    const coordinatorURL = this.getElectionConfig().services.voterAuthorizer.url;
+    const voterAuthorizerContextUuid = this.getElectionConfig().services.voterAuthorizer.electionContextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
     const servicesBoardAddress = this.getElectionConfig().services.address;
 
@@ -198,6 +198,8 @@ export class AVClient implements IAVClient {
 
     const decoded = jwt.decode(authToken); //, this.getElectionConfig().services.voter_authorizer.public_key);
 
+    console.log('DECODED TOKEN');
+
     if(decoded === null)
       throw new Error('Auth token could not be decoded');
 
@@ -205,17 +207,19 @@ export class AVClient implements IAVClient {
 
     const voterSessionItemExpectation = {
       type: 'VoterSessionItem' as BoardItemType,
-      parent_address: this.getElectionConfig().configAddress,
+      parentAddress: this.getElectionConfig().services.address,
       content: {
         authToken: authToken,
         identifier: decoded['identifier'],
         publicKey: decoded['public_key'],
-        voterGroup: decoded['voter_group_key'],
-        segment1: decoded['segment1']
+        voterGroup: decoded['voter_group_key']
       }
     }
 
     const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
+    console.log('Actual', voterSessionItem);
+
+    console.log('Expected', voterSessionItemExpectation);
 
     validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
 
@@ -297,9 +301,9 @@ export class AVClient implements IAVClient {
     // 1. Create and submit commitment item
     // 2. Keep randomizer(s) throughout the session
     //this.commitment = {}
-
+ 
     const commitmentItem = {
-      parent_address: this.voterSession.address,
+      parentAddress: this.voterSession.address,
       type: "VoterEncryptionCommitmentItem",
       content: {
         commitment: commitment.result
@@ -317,7 +321,7 @@ export class AVClient implements IAVClient {
     const finalizedCryptograms = finalizeBallotCryptograms(this.clientEnvelopes, this.serverEnvelopes)
      
     const ballotCryptogramsItem = {
-      parent_address: this.boardCommitment.address,
+      parentAddress: this.boardCommitment.address,
       type: "BallotCryptogramsItem",
       content: {
         cryptograms: finalizedCryptograms,
@@ -362,7 +366,7 @@ export class AVClient implements IAVClient {
           throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
         }
         const castRequestItem = {
-            parent_address: this.ballotCryptogramItem.address,
+            parentAddress: this.ballotCryptogramItem.address,
             type: 'CastRequestItem',
             content: {}
         }
@@ -370,7 +374,7 @@ export class AVClient implements IAVClient {
         const signedPayload = signPayload(castRequestItem, this.privateKey())
         
         const receipt = (await this.bulletinBoard.submitCastRequest(signedPayload)).data
-        return receipt.cast_request.address
+        return receipt.castRequest.address
       }
 
   /**

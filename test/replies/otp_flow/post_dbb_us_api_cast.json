@@ -1,18 +1,13 @@
 {
-  "cast_request": {
-    "id": 38,
-    "election_id": 1,
-    "address": "e8a22a434bd97baaee045c4bc0d8bb6e4dfe86aae288a35f9105b2d5e6061809",
+  "castRequest": {
+    "address": "0323af268dc3d5cb7037dd6cffe425368b77f505e18a4390d9713ca6b80f8a3b",
+    "author": "02f99e41e823d5f18d020b76863e1129aaf6f894bc64636c01a54341c4b822daee",
+    "electionId": 1,
+    "parentAddress": "5a584b7b0a671c8f3f5088cdb3e01c3551d4ec43142955358b48667514029d25",
+    "previousAddress": "5a584b7b0a671c8f3f5088cdb3e01c3551d4ec43142955358b48667514029d25",
+    "registeredAt": "2022-02-16T08:17:06.766Z",
+    "signature": "bfcf3161b733553829a6fc5e5118115f75cc59be02b4998832a0f061785aea1b,11fb5735b91c0bcc1d3944583753cbbe34ad071f161e3dcbe0b837a4cf0fb385",
     "type": "CastRequestItem",
-    "content": {},
-    "author": "0219814530e73d8a3ca9b58599f6916961aa55177d0b044339a36d74f761f6051f",
-    "parent_address": "4cd8cc9c9d6a3f1037d4c2e056ac47131b8b92ce84dfbb1feaa43bf5ca1cd3db",
-    "registered_at": "2022-02-11T13:00:06.121+01:00",
-    "signature": "1ae95e33fddfceb914e7bfa34ff119d91079a8862ec2e61129de2ee49d8a847c,337159e60698ec5cc69af1329da0d25139209b9dee3df6718a2a2aeea6f301de",
-    "attachment": null,
-    "resource_id": null,
-    "created_at": "2022-02-11T13:00:06.124+01:00",
-    "updated_at": "2022-02-11T13:00:06.124+01:00",
-    "previous_address": "4cd8cc9c9d6a3f1037d4c2e056ac47131b8b92ce84dfbb1feaa43bf5ca1cd3db"
+    "content": {}
   }
 }

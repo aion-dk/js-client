@@ -1,22 +1,19 @@
 {
-  "id": 34,
-  "election_id": 1,
-  "address": "0505b8510e29afc9b04cac944c70b6d05d5069ad24cf6b322dcb13ef1d41f156",
-  "type": "VoterSessionItem",
-  "content": {
-    "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiYTM2OTUzYmNhZjRiZDA3MjEwNmZjNjcwMjIzYzNiOTYyZDAyMTc3MiIsInB1YmxpY19rZXkiOiIwMjE5ODE0NTMwZTczZDhhM2NhOWI1ODU5OWY2OTE2OTYxYWE1NTE3N2QwYjA0NDMzOWEzNmQ3NGY3NjFmNjA1MWYiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiIyYzU3ZGJjY2NkNDdlYzkxZTNkYzY3MzFlZDAzMjgxYTI5OWMzMzNjIiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0NDU4MDgwNSwiZXhwIjoxNjQ0NTgyNjA1fQ.e5MP2hKKiq4CzJgGCCBOJ4gWHaX72nltlUkhidSxCE-WPKzJp3WZARObWJRRQQWRI21iTFWy7790Fy93IhYz_A",
-    "identifier": "a36953bcaf4bd072106fc670223c3b962d021772",
-    "voterGroup": "4",
-    "publicKey": "0219814530e73d8a3ca9b58599f6916961aa55177d0b044339a36d74f761f6051f",
-    "segment1": "4"
-  },
-  "author": "0210c6033e82afb25b0b2dd9fa2f310c6b095640b0c92d7e21a1495222b3833abc",
-  "parent_address": "b2ced8cee62f50ec444f73b4336b881c58485323fb9ccfb840d60bf778e4d407",
-  "registered_at": "2022-02-11T12:00:05.363Z",
-  "signature": "1fb41fd2b7f218c00fab955232f1546b5813e3898b747d6117fa37cafd1b9b08,5e20267771932590d5ef64288053f95246454606314dc531e43a926b0a2f6500",
-  "attachment": null,
-  "resource_id": null,
-  "created_at": "2022-02-11T13:00:05.369+01:00",
-  "updated_at": "2022-02-11T13:00:05.369+01:00",
-  "previous_address": "801071cbefb9eba398aaef3fb776e657069fe933404537344d0f3ce2db9ce57e"
+  "voterSession": {
+    "address": "a8d343ae0dd4997e61e72ffb49e9ac4584d5d0b01fb32baeff0d7052191bc956",
+    "author": "021c154b99952eb635de3898d590f729f4bbe2ef5d80aece3b0737d3ba2d451141",
+    "electionId": 1,
+    "parentAddress": "8edbc294d724e3571f3bcbbbfe9c6acf639c3d773d00137bec5e5f9a5c685c1d",
+    "previousAddress": "fbd227758d27ea21df97ed22afc857034655f3db02767dac4fb71c09e28ebf5c",
+    "registeredAt": "2022-02-16T08:17:06.328Z",
+    "signature": "57d1bb731c178e1951345a494bd666686c3fbae7791b1c7bb0d4eb3608331123,e0f60f877a8b2643f48ed6009020ac44ed09c824c6d79f0a53368c58b3712a0b",
+    "type": "VoterSessionItem",
+    "attachment": null,
+    "content": {
+      "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiYzQ0Y2NjMGRhYWU4ZmE5NGQ3MjQ3YjQzYmEzMzVmNDBlZTlhNDA5NyIsInB1YmxpY19rZXkiOiIwMmY5OWU0MWU4MjNkNWYxOGQwMjBiNzY4NjNlMTEyOWFhZjZmODk0YmM2NDYzNmMwMWE1NDM0MWM0YjgyMmRhZWUiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiIxZTdiOTg4MTUyMzBhYzdiZTk2ODllYTNmZmUwMWIyY2RkOTY2YmEzIiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0NDk5OTQyNiwiZXhwIjoxNjQ1MDAxMjI2fQ.5U3vqitUKcECQRYljsp1cOD61dIUfLGW_2tO8A6VzRBB3Qv1TMFfsvN7DEpYS_FMiUgcn61H5PQyfPozNWO1kw",
+      "identifier": "c44ccc0daae8fa94d7247b43ba335f40ee9a4097",
+      "publicKey": "02f99e41e823d5f18d020b76863e1129aaf6f894bc64636c01a54341c4b822daee",
+      "voterGroup": "4"
+    }
+  }
 }

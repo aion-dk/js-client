@@ -53,28 +53,30 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
     throw new Error(`BoardItem did not match expected type '${expectations.type}'`);
   }
 
-  if(expectations.parent_address != item.parent_address) {
-    throw new Error(`BoardItem did not match expected parent address ${expectations.parent_address}`);
+  if(expectations.parentAddress != item.parentAddress) {
+    throw new Error(`BoardItem did not match expected parent address ${expectations.parentAddress}`);
   }
 
   const addressHashSource = uniformer.formString({
     type: item.type,
     content: item.content,
-    parentAddress: item.parent_address,
-    previousAddress: item.previous_address,
-    registeredAt: item.registered_at
+    parentAddress: item.parentAddress,
+    previousAddress: item.previousAddress,
+    registeredAt: item.registeredAt
   });
 
   const expectedItemAddress = Crypto.hashString(addressHashSource);
 
   if(item.address != expectedItemAddress) {
+    console.log('expected', expectedItemAddress);
+    console.log('actual', item.address);
     throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
   }
 
   const signedPayload = uniformer.formString({
     content: item.content,
     type: item.type,
-    parent_address: item.parent_address
+    parentAddress: item.parentAddress
   });
 
   // console.log('signedPayload', signedPayload);

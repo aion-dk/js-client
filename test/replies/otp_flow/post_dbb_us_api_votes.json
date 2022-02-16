@@ -1,27 +1,22 @@
 {
   "vote": {
-    "id": 37,
-    "election_id": 1,
-    "address": "4cd8cc9c9d6a3f1037d4c2e056ac47131b8b92ce84dfbb1feaa43bf5ca1cd3db",
+    "address": "5a584b7b0a671c8f3f5088cdb3e01c3551d4ec43142955358b48667514029d25",
+    "author": "02f99e41e823d5f18d020b76863e1129aaf6f894bc64636c01a54341c4b822daee",
+    "electionId": 1,
+    "parentAddress": "baf0983e8143c8539fc9e3c14b4bcd4f5af4d25c57567f9ea5dff23fe78881d0",
+    "previousAddress": "baf0983e8143c8539fc9e3c14b4bcd4f5af4d25c57567f9ea5dff23fe78881d0",
+    "registeredAt": "2022-02-16T08:17:06.730Z",
+    "signature": "15ce95b944543ffdfa4c40d6c4c966fd1d066374530a2694f2486c2cb31e9a8c,4712b17e52ad10893aa0f8986fb9c686fc5b0b26f5e45df3090c5b7af562de89",
     "type": "BallotCryptogramsItem",
     "content": {
       "cryptograms": {
         "f7a04384-1458-5911-af38-7e08a46136e7": [
-          "0365d0cc1e0e3b6dee1119eec77c47ae653b85266de3547d88b2ba6170d000ec19,029ac034c5dc2325b9a28411f06b6af9f54aa8b0cecc3b3980ab1a514a9f2d0db6"
+          "02568cc83e2a562606575dccedf2bd644fe4537d43fcd5d414f76637d1e2a90f9a,025128ee0f46abcfb486c5ef3a9f556d796b4eee1146dca08915493674198b7712"
         ],
         "026ca870-537e-57b2-b313-9bb5d9fbe78b": [
-          "02b02b1433d2150e5bb112cf511caa664fb88fc24e332f2bb402d0bf9d2b301df2,02175d8314f1ec0808c6e0297b65cd20de808fbcdeb184444eacb4f4c7bb7d7ae5"
+          "0372fb4eb0b9f7030cbc5a273f03784cd78a33512ac021539971ce91cd3ab9d122,020fb0258e2a3f6d898855117695c5770a89c236be3081ff511989ec7943d24402"
         ]
       }
-    },
-    "author": "0219814530e73d8a3ca9b58599f6916961aa55177d0b044339a36d74f761f6051f",
-    "parent_address": "9d28cb26c016171b12cb3e4d924a97ee15b08b59022984d10cc281e694c0a824",
-    "registered_at": "2022-02-11T13:00:06.045+01:00",
-    "signature": "156d2f07b0cd2a37ded219cb9db899ba638c1912bd1d2d92da091210153ec576,dd385cc717fe0788f8e2efc4fa6172d2dd62c119235b96ea70828a46dca86715",
-    "attachment": null,
-    "resource_id": null,
-    "created_at": "2022-02-11T13:00:06.049+01:00",
-    "updated_at": "2022-02-11T13:00:06.049+01:00",
-    "previous_address": "9d28cb26c016171b12cb3e4d924a97ee15b08b59022984d10cc281e694c0a824"
+    }
   }
 }
