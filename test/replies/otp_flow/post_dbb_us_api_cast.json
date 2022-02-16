@@ -1,12 +1,12 @@
 {
   "castRequest": {
-    "address": "470d978715eac2d539d2bba3587bce24dbc4d0af18d5eb8f5f1fe6e28f0f5fa4",
-    "author": "03bdd2d1196bb4faf7caf527685dfd54f85665e4a93697a438429fe1f577350148",
+    "address": "e45c83977bd50839e8e8c1d2589c5c99df7b0f1a55df7fc818b036ea422f594d",
+    "author": "0203d035eb45ad324705736c2e208ba957f9f6de7f71ca09eaec8a4cfb4c5afadf",
     "electionId": 1,
-    "parentAddress": "1bf3e061524753afa1303b5e3940acfc28c585c523206e5aba7f86247f97eecf",
-    "previousAddress": "1bf3e061524753afa1303b5e3940acfc28c585c523206e5aba7f86247f97eecf",
-    "registeredAt": "2022-02-16T08:29:19.458Z",
-    "signature": "9b49db523597d7bf30b0cdbd2bb12b5864c19a8047526542eb2376716fc47f72,985a8d6e87e629aa7d18021c7de3ccd409cc7e9ba039682322096edcf951beac",
+    "parentAddress": "31ffa89288023564a3863d44f2fa9ed033134dde75942f9ba0d6e2eaa4edb5f7",
+    "previousAddress": "31ffa89288023564a3863d44f2fa9ed033134dde75942f9ba0d6e2eaa4edb5f7",
+    "registeredAt": "2022-02-16T10:01:18.701Z",
+    "signature": "ce7b16aef32b3fcf5ebd46d69153417b5fe8cc73a849afd8a9e50dd3b232b103,ec994afd8adc101a1978f2e7c8fe805f86ce54a97fd8bddaf2a39cb71748a46f",
     "type": "CastRequestItem",
     "content": {}
   }

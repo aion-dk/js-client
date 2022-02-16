@@ -77,10 +77,6 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
     parentAddress: item.parentAddress
   });
 
-  // console.log('signedPayload', signedPayload);
-  // console.log('dbb public key', dbbPublicKey);
-  // console.log('item signature', item.signature);
-
   if(!Crypto.verifySchnorrSignature(item.signature, signedPayload, dbbPublicKey)) {
     throw new Error('Board signature verification failed');
   }

@@ -1,18 +1,18 @@
 {
   "voterSession": {
-    "address": "bd969ad39aec4b1a90f93249c4ead8f05d5ba0c38d576df0e8d8c8e248ff3037",
-    "author": "021c154b99952eb635de3898d590f729f4bbe2ef5d80aece3b0737d3ba2d451141",
+    "address": "37111c4e93d66d6011bb551b53c83d096059ae51a93e23886fbda61773d5bfb9",
+    "author": "02fd01124337668ff32acc6c1fca36ad3dcdff56fc9eff41c106074113b0fd5800",
     "electionId": 1,
-    "parentAddress": "8edbc294d724e3571f3bcbbbfe9c6acf639c3d773d00137bec5e5f9a5c685c1d",
-    "previousAddress": "0323af268dc3d5cb7037dd6cffe425368b77f505e18a4390d9713ca6b80f8a3b",
-    "registeredAt": "2022-02-16T08:29:19.009Z",
-    "signature": "a58b42b151dc5c1eace38587a4f37b1367488373466200cc80024107c45008f7,47c9fac9778e3ad30733f7bc4c3a7faa41d8e12bccc4a36fa7eef337eb738358",
+    "parentAddress": "3188db445b0189298bf33a7298cb72c9fe28697501c15c78fe53694d1b60d252",
+    "previousAddress": "b5d74ecbadc504a1e63bfddfb89de855d76d727692292807ec17c78f32e7074a",
+    "registeredAt": "2022-02-16T10:01:18.198Z",
+    "signature": "f7e2f4aed692d83ecff92dcb513df02a60a583b49d4d6d83fbb94c468b49fdac,9b5bc6f4f1fa48fb678cb5d4ccb525c972bdbbe6443d3710d540c13c9be20290",
     "type": "VoterSessionItem",
     "attachment": null,
     "content": {
-      "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiYzQ0Y2NjMGRhYWU4ZmE5NGQ3MjQ3YjQzYmEzMzVmNDBlZTlhNDA5NyIsInB1YmxpY19rZXkiOiIwM2JkZDJkMTE5NmJiNGZhZjdjYWY1Mjc2ODVkZmQ1NGY4NTY2NWU0YTkzNjk3YTQzODQyOWZlMWY1NzczNTAxNDgiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiI1NmQxOTQ4MzE3ZTVhZGE2MDkyNjA3MjliM2Y2NTNiMmQ1YWM5YjAwIiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0NTAwMDE1OCwiZXhwIjoxNjQ1MDAxOTU4fQ.gfoWod-W0NAmB6_-72d2d6KlwjQtiPulgD1xpY-REFxXN3BvocGsrMn1JuNqgn9G3fzqortPLTPAtS7ofQ6nwA",
-      "identifier": "c44ccc0daae8fa94d7247b43ba335f40ee9a4097",
-      "publicKey": "03bdd2d1196bb4faf7caf527685dfd54f85665e4a93697a438429fe1f577350148",
+      "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiMzZmMzJiNWE3ZmIyYjRmNDE0ZjkyNzU3MDIwNjFhNGIzNmU3NTY1ZSIsInB1YmxpY19rZXkiOiIwMjAzZDAzNWViNDVhZDMyNDcwNTczNmMyZTIwOGJhOTU3ZjlmNmRlN2Y3MWNhMDllYWVjOGE0Y2ZiNGM1YWZhZGYiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiJlOTEwYzgwZjQwZGE4MjhhMzIwNTg5MjkzMzk4MjdkOWJlYThkMWZlIiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0NTAwNTY3OCwiZXhwIjoxNjQ1MDA3NDc4fQ.m0JTiWeyEfgzas3cORhNEjwigAU_anvG2elX_QnyuNIRzfjPwiyvcwe5_S7UM7J-bCZ13QnRNjFnt56TI8IRig",
+      "identifier": "36f32b5a7fb2b4f414f9275702061a4b36e7565e",
+      "publicKey": "0203d035eb45ad324705736c2e208ba957f9f6de7f71ca09eaec8a4cfb4c5afadf",
       "voterGroup": "4"
     }
   }
