@@ -12,12 +12,12 @@ describe('election configuration validation', () => {
 
   beforeEach(async () => {
     client = new AVClient('http://nothing.local');
-    electionConfig = readJSON('./replies/otp_flow/get_dbb_us_api_election_config.json');
+    electionConfig = readJSON('./replies/otp_flow/get_dbb_us_api_election_config.json').electionConfig;
   });
 
   context('OTP provider URL is empty', () => {
     it('fails with an error', async () => {
-      electionConfig.services.otp_provider.url = '';
+      electionConfig.services.otpProvider.url = '';
 
       await expectError(
         client.initialize(electionConfig),
@@ -29,7 +29,7 @@ describe('election configuration validation', () => {
 
   context('Voter Authorizer URL is empty', () => {
     it('fails with an error', async () => {
-      electionConfig.services.voter_authorizer.url = '';
+      electionConfig.services.voterAuthorizer.url = '';
 
       await expectError(
         client.initialize(electionConfig),

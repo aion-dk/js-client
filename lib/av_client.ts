@@ -196,14 +196,10 @@ export class AVClient implements IAVClient {
 
     const { authToken } = authorizationResponse.data;
 
-    const decoded = jwt.decode(authToken); //, this.getElectionConfig().services.voter_authorizer.public_key);
-
-    console.log('DECODED TOKEN');
+    const decoded = jwt.decode(authToken); // TODO: Verify against dbb pubkey: this.getElectionConfig().services.voterAuthorizer.public_key);
 
     if(decoded === null)
       throw new Error('Auth token could not be decoded');
-
-    //console.log('JWT decoded', test);
 
     const voterSessionItemExpectation = {
       type: 'VoterSessionItem' as BoardItemType,
@@ -218,7 +214,6 @@ export class AVClient implements IAVClient {
 
     const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
     // console.log('Actual', voterSessionItem);
-
     // console.log('Expected', voterSessionItemExpectation);
 
     validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
