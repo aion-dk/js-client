@@ -171,10 +171,6 @@ export interface BallotCryptogramItem extends BaseBoardItem {
   content: {
     cryptograms: ContestMap<string[]>
   } 
-  address: string
-  author: string
-  signature: string
-  parentAddress: string
   type: "BallotCryptogramItem"
 }
 
