@@ -118,10 +118,8 @@ export class AVClient implements IAVClient {
     }
 
     if (keyPair) {
-      console.log('Using injected keypair');
       this.keyPair = keyPair;
     } else {
-      console.log('Generating random keypair');
       this.keyPair = randomKeyPair();
     }
   }
@@ -329,7 +327,7 @@ export class AVClient implements IAVClient {
     
     // Submit ballot
     const finalizedCryptograms = finalizeBallotCryptograms(this.clientEnvelopes, this.serverEnvelopes)
-     
+
     const ballotCryptogramsItem = {
       parentAddress: this.boardCommitment.address,
       type: "BallotCryptogramsItem",
@@ -356,7 +354,7 @@ export class AVClient implements IAVClient {
       }
     }
 
-    validatePayload(ballotCryptogramsItemResponse, ballotCryptogramsItemExpectation, this.getDbbPublicKey())
+    validatePayload(ballotCryptogramsItemResponse, ballotCryptogramsItemExpectation)
 
     this.ballotCryptogramItem = ballotCryptogramsItemResponse
 

@@ -10,16 +10,16 @@ import {
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 
-const USE_MOCK = false;
+const USE_MOCK = true;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;
   let expectedNetworkRequests : any[] = [];
 
   beforeEach(() => {
-    if(USE_MOCK) {
-      sandbox = resetDeterminism();
+    sandbox = resetDeterminism();
 
+    if(USE_MOCK) {
       expectedNetworkRequests = [
         bbHost.get_election_config(),
         vaHost.post_create_session(),
@@ -40,7 +40,7 @@ describe('entire voter flow using OTP authorization', () => {
     }
   });
 
-  it.only('returns a receipt', async () => {
+  it('returns a receipt', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       const client = new AVClient('http://us-avx:3000/dbb/us/api');
