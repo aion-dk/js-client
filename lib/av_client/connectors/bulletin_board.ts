@@ -58,6 +58,10 @@ export class BulletinBoard {
     });
   }
 
+  getVotingTrack(verificationStartAddress: string): Promise<AxiosResponse> {
+    return this.backend.get(`voting_track?verificationTrackAddress=${verificationStartAddress}`)
+  }
+
   submitCommitment(signedCommit): Promise<AxiosResponse> {
     return this.backend.post('commitments', signedCommit, {
       headers: {

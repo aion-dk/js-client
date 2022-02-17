@@ -332,7 +332,9 @@ export class AVClient implements IAVClient {
       proofs: sealEnvelopes(this.clientEnvelopes)
     };
 
-    const ballotCryptogramsItemResponse = (await this.bulletinBoard.submitVotes(itemWithProofs)).data.vote;
+    const response = (await this.bulletinBoard.submitVotes(itemWithProofs)).data
+    const ballotCryptogramsItemResponse = response.vote;
+    const verificationTrackStartItem = response.verification
 
     const ballotCryptogramsItemExpectation = {
       parentAddress: boardCommitment.address,
@@ -346,7 +348,7 @@ export class AVClient implements IAVClient {
 
     this.ballotCryptogramItem = ballotCryptogramsItemResponse
 
-    return 'checking code/verification track start address';
+    return verificationTrackStartItem.address;
   }
 
     /**
