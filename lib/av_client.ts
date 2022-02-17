@@ -41,6 +41,7 @@ import {
 import * as sjclLib from './av_client/sjcl';
 import { sealEnvelopes, signPayload, validatePayload } from './av_client/sign';
 import { finalizeBallotCryptograms } from './av_client/actions/finalize_ballot_cryptograms';
+import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -297,46 +298,19 @@ export class AVClient implements IAVClient {
       envelopes,
     } = constructBallotCryptograms(state, cvr);
 
+    this.clientEnvelopes = envelopes;
     // 1. Create and submit commitment item
     // 2. Keep randomizer(s) throughout the session
     //this.commitment = {}
  
-    const commitmentItem = {
-      parentAddress: this.voterSession.address,
-      type: "VoterEncryptionCommitmentItem",
-      content: {
-        commitment: commitment.result
-      }
-    };
-
-    this.clientEnvelopes = envelopes;
-
-    const signedCommitmentItem = signPayload(commitmentItem, this.privateKey());
-    const response = await this.bulletinBoard.submitCommitment(signedCommitmentItem);
-
-    const voterCommitment: VoterCommitmentItem = response.data.voterCommitment;
-    const boardCommitment = response.data.boardCommitment;
-    this.serverEnvelopes = response.data.envelopes;
-
-    // TODO; Cannot validate board commitment without the client commitment item
-    const voterCommitmentItemExpectation = {
-      parentAddress: this.voterSession.address,
-      type: "VoterEncryptionCommitmentItem" as BoardItemType,
-      content: {
-        commitment: commitment.result
-      }
-    }
-
-    validatePayload(voterCommitment, voterCommitmentItemExpectation)
-    
-    const boardCommitmentItemExpectation = {
-      parentAddress: voterCommitment.address,
-      type: "BoardEncryptionCommitmentItem" as BoardItemType,
-    }
-
-    validatePayload(boardCommitment, boardCommitmentItemExpectation, this.getDbbPublicKey())
+    const {
+      voterCommitment,     // TODO: Required when spoiling
+      boardCommitment,
+      serverEnvelopes
+    } = await submitVoterCommitment(this.bulletinBoard, this.voterSession.address, commitment.result, this.privateKey(), this.getDbbPublicKey());
 
     this.boardCommitment = boardCommitment;
+    this.serverEnvelopes = serverEnvelopes;
 
     
     // Submit ballot
