@@ -10,7 +10,7 @@ import {
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;
@@ -40,11 +40,14 @@ describe('entire voter flow using OTP authorization', () => {
     }
   });
 
-  it('returns a receipt', async () => {
+  it.only('returns a receipt', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       const client = new AVClient('http://us-avx:3000/dbb/us/api');
-      await client.initialize()
+      await client.initialize(undefined, {
+        privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
+        publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
+      });
 
       const voterId = 'A00000000006'
       const voterEmail = 'mvptuser@yahoo.com'

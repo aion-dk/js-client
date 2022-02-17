@@ -1,6 +1,8 @@
 import { expect } from 'chai';
 import Uniformer from '../lib/util/uniformer';
 import * as Crypto from '../lib/av_client/aion_crypto';
+import { AVClient } from '../lib/av_client';
+import { randomKeyPair } from '../lib//av_client/generate_key_pair';
 
 describe('Uniformer', () => {
   context('when object is a Hash', () => {
@@ -119,5 +121,13 @@ describe('Uniformer', () => {
 
     const uniformed = new Uniformer().formString(sample);
     //console.log('computed address', Crypto.hashString(uniformed));
-  })
+  });
+
+  // it.only('instantiate AVCLIENT', () => {
+  //   console.log(randomKeyPair());
+  //   console.log(randomKeyPair());
+
+  //   //const uniformed = new Uniformer().formString(sample);
+  //   //console.log('computed address', Crypto.hashString(uniformed));
+  // })
 });

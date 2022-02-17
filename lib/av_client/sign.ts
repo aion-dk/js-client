@@ -40,12 +40,15 @@ export const signPayload = (obj: any, privateKey: string) => {
 }
 
 export const validatePayload = (item: BoardItem, expectations: ItemExpectation, dbbPublicKey: string) => {
+  console.log('Validating item ', item.type);
   const uniformer = new Uniformer();
 
   const expectedContent = uniformer.formString(expectations.content);
   const actualContent = uniformer.formString(item.content);
 
   if(expectedContent != actualContent) {
+    console.log('actual', item.content);
+    console.log('expectations', expectations.content);
     throw new Error('Item payload failed sanity check. Received item did not match expected');
   }
 
@@ -71,6 +74,8 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
     throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
   }
 
+  console.log('item.content', item.content);
+
   const signedPayload = uniformer.formString({
     content: item.content,
     type: item.type,
@@ -78,6 +83,13 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
   });
 
   if(!Crypto.verifySchnorrSignature(item.signature, signedPayload, dbbPublicKey)) {
+    console.log('item.signature', item.signature);
+    console.log('pub key', dbbPublicKey);
+    console.log('signedPayload', JSON.stringify({
+      content: item.content,
+      type: item.type,
+      parentAddress: item.parentAddress
+    }, null, 2));
     throw new Error('Board signature verification failed');
   }
 }

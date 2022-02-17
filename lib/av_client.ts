@@ -102,18 +102,28 @@ export class AVClient implements IAVClient {
    * If no config is provided, it fetches one from the backend.
    *
    * @param electionConfig Allows injection of an election configuration for testing purposes
+   * @param keyPair Allows injection of a keypair to support automatic testing
    * @returns Returns undefined if succeeded or throws an error
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
+  async initialize(electionConfig: ElectionConfig | undefined, keyPair: KeyPair): Promise<void>
   async initialize(electionConfig: ElectionConfig): Promise<void>
   async initialize(): Promise<void>
-  public async initialize(electionConfig?: ElectionConfig): Promise<void> {
-    if (!electionConfig) {
-      electionConfig = await fetchElectionConfig(this.bulletinBoard);
+  public async initialize(electionConfig?: ElectionConfig, keyPair?: KeyPair): Promise<void> {
+    if (electionConfig) {
+      validateElectionConfig(electionConfig);
+      this.electionConfig = electionConfig;
+    } else {
+      this.electionConfig = await fetchElectionConfig(this.bulletinBoard);
     }
 
-    validateElectionConfig(electionConfig);
-    this.electionConfig = electionConfig;
+    if (keyPair) {
+      console.log('Using injected keypair');
+      this.keyPair = keyPair;
+    } else {
+      console.log('Generating random keypair');
+      this.keyPair = randomKeyPair();
+    }
   }
 
   /**
@@ -180,8 +190,6 @@ export class AVClient implements IAVClient {
   public async createVoterRegistration(): Promise<void> {
     if(!this.identityConfirmationToken)
       throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
-
-    this.keyPair = randomKeyPair();
 
     const coordinatorURL = this.getElectionConfig().services.voterAuthorizer.url;
     const voterAuthorizerContextUuid = this.getElectionConfig().services.voterAuthorizer.electionContextUuid;
@@ -289,7 +297,7 @@ export class AVClient implements IAVClient {
 
     const {
       commitment,
-      envelopeRandomizers,
+      envelopeRandomizers, // TODO: Required when spoiling
       envelopes,
     } = constructBallotCryptograms(state, cvr);
 
@@ -309,6 +317,13 @@ export class AVClient implements IAVClient {
 
     const signedCommitmentItem = signPayload(commitmentItem, this.privateKey());
     const response = await this.bulletinBoard.submitCommitment(signedCommitmentItem);
+
+    // TODO; Cannot validate board commitment without the client commitment item
+    // const commitmentItemExpectation = {
+    //   type: "BoardEncryptionCommitmentItem",
+    // }
+    //validatePayload(signedCommitmentItem, commitmentItemExpectation, this.getDbbPublicKey())
+
     this.boardCommitment = response.data.commitment;
     this.serverEnvelopes = response.data.envelopes;
     
@@ -331,8 +346,19 @@ export class AVClient implements IAVClient {
       proofs: sealEnvelopes(this.clientEnvelopes)
     };
 
-    const submitVoteResponse = (await this.bulletinBoard.submitVotes(itemWithProofs)).data;
-    this.ballotCryptogramItem = submitVoteResponse.vote
+    const ballotCryptogramsItemResponse = (await this.bulletinBoard.submitVotes(itemWithProofs)).data.vote;
+
+    const ballotCryptogramsItemExpectation = {
+      parentAddress: this.boardCommitment.address,
+      type: "BallotCryptogramsItem" as BoardItemType,
+      content: {
+        cryptograms: finalizedCryptograms,
+      }
+    }
+
+    validatePayload(ballotCryptogramsItemResponse, ballotCryptogramsItemExpectation, this.getDbbPublicKey())
+
+    this.ballotCryptogramItem = ballotCryptogramsItemResponse
 
     return 'checking code/verification track start address';
   }
