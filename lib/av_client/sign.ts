@@ -42,11 +42,8 @@ export const signPayload = (obj: any, privateKey: string) => {
 export const validatePayload = (item: BoardItem, expectations: ItemExpectation, signaturePublicKey?: string) => {
   const uniformer = new Uniformer();
 
-  const expectedContent = uniformer.formString(expectations.content);
-  const actualContent = uniformer.formString(item.content);
-
-  if(expectedContent != actualContent) {
-    throw new Error('Item payload failed sanity check. Received item did not match expected');
+  if(expectations.content !== undefined) {
+    verifyContent(item.content, expectations.content)
   }
 
   if(expectations.type != item.type) {
@@ -57,19 +54,7 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
     throw new Error(`BoardItem did not match expected parent address ${expectations.parentAddress}`);
   }
 
-  const addressHashSource = uniformer.formString({
-    type: item.type,
-    content: item.content,
-    parentAddress: item.parentAddress,
-    previousAddress: item.previousAddress,
-    registeredAt: item.registeredAt
-  });
-
-  const expectedItemAddress = Crypto.hashString(addressHashSource);
-
-  if(item.address != expectedItemAddress) {
-    throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
-  }
+  verifyAddress(item);
 
   if(signaturePublicKey !== undefined) {
     verifySignature(item, signaturePublicKey);
@@ -96,5 +81,34 @@ const verifySignature = (item: BoardItem, signaturePublicKey: string) => {
 
   if(!Crypto.verifySchnorrSignature(item.signature, signedPayload, signaturePublicKey)) {
     throw new Error('Board signature verification failed');
+  }
+};
+
+const verifyContent = (actual: Record<string, any>, expectations: Record<string, any>) => {
+  const uniformer = new Uniformer();
+
+  const expectedContent = uniformer.formString(expectations);
+  const actualContent = uniformer.formString(actual);
+
+  if(expectedContent != actualContent) {
+    throw new Error('Item payload failed sanity check. Received item did not match expected');
+  }
+};
+
+const verifyAddress = (item: BoardItem) => {
+  const uniformer = new Uniformer();
+
+  const addressHashSource = uniformer.formString({
+    type: item.type,
+    content: item.content,
+    parentAddress: item.parentAddress,
+    previousAddress: item.previousAddress,
+    registeredAt: item.registeredAt
+  });
+
+  const expectedItemAddress = Crypto.hashString(addressHashSource);
+
+  if(item.address != expectedItemAddress) {
+    throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
   }
 }

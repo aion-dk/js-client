@@ -1,17 +1,17 @@
 {
   "electionConfig": {
-    "dbbPublicKey": "035e979fc24b45b781164d4127a2284d1478b8a5a85cb6c7684127beec6cde6835",
-    "encryptionKey": "031c50f2e04d38e1a89e7e5e7a3c9b6233436ce961ae5b47810b4b6f5296583034",
+    "dbbPublicKey": "024fef1695a604590fc8f793e4cbced118ebe952e3df71e3f3560cff51a91c7104",
+    "encryptionKey": "028bfdeb71e0d26c364499d7dcf27741e1d5bf978d113f6e9f3d088b8c3da407f7",
     "services": {
-      "address": "3a5d4d5493b8c66bea90866ad51732f0169cb2be9a869895c513b05027106f94",
+      "address": "d4ca4132ab2700656e681753f8c7176f5a0fb07c7c31a3fcfd70bf6e5efe4bf8",
       "voterAuthorizer": {
-        "electionContextUuid": "523cb19b-4598-4666-bc74-fa4d007cad1f",
-        "publicKey": "023ad2a6043f7f0dee5340dbd48310a93cad231009b740c86b8b622db061612f51",
+        "electionContextUuid": "6de0d4ea-1cc6-41fa-ace2-c1532d3ec0f8",
+        "publicKey": "03623a09ff13719c7e9ed2634350ce1927fed35cfa9b1e9638039de16fbccc46cb",
         "url": "http://authorizer.local.assemblyvoting.net:1234/"
       },
       "otpProvider": {
-        "electionContextUuid": "78fbb48e-095d-4cb2-b3b3-0589707e816f",
-        "publicKey": "03430a4772acd9a8c774bdf29327336a25f3f2c9052bed68a2ebdde2a1d00746b6",
+        "electionContextUuid": "0499d1fc-4d0d-43fd-a82b-8f120b38fa4e",
+        "publicKey": "03de2223daf5d207e093afe493b2a151d8e82808a24aa9690539dc6160f7e4fd70",
         "url": "http://otp-provider.local.assemblyvoting.net:1111/"
       }
     },

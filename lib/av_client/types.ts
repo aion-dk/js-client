@@ -121,6 +121,7 @@ export interface Election {
 
 export type BoardItem =
   VoterSessionItem |
+  VoterCommitmentItem |
   BoardCommitmentItem |
   BallotCryptogramItem
 
@@ -158,6 +159,14 @@ export interface BoardCommitmentItem extends BaseBoardItem {
   type: "BoardCommitmentItem"
 }
 
+export interface VoterCommitmentItem extends BaseBoardItem {
+  content: {
+    commitment: string
+  } 
+
+  type: "VoterCommitmentItem"
+}
+
 export interface BallotCryptogramItem extends BaseBoardItem {
   content: {
     cryptograms: ContestMap<string[]>
@@ -170,7 +179,7 @@ export interface BallotCryptogramItem extends BaseBoardItem {
 }
 
 export interface ItemExpectation {
-  content: {
+  content?: {
     [k: string]: any
   }
   type: BoardItemType

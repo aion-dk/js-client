@@ -3,7 +3,7 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
-import { KeyPair, CastVoteRecord, Affidavit, BoardItemType } from './av_client/types';
+import { KeyPair, CastVoteRecord, Affidavit, BoardItemType, VoterCommitmentItem } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import * as jwt from 'jsonwebtoken';
 
@@ -219,8 +219,6 @@ export class AVClient implements IAVClient {
     }
 
     const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
-    // console.log('Actual', voterSessionItem);
-    // console.log('Expected', voterSessionItemExpectation);
 
     validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
 
@@ -316,14 +314,30 @@ export class AVClient implements IAVClient {
     const signedCommitmentItem = signPayload(commitmentItem, this.privateKey());
     const response = await this.bulletinBoard.submitCommitment(signedCommitmentItem);
 
-    // TODO; Cannot validate board commitment without the client commitment item
-    // const commitmentItemExpectation = {
-    //   type: "BoardEncryptionCommitmentItem",
-    // }
-    //validatePayload(signedCommitmentItem, commitmentItemExpectation, this.getDbbPublicKey())
-
-    this.boardCommitment = response.data.commitment;
+    const voterCommitment: VoterCommitmentItem = response.data.voterCommitment;
+    const boardCommitment = response.data.boardCommitment;
     this.serverEnvelopes = response.data.envelopes;
+
+    // TODO; Cannot validate board commitment without the client commitment item
+    const voterCommitmentItemExpectation = {
+      parentAddress: this.voterSession.address,
+      type: "VoterEncryptionCommitmentItem" as BoardItemType,
+      content: {
+        commitment: commitment.result
+      }
+    }
+
+    validatePayload(voterCommitment, voterCommitmentItemExpectation)
+    
+    const boardCommitmentItemExpectation = {
+      parentAddress: voterCommitment.address,
+      type: "BoardEncryptionCommitmentItem" as BoardItemType,
+    }
+
+    validatePayload(boardCommitment, boardCommitmentItemExpectation, this.getDbbPublicKey())
+
+    this.boardCommitment = boardCommitment;
+
     
     // Submit ballot
     const finalizedCryptograms = finalizeBallotCryptograms(this.clientEnvelopes, this.serverEnvelopes)
@@ -347,7 +361,7 @@ export class AVClient implements IAVClient {
     const ballotCryptogramsItemResponse = (await this.bulletinBoard.submitVotes(itemWithProofs)).data.vote;
 
     const ballotCryptogramsItemExpectation = {
-      parentAddress: this.boardCommitment.address,
+      parentAddress: boardCommitment.address,
       type: "BallotCryptogramsItem" as BoardItemType,
       content: {
         cryptograms: finalizedCryptograms,
