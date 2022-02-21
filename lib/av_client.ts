@@ -39,9 +39,10 @@ import {
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
-import { sealEnvelopes, signPayload, validatePayload } from './av_client/sign';
-import { finalizeBallotCryptograms } from './av_client/actions/finalize_ballot_cryptograms';
+import { signPayload, validatePayload } from './av_client/sign';
+
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
+import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -307,48 +308,27 @@ export class AVClient implements IAVClient {
       voterCommitment,     // TODO: Required when spoiling
       boardCommitment,
       serverEnvelopes
-    } = await submitVoterCommitment(this.bulletinBoard, this.voterSession.address, commitment.result, this.privateKey(), this.getDbbPublicKey());
+    } = await submitVoterCommitment(
+      this.bulletinBoard,
+      this.voterSession.address,
+      commitment.result,
+      this.privateKey(),
+      this.getDbbPublicKey()
+    );
 
     this.boardCommitment = boardCommitment;
     this.serverEnvelopes = serverEnvelopes;
 
-    
-    // Submit ballot
-    const finalizedCryptograms = finalizeBallotCryptograms(this.clientEnvelopes, this.serverEnvelopes)
+    const [ ballotCryptogramItem, verificationStartItem ]  = await submitVoterCryptograms(
+      this.bulletinBoard,
+      this.clientEnvelopes,
+      this.serverEnvelopes,
+      boardCommitment.address,
+      this.privateKey()
+    );
 
-    const ballotCryptogramsItem = {
-      parentAddress: this.boardCommitment.address,
-      type: "BallotCryptogramsItem",
-      content: {
-        cryptograms: finalizedCryptograms,
-      }
-    };
-
-    const signedBallotCryptogramsItem = signPayload(ballotCryptogramsItem, this.privateKey());
-    // TODO: clarify how the receipt should be strucuted.
-
-    const itemWithProofs = {
-      ...signedBallotCryptogramsItem,
-      proofs: sealEnvelopes(this.clientEnvelopes)
-    };
-
-    const response = (await this.bulletinBoard.submitVotes(itemWithProofs)).data
-    const ballotCryptogramsItemResponse = response.vote;
-    const verificationTrackStartItem = response.verification
-
-    const ballotCryptogramsItemExpectation = {
-      parentAddress: boardCommitment.address,
-      type: "BallotCryptogramsItem" as BoardItemType,
-      content: {
-        cryptograms: finalizedCryptograms,
-      }
-    }
-
-    validatePayload(ballotCryptogramsItemResponse, ballotCryptogramsItemExpectation)
-
-    this.ballotCryptogramItem = ballotCryptogramsItemResponse
-
-    return verificationTrackStartItem.address;
+    this.ballotCryptogramItem = ballotCryptogramItem;
+    return verificationStartItem.address;
   }
 
     /**
