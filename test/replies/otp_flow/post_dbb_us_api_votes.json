@@ -1,21 +1,30 @@
 {
   "vote": {
-    "address": "2231a604dc02a0ebdaa8a698f1cfc051e9a25115e40b7e74e847d5ab2821f034",
+    "address": "a878c71853ce40f0c764289254c949ba5ec1e5382932b3cab5c97763d8cbfd5b",
     "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
-    "parentAddress": "8d67ac230af0242df2a2487602edce9a42fc34c9cb45d3a46184ed02807c7bbb",
-    "previousAddress": "8d67ac230af0242df2a2487602edce9a42fc34c9cb45d3a46184ed02807c7bbb",
-    "registeredAt": "2022-02-17T12:07:57.697Z",
-    "signature": "02cb15e0cc705e204ed25a973d1d6b6281ecdef0df47fc54576cbc4948cddfdf,61c4450788052f4106ba647969f84bd481146bb100931993bbcb13c4b0f9a4b8",
-    "type": "BallotCryptogramsItem",
+    "parentAddress": "ea8d7b14c7615cd373907888bc2dab1b81d24358be01c9099c031a96b661400c",
+    "previousAddress": "ea8d7b14c7615cd373907888bc2dab1b81d24358be01c9099c031a96b661400c",
     "content": {
       "cryptograms": {
         "f7a04384-1458-5911-af38-7e08a46136e7": [
-          "02c85a29c87c08acbe0805c755575e91fdf1fd841dd3dec5a7d67b57bcb7bc60e9,03be5c1c96172a992537ab7a16794df39ddd0cf14745a2ad9b6e2d5f010e989369"
+          "029eace1bd386692907c5a73e0f5e68c9835b13cda88d759d0927a495d36059cea,03cd40a1d79a8947a286544b0431eb570ccacf4e7878212ec8572fdbd062c291ed"
         ],
         "026ca870-537e-57b2-b313-9bb5d9fbe78b": [
-          "039adeebd9943687667669dab68ed6fdfcc7d6ed865045327939acb14abe5375ba,02afa8438bddd4faa275b6189765f4331a940319a3bf7f6c65c278185f0b5bd3af"
+          "028a31c545ada29b82fc078b94fa43660b55e0ba65dbdd08ce23c14c41e4afdb02,03013ce4b3cdf1b75c745b03e786dac7802c7ffe8995d3117dafee0831e46a5927"
         ]
       }
-    }
+    },
+    "registeredAt": "2022-02-21T08:32:05.625Z",
+    "signature": "fa6b1e13dd7f9a5c1c489887af29127e24f0fa34ee70879b432aa919456cf2ed,cbba9d7463afa64a899cdcc2c528e64aabcf089863c3f14b061c928a140ea003",
+    "type": "BallotCryptogramsItem"
+  },
+  "verification": {
+    "author": "024645f05b81246a30ddce658cb1085f1146dbd5b14e1a1eb074c5ecb3333d72c6",
+    "address": "2d4ad914f8de7fcdba5855638b8feef2bbda84d2a40682afc607cbc0c2901d8a",
+    "parentAddress": "a878c71853ce40f0c764289254c949ba5ec1e5382932b3cab5c97763d8cbfd5b",
+    "type": "VerificationStartItem",
+    "content": {},
+    "signature": "25bdddc2ce0a64da878604c3fcc9c438fcc626f36657802161d359c6973b28f2,cd910dca754ca56adce26be6b7fded6c5b8b26b0e79de7fd63ec8e63384d2924",
+    "registeredAt": "2022-02-21T09:32:05.633+01:00"
   }
 }

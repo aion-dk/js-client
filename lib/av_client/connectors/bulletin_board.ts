@@ -62,8 +62,8 @@ export class BulletinBoard {
     return this.backend.get(`verifier/voting_track?verificationTrackAddress=${verificationStartAddress}`)
   }
 
-  getVerifierItem(verificationStartAddress: string): Promise<AxiosResponse> {
-    return this.backend.get(`verifier/ballot_spoil_request?verificationTrackAddress=${verificationStartAddress}`)
+  getSpoilRequestItem(ballotCryptogramAddress: string): Promise<AxiosResponse> {
+    return this.backend.get(`verifier/find_spoil_request?ballotCryptogramAddress=${ballotCryptogramAddress}`)
   }
 
   submitCommitment(signedCommit): Promise<AxiosResponse> {

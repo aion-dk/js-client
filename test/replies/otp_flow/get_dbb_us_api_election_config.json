@@ -1,18 +1,18 @@
 {
   "electionConfig": {
-    "dbbPublicKey": "024fef1695a604590fc8f793e4cbced118ebe952e3df71e3f3560cff51a91c7104",
-    "encryptionKey": "028bfdeb71e0d26c364499d7dcf27741e1d5bf978d113f6e9f3d088b8c3da407f7",
+    "dbbPublicKey": "024645f05b81246a30ddce658cb1085f1146dbd5b14e1a1eb074c5ecb3333d72c6",
+    "encryptionKey": "02223f7f1468c083bba8f3f4228a079cdc372736f8f5ecfc751a52fb134e002777",
     "services": {
-      "address": "d4ca4132ab2700656e681753f8c7176f5a0fb07c7c31a3fcfd70bf6e5efe4bf8",
+      "address": "e8cbebfb2d9f1bee6682fc8fbfe7ebba969c476f021757f5b38dcfd49f604944",
       "voterAuthorizer": {
-        "electionContextUuid": "6de0d4ea-1cc6-41fa-ace2-c1532d3ec0f8",
-        "publicKey": "03623a09ff13719c7e9ed2634350ce1927fed35cfa9b1e9638039de16fbccc46cb",
-        "url": "http://authorizer.local.assemblyvoting.net:1234/"
+        "electionContextUuid": "9951c766-2b04-4c3a-aa38-9ef20a98c656",
+        "publicKey": "03bf79df320a8ed5fd989dfab40387006a39245c113bec9ac993c56f352fdd15f7",
+        "url": "http://localhost:1234"
       },
       "otpProvider": {
-        "electionContextUuid": "0499d1fc-4d0d-43fd-a82b-8f120b38fa4e",
-        "publicKey": "03de2223daf5d207e093afe493b2a151d8e82808a24aa9690539dc6160f7e4fd70",
-        "url": "http://otp-provider.local.assemblyvoting.net:1111/"
+        "electionContextUuid": "2bd0a468-238b-4a70-b5a4-5d1832816248",
+        "publicKey": "03abd6f86b6da7a9144902a49689ab11ac1755ce17834b59a5e8f906935c48b89f",
+        "url": "http://localhost:1111"
       }
     },
     "ballotConfigs": {

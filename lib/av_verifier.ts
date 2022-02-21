@@ -12,39 +12,32 @@ export class AVVerifier {
       this.dbbPublicKey = dbbPublicKey;
     }
 
-    public findBallot(verificationStartAddress: string): [Promise<boolean>, Promise<string>] {
-      return [this.searchForBallot(verificationStartAddress), this.pollForSpoilRequest(verificationStartAddress, 500, 10)]
+    public async findBallot(verificationStartAddress: string): Promise<string> {
+      let cryptogramAddress = ''
+      await this.bulletinBoard.getVotingTrack(verificationStartAddress).then(response => {
+        if (['voterCommitmentItem', 'serverCommitmentItem', 'ballotCryptogramsItem', 'verificationTrackStartItem']
+          .every(p => Object.keys(response.data).includes(p))){
+            cryptogramAddress = response.data.ballotCryptogramsItem.address
+        }
+      })
+
+      return cryptogramAddress
     }
 
-    private async searchForBallot(verificationStartAddress: string): Promise<boolean>{
-      let foundBallot = true
-      await this.bulletinBoard.getVotingTrack(verificationStartAddress)
-        .then(res => {
-          if (!['voterCommitmentItem', 'serverCommitmentItem', 'ballotCryptogramsItem', 'verificationTrackStartItem'].every(p => Object.keys(res.data).includes(p))){
-            foundBallot = false
-          }
-        })
-        .catch(() => {
-          foundBallot = false
-        })
-
-      return Promise.resolve(foundBallot)
-    }
-
-    private async pollForSpoilRequest(verificationStartAddress: string, interval: number, maxAttempts: number): Promise<string> {
+    public async pollForSpoilRequest(ballotCryptogramsAddress: string, interval: number, maxAttempts: number): Promise<string> {
       let attempts = 0;
-    
+      
       const executePoll = async (resolve, reject) => {
-        const result = await this.bulletinBoard.getVerifierItem(verificationStartAddress);
+        let result  = await this.bulletinBoard.getSpoilRequestItem(ballotCryptogramsAddress);
         attempts++;
-    
-        if (result.data.item.type === 'SpoilRequestItem') {
+
+        if (result?.data?.item?.type === 'SpoilRequestItem') {
           return resolve(result.data.item.address);
-        } else if (maxAttempts && attempts === maxAttempts) {
+        } else if (result?.data?.item?.type === 'CastRequestItem'){
+          return reject(new Error('Ballot has been cast and cannot be spoiled'))
+        }  else if (maxAttempts && attempts === maxAttempts) {
           return reject(new Error('Exceeded max attempts'));
-        } else if (result.data.item.type === 'CastRequestItem'){
-            return reject(new Error('Ballot has been cast and cannot be spoiled'))
-        } else {
+        } else  {
           setTimeout(executePoll, interval, resolve, reject);
         }
       };

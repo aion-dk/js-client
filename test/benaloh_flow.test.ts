@@ -29,27 +29,18 @@ describe('entire benaloh flow', () => {
       const client = new AVClient('http://us-avx:3000/dbb/us/api');
 
       const trackingCode = await placeVote(client) as string
-      const promises = verifier.findBallot("eab452d703f75ca372455e4a09289674200af045f3e9b22ee7251ca97ede1e58") // Should use tracking code
-
-      promises[0].then(res => {
-        expect(res).to.eql(true)
-      })
-
-      promises[1].then(res => {
-        console.log('polling result:', res)
-      }).catch(error => {
-        console.error(error)
-      })
-
-      client.castBallot()
+      const cryptogramAddress = await verifier.findBallot(trackingCode)
+      //client.spoilBallotCryptograms()
+      let spoilRequest : any
+      if(cryptogramAddress){
+        spoilRequest = await verifier.pollForSpoilRequest(cryptogramAddress, 100, 10)
+      }
     }
 
     await performTest()
-
-      
   }).timeout(10000);
 
-  it.only('cannot spoil ballot because it has been cast', async () => {
+  it('cannot spoil ballot because it has been cast', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       // Setup
@@ -57,20 +48,19 @@ describe('entire benaloh flow', () => {
       const client = new AVClient('http://us-avx:3000/dbb/us/api');
       const trackingCode = await placeVote(client) as string
 
-      // Find ballot and start polling for spoil request
-      const promises = verifier.findBallot("eab452d703f75ca372455e4a09289674200af045f3e9b22ee7251ca97ede1e58")
+      // Find ballot a ballot with corresponding tracking code
+      const cryptogramAddress = await verifier.findBallot(trackingCode)
 
       // Casting ballot rather than spoiling
       await client.castBallot()
 
-      // We should be able to find a ballot
-      const foundBallot = await promises[0]
-      expect(foundBallot).to.eql(true)
+      // We should have found a ballot
+      expect(cryptogramAddress.length).to.eql(64)
 
       // We should receive an error which tells us the ballot we are trying to spoil has already been cast
-      const spoilRequest = await promises[1].catch(er => {
-        expect(er.message).to.eql("Ballot has been cast and cannot be spoiled")
-      });
+      const spoilRequest = await verifier.pollForSpoilRequest(cryptogramAddress, 1000, 10).catch(error => {
+        expect(error.message).to.eql('Ballot has been cast and cannot be spoiled')
+      })
 
       expect(spoilRequest).to.eql(undefined)
     }
@@ -81,23 +71,25 @@ describe('entire benaloh flow', () => {
   it('finds a ballot but spoil request isnt registered in time', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
+      // Setup
       const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
       const client = new AVClient('http://us-avx:3000/dbb/us/api');
-
       const trackingCode = await placeVote(client) as string
-      const promises = verifier.findBallot(trackingCode)
+      // Find ballot a ballot with corresponding tracking code
+      const cryptogramAddress = await verifier.findBallot(trackingCode)
 
-      const foundBallot = await promises[0]
-      expect(foundBallot).to.eql(true)
-      const spoilRequest = await promises[1].catch(er => {
-        expect(er.message).to.eql("Exceeded max attempts")
-      });
+      // We should have found a ballot
+      expect(cryptogramAddress.length).to.eql(64)
+
+      // We should receive an error which tells us the ballot we are looking for has no spoil request
+      const spoilRequest = await verifier.pollForSpoilRequest(cryptogramAddress, 100, 5).catch(error => {
+        expect(error.message).to.eql('Exceeded max attempts')
+      })
 
       expect(spoilRequest).to.eql(undefined)
     }
-
+    
     await performTest()
-
       
   }).timeout(10000);
 
@@ -138,7 +130,6 @@ describe('entire benaloh flow', () => {
     const trackingCode = await client.constructBallotCryptograms(cvr).catch((e) => {
       console.error(e);
     });
-
     return trackingCode
   }
 
