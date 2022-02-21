@@ -30,6 +30,34 @@
       }
     },
     "contestConfigs": {
+      "f7a04384-1458-5911-af38-7e08a46136e7": {
+        "markingType": {
+          "style": "regular",
+          "handleSize": 1,
+          "minMarks": 1,
+          "maxMarks": 1
+        },
+        "options": [
+          {
+            "handle": 1,
+            "title": {
+              "en": "Option 1"
+            }
+          },
+          {
+            "handle": 2,
+            "title": {
+              "en": "Option 2"
+            }
+          }
+        ],
+        "title": {
+          "en": "First ballot"
+        },
+        "resultType": {
+          "name": "resultType name not matter right now"
+        }
+      },
       "026ca870-537e-57b2-b313-9bb5d9fbe78b": {
         "markingType": {
           "style": "regular",
@@ -59,34 +87,6 @@
         ],
         "title": {
           "en": "Second ballot"
-        },
-        "resultType": {
-          "name": "resultType name not matter right now"
-        }
-      },
-      "f7a04384-1458-5911-af38-7e08a46136e7": {
-        "markingType": {
-          "style": "regular",
-          "handleSize": 1,
-          "minMarks": 1,
-          "maxMarks": 1
-        },
-        "options": [
-          {
-            "handle": 1,
-            "title": {
-              "en": "Option 1"
-            }
-          },
-          {
-            "handle": 2,
-            "title": {
-              "en": "Option 2"
-            }
-          }
-        ],
-        "title": {
-          "en": "First ballot"
         },
         "resultType": {
           "name": "resultType name not matter right now"

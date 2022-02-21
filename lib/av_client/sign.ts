@@ -87,8 +87,6 @@ const verifySignature = (item: BoardItem, signaturePublicKey: string) => {
 const verifyContent = (actual: Record<string, any>, expectations: Record<string, any>) => {
   const uniformer = new Uniformer();
 
-  console.log('exp',expectations)
-  console.log('act', actual)
   const expectedContent = uniformer.formString(expectations);
   const actualContent = uniformer.formString(actual);
 
