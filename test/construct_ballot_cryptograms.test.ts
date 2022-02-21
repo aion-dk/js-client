@@ -37,7 +37,7 @@ describe('AVClient#constructBallotCryptograms', () => {
   });
 
   context('given previous steps succeeded, and it receives valid values', () => {
-    it('encrypts correctly', async () => {
+    it.only('encrypts correctly', async () => {
       await client.requestAccessCode('voter123', 'voter@foo.bar');
       await client.validateAccessCode('1234');
       await client.registerVoter()
