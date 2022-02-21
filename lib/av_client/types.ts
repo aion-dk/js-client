@@ -174,6 +174,10 @@ export interface BallotCryptogramItem extends BaseBoardItem {
   type: "BallotCryptogramItem"
 }
 
+export interface VerificationStartItem extends BaseBoardItem {
+  type: "VerificationStartItem"
+}
+
 export interface ItemExpectation {
   content?: {
     [k: string]: any
