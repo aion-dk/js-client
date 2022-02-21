@@ -1,4 +1,4 @@
-import { BallotBoxReceipt, ContestMap, OpenableEnvelope, SealedEnvelope } from './types'
+import { BoardItem, ContestMap, ItemExpectation, OpenableEnvelope } from './types'
 import * as Crypto from './aion_crypto';
 import * as sjcl from './sjcl';
 import Uniformer from '../util/uniformer';
@@ -39,6 +39,28 @@ export const signPayload = (obj: any, privateKey: string) => {
   }
 }
 
+export const validatePayload = (item: BoardItem, expectations: ItemExpectation, signaturePublicKey?: string) => {
+  const uniformer = new Uniformer();
+
+  if(expectations.content !== undefined) {
+    verifyContent(item.content, expectations.content)
+  }
+
+  if(expectations.type != item.type) {
+    throw new Error(`BoardItem did not match expected type '${expectations.type}'`);
+  }
+
+  if(expectations.parentAddress != item.parentAddress) {
+    throw new Error(`BoardItem did not match expected parent address ${expectations.parentAddress}`);
+  }
+
+  verifyAddress(item);
+
+  if(signaturePublicKey !== undefined) {
+    verifySignature(item, signaturePublicKey);
+  }
+}
+
 export const sealEnvelopes = (encryptedVotes: ContestMap<OpenableEnvelope>): ContestMap<string[]> => {
   const sealEnvelope = (envelope: OpenableEnvelope): string[] => {
     const { cryptograms, randomness } = envelope;
@@ -49,42 +71,44 @@ export const sealEnvelopes = (encryptedVotes: ContestMap<OpenableEnvelope>): Con
   return Object.fromEntries(Object.keys(encryptedVotes).map(k => [k, sealEnvelope(encryptedVotes[k])]))
 }
 
-export function assertValidReceipt(contentHash: string, voterSignature: string, receipt: BallotBoxReceipt, electionSigningPublicKey: string): void {
-  assertBoardHashComputation(contentHash, receipt);
-  assertValidServerSignature(receipt, voterSignature, electionSigningPublicKey);
-}
+const verifySignature = (item: BoardItem, signaturePublicKey: string) => {
+  const uniformer = new Uniformer();
+  const signedPayload = uniformer.formString({
+    content: item.content,
+    type: item.type,
+    parentAddress: item.parentAddress
+  });
 
-function assertValidServerSignature(receipt: BallotBoxReceipt, voterSignature: string, electionSigningPublicKey: string) {
-  const receiptHashObject = {
-    board_hash: receipt.boardHash,
-    signature: voterSignature
-  };
-
-  const receiptHashString = JSON.stringify(receiptHashObject);
-  const receiptHash = Crypto.hashString(receiptHashString);
-
-  if (!Crypto.verifySchnorrSignature(receipt.serverSignature, receiptHash, electionSigningPublicKey)) {
-    throw new Error('Invalid vote receipt: corrupt server signature');
+  if(!Crypto.verifySchnorrSignature(item.signature, signedPayload, signaturePublicKey)) {
+    throw new Error('Board signature verification failed');
   }
-}
+};
 
-function assertBoardHashComputation(contentHash: string, receipt: BallotBoxReceipt) {
-  const boardHashObject = {
-    content_hash: contentHash,
-    previous_board_hash: receipt.previousBoardHash,
-    registered_at: receipt.registeredAt
-  };
+const verifyContent = (actual: Record<string, any>, expectations: Record<string, any>) => {
+  const uniformer = new Uniformer();
 
-  const boardHashString = JSON.stringify(boardHashObject);
-  const computedBoardHash = Crypto.hashString(boardHashString);
+  const expectedContent = uniformer.formString(expectations);
+  const actualContent = uniformer.formString(actual);
 
-  if (computedBoardHash != receipt.boardHash) {
-    throw new Error('Invalid vote receipt: corrupt board hash');
+  if(expectedContent != actualContent) {
+    throw new Error('Item payload failed sanity check. Received item did not match expected');
   }
-}
+};
 
-function computeNextBoardHash(content: Record<string, unknown>) {
-  const contentString = JSON.stringify(content);
-  const contentHash = Crypto.hashString(contentString);
-  return contentHash;
+const verifyAddress = (item: BoardItem) => {
+  const uniformer = new Uniformer();
+
+  const addressHashSource = uniformer.formString({
+    type: item.type,
+    content: item.content,
+    parentAddress: item.parentAddress,
+    previousAddress: item.previousAddress,
+    registeredAt: item.registeredAt
+  });
+
+  const expectedItemAddress = Crypto.hashString(addressHashSource);
+
+  if(item.address != expectedItemAddress) {
+    throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
+  }
 }

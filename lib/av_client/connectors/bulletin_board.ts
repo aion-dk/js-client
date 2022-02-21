@@ -27,8 +27,8 @@ export class BulletinBoard {
 
   async createVoterRegistration(authToken: string, parentAddress: string): Promise<VoterSessionItem> {
     const response = await this.backend.post('registrations', {
-      auth_token: authToken,
-      parent_address: parentAddress
+      authToken,
+      parentAddress
     }).catch(error => {
       const response = error.response as AxiosResponse<BulletinBoardData>;
       if (error.request && !response) {
@@ -47,7 +47,7 @@ export class BulletinBoard {
       throw error;
     });
 
-    return (response.data as VoterSessionItem)
+    return (response.data.voterSession as VoterSessionItem)
   }
 
   submitVotes(signedBallotCryptogramsItem): Promise<AxiosResponse> {

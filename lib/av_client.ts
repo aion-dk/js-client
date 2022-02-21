@@ -1,12 +1,12 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
-import SubmitVotes from './av_client/submit_votes';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
-import { KeyPair, CastVoteRecord, Affidavit } from './av_client/types';
+import { KeyPair, CastVoteRecord, Affidavit, BoardItemType, VoterCommitmentItem } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
-import EncryptVotes from './av_client/encrypt_votes';
+import * as jwt from 'jsonwebtoken';
+
 
 import {
   fetchElectionConfig,
@@ -39,8 +39,10 @@ import {
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
-import { sealEnvelopes, signPayload } from './av_client/sign';
-import { finalizeBallotCryptograms } from './av_client/actions/finalize_ballot_cryptograms';
+import { signPayload, validatePayload } from './av_client/sign';
+
+import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
+import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -77,6 +79,7 @@ export class AVClient implements IAVClient {
   private authorizationSessionId: string;
   private email: string;
   private identityConfirmationToken: IdentityConfirmationToken;
+  private dbbPublicKey: string | undefined;
 
   private bulletinBoard: BulletinBoard;
   private electionConfig?: ElectionConfig;
@@ -91,8 +94,9 @@ export class AVClient implements IAVClient {
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
    */
-  constructor(bulletinBoardURL: string) {
+  constructor(bulletinBoardURL: string, dbbPublicKey?: string) {
     this.bulletinBoard = new BulletinBoard(bulletinBoardURL);
+    this.dbbPublicKey = dbbPublicKey;
   }
 
   /**
@@ -100,18 +104,26 @@ export class AVClient implements IAVClient {
    * If no config is provided, it fetches one from the backend.
    *
    * @param electionConfig Allows injection of an election configuration for testing purposes
+   * @param keyPair Allows injection of a keypair to support automatic testing
    * @returns Returns undefined if succeeded or throws an error
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
+  async initialize(electionConfig: ElectionConfig | undefined, keyPair: KeyPair): Promise<void>
   async initialize(electionConfig: ElectionConfig): Promise<void>
   async initialize(): Promise<void>
-  public async initialize(electionConfig?: ElectionConfig): Promise<void> {
-    if (!electionConfig) {
-      electionConfig = await fetchElectionConfig(this.bulletinBoard);
+  public async initialize(electionConfig?: ElectionConfig, keyPair?: KeyPair): Promise<void> {
+    if (electionConfig) {
+      validateElectionConfig(electionConfig);
+      this.electionConfig = electionConfig;
+    } else {
+      this.electionConfig = await fetchElectionConfig(this.bulletinBoard);
     }
 
-    validateElectionConfig(electionConfig);
-    this.electionConfig = electionConfig;
+    if (keyPair) {
+      this.keyPair = keyPair;
+    } else {
+      this.keyPair = randomKeyPair();
+    }
   }
 
   /**
@@ -128,8 +140,8 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
-    const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
-    const voterAuthorizerContextUuid = this.getElectionConfig().services.voter_authorizer.election_context_uuid;
+    const coordinatorURL = this.getElectionConfig().services.voterAuthorizer.url;
+    const voterAuthorizerContextUuid = this.getElectionConfig().services.voterAuthorizer.electionContextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
 
     return coordinator.createSession(opaqueVoterId, email)
@@ -164,8 +176,8 @@ export class AVClient implements IAVClient {
     if(!this.email)
       throw new InvalidStateError('Cannot validate access code. Access code was not requested.');
 
-    const otpProviderUrl = this.getElectionConfig().services.otp_provider.url;
-    const otpProviderElectionContextUuid = this.getElectionConfig().services.otp_provider.election_context_uuid;
+    const otpProviderUrl = this.getElectionConfig().services.otpProvider.url;
+    const otpProviderElectionContextUuid = this.getElectionConfig().services.otpProvider.electionContextUuid;
     const provider = new OTPProvider(otpProviderUrl, otpProviderElectionContextUuid)
 
     this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email);
@@ -179,10 +191,8 @@ export class AVClient implements IAVClient {
     if(!this.identityConfirmationToken)
       throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
 
-    this.keyPair = randomKeyPair();
-
-    const coordinatorURL = this.getElectionConfig().services.voter_authorizer.url;
-    const voterAuthorizerContextUuid = this.getElectionConfig().services.voter_authorizer.election_context_uuid;
+    const coordinatorURL = this.getElectionConfig().services.voterAuthorizer.url;
+    const voterAuthorizerContextUuid = this.getElectionConfig().services.voterAuthorizer.electionContextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
     const servicesBoardAddress = this.getElectionConfig().services.address;
 
@@ -194,7 +204,25 @@ export class AVClient implements IAVClient {
 
     const { authToken } = authorizationResponse.data;
 
+    const decoded = jwt.decode(authToken); // TODO: Verify against dbb pubkey: this.getElectionConfig().services.voterAuthorizer.public_key);
+
+    if(decoded === null)
+      throw new Error('Auth token could not be decoded');
+
+    const voterSessionItemExpectation = {
+      type: 'VoterSessionItem' as BoardItemType,
+      parentAddress: this.getElectionConfig().services.address,
+      content: {
+        authToken: authToken,
+        identifier: decoded['identifier'],
+        publicKey: decoded['public_key'],
+        voterGroup: decoded['voter_group_key']
+      }
+    }
+
     const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
+
+    validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
 
     this.voterSession = voterSessionItem;
     this.bulletinBoard.setVoterSessionUuid(voterSessionItem.content.identifier);
@@ -267,50 +295,37 @@ export class AVClient implements IAVClient {
 
     const {
       commitment,
-      envelopeRandomizers,
+      envelopeRandomizers, // TODO: Required when spoiling
       envelopes,
     } = constructBallotCryptograms(state, cvr);
 
+    this.clientEnvelopes = envelopes;
     // 1. Create and submit commitment item
     // 2. Keep randomizer(s) throughout the session
     //this.commitment = {}
+ 
+    const {
+      voterCommitment,     // TODO: Required when spoiling
+      boardCommitment,
+      serverEnvelopes
+    } = await submitVoterCommitment(
+      this.bulletinBoard,
+      this.voterSession.address,
+      commitment.result,
+      this.privateKey(),
+      this.getDbbPublicKey()
+    );
 
-    const commitmentItem = {
-      parent_address: this.voterSession.address,
-      type: "VoterEncryptionCommitmentItem",
-      content: {
-        commitment: commitment.result
-      }
-    };
+    this.boardCommitment = boardCommitment;
+    this.serverEnvelopes = serverEnvelopes;
 
-    this.clientEnvelopes = envelopes;
-
-    const signedCommitmentItem = signPayload(commitmentItem, this.privateKey());
-    const response = await this.bulletinBoard.submitCommitment(signedCommitmentItem);
-    this.boardCommitment = response.data.commitment;
-    this.serverEnvelopes = response.data.envelopes;
-    
-    // Submit ballot
-    const finalizedCryptograms = finalizeBallotCryptograms(this.clientEnvelopes, this.serverEnvelopes)
-     
-    const ballotCryptogramsItem = {
-      parent_address: this.boardCommitment.address,
-      type: "BallotCryptogramsItem",
-      content: {
-        cryptograms: finalizedCryptograms,
-      }
-    };
-
-    const signedBallotCryptogramsItem = signPayload(ballotCryptogramsItem, this.privateKey());
-    // TODO: clarify how the receipt should be strucuted.
-
-    const itemWithProofs = {
-      ...signedBallotCryptogramsItem,
-      proofs: sealEnvelopes(this.clientEnvelopes)
-    };
-
-    const submitVoteResponse = (await this.bulletinBoard.submitVotes(itemWithProofs)).data;
-    this.ballotCryptogramItem = submitVoteResponse.vote
+    this.ballotCryptogramItem = await submitVoterCryptograms(
+      this.bulletinBoard,
+      this.clientEnvelopes,
+      this.serverEnvelopes,
+      boardCommitment.address,
+      this.privateKey()
+    );
 
     return 'checking code/verification track start address';
   }
@@ -339,7 +354,7 @@ export class AVClient implements IAVClient {
           throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
         }
         const castRequestItem = {
-            parent_address: this.ballotCryptogramItem.address,
+            parentAddress: this.ballotCryptogramItem.address,
             type: 'CastRequestItem',
             content: {}
         }
@@ -347,7 +362,7 @@ export class AVClient implements IAVClient {
         const signedPayload = signPayload(castRequestItem, this.privateKey())
         
         const receipt = (await this.bulletinBoard.submitCastRequest(signedPayload)).data
-        return receipt.cast_request.address
+        return receipt.castRequest.address
       }
 
   /**
@@ -405,8 +420,16 @@ export class AVClient implements IAVClient {
     return this.electionConfig
   }
 
-  private electionSigningPublicKey(): ECPoint {
-    return this.getElectionConfig().signingPublicKey
+  public getDbbPublicKey(): string {
+    const dbbPublicKeyFromConfig = this.getElectionConfig().dbbPublicKey;
+
+    if(this.dbbPublicKey) {
+      return this.dbbPublicKey;
+    } else if (dbbPublicKeyFromConfig) {
+      return dbbPublicKeyFromConfig;
+    } else {
+      throw new InvalidStateError('No DBB public key available')
+    }
   }
 
   private affidavitConfig(): AffidavitConfig {

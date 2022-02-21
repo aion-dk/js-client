@@ -1,5 +1,8 @@
 import { expect } from 'chai';
 import Uniformer from '../lib/util/uniformer';
+import * as Crypto from '../lib/av_client/aion_crypto';
+import { AVClient } from '../lib/av_client';
+import { randomKeyPair } from '../lib//av_client/generate_key_pair';
 
 describe('Uniformer', () => {
   context('when object is a Hash', () => {
@@ -95,4 +98,36 @@ describe('Uniformer', () => {
       ]
     ));
   });
+
+  it.skip('random', () => {
+    const sample = {
+      parentAddress: '24598ebf2abcc545c6b5e6ca0cd3057ca61aecf90100dfeaf97bfe1adcc13f9c',
+      previousAddress: '5dbf737f8cecb4ed60f2e6fcc2e1e42c2c757b29c2904e5b648015ddf2ca6081',
+      registeredAt: '2022-02-15T14:29:14.331Z',
+      type: 'VoterSessionItem',
+      content: {
+        authToken: 'eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiNTc2MDIzNTBkMmM4NDJjNjUyN2M4ZjNhYjAyYjRjYzZhNjJjZTY0YSIsInB1YmxpY19rZXkiOiIwMzg0NzhkNzlhY2YwNDgwOTdmNjc5MTYxYTlhZDA2OTY5MDMwZTBhNDJhYmYxZWZiYTRiODZhOGY2OGM0ZDk2MjUiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiI5ZTRlYTE1ODVkZGFlZWFhYWQ3NDU2NmIzYjAzNjcwZTk2ODMzZmNmIiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0NDkzNTM1NCwiZXhwIjoxNjQ0OTM3MTU0fQ.D68KykcXvYEcygeag7SNzkAK1hVhvxY1f48TXeZEQkhwAWxeGv4tBrEAsG12skCompmYODfREK3IYAfHGGBW1g',
+        identifier: '57602350d2c842c6527c8f3ab02b4cc6a62ce64a',
+        publicKey: '038478d79acf048097f679161a9ad06969030e0a42abf1efba4b86a8f68c4d9625',
+        segment1: '4',
+        segment2: null,
+        segment3: null,
+        segment4: null,
+        segment5: null,
+        segment6: null,
+        voterGroup: '4'
+      }
+    };
+
+    const uniformed = new Uniformer().formString(sample);
+    //console.log('computed address', Crypto.hashString(uniformed));
+  });
+
+  // it.only('instantiate AVCLIENT', () => {
+  //   console.log(randomKeyPair());
+  //   console.log(randomKeyPair());
+
+  //   //const uniformed = new Uniformer().formString(sample);
+  //   //console.log('computed address', Crypto.hashString(uniformed));
+  // })
 });
