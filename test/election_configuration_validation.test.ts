@@ -40,7 +40,7 @@ describe('election configuration validation', () => {
 
   context('services key is missing', () => {
     it('fails with an error', async () => {
-      delete electionConfig.services;
+      delete (electionConfig as any).services;
 
       await expectError(
         client.initialize(electionConfig),
