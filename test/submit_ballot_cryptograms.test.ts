@@ -56,15 +56,9 @@ describe('AVClient#submitBallotCryptograms', () => {
       await client.constructBallotCryptograms(cvr)
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
-      const receipt = await client.castBallot(affidavit);
-      expect(receipt).to.have.keys(
-        'boardHash',
-        'previousBoardHash',
-        'registeredAt',
-        'serverSignature',
-        'voteSubmissionId'
-      );
-      expect(receipt.previousBoardHash.length).to.eql(64);
+      const ballotTrackingCode = await client.castBallot(affidavit);
+
+      expect(ballotTrackingCode.length).to.eql(5);
     });
   });
 
