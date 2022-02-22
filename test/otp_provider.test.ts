@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import nock = require('nock');
 
 import { OTPProvider } from '../lib/av_client/connectors/otp_provider';

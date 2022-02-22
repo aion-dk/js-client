@@ -53,7 +53,7 @@ describe('validateCvr', () => {
   });
 
   const createOptions = (optionHandles: number[]): Option[] => {
-    return optionHandles.map((handle, i) => {
+    return optionHandles.map((handle) => {
       return {
         "handle": handle,
         "title": {},

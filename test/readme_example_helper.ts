@@ -1,7 +1,6 @@
 import nock = require('nock');
 import {
   resetDeterminism,
-  bulletinBoardHost,
   OTPProviderHost,
   voterAuthorizerHost,
   bbHost

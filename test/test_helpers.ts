@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import nock = require('nock');
 import sinon = require('sinon');
-const fs = require('fs');
+import * as fs from 'fs';
 const sjcl = require('../lib/av_client/sjcl');
 
 export const bulletinBoardHost = 'http://us-avx:3000/';
@@ -64,7 +64,7 @@ export function deterministicRandomWords(nwords, _paranoia) {
   }
 
   let nextRandomInt = global.deterministicOffset;
-  let output : number[] = []
+  const output : number[] = []
   for (let i = 0; i < nwords; i++) {
     if (nextRandomInt > highestValidNumber) {
       nextRandomInt = lowestValidNumber
@@ -77,7 +77,7 @@ export function deterministicRandomWords(nwords, _paranoia) {
 }
 
 export function readJSON(path) {
-  const data = fs.readFileSync(require.resolve(path));
+  const data = fs.readFileSync(require.resolve(path), 'utf-8');
   const json = JSON.parse(data);
   return json;
 }
