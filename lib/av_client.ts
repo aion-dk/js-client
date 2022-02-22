@@ -300,9 +300,6 @@ export class AVClient implements IAVClient {
     } = constructBallotCryptograms(state, cvr);
 
     this.clientEnvelopes = envelopes;
-    // 1. Create and submit commitment item
-    // 2. Keep randomizer(s) throughout the session
-    //this.commitment = {}
  
     const {
       voterCommitment,     // TODO: Required when spoiling
