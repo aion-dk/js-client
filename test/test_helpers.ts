@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import nock = require('nock');
 import sinon = require('sinon');
 import * as fs from 'fs';
-const sjcl = require('../lib/av_client/sjcl');
+import * as sjcl from '../lib/av_client/sjcl';
 
 export const bulletinBoardHost = 'http://us-avx:3000/';
 export const OTPProviderHost = 'http://otp-provider.local.assemblyvoting.net:1111/';
@@ -101,7 +101,9 @@ export async function recordResponses(callback) {
   cleanup();
 }
 
-export async function expectError(promise: (Promise<any>|Function), errorType: any, message: string): Promise<any> {
+type SynchronousFunction = () => void
+
+export async function expectError(promise: (Promise<any>|SynchronousFunction), errorType: any, message: string): Promise<any> {
   if (typeof promise == 'object') { // Async promise
     return promise
       .then(() => expect.fail('Expected promise to be rejected'))

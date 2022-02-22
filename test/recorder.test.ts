@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import { recordResponses } from './test_helpers'
-const fs = require('fs');
-const axios = require('axios')
+import { recordResponses } from './test_helpers';
+import * as fs from 'fs';
+import axios from 'axios';
 
 // Skipping by default, as it messes with nock when running mocha in watch mode.
 // Enable this if mock recording breaks somehow.
