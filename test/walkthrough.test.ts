@@ -14,7 +14,7 @@ const USE_MOCK = true;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;
-  let expectedNetworkRequests : any[] = [];
+  let expectedNetworkRequests : nock.Scope[] = [];
 
   beforeEach(() => {
     sandbox = resetDeterminism();
@@ -63,7 +63,7 @@ describe('entire voter flow using OTP authorization', () => {
         oneTimePassword = await extractOTPFromEmail();
       }
 
-      const confirmationToken = await client.validateAccessCode(oneTimePassword).catch((e) => {
+      const _confirmationToken = await client.validateAccessCode(oneTimePassword).catch((e) => {
         console.error(e);
         expect.fail('AVClient#validateAccessCode failed');
       });
@@ -82,7 +82,7 @@ describe('entire voter flow using OTP authorization', () => {
 
       const cvr = Object.fromEntries(contestsChoices)
 
-      const trackingCode = await client.constructBallotCryptograms(cvr).catch((e) => {
+      const _trackingCode = await client.constructBallotCryptograms(cvr).catch((e) => {
         console.error(e);
         expect.fail('AVClient#constructBallotCryptograms failed');
       });

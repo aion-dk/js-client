@@ -1,5 +1,4 @@
-import { AVClient } from '../lib/av_client';
-import { expect } from 'chai';
+import { AVClient, ElectionConfig } from '../lib/av_client';
 import {
   expectError,
   readJSON
@@ -8,7 +7,7 @@ import { InvalidConfigError } from '../lib/av_client/errors';
 
 describe('election configuration validation', () => {
   let client: AVClient;
-  let electionConfig: any;
+  let electionConfig: ElectionConfig;
 
   beforeEach(async () => {
     client = new AVClient('http://nothing.local');

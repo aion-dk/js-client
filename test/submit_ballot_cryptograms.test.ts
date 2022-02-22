@@ -10,8 +10,6 @@ import {
 } from './test_helpers';
 import * as Crypto from '../lib/av_client/aion_crypto';
 
-const fs = require('fs')
-
 describe('AVClient#submitBallotCryptograms', () => {
   let client: AVClient;
   let sandbox;
@@ -80,7 +78,7 @@ describe('AVClient#submitBallotCryptograms', () => {
       const randomness = 'corrupted_randomness!';
 
       // TODO: Refactor to avoid manipulation of internal state
-      (client as any ).voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(randomness);
+      (client as any).voteEncryptions['1'].proof = Crypto.generateDiscreteLogarithmProof(randomness);
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       await expectError(

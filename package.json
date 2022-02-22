@@ -17,7 +17,7 @@
     "docs": "typedoc --plugin none --out docs --includes test/",
     "build": "tsc && cp lib/av_client/*.js dist/lib/av_client",
     "prepublish": "tsc && cp lib/av_client/*.js dist/lib/av_client",
-    "lint": "eslint lib/"
+    "lint": "eslint lib/ test/"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^8.5.8",
