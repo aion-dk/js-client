@@ -8,7 +8,7 @@ export interface IAVClient {
   registerVoter(): Promise<void>
   constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
   spoilBallotCryptograms(): Promise<void>
-  castBallot(affidavit: Affidavit): Promise<BallotBoxReceipt>
+  castBallot(affidavit: Affidavit): Promise<string>
   purgeData(): void
 }
 
@@ -176,7 +176,7 @@ export interface BallotCryptogramItem extends BaseBoardItem {
 
 export interface ItemExpectation {
   content?: {
-    [k: string]: any
+    [k: string]: unknown
   }
   type: BoardItemType
   parentAddress: string
