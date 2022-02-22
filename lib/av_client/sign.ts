@@ -61,7 +61,7 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
 
 export const sealEnvelopes = (encryptedVotes: ContestMap<OpenableEnvelope>): ContestMap<string[]> => {
   const sealEnvelope = (envelope: OpenableEnvelope): string[] => {
-    const { cryptograms, randomness } = envelope;
+    const { randomness } = envelope;
     const proofs = randomness.map(randomizer => Crypto.generateDiscreteLogarithmProof(randomizer)) 
     return proofs
   }
