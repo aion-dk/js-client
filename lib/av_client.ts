@@ -392,7 +392,7 @@ export class AVClient implements IAVClient {
    * @throws ServerCommitmentError if the server commitment is invalid
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async spoilBallot(): Promise<void> {
+  public async spoilBallot(): Promise<string> {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
     }
