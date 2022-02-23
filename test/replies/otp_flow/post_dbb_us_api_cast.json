@@ -1,12 +1,12 @@
 {
   "castRequest": {
-    "address": "1f7377275c923833b006d14f07f1a7418d08fb682c482bedd6f9a4131e5d22e1",
+    "address": "90931bf4db84b36637e87ac1c3cc845e47c1a49131904966995d91a79d4d7006",
     "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
-    "parentAddress": "8515e6c993ad6bacbbe827d7c6e37f7c2cae88a113636bbacd01ade3f9c9d373",
-    "previousAddress": "8515e6c993ad6bacbbe827d7c6e37f7c2cae88a113636bbacd01ade3f9c9d373",
+    "parentAddress": "55dc41b11a600b5cdcac551c4f4f8e6ef9a379e56aa53654ee72c923214b8fe8",
+    "previousAddress": "55dc41b11a600b5cdcac551c4f4f8e6ef9a379e56aa53654ee72c923214b8fe8",
     "content": {},
-    "registeredAt": "2022-02-21T10:07:15.901Z",
-    "signature": "3f372ba6ad28638f0cccd4be63b154fa3581bb03f6576d4daaf3732a8cea3c9b,2b7a2e01ab851ed1035b9c1e70f1dfa47830eccaa7d6ab552cc4797b4bb1708c",
+    "registeredAt": "2022-02-21T11:37:09.079Z",
+    "signature": "23f59b4837f1c9ae80c287f5ce3b55f4a89822db48e07e7fae04b1c71c7aeb17,3711fadbaa5fb05546bce1753c987bf2ba964bbab292ee36b1dd81e84c952e73",
     "type": "CastRequestItem"
   }
 }

@@ -22,7 +22,7 @@ describe('entire benaloh flow', () => {
     // Cleanup
   });
 
-  it.skip('spoils a ballot', async () => {
+  it.only('spoils a ballot', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
@@ -30,17 +30,34 @@ describe('entire benaloh flow', () => {
 
       const trackingCode = await placeVote(client) as string
       const cryptogramAddress = await verifier.findBallot(trackingCode)
-      //client.spoilBallotCryptograms()
-      let spoilRequest : any
-      if(cryptogramAddress){
-        spoilRequest = await verifier.pollForSpoilRequest(cryptogramAddress, 100, 10)
+      await client.spoilBallot()
+      let spoilRequestAddress : any
+      let verifierItem : any
+      if(cryptogramAddress){ // We found a ballot using the tracking code
+        // The verifier starts polling for spoil request
+        spoilRequestAddress = await verifier.pollForSpoilRequest(cryptogramAddress, 100, 10)
+
+        // The verifier found a spoil request and now submits it's public key in a VerifierItem
+        verifierItem = await verifier.submitVerifierKey(spoilRequestAddress)
+
+        // Verifier polls for commitment openings
+
+        // The app polls for a verifier item (and finds one)
+
+        // The app confirms the verifier codes matches
+
+        // The app creates the commitment openings and submits them
+
+        // The verifier should get the commitment openings
+
+        // The verifier decrypts the ballot
       }
     }
 
     await performTest()
   }).timeout(10000);
 
-  it.skip('cannot spoil ballot because it has been cast', async () => {
+  it.only('cannot spoil ballot because it has already been cast', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       // Setup

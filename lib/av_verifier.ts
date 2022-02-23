@@ -1,7 +1,10 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
+import { randomKeyPair } from './av_client/generate_key_pair';
+import { signPayload } from './av_client/sign';
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
+  private verifierPrivateKey: string | undefined
 
   private bulletinBoard: BulletinBoard;
     /**
@@ -24,11 +27,27 @@ export class AVVerifier {
       return cryptogramAddress
     }
 
+    public async submitVerifierKey(spoilRequestAddress: string): Promise<void> {
+      const keyPair = randomKeyPair()
+      this.verifierPrivateKey = keyPair.privateKey
+
+      const verfierItem = {
+        type: 'VerifierItem',
+        parentAddress: spoilRequestAddress,
+        content: {
+          publicKey: keyPair.publicKey
+        }
+      }
+
+      const signedVerifierItem = signPayload(verfierItem, keyPair.privateKey)
+      await this.bulletinBoard.submitVerifierItem(signedVerifierItem)
+    }
+
     public async pollForSpoilRequest(ballotCryptogramsAddress: string, interval: number, maxAttempts: number): Promise<string> {
       let attempts = 0;
       
       const executePoll = async (resolve, reject) => {
-        let result  = await this.bulletinBoard.getSpoilRequestItem(ballotCryptogramsAddress);
+        let result = await this.bulletinBoard.getSpoilRequestItem(ballotCryptogramsAddress);
         attempts++;
 
         if (result?.data?.item?.type === 'SpoilRequestItem') {

@@ -7,7 +7,7 @@ export interface IAVClient {
   validateAccessCode(code: string): Promise<void>
   registerVoter(): Promise<void>
   constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
-  spoilBallotCryptograms(): Promise<void>
+  spoilBallot(): Promise<void>
   castBallot(affidavit: Affidavit): Promise<BallotBoxReceipt>
   purgeData(): void
 }
@@ -171,7 +171,7 @@ export interface BallotCryptogramItem extends BaseBoardItem {
   content: {
     cryptograms: ContestMap<string[]>
   } 
-  type: "BallotCryptogramItem"
+  type: "BallotCryptogramsItem"
 }
 
 export interface VerificationStartItem extends BaseBoardItem {
