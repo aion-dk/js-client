@@ -22,7 +22,7 @@ describe('entire benaloh flow', () => {
     // Cleanup
   });
 
-  it.only('spoils a ballot', async () => {
+  it.skip('spoils a ballot', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
@@ -57,7 +57,7 @@ describe('entire benaloh flow', () => {
     await performTest()
   }).timeout(10000);
 
-  it.only('cannot spoil ballot because it has already been cast', async () => {
+  it.skip('cannot spoil ballot because it has already been cast', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       // Setup
