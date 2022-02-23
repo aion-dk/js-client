@@ -54,9 +54,9 @@ describe('AVClient#submitBallotCryptograms', () => {
       await client.constructBallotCryptograms(cvr)
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
-      const ballotTrackingCode = await client.castBallot(affidavit);
+      const receipt = await client.castBallot(affidavit);
 
-      expect(ballotTrackingCode.length).to.eql(5);
+      expect(receipt.address.length).to.eql(5);
     });
   });
 

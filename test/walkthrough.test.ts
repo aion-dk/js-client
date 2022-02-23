@@ -90,7 +90,7 @@ describe('entire voter flow using OTP authorization', () => {
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       const receipt = await client.castBallot(affidavit);
-      expect(receipt.length).to.eql(64)
+      expect(receipt.address.length).to.eql(64)
 
       if(USE_MOCK)
         expectedNetworkRequests.forEach((mock) => mock.done());
