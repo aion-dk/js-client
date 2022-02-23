@@ -1,12 +1,13 @@
 {
   "castRequest": {
-    "address": "609e2caf86fb0ae1b7edb0ae82e89dbe9b0229b36429e474152bba58d6b6df24",
+    "address": "dd5628bc56e20c94031686f2c519ffad510893290c15c5a6a71bbc9cb6cfb2dc",
     "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
-    "parentAddress": "2231a604dc02a0ebdaa8a698f1cfc051e9a25115e40b7e74e847d5ab2821f034",
-    "previousAddress": "2231a604dc02a0ebdaa8a698f1cfc051e9a25115e40b7e74e847d5ab2821f034",
-    "registeredAt": "2022-02-17T12:07:57.790Z",
-    "signature": "84ff635d17c5d4a0f82cbfc98dcffd01c7863c4e7765baa24741bfd05d7ba90b,0ee837a5583680188b5b5a739dde782996f2c8078c636d0d4a67c5574c0024ba",
-    "type": "CastRequestItem",
-    "content": {}
-  }
+    "parentAddress": "c8682a15daadf8f59fc28e56e94bb34034b2cfaf9efa8002c26661e68783533b",
+    "previousAddress": "c8682a15daadf8f59fc28e56e94bb34034b2cfaf9efa8002c26661e68783533b",
+    "content": {},
+    "registeredAt": "2022-02-23T10:18:21.558Z",
+    "signature": "c6169e2cfdf947a0a8b90fda4bccd0ea10fc3e5b9284776311f5b58071a2f708,a2303ee627dd4beee0691ef77ae9084886cb7348064631aca552527578320e2d",
+    "type": "CastRequestItem"
+  },
+  "receipt": "51e1fbea79595e518779d2c78aebc6a9c266f6055a1edbc16ede0c1a40406aa1,18e7ac0b2f410f8f66289f9a074cd97b8f807810911eb4601b4e4bbd749bc57c"
 }

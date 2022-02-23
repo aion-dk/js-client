@@ -110,3 +110,18 @@ const verifyAddress = (item: BoardItem) => {
     throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
   }
 }
+
+export const validateReceipt = (items: BoardItem[], receipt: string, publicKey: string) => {
+  const uniformer = new Uniformer();
+
+  const content = {
+    signature: items[0].signature,
+    address: items[items.length-1].address
+  }
+
+  const message = uniformer.formString(content);
+
+  if(!Crypto.verifySchnorrSignature(receipt, message, publicKey)) {
+    throw new Error('Board receipt verification failed');
+  }
+}
