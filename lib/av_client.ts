@@ -39,7 +39,7 @@ import {
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
-import { signPayload, validatePayload } from './av_client/sign';
+import { signPayload, validatePayload, validateReceipt } from './av_client/sign';
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
@@ -220,9 +220,12 @@ export class AVClient implements IAVClient {
       }
     }
 
-    const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
+    const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
+    const voterSessionItem = voterSessionItemResponse.data.voterSession;
+    const receipt = voterSessionItemResponse.data.receipt;
 
     validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
+    validateReceipt([voterSessionItem], receipt, this.getDbbPublicKey());
 
     this.voterSession = voterSessionItem;
     this.bulletinBoard.setVoterSessionUuid(voterSessionItem.content.identifier);
@@ -321,7 +324,8 @@ export class AVClient implements IAVClient {
       this.clientEnvelopes,
       this.serverEnvelopes,
       boardCommitment.address,
-      this.privateKey()
+      this.privateKey(),
+      this.getDbbPublicKey()
     );
 
     return 'checking code/verification track start address';

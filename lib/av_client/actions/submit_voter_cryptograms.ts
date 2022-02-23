@@ -1,14 +1,15 @@
 import { BulletinBoard } from '../connectors/bulletin_board';
 import { BallotCryptogramItem, BoardItemType, ContestMap, OpenableEnvelope } from '../types';
 import { finalizeBallotCryptograms } from './finalize_ballot_cryptograms';
-import { sealEnvelopes, signPayload, validatePayload } from '../sign';
+import { sealEnvelopes, signPayload, validatePayload, validateReceipt } from '../sign';
 
 const submitVoterCryptograms = async (
   bulletinBoard: BulletinBoard,
   clientEnvelopes: ContestMap<OpenableEnvelope>,
   serverEnvelopes: ContestMap<string[]>,
   boardCommitmentAddress: string,
-  voterSigningKey: string
+  voterSigningKey: string,
+  dbbPublicKey: string
   ): Promise<BallotCryptogramItem> => {
 
   const finalizedCryptograms = finalizeBallotCryptograms(clientEnvelopes, serverEnvelopes)
@@ -29,7 +30,10 @@ const submitVoterCryptograms = async (
     proofs: sealEnvelopes(clientEnvelopes)
   };
 
-  const ballotCryptogramsItemResponse = (await bulletinBoard.submitVotes(itemWithProofs)).data.vote;
+  const response = (await bulletinBoard.submitVotes(itemWithProofs));
+  const ballotCryptogramsItemCopy = response.data.vote;
+  const verificationItem = response.data.verification;
+  const receipt = response.data.receipt;
 
   const ballotCryptogramsItemExpectation = {
     parentAddress: boardCommitmentAddress,
@@ -39,9 +43,10 @@ const submitVoterCryptograms = async (
     }
   }
 
-  validatePayload(ballotCryptogramsItemResponse, ballotCryptogramsItemExpectation)
+  validatePayload(ballotCryptogramsItemCopy, ballotCryptogramsItemExpectation);
+  validateReceipt([ballotCryptogramsItemCopy, verificationItem], receipt, dbbPublicKey);
 
-  return ballotCryptogramsItemResponse as BallotCryptogramItem;
+  return ballotCryptogramsItemCopy as BallotCryptogramItem;
 }
 
 export default submitVoterCryptograms;
