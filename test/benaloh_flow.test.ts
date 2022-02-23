@@ -122,12 +122,9 @@ describe('entire benaloh flow', () => {
       console.error(e);
     });
 
-    let oneTimePassword: string;
-
-    oneTimePassword = await extractOTPFromEmail();
+    const oneTimePassword = await extractOTPFromEmail();
     
-
-    const confirmationToken = await client.validateAccessCode(oneTimePassword).catch((e) => {
+    await client.validateAccessCode(oneTimePassword).catch((e) => {
       console.error(e);
     });
 

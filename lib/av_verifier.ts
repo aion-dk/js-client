@@ -47,7 +47,7 @@ export class AVVerifier {
       let attempts = 0;
       
       const executePoll = async (resolve, reject) => {
-        let result = await this.bulletinBoard.getSpoilRequestItem(ballotCryptogramsAddress);
+        const result = await this.bulletinBoard.getSpoilRequestItem(ballotCryptogramsAddress);
         attempts++;
 
         if (result?.data?.item?.type === 'SpoilRequestItem') {
@@ -62,5 +62,5 @@ export class AVVerifier {
       };
     
       return new Promise(executePoll);
-    };
+    }
 }
