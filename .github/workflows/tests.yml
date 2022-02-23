@@ -11,6 +11,10 @@ jobs:
         with:
           node-version: '14.x'
           cache: 'npm'
+      - name: print stuff
+        run: |
+          echo ${GITHUB_REF}
+          echo ${GITHUB_REF_NAME}
       - name: Install NPM packages
         run: npm ci
       - name: Run linter
