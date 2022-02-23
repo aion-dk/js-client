@@ -1,5 +1,5 @@
 import { BulletinBoard } from '../connectors/bulletin_board';
-import { BallotCryptogramItem, BoardItemType, ContestMap, OpenableEnvelope } from '../types';
+import { BallotCryptogramItem, BoardItemType, ContestMap, OpenableEnvelope, VerificationStartItem } from '../types';
 import { finalizeBallotCryptograms } from './finalize_ballot_cryptograms';
 import { sealEnvelopes, signPayload, validatePayload, validateReceipt } from '../sign';
 
@@ -10,7 +10,7 @@ const submitVoterCryptograms = async (
   boardCommitmentAddress: string,
   voterSigningKey: string,
   dbbPublicKey: string
-  ): Promise<BallotCryptogramItem> => {
+  ): Promise<[BallotCryptogramItem, VerificationStartItem]> => {
 
   const finalizedCryptograms = finalizeBallotCryptograms(clientEnvelopes, serverEnvelopes)
 
@@ -46,7 +46,10 @@ const submitVoterCryptograms = async (
   validatePayload(ballotCryptogramsItemCopy, ballotCryptogramsItemExpectation);
   validateReceipt([ballotCryptogramsItemCopy, verificationItem], receipt, dbbPublicKey);
 
-  return ballotCryptogramsItemCopy as BallotCryptogramItem;
+  return [
+    ballotCryptogramsItemCopy as BallotCryptogramItem,
+    verificationItem as VerificationStartItem
+  ];
 }
 
 export default submitVoterCryptograms;

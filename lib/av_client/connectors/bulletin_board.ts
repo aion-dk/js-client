@@ -58,6 +58,18 @@ export class BulletinBoard {
     });
   }
 
+  getVotingTrack(verificationStartAddress: string): Promise<AxiosResponse> {
+    return this.backend.get(`verification/vote_track/${verificationStartAddress}`)
+  }
+
+  getSpoilRequestItem(ballotCryptogramAddress: string): Promise<AxiosResponse> {
+    return this.backend.get(`verification/spoil_status/${ballotCryptogramAddress}`)
+  }
+
+  submitVerifierItem(signedVerifierItem): Promise<AxiosResponse> {
+    return this.backend.post('verification/verifier', signedVerifierItem)
+  }
+
   submitCommitment(signedCommit): Promise<AxiosResponse> {
     return this.backend.post('commitments', signedCommit, {
       headers: {
@@ -68,6 +80,14 @@ export class BulletinBoard {
 
   submitCastRequest(content): Promise<AxiosResponse> {
     return this.backend.post('cast', content, {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
+  }
+
+  submitSpoilRequest(content): Promise<AxiosResponse> {
+    return this.backend.post('spoil', content, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }

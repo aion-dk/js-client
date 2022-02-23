@@ -7,8 +7,8 @@ export interface IAVClient {
   validateAccessCode(code: string): Promise<void>
   registerVoter(): Promise<void>
   constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
-  spoilBallotCryptograms(): Promise<void>
-  castBallot(affidavit: Affidavit): Promise<string>
+  spoilBallot(): Promise<string>
+  castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
   purgeData(): void
 }
 
@@ -112,11 +112,9 @@ export interface Election {
  * ```
  */
  export type BallotBoxReceipt = {
-  previousBoardHash: HashValue
-  boardHash: HashValue
+  address: string
   registeredAt: string
-  serverSignature: Signature
-  voteSubmissionId: string
+  signature: Signature
 }
 
 export type BoardItem =
@@ -171,7 +169,11 @@ export interface BallotCryptogramItem extends BaseBoardItem {
   content: {
     cryptograms: ContestMap<string[]>
   } 
-  type: "BallotCryptogramItem"
+  type: "BallotCryptogramsItem"
+}
+
+export interface VerificationStartItem extends BaseBoardItem {
+  type: "VerificationStartItem"
 }
 
 export interface ItemExpectation {

@@ -319,7 +319,7 @@ export class AVClient implements IAVClient {
     this.boardCommitment = boardCommitment;
     this.serverEnvelopes = serverEnvelopes;
 
-    this.ballotCryptogramItem = await submitVoterCryptograms(
+    const [ ballotCryptogramItem, verificationStartItem ]  = await submitVoterCryptograms(
       this.bulletinBoard,
       this.clientEnvelopes,
       this.serverEnvelopes,
@@ -328,7 +328,8 @@ export class AVClient implements IAVClient {
       this.getDbbPublicKey()
     );
 
-    return 'checking code/verification track start address';
+    this.ballotCryptogramItem = ballotCryptogramItem;
+    return verificationStartItem.address;
   }
 
     /**
@@ -350,7 +351,7 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-    public async castBallot(_affidavit?: Affidavit): Promise<string> {
+    public async castBallot(_affidavit?: Affidavit): Promise<BallotBoxReceipt> {
       if(!(this.voterSession)) {
         throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
       }
@@ -363,8 +364,8 @@ export class AVClient implements IAVClient {
 
       const signedPayload = signPayload(castRequestItem, this.privateKey());
 
-      const receipt = (await this.bulletinBoard.submitCastRequest(signedPayload)).data;
-      return receipt.castRequest.address as string;
+      const receipt = (await this.bulletinBoard.submitCastRequest(signedPayload)).data.castRequest;
+      return receipt
     }
 
   /**
@@ -395,15 +396,20 @@ export class AVClient implements IAVClient {
    * @throws ServerCommitmentError if the server commitment is invalid
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async spoilBallotCryptograms(): Promise<void> {
-    // TODO: encrypt the vote cryptograms one more time with a key derived from `this.generateTestCode`.
-    //  A key is derived like: key = hash(test code, ballot id, cryptogram index)
-    // TODO: compute commitment openings of the voter commitment
-    // TODO: call the bulletin board to spoil the cryptograms. Send the encrypted vote cryptograms and voter commitment
-    //  opening. Response contains server commitment openings.
-    // TODO: verify the server commitment openings against server commitment and server empty cryptograms
+  public async spoilBallot(): Promise<string> {
+    if(!(this.voterSession)) {
+      throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
+    }
+    const spoilRequestItem = {
+        parentAddress: this.ballotCryptogramItem.address,
+        type: 'SpoilRequestItem',
+        content: {}
+    }
 
-    throw new Error('Not implemented yet');
+    const signedPayload = signPayload(spoilRequestItem, this.privateKey())
+    
+    const receipt = (await this.bulletinBoard.submitSpoilRequest(signedPayload)).data
+    return receipt.spoilRequest.address
   }
 
   /**
