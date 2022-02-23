@@ -112,11 +112,9 @@ export interface Election {
  * ```
  */
  export type BallotBoxReceipt = {
-  previousBoardHash: HashValue
   address: string
   registeredAt: string
-  serverSignature: Signature
-  voteSubmissionId: string
+  signature: Signature
 }
 
 export type BoardItem =
