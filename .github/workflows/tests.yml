@@ -19,6 +19,7 @@ jobs:
         run: |
           echo ${GITHUB_REF}
           echo ${GITHUB_REF_NAME}
+          git rev-parse --abbrev-ref HEAD
       - name: Install NPM packages
         run: npm ci
       - name: Run linter
