@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import nock = require('nock');
 
 import { BulletinBoard } from '../lib/av_client/connectors/bulletin_board';

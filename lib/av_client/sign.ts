@@ -27,7 +27,7 @@ export function fingerprint(encryptedAffidavid: string): string {
   return Crypto.hashString(encryptedAffidavid)
 }
 
-export const signPayload = (obj: any, privateKey: string) => {
+export const signPayload = (obj: any, privateKey: string) => {  // eslint-disable-line @typescript-eslint/no-explicit-any
   const uniformer = new Uniformer();
   const uniformPayload = uniformer.formString(obj);
 
@@ -40,8 +40,6 @@ export const signPayload = (obj: any, privateKey: string) => {
 }
 
 export const validatePayload = (item: BoardItem, expectations: ItemExpectation, signaturePublicKey?: string) => {
-  const uniformer = new Uniformer();
-
   if(expectations.content !== undefined) {
     verifyContent(item.content, expectations.content)
   }
@@ -63,7 +61,7 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
 
 export const sealEnvelopes = (encryptedVotes: ContestMap<OpenableEnvelope>): ContestMap<string[]> => {
   const sealEnvelope = (envelope: OpenableEnvelope): string[] => {
-    const { cryptograms, randomness } = envelope;
+    const { randomness } = envelope;
     const proofs = randomness.map(randomizer => Crypto.generateDiscreteLogarithmProof(randomizer)) 
     return proofs
   }
@@ -84,7 +82,7 @@ const verifySignature = (item: BoardItem, signaturePublicKey: string) => {
   }
 };
 
-const verifyContent = (actual: Record<string, any>, expectations: Record<string, any>) => {
+const verifyContent = (actual: Record<string, unknown>, expectations: Record<string, unknown>) => {
   const uniformer = new Uniformer();
 
   const expectedContent = uniformer.formString(expectations);

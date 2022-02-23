@@ -17,7 +17,7 @@ import { AccessCodeExpired } from '../lib/av_client/errors';
 describe('AVClient#validateAccessCode', () => {
   let client: AVClient;
   let sandbox;
-  const expectedNetworkRequests : any[] = [];
+  const expectedNetworkRequests : nock.Scope[] = [];
 
   beforeEach(async () => {
     sandbox = resetDeterminism();
@@ -98,7 +98,7 @@ describe('AVClient#validateAccessCode', () => {
       const email = 'blabla@aion.dk';
 
       await client.requestAccessCode('voter123', email);
-      const result = await client.validateAccessCode(otp);
+      await client.validateAccessCode(otp);
 
       await expectError(
         client.registerVoter(),

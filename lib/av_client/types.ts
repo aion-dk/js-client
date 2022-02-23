@@ -180,7 +180,7 @@ export interface VerificationStartItem extends BaseBoardItem {
 
 export interface ItemExpectation {
   content?: {
-    [k: string]: any
+    [k: string]: unknown
   }
   type: BoardItemType
   parentAddress: string

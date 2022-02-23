@@ -10,7 +10,7 @@ describe('Util#nistCvrToAvCvr', () => {
 
   context('NIST converter transforms 1500-103 XML to json', () => {
     it('Convert simple selection for single contest', async () => {
-      var xml = readFile('./cvrs/jetsons_bedrock-precinct2_cvr.xml');
+      const xml = readFile('./cvrs/jetsons_bedrock-precinct2_cvr.xml');
 
       const result = NistConverter.nistCvrToAvCvr(xml);
 
@@ -20,7 +20,7 @@ describe('Util#nistCvrToAvCvr', () => {
     });
 
     it('Convert simple selection for two contests', () => {
-      var xml = readFile('./cvrs/sample1.xml');
+      const xml = readFile('./cvrs/sample1.xml');
 
       const result = NistConverter.nistCvrToAvCvr(xml);
 
@@ -29,7 +29,7 @@ describe('Util#nistCvrToAvCvr', () => {
     });
 
     it('No contests throws an error', async () => {
-      var xml = readFile('./cvrs/no_contests.xml');
+      const xml = readFile('./cvrs/no_contests.xml');
 
       await expectError(
         () => NistConverter.nistCvrToAvCvr(xml),
@@ -39,7 +39,7 @@ describe('Util#nistCvrToAvCvr', () => {
     });
 
     it('No contest selection throws an error', async () => {
-      var xml = readFile('./cvrs/no_contest_selection.xml');
+      const xml = readFile('./cvrs/no_contest_selection.xml');
 
       await expectError(
         () => NistConverter.nistCvrToAvCvr(xml),
@@ -49,7 +49,7 @@ describe('Util#nistCvrToAvCvr', () => {
     });
 
     it('Extracts correct snapshot', () => {
-      var xml = readFile('./cvrs/sample2.xml');
+      const xml = readFile('./cvrs/sample2.xml');
 
       const result = NistConverter.nistCvrToAvCvr(xml);
 

@@ -3,7 +3,7 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
-import { KeyPair, CastVoteRecord, Affidavit, BoardItemType, VoterCommitmentItem } from './av_client/types';
+import { KeyPair, CastVoteRecord, Affidavit, BoardItemType } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import * as jwt from 'jsonwebtoken';
 
@@ -300,9 +300,6 @@ export class AVClient implements IAVClient {
     } = constructBallotCryptograms(state, cvr);
 
     this.clientEnvelopes = envelopes;
-    // 1. Create and submit commitment item
-    // 2. Keep randomizer(s) throughout the session
-    //this.commitment = {}
  
     const {
       voterCommitment,     // TODO: Required when spoiling
@@ -334,7 +331,7 @@ export class AVClient implements IAVClient {
     /**
    * Should be the last call in the entire voting process.
    *
-   * Submits encrypted ballot and the affidavit to the digital ballot box.
+   * Requests that the previously constructed ballot is cast.
    *
    *
    * @param affidavit The {@link Affidavit | affidavit} document.
@@ -350,21 +347,22 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-      public async castBallot(affidavit?: Affidavit): Promise<any> {
-        if(!(this.voterSession)) {
-          throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
-        }
-        const castRequestItem = {
-            parentAddress: this.ballotCryptogramItem.address,
-            type: 'CastRequestItem',
-            content: {}
-        }
-
-        const signedPayload = signPayload(castRequestItem, this.privateKey())
-        
-        const receipt = (await this.bulletinBoard.submitCastRequest(signedPayload)).data
-        return receipt.castRequest.address
+    public async castBallot(_affidavit?: Affidavit): Promise<string> {
+      if(!(this.voterSession)) {
+        throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
       }
+
+      const castRequestItem = {
+          parentAddress: this.ballotCryptogramItem.address,
+          type: 'CastRequestItem',
+          content: {}
+      };
+
+      const signedPayload = signPayload(castRequestItem, this.privateKey());
+
+      const receipt = (await this.bulletinBoard.submitCastRequest(signedPayload)).data;
+      return receipt.castRequest.address as string;
+    }
 
   /**
    * @deprecated

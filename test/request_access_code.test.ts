@@ -17,7 +17,7 @@ import {
 
 describe('AVClient#requestAccessCode', () => {
   let client: AVClient;
-  const expectedNetworkRequests : any[] = [];
+  const expectedNetworkRequests : nock.Scope[] = [];
 
   beforeEach(async () => {
     expectedNetworkRequests.push(bbHost.get_election_config());
@@ -39,7 +39,7 @@ describe('AVClient#requestAccessCode', () => {
           expect(result).to.eql(undefined);
           expectedNetworkRequests.forEach((mock) => mock.done());
         },
-        (error) => {
+        (_error) => {
           expect.fail('Expected a resolved promise');
         }
       );

@@ -8,6 +8,7 @@ import {
   vaHost,
   otpHost
 } from './test_helpers';
+import { expect } from 'chai';
 
 describe('AVClient#constructBallotCryptograms', () => {
   let client: AVClient;
@@ -49,7 +50,7 @@ describe('AVClient#constructBallotCryptograms', () => {
 
       const trackingCode = await client.constructBallotCryptograms(cvr);
 
-      // expect(trackingCode.length).to.eql(64);
+      expect(typeof trackingCode === "string").to.be.true;
     });
   });
 
