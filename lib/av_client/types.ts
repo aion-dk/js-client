@@ -8,7 +8,7 @@ export interface IAVClient {
   registerVoter(): Promise<void>
   constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
   spoilBallot(): Promise<void>
-  castBallot(affidavit: Affidavit): Promise<BallotBoxReceipt>
+  castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
   purgeData(): void
 }
 
@@ -113,7 +113,7 @@ export interface Election {
  */
  export type BallotBoxReceipt = {
   previousBoardHash: HashValue
-  boardHash: HashValue
+  address: string
   registeredAt: string
   serverSignature: Signature
   voteSubmissionId: string
