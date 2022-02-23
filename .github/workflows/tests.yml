@@ -20,6 +20,9 @@ jobs:
           echo ${GITHUB_REF}
           echo ${GITHUB_REF_NAME}
           git rev-parse --abbrev-ref HEAD
+      - name: try conditional
+        if: github.event.pull_request != null
+        run: echo "Hello World - this is trigger by a PR!"
       - name: Install NPM packages
         run: npm ci
       - name: Run linter
