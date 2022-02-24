@@ -1,7 +1,8 @@
 import { BulletinBoard } from '../connectors/bulletin_board';
-import { BallotCryptogramItem, BoardItemType, ContestMap, OpenableEnvelope, VerificationStartItem } from '../types';
+import { BallotCryptogramItem, BoardItem, BoardItemType, ContestMap, OpenableEnvelope, VerificationStartItem } from '../types';
 import { finalizeBallotCryptograms } from './finalize_ballot_cryptograms';
 import { sealEnvelopes, signPayload, validatePayload } from '../sign';
+import { BALLOT_CRYPTOGRAMS_ITEM } from '../constants';
 
 const submitVoterCryptograms = async (
   bulletinBoard: BulletinBoard,
@@ -15,7 +16,7 @@ const submitVoterCryptograms = async (
 
   const ballotCryptogramsItem = {
     parentAddress: boardCommitmentAddress,
-    type: "BallotCryptogramsItem",
+    type: BALLOT_CRYPTOGRAMS_ITEM,
     content: {
       cryptograms: finalizedCryptograms,
     }
@@ -33,7 +34,7 @@ const submitVoterCryptograms = async (
 
   const ballotCryptogramsItemExpectation = {
     parentAddress: boardCommitmentAddress,
-    type: "BallotCryptogramsItem" as BoardItemType,
+    type: BALLOT_CRYPTOGRAMS_ITEM as BoardItemType,
     content: {
       cryptograms: finalizedCryptograms,
     }

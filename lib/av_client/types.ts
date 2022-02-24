@@ -126,7 +126,7 @@ export type BoardItem =
 export type BoardItemType =
   "VoterSessionItem" |
   "BoardCommitmentItem" |
-  "BallotCryptogramItem"
+  "BallotCryptogramsItem"
 
 
 interface BaseBoardItem {

@@ -35,7 +35,7 @@ describe('entire benaloh flow', () => {
       let verifierItem : any
       if(cryptogramAddress){ // We found a ballot using the tracking code
         // The verifier starts polling for spoil request
-        spoilRequestAddress = await verifier.pollForSpoilRequest(cryptogramAddress, 100, 10)
+        spoilRequestAddress = await verifier.pollForSpoilRequest(cryptogramAddress)
 
         // The verifier found a spoil request and now submits it's public key in a VerifierItem
         verifierItem = await verifier.submitVerifierKey(spoilRequestAddress)
@@ -75,7 +75,7 @@ describe('entire benaloh flow', () => {
       expect(cryptogramAddress.length).to.eql(64)
 
       // We should receive an error which tells us the ballot we are trying to spoil has already been cast
-      const spoilRequest = await verifier.pollForSpoilRequest(cryptogramAddress, 1000, 10).catch(error => {
+      const spoilRequest = await verifier.pollForSpoilRequest(cryptogramAddress).catch(error => {
         expect(error.message).to.eql('Ballot has been cast and cannot be spoiled')
       })
 
@@ -99,7 +99,7 @@ describe('entire benaloh flow', () => {
       expect(cryptogramAddress.length).to.eql(64)
 
       // We should receive an error which tells us the ballot we are looking for has no spoil request
-      const spoilRequest = await verifier.pollForSpoilRequest(cryptogramAddress, 100, 5).catch(error => {
+      const spoilRequest = await verifier.pollForSpoilRequest(cryptogramAddress).catch(error => {
         expect(error.message).to.eql('Exceeded max attempts')
       })
 
