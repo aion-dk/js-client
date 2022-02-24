@@ -406,15 +406,20 @@ export class AVClient implements IAVClient {
       throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
     }
     const spoilRequestItem = {
-        parentAddress: this.ballotCryptogramItem.address,
-        type: 'SpoilRequestItem',
-        content: {}
+      parentAddress: this.ballotCryptogramItem.address,
+      type: 'SpoilRequestItem' as BoardItemType,
+      content: {}
     }
 
-    const signedPayload = signPayload(spoilRequestItem, this.privateKey())
+    const signedPayload = signPayload(spoilRequestItem, this.privateKey());
     
-    const receipt = (await this.bulletinBoard.submitSpoilRequest(signedPayload)).data
-    return receipt.spoilRequest.address
+    const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload));
+    const { spoilRequest, receipt } = response.data;
+
+    validatePayload(spoilRequest, spoilRequestItem);
+    validateReceipt([spoilRequest], receipt, this.getDbbPublicKey());
+
+    return receipt;
   }
 
   /**
