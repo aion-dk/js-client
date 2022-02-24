@@ -351,21 +351,26 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-    public async castBallot(_affidavit?: Affidavit): Promise<BallotBoxReceipt> {
+    public async castBallot(_affidavit?: Affidavit): Promise<string> {
       if(!(this.voterSession)) {
         throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
       }
 
       const castRequestItem = {
           parentAddress: this.ballotCryptogramItem.address,
-          type: 'CastRequestItem',
+          type: 'CastRequestItem' as BoardItemType,
           content: {}
       };
 
       const signedPayload = signPayload(castRequestItem, this.privateKey());
 
-      const receipt = (await this.bulletinBoard.submitCastRequest(signedPayload)).data.castRequest;
-      return receipt
+      const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
+      const { castRequest, receipt } = response.data;
+
+      validatePayload(castRequest, castRequestItem);
+      validateReceipt([castRequest], receipt, this.getDbbPublicKey());
+
+      return receipt;
     }
 
   /**

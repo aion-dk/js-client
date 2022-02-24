@@ -8,7 +8,7 @@ export interface IAVClient {
   registerVoter(): Promise<void>
   constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
   spoilBallot(): Promise<string>
-  castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
+  castBallot (affidavit: Affidavit): Promise<string>
   purgeData(): void
 }
 
