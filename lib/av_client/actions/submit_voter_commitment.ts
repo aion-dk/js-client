@@ -15,43 +15,35 @@ const submitVoterCommitment = async (
   voterSigningKey: string,
   dbbPublicKey: string): Promise<SubmitVoterCommitmentResponse> => {
 
-  const commitmentItem = {
+  const voterCommitmentItem = {
     parentAddress: sessionAddress,
-    type: "VoterEncryptionCommitmentItem",
+    type: "VoterEncryptionCommitmentItem"  as BoardItemType,
     content: {
       commitment: commitment
     }
   };
 
-  const signedCommitmentItem = signPayload(commitmentItem, voterSigningKey);
+  const signedCommitmentItem = signPayload(voterCommitmentItem, voterSigningKey);
   const response = await bulletinBoard.submitCommitment(signedCommitmentItem);
 
-  const voterCommitment: VoterCommitmentItem = response.data.voterCommitment;
+  const voterCommitmentCopy: VoterCommitmentItem = response.data.voterCommitment;
   const boardCommitment = response.data.boardCommitment;
   const serverEnvelopes = response.data.envelopes;
   const receipt = response.data.receipt;
 
-  const voterCommitmentItemExpectation = {
-    parentAddress: sessionAddress,
-    type: "VoterEncryptionCommitmentItem" as BoardItemType,
-    content: {
-      commitment: commitment
-    }
-  }
 
-  validatePayload(voterCommitment, voterCommitmentItemExpectation);
+  validatePayload(voterCommitmentCopy, voterCommitmentItem);
 
   const boardCommitmentItemExpectation = {
-    parentAddress: voterCommitment.address,
+    parentAddress: voterCommitmentCopy.address,
     type: "BoardEncryptionCommitmentItem" as BoardItemType,
   }
 
   validatePayload(boardCommitment, boardCommitmentItemExpectation, dbbPublicKey)
-
-  validateReceipt([voterCommitment, boardCommitment], receipt, dbbPublicKey);
+  validateReceipt([voterCommitmentCopy, boardCommitment], receipt, dbbPublicKey);
 
   return {
-    voterCommitment,
+    voterCommitment: voterCommitmentCopy,
     boardCommitment, 
     serverEnvelopes
   }

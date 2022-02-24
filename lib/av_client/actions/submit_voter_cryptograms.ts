@@ -16,7 +16,7 @@ const submitVoterCryptograms = async (
 
   const ballotCryptogramsItem = {
     parentAddress: boardCommitmentAddress,
-    type: "BallotCryptogramsItem",
+    type: "BallotCryptogramsItem" as BoardItemType,
     content: {
       cryptograms: finalizedCryptograms,
     }
@@ -35,15 +35,7 @@ const submitVoterCryptograms = async (
   const verificationItem = response.data.verification;
   const receipt = response.data.receipt;
 
-  const ballotCryptogramsItemExpectation = {
-    parentAddress: boardCommitmentAddress,
-    type: "BallotCryptogramsItem" as BoardItemType,
-    content: {
-      cryptograms: finalizedCryptograms,
-    }
-  }
-
-  validatePayload(ballotCryptogramsItemCopy, ballotCryptogramsItemExpectation);
+  validatePayload(ballotCryptogramsItemCopy, ballotCryptogramsItem);
   validateReceipt([ballotCryptogramsItemCopy, verificationItem], receipt, dbbPublicKey);
 
   return [
