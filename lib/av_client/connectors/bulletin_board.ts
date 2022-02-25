@@ -25,7 +25,7 @@ export class BulletinBoard {
     return this.backend.get('election_config');
   }
 
-  async createVoterRegistration(authToken: string, parentAddress: string): Promise<VoterSessionItem> {
+  async createVoterRegistration(authToken: string, parentAddress: string): Promise<AxiosResponse> {
     const response = await this.backend.post('registrations', {
       authToken,
       parentAddress
@@ -47,7 +47,7 @@ export class BulletinBoard {
       throw error;
     });
 
-    return (response.data.voterSession as VoterSessionItem)
+    return response;
   }
 
   submitVotes(signedBallotCryptogramsItem): Promise<AxiosResponse> {

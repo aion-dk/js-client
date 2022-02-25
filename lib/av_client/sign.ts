@@ -27,7 +27,7 @@ export function fingerprint(encryptedAffidavid: string): string {
   return Crypto.hashString(encryptedAffidavid)
 }
 
-export const signPayload = (obj: any, privateKey: string) => {  // eslint-disable-line @typescript-eslint/no-explicit-any
+export const signPayload = (obj: Record<string, unknown>, privateKey: string) => {
   const uniformer = new Uniformer();
   const uniformPayload = uniformer.formString(obj);
 
@@ -41,7 +41,7 @@ export const signPayload = (obj: any, privateKey: string) => {  // eslint-disabl
 
 export const validatePayload = (item: BoardItem, expectations: ItemExpectation, signaturePublicKey?: string) => {
   if(expectations.content !== undefined) {
-    verifyContent(item.content, expectations.content)
+    verifyContent(item.content, expectations.content);
   }
 
   if(expectations.type != item.type) {
@@ -62,8 +62,8 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
 export const sealEnvelopes = (encryptedVotes: ContestMap<OpenableEnvelope>): ContestMap<string[]> => {
   const sealEnvelope = (envelope: OpenableEnvelope): string[] => {
     const { randomness } = envelope;
-    const proofs = randomness.map(randomizer => Crypto.generateDiscreteLogarithmProof(randomizer)) 
-    return proofs
+    const proofs = randomness.map(randomizer => Crypto.generateDiscreteLogarithmProof(randomizer));
+    return proofs;
   }
 
   return Object.fromEntries(Object.keys(encryptedVotes).map(k => [k, sealEnvelope(encryptedVotes[k])]))
@@ -108,5 +108,20 @@ const verifyAddress = (item: BoardItem) => {
 
   if(item.address != expectedItemAddress) {
     throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
+  }
+}
+
+export const validateReceipt = (items: BoardItem[], receipt: string, publicKey: string) => {
+  const uniformer = new Uniformer();
+
+  const content = {
+    signature: items[0].signature,
+    address: items[items.length-1].address
+  }
+
+  const message = uniformer.formString(content);
+
+  if(!Crypto.verifySchnorrSignature(receipt, message, publicKey)) {
+    throw new Error('Board receipt verification failed');
   }
 }

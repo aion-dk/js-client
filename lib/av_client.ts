@@ -39,7 +39,7 @@ import {
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
-import { signPayload, validatePayload } from './av_client/sign';
+import { signPayload, validatePayload, validateReceipt } from './av_client/sign';
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
@@ -221,9 +221,12 @@ export class AVClient implements IAVClient {
       }
     }
 
-    const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
+    const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
+    const voterSessionItem = voterSessionItemResponse.data.voterSession;
+    const receipt = voterSessionItemResponse.data.receipt;
 
     validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
+    validateReceipt([voterSessionItem], receipt, this.getDbbPublicKey());
 
     this.voterSession = voterSessionItem;
     this.bulletinBoard.setVoterSessionUuid(voterSessionItem.content.identifier);
@@ -322,7 +325,8 @@ export class AVClient implements IAVClient {
       this.clientEnvelopes,
       this.serverEnvelopes,
       boardCommitment.address,
-      this.privateKey()
+      this.privateKey(),
+      this.getDbbPublicKey()
     );
 
     this.ballotCryptogramItem = ballotCryptogramItem;
@@ -348,21 +352,26 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-    public async castBallot(_affidavit?: Affidavit): Promise<BallotBoxReceipt> {
+    public async castBallot(_affidavit?: Affidavit): Promise<string> {
       if(!(this.voterSession)) {
         throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
       }
 
       const castRequestItem = {
           parentAddress: this.ballotCryptogramItem.address,
-          type: 'CastRequestItem',
+          type: 'CastRequestItem' as BoardItemType,
           content: {}
       };
 
       const signedPayload = signPayload(castRequestItem, this.privateKey());
 
-      const receipt = (await this.bulletinBoard.submitCastRequest(signedPayload)).data.castRequest;
-      return receipt
+      const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
+      const { castRequest, receipt } = response.data;
+
+      validatePayload(castRequest, castRequestItem);
+      validateReceipt([castRequest], receipt, this.getDbbPublicKey());
+
+      return receipt;
     }
 
   /**
@@ -398,15 +407,20 @@ export class AVClient implements IAVClient {
       throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
     }
     const spoilRequestItem = {
-        parentAddress: this.ballotCryptogramItem.address,
-        type: 'SpoilRequestItem',
-        content: {}
+      parentAddress: this.ballotCryptogramItem.address,
+      type: 'SpoilRequestItem' as BoardItemType,
+      content: {}
     }
 
-    const signedPayload = signPayload(spoilRequestItem, this.privateKey())
+    const signedPayload = signPayload(spoilRequestItem, this.privateKey());
     
-    const receipt = (await this.bulletinBoard.submitSpoilRequest(signedPayload)).data
-    return receipt.spoilRequest.address
+    const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload));
+    const { spoilRequest, receipt } = response.data;
+
+    validatePayload(spoilRequest, spoilRequestItem);
+    validateReceipt([spoilRequest], receipt, this.getDbbPublicKey());
+
+    return receipt;
   }
 
   /**
