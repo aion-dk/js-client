@@ -66,6 +66,10 @@ export class BulletinBoard {
     return this.backend.get(`verification/spoil_status/${ballotCryptogramAddress}`)
   }
 
+  getVerifierItem(spoilRequestAddress: string): Promise<AxiosResponse> {
+    return this.backend.get(`verification/verifier/${spoilRequestAddress}`)
+  }
+
   submitVerifierItem(signedVerifierItem): Promise<AxiosResponse> {
     return this.backend.post('verification/verifier', signedVerifierItem)
   }

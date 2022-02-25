@@ -1,4 +1,5 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
+import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
 
@@ -32,7 +33,7 @@ export class AVVerifier {
       this.verifierPrivateKey = keyPair.privateKey
 
       const verfierItem = {
-        type: 'VerifierItem',
+        type: VERIFIER_ITEM,
         parentAddress: spoilRequestAddress,
         content: {
           publicKey: keyPair.publicKey
@@ -43,21 +44,21 @@ export class AVVerifier {
       await this.bulletinBoard.submitVerifierItem(signedVerifierItem)
     }
 
-    public async pollForSpoilRequest(ballotCryptogramsAddress: string, interval: number, maxAttempts: number): Promise<string> {
+    public async pollForSpoilRequest(ballotCryptogramsAddress: string): Promise<string> {
       let attempts = 0;
       
       const executePoll = async (resolve, reject) => {
         const result = await this.bulletinBoard.getSpoilRequestItem(ballotCryptogramsAddress);
         attempts++;
 
-        if (result?.data?.item?.type === 'SpoilRequestItem') {
+        if (result?.data?.item?.type === SPOIL_REQUEST_ITEM) {
           return resolve(result.data.item.address);
-        } else if (result?.data?.item?.type === 'CastRequestItem'){
+        } else if (result?.data?.item?.type === CAST_REQUEST_ITEM){
           return reject(new Error('Ballot has been cast and cannot be spoiled'))
-        }  else if (maxAttempts && attempts === maxAttempts) {
+        }  else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
           return reject(new Error('Exceeded max attempts'));
         } else  {
-          setTimeout(executePoll, interval, resolve, reject);
+          setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
         }
       };
     

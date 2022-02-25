@@ -124,9 +124,14 @@ export type BoardItem =
   BallotCryptogramItem
 
 export type BoardItemType =
-  "VoterSessionItem" |
-  "BoardCommitmentItem" |
-  "BallotCryptogramItem"
+  "BallotCryptogramsItem" |
+  "BoardEncryptionCommitmentItem" |
+  "CastRequestItem" |
+  "SpoilRequestItem" |
+  "VerificationStartItem" |
+  "VerifierItem" |
+  "VoterEncryptionCommitmentItem" |
+  "VoterSessionItem"
 
 
 interface BaseBoardItem {
@@ -154,7 +159,7 @@ export interface BoardCommitmentItem extends BaseBoardItem {
     commitment: string
   } 
 
-  type: "BoardCommitmentItem"
+  type: "BoardEncryptionCommitmentItem"
 }
 
 export interface VoterCommitmentItem extends BaseBoardItem {
@@ -162,7 +167,7 @@ export interface VoterCommitmentItem extends BaseBoardItem {
     commitment: string
   } 
 
-  type: "VoterCommitmentItem"
+  type: "VoterEncryptionCommitmentItem"
 }
 
 export interface BallotCryptogramItem extends BaseBoardItem {
