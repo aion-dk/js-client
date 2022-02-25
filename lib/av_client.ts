@@ -3,7 +3,7 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
-import { KeyPair, CastVoteRecord, Affidavit, BoardItemType, VerifierItem, ServerCommitmentOpening, SpoilRequestItem } from './av_client/types';
+import { KeyPair, CastVoteRecord, Affidavit, BoardItemType, VerifierItem, BoardCommitmentOpening, SpoilRequestItem } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import * as jwt from 'jsonwebtoken';
 
@@ -91,6 +91,7 @@ export class AVClient implements IAVClient {
   private voterSession: VoterSessionItem;
   private boardCommitment: BoardCommitmentItem;
   private ballotCryptogramItem: BallotCryptogramItem;
+  private boardCommitmentOpening: BoardCommitmentOpening;
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -352,7 +353,7 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-    public async castBallot(_affidavit?: Affidavit): Promise<string> {
+    public async castBallot(_affidavit?: Affidavit): Promise<BallotBoxReceipt> {
       if(!(this.voterSession)) {
         throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
       }
@@ -402,7 +403,7 @@ export class AVClient implements IAVClient {
    * @throws ServerCommitmentError if the server commitment is invalid
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async spoilBallot(): Promise<[ServerCommitmentOpening, SpoilRequestItem]> {
+  public async spoilBallot(): Promise<string> {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
     }
@@ -416,12 +417,14 @@ export class AVClient implements IAVClient {
     
     const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload))
 
-    const { spoilRequest, receipt, serverCommitmentOpening } = response.data;
+    const { spoilRequest, receipt, boardCommitmentOpening } = response.data;
+
+    this.boardCommitmentOpening = boardCommitmentOpening
 
     validatePayload(spoilRequest, spoilRequestItem);
     validateReceipt([spoilRequest], receipt, this.getDbbPublicKey());
     
-    return [serverCommitmentOpening, spoilRequest]
+    return spoilRequest.address
   }
 
   /**

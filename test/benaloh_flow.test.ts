@@ -4,12 +4,14 @@ import {
   resetDeterminism,
   vaHost,
   bbHost,
-  otpHost
+  otpHost,
+  expectError
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 import { AVVerifier } from '../lib/av_verifier';
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
+import { equal } from 'assert';
 
 const USE_MOCK = true;
 
@@ -22,7 +24,7 @@ describe('entire benaloh flow', () => {
     // Cleanup
   });
 
-  it.skip('spoils a ballot', async () => {
+  it('spoils a ballot', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
@@ -31,14 +33,23 @@ describe('entire benaloh flow', () => {
       const trackingCode = await placeVote(client) as string
       const cryptogramAddress = await verifier.findBallot(trackingCode)
       await client.spoilBallot()
+
       let spoilRequestAddress : any
       let verifierItem : any
+      let appVerifierItem : any
       if(cryptogramAddress){ // We found a ballot using the tracking code
         // The verifier starts polling for spoil request
         spoilRequestAddress = await verifier.pollForSpoilRequest(cryptogramAddress)
 
         // The verifier found a spoil request and now submits it's public key in a VerifierItem
         verifierItem = await verifier.submitVerifierKey(spoilRequestAddress)
+
+        appVerifierItem = await client.pollForVerifierItem(spoilRequestAddress)
+        
+        // Emulating a pairing the app and verifier tracking codes
+        expect(verifierItem.address).to.eql(appVerifierItem.address)
+
+        // App creates the voterCommitmentOpening
 
         // Verifier polls for commitment openings
 

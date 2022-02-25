@@ -192,7 +192,7 @@ export interface SpoilRequestItem extends BaseBoardItem {
   type: "SpoilRequestItem"
 }
 
-export interface ServerCommitmentOpening {
+export interface BoardCommitmentOpening {
   randomizers: ContestMap<string[]>
   commitmentRandomness: string
 }
