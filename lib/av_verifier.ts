@@ -2,6 +2,7 @@ import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
+import { VerifierItem } from './av_client/types';
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -28,7 +29,7 @@ export class AVVerifier {
       return cryptogramAddress
     }
 
-    public async submitVerifierKey(spoilRequestAddress: string): Promise<void> {
+    public async submitVerifierKey(spoilRequestAddress: string): Promise<VerifierItem> {
       const keyPair = randomKeyPair()
       this.verifierPrivateKey = keyPair.privateKey
 
@@ -41,19 +42,23 @@ export class AVVerifier {
       }
 
       const signedVerifierItem = signPayload(verfierItem, keyPair.privateKey)
-      await this.bulletinBoard.submitVerifierItem(signedVerifierItem)
+      const verifierItem: VerifierItem = (await this.bulletinBoard.submitVerifierItem(signedVerifierItem)).data
+      return verifierItem
     }
 
     public async pollForSpoilRequest(ballotCryptogramsAddress: string): Promise<string> {
       let attempts = 0;
       
       const executePoll = async (resolve, reject) => {
-        const result = await this.bulletinBoard.getSpoilRequestItem(ballotCryptogramsAddress);
+        const result = await this.bulletinBoard.getSpoilRequestItem(ballotCryptogramsAddress).catch(error => {
+          console.error(error)
+        });
+
         attempts++;
 
-        if (result?.data?.item?.type === SPOIL_REQUEST_ITEM) {
-          return resolve(result.data.item.address);
-        } else if (result?.data?.item?.type === CAST_REQUEST_ITEM){
+        if (result?.data?.type === SPOIL_REQUEST_ITEM) {
+          return resolve(result.data.address);
+        } else if (result?.data?.type === CAST_REQUEST_ITEM){
           return reject(new Error('Ballot has been cast and cannot be spoiled'))
         }  else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
           return reject(new Error('Exceeded max attempts'));

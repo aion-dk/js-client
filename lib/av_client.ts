@@ -3,7 +3,7 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
-import { KeyPair, CastVoteRecord, Affidavit, BoardItemType } from './av_client/types';
+import { KeyPair, CastVoteRecord, Affidavit, BoardItemType, VerifierItem, ServerCommitmentOpening, SpoilRequestItem } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import * as jwt from 'jsonwebtoken';
 
@@ -43,6 +43,7 @@ import { signPayload, validatePayload } from './av_client/sign';
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
+import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -354,7 +355,7 @@ export class AVClient implements IAVClient {
 
       const castRequestItem = {
           parentAddress: this.ballotCryptogramItem.address,
-          type: 'CastRequestItem',
+          type: CAST_REQUEST_ITEM,
           content: {}
       };
 
@@ -392,20 +393,20 @@ export class AVClient implements IAVClient {
    * @throws ServerCommitmentError if the server commitment is invalid
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async spoilBallot(): Promise<string> {
+  public async spoilBallot(): Promise<[ServerCommitmentOpening, SpoilRequestItem]> {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
     }
     const spoilRequestItem = {
         parentAddress: this.ballotCryptogramItem.address,
-        type: 'SpoilRequestItem',
+        type: SPOIL_REQUEST_ITEM,
         content: {}
     }
 
     const signedPayload = signPayload(spoilRequestItem, this.privateKey())
     
-    const receipt = (await this.bulletinBoard.submitSpoilRequest(signedPayload)).data
-    return receipt.spoilRequest.address
+    const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload)).data
+    return [response.serverCommitmentOpening, response.spoilRequest]
   }
 
   /**
@@ -446,6 +447,28 @@ export class AVClient implements IAVClient {
 
   private publicKey(): ECPoint {
     return this.keyPair.publicKey
+  }
+
+  public async pollForVerifierItem(spoilRequestAddres: string): Promise<VerifierItem> {
+   let attempts = 0;
+   
+   const executePoll = async (resolve, reject) => {
+      const result = await this.bulletinBoard.getVerifierItem(spoilRequestAddres).catch(error => {
+        console.error(error)
+      });
+
+      attempts++;
+
+      if (result?.data?.type === VERIFIER_ITEM) {
+        return resolve(result.data);
+      } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
+        return reject(new Error('Exceeded max attempts'));
+      } else  {
+        setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
+      }
+    };
+  
+   return new Promise(executePoll);
   }
 }
 

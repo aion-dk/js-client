@@ -7,7 +7,7 @@ export interface IAVClient {
   validateAccessCode(code: string): Promise<void>
   registerVoter(): Promise<void>
   constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
-  spoilBallot(): Promise<string>
+  spoilBallot(): Promise<ServerCommitmentOpening>
   castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
   purgeData(): void
 }
@@ -174,6 +174,22 @@ export interface BallotCryptogramItem extends BaseBoardItem {
 
 export interface VerificationStartItem extends BaseBoardItem {
   type: "VerificationStartItem"
+}
+
+export interface VerifierItem extends BaseBoardItem {
+  content: {
+    publicKey: string
+  }
+  type: "VerifierItem"
+}
+
+export interface SpoilRequestItem extends BaseBoardItem {
+  type: "SpoilRequestItem"
+}
+
+export interface ServerCommitmentOpening {
+  randomizers: ContestMap<string[]>
+  commitmentRandomness: string
 }
 
 export interface ItemExpectation {
