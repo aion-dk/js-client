@@ -43,6 +43,7 @@ import { signPayload, validatePayload, validateReceipt } from './av_client/sign'
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
+import { VOTER_SESSION_ITEM } from './av_client/constants';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -210,7 +211,7 @@ export class AVClient implements IAVClient {
       throw new Error('Auth token could not be decoded');
 
     const voterSessionItemExpectation = {
-      type: 'VoterSessionItem' as BoardItemType,
+      type: VOTER_SESSION_ITEM,
       parentAddress: this.getElectionConfig().services.address,
       content: {
         authToken: authToken,

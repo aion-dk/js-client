@@ -1,6 +1,7 @@
 import { BulletinBoard } from "../connectors/bulletin_board";
+import { BOARD_COMMITMENT_ITEM, VOTER_COMMITMENT_ITEM } from "../constants";
 import { signPayload, validatePayload, validateReceipt } from "../sign";
-import { BoardCommitmentItem, BoardItemType, ContestMap, VoterCommitmentItem } from "../types";
+import { BoardCommitmentItem, ContestMap, VoterCommitmentItem } from "../types";
 
 type SubmitVoterCommitmentResponse = {
   voterCommitment: VoterCommitmentItem
@@ -17,7 +18,7 @@ const submitVoterCommitment = async (
 
   const voterCommitmentItem = {
     parentAddress: sessionAddress,
-    type: "VoterEncryptionCommitmentItem"  as BoardItemType,
+    type: VOTER_COMMITMENT_ITEM,
     content: {
       commitment: commitment
     }
@@ -31,12 +32,11 @@ const submitVoterCommitment = async (
   const serverEnvelopes = response.data.envelopes;
   const receipt = response.data.receipt;
 
-
   validatePayload(voterCommitmentCopy, voterCommitmentItem);
 
   const boardCommitmentItemExpectation = {
     parentAddress: voterCommitmentCopy.address,
-    type: "BoardEncryptionCommitmentItem" as BoardItemType,
+    type: BOARD_COMMITMENT_ITEM,
   }
 
   validatePayload(boardCommitment, boardCommitmentItemExpectation, dbbPublicKey)
