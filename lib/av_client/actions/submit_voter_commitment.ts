@@ -1,7 +1,7 @@
 import { BulletinBoard } from "../connectors/bulletin_board";
 import { BOARD_COMMITMENT_ITEM, VOTER_COMMITMENT_ITEM } from "../constants";
-import { signPayload, validatePayload } from "../sign";
-import { BoardCommitmentItem, BoardItemType, ContestMap, VoterCommitmentItem } from "../types";
+import { signPayload, validatePayload, validateReceipt } from "../sign";
+import { BoardCommitmentItem, ContestMap, VoterCommitmentItem } from "../types";
 
 type SubmitVoterCommitmentResponse = {
   voterCommitment: VoterCommitmentItem
@@ -14,9 +14,9 @@ const submitVoterCommitment = async (
   sessionAddress: string,
   commitment: string,
   voterSigningKey: string,
-  dbbPublicKey?: string): Promise<SubmitVoterCommitmentResponse> => {
+  dbbPublicKey: string): Promise<SubmitVoterCommitmentResponse> => {
 
-  const commitmentItem = {
+  const voterCommitmentItem = {
     parentAddress: sessionAddress,
     type: VOTER_COMMITMENT_ITEM,
     content: {
@@ -24,32 +24,26 @@ const submitVoterCommitment = async (
     }
   };
 
-  const signedCommitmentItem = signPayload(commitmentItem, voterSigningKey);
+  const signedCommitmentItem = signPayload(voterCommitmentItem, voterSigningKey);
   const response = await bulletinBoard.submitCommitment(signedCommitmentItem);
 
-  const voterCommitment: VoterCommitmentItem = response.data.voterCommitment;
+  const voterCommitmentCopy: VoterCommitmentItem = response.data.voterCommitment;
   const boardCommitment = response.data.boardCommitment;
   const serverEnvelopes = response.data.envelopes;
+  const receipt = response.data.receipt;
 
-  const voterCommitmentItemExpectation = {
-    parentAddress: sessionAddress,
-    type: VOTER_COMMITMENT_ITEM as BoardItemType,
-    content: {
-      commitment: commitment
-    }
-  }
-
-  validatePayload(voterCommitment, voterCommitmentItemExpectation)
+  validatePayload(voterCommitmentCopy, voterCommitmentItem);
 
   const boardCommitmentItemExpectation = {
-    parentAddress: voterCommitment.address,
-    type: BOARD_COMMITMENT_ITEM as BoardItemType,
+    parentAddress: voterCommitmentCopy.address,
+    type: BOARD_COMMITMENT_ITEM,
   }
 
   validatePayload(boardCommitment, boardCommitmentItemExpectation, dbbPublicKey)
+  validateReceipt([voterCommitmentCopy, boardCommitment], receipt, dbbPublicKey);
 
   return {
-    voterCommitment,
+    voterCommitment: voterCommitmentCopy,
     boardCommitment, 
     serverEnvelopes
   }

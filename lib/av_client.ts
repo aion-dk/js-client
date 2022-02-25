@@ -39,11 +39,11 @@ import {
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
-import { signPayload, validatePayload } from './av_client/sign';
+import { signPayload, validatePayload, validateReceipt } from './av_client/sign';
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
-import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
+import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -211,7 +211,7 @@ export class AVClient implements IAVClient {
       throw new Error('Auth token could not be decoded');
 
     const voterSessionItemExpectation = {
-      type: 'VoterSessionItem' as BoardItemType,
+      type: VOTER_SESSION_ITEM,
       parentAddress: this.getElectionConfig().services.address,
       content: {
         authToken: authToken,
@@ -221,9 +221,12 @@ export class AVClient implements IAVClient {
       }
     }
 
-    const voterSessionItem = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
+    const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
+    const voterSessionItem = voterSessionItemResponse.data.voterSession;
+    const receipt = voterSessionItemResponse.data.receipt;
 
     validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
+    validateReceipt([voterSessionItem], receipt, this.getDbbPublicKey());
 
     this.voterSession = voterSessionItem;
     this.bulletinBoard.setVoterSessionUuid(voterSessionItem.content.identifier);
@@ -322,7 +325,8 @@ export class AVClient implements IAVClient {
       this.clientEnvelopes,
       this.serverEnvelopes,
       boardCommitment.address,
-      this.privateKey()
+      this.privateKey(),
+      this.getDbbPublicKey()
     );
 
     this.ballotCryptogramItem = ballotCryptogramItem;
@@ -348,7 +352,7 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-    public async castBallot(_affidavit?: Affidavit): Promise<BallotBoxReceipt> {
+    public async castBallot(_affidavit?: Affidavit): Promise<string> {
       if(!(this.voterSession)) {
         throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
       }
@@ -361,8 +365,13 @@ export class AVClient implements IAVClient {
 
       const signedPayload = signPayload(castRequestItem, this.privateKey());
 
-      const receipt = (await this.bulletinBoard.submitCastRequest(signedPayload)).data.castRequest;
-      return receipt
+      const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
+      const { castRequest, receipt } = response.data;
+
+      validatePayload(castRequest, castRequestItem);
+      validateReceipt([castRequest], receipt, this.getDbbPublicKey());
+
+      return receipt;
     }
 
   /**
@@ -403,10 +412,16 @@ export class AVClient implements IAVClient {
         content: {}
     }
 
-    const signedPayload = signPayload(spoilRequestItem, this.privateKey())
+    const signedPayload = signPayload(spoilRequestItem, this.privateKey());
     
-    const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload)).data
-    return [response.serverCommitmentOpening, response.spoilRequest]
+    const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload))
+
+    const { spoilRequest, receipt, serverCommitmentOpening } = response.data;
+
+    validatePayload(spoilRequest, spoilRequestItem);
+    validateReceipt([spoilRequest], receipt, this.getDbbPublicKey());
+    
+    return [serverCommitmentOpening, spoilRequest]
   }
 
   /**
