@@ -103,3 +103,12 @@ export class CorruptCvrError extends AvClientError {
     Object.setPrototypeOf(this, CorruptCvrError.prototype);
   }
 }
+
+export class TimeoutError extends AvClientError {
+  readonly name = "TimeoutError";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, CorruptCvrError.prototype);
+  }
+}
