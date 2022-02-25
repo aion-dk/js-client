@@ -7,7 +7,7 @@ export interface IAVClient {
   validateAccessCode(code: string): Promise<void>
   registerVoter(): Promise<void>
   constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
-  spoilBallot(): Promise<ServerCommitmentOpening>
+  spoilBallot(): Promise<[ServerCommitmentOpening, SpoilRequestItem]>
   castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
   purgeData(): void
 }
