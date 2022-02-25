@@ -1,5 +1,5 @@
 import { BulletinBoard } from '../connectors/bulletin_board';
-import { BallotCryptogramItem, BoardItem, BoardItemType, ContestMap, OpenableEnvelope, VerificationStartItem } from '../types';
+import { BallotCryptogramItem, BoardItemType, ContestMap, OpenableEnvelope, VerificationStartItem } from '../types';
 import { finalizeBallotCryptograms } from './finalize_ballot_cryptograms';
 import { sealEnvelopes, signPayload, validatePayload } from '../sign';
 import { BALLOT_CRYPTOGRAMS_ITEM } from '../constants';
