@@ -12,22 +12,48 @@
   </head>
 
   <body>
-    <form class="form-signin" action="#">
-      <div class="text-center mb-4">
-        <h1 class="h3 mb-3 font-weight-normal">AVX Verifier</h1>
+    <div class="text-center mb-12">
+      <form id="findBallot" action="#">
+        <div class="text-center mb-4">
+          <h1 class="h3 mb-3 font-weight-normal">AVX Verifier</h1>
 
-        <p>Insert the Ballot Code found on your Mobile Voting App, to verify your choices. This process will spoil and invalidate your votes.</p>
+          <p>Insert the Ballot Code found on your Mobile Voting App, to verify your choices. This process will spoil and invalidate your votes.</p>
+        </div>
+
+        <div class="form-label-group">
+          <input type="text" id="verifier-code" name="verifier[code]" class="form-control" placeholder="Verifier Cofe" required />
+        </div>
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Find Ballot</button>
+      </form>
+
+      <form id="submitVerifierKey" class="collapse" action="#">
+        <div class="text-center mb-4">
+          <h1 class="h3 mb-3 font-weight-normal">AVX Verifier</h1>
+
+          <p>Insert the Ballot Code found on your Mobile Voting App, to verify your choices. This process will spoil and invalidate your votes.</p>
+        </div>
+
+        <div class="form-label-group">
+          <span id="verification-code">--code--</span>
+        </div>
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Confirm</button>
+      </form>
+
+      <div id="showChoices" class="collapse">
+        <div class="text-center mb-4">
+          <h1 class="h3 mb-3 font-weight-normal">AVX Verifier</h1>
+        </div>
+
+        <div class="form-label-group">
+          <ol id="choices">
+            <li class="template">--template--</li>
+          </ol>
+        </div>
       </div>
+    </div>
 
-      <div class="form-label-group">
-        <input type="text" id="verifier[code]" name="verifier[]" class="form-control" placeholder="Verifier Cofe" required />
-        <!-- <label for="inputPassword">Code</label> -->
-      </div>
-
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Find Ballot</button>
-    </form>
-
-    <script>var exports = {};</script>
     <script src="./files/jquery-3.6.0.min.js"></script>
     <script src="./files/bootstrap.min.js"></script>
     <script src="../dist/bundle.js"></script>
