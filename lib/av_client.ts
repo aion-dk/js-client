@@ -92,6 +92,7 @@ export class AVClient implements IAVClient {
   private serverEnvelopes: ContestMap<string[]>;
   private voterSession: VoterSessionItem;
   private boardCommitment: BoardCommitmentItem;
+  private verifierItem: VerifierItem
   private ballotCryptogramItem: BallotCryptogramItem;
   private boardCommitmentOpening: CommitmentOpening;
   private clientCommitmentOpening: CommitmentOpening
@@ -441,7 +442,15 @@ export class AVClient implements IAVClient {
       throw new InvalidStateError('Cannot challenge ballot, no user session')
     }
 
-    this.bulletinBoard.submitCommitmentOpenings(this.clientCommitmentOpening)
+    const commitmentOpenings = {
+      commitmentOpenings: {
+        parentAddress: this.verifierItem.address,
+        boardCommitmentOpening: this.boardCommitmentOpening,
+        clientCommitmentOpening: this.clientCommitmentOpening
+      }
+    }
+
+    this.bulletinBoard.submitCommitmentOpenings(commitmentOpenings)
   }
 
   /**
@@ -495,6 +504,7 @@ export class AVClient implements IAVClient {
       attempts++;
 
       if (result?.data?.type === VERIFIER_ITEM) {
+        this.verifierItem = result.data
         return resolve(result.data);
       } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
         return reject(new Error('Exceeded max attempts'));
