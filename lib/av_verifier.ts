@@ -7,6 +7,8 @@ import { VerifierItem } from './av_client/types';
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
   private verifierPrivateKey: string | undefined
+  private cryptogramAddress: string
+  private verifierItem: VerifierItem
 
   private bulletinBoard: BulletinBoard;
     /**
@@ -22,7 +24,7 @@ export class AVVerifier {
       await this.bulletinBoard.getVotingTrack(verificationStartAddress).then(response => {
         if (['voterCommitmentItem', 'serverCommitmentItem', 'ballotCryptogramsItem', 'verificationTrackStartItem']
           .every(p => Object.keys(response.data).includes(p))){
-            cryptogramAddress = response.data.ballotCryptogramsItem.address
+            this.cryptogramAddress = response.data.ballotCryptogramsItem.address
         }
       })
 
@@ -42,18 +44,17 @@ export class AVVerifier {
       }
 
       const signedVerifierItem = signPayload(verfierItem, keyPair.privateKey)
-      const verifierItem: VerifierItem = (await this.bulletinBoard.submitVerifierItem(signedVerifierItem)).data
-      return verifierItem
+      this.verifierItem = (await this.bulletinBoard.submitVerifierItem(signedVerifierItem)).data
+      return this.verifierItem
     }
 
-    public async pollForSpoilRequest(ballotCryptogramsAddress: string): Promise<string> {
+    public async pollForSpoilRequest(): Promise<string> {
       let attempts = 0;
       
       const executePoll = async (resolve, reject) => {
-        const result = await this.bulletinBoard.getSpoilRequestItem(ballotCryptogramsAddress).catch(error => {
-          console.error(error)
+        const result = await this.bulletinBoard.getSpoilRequestItem(this.cryptogramAddress).catch(error => {
+          // console.error(error)
         });
-
         attempts++;
 
         if (result?.data?.type === SPOIL_REQUEST_ITEM) {
@@ -61,6 +62,27 @@ export class AVVerifier {
         } else if (result?.data?.type === CAST_REQUEST_ITEM){
           return reject(new Error('Ballot has been cast and cannot be spoiled'))
         }  else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
+          return reject(new Error('Exceeded max attempts'));
+        } else  {
+          setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
+        }
+      };
+    
+      return new Promise(executePoll);
+    }
+
+    public async pollForCommitmentOpening() {
+      let attempts = 0;
+
+      const executePoll = async (resolve, reject) => {
+        const result = await this.bulletinBoard.getCommitmentOpenings(this.verifierItem.address).catch(error => {
+          // console.error(error)
+        });
+
+        attempts++;
+        if (result?.data?.voterCommitmentOpening && result?.data?.boardCommitmentOpening) {
+          return resolve(result.data);
+        } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
           return reject(new Error('Exceeded max attempts'));
         } else  {
           setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);

@@ -95,7 +95,8 @@ export class AVClient implements IAVClient {
   private verifierItem: VerifierItem
   private ballotCryptogramItem: BallotCryptogramItem;
   private boardCommitmentOpening: CommitmentOpening;
-  private clientCommitmentOpening: CommitmentOpening
+  private clientCommitmentOpening: CommitmentOpening;
+  private spoilRequest: SpoilRequestItem
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -429,6 +430,7 @@ export class AVClient implements IAVClient {
 
     const { spoilRequest, receipt, boardCommitmentOpening } = response.data;
 
+    this.spoilRequest = spoilRequest
     this.boardCommitmentOpening = boardCommitmentOpening
 
     validatePayload(spoilRequest, spoilRequestItem);
@@ -501,12 +503,12 @@ export class AVClient implements IAVClient {
     return this.keyPair.publicKey
   }
 
-  public async pollForVerifierItem(spoilRequestAddres: string): Promise<VerifierItem> {
+  public async pollForVerifierItem(): Promise<VerifierItem> {
    let attempts = 0;
    
    const executePoll = async (resolve, reject) => {
-      const result = await this.bulletinBoard.getVerifierItem(spoilRequestAddres).catch(error => {
-        console.error(error)
+      const result = await this.bulletinBoard.getVerifierItem(this.spoilRequest.address).catch(error => {
+        // console.error(error)
       });
 
       attempts++;
