@@ -3,7 +3,7 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
-import { KeyPair, CastVoteRecord, Affidavit, BoardItemType, VerifierItem, BoardCommitmentOpening, SpoilRequestItem } from './av_client/types';
+import { KeyPair, CastVoteRecord, Affidavit, BoardItemType, VerifierItem, CommitmentOpening, SpoilRequestItem } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import * as jwt from 'jsonwebtoken';
 
@@ -45,6 +45,7 @@ import { signPayload, validatePayload, validateReceipt } from './av_client/sign'
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
+import { throws } from 'assert';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -92,7 +93,8 @@ export class AVClient implements IAVClient {
   private voterSession: VoterSessionItem;
   private boardCommitment: BoardCommitmentItem;
   private ballotCryptogramItem: BallotCryptogramItem;
-  private boardCommitmentOpening: BoardCommitmentOpening;
+  private boardCommitmentOpening: CommitmentOpening;
+  private clientCommitmentOpening: CommitmentOpening
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -306,6 +308,11 @@ export class AVClient implements IAVClient {
     } = constructBallotCryptograms(state, cvr);
 
     this.clientEnvelopes = envelopes;
+    
+    this.clientCommitmentOpening = {
+      commitmentRandomness: commitment.randomizer,
+      randomizers: envelopeRandomizers
+    }
  
     const {
       voterCommitment,     // TODO: Required when spoiling
@@ -408,6 +415,7 @@ export class AVClient implements IAVClient {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
     }
+
     const spoilRequestItem = {
         parentAddress: this.ballotCryptogramItem.address,
         type: SPOIL_REQUEST_ITEM,
@@ -426,6 +434,14 @@ export class AVClient implements IAVClient {
     validateReceipt([spoilRequest], receipt, this.getDbbPublicKey());
     
     return spoilRequest.address
+  }
+
+  public async challengeBallot(): Promise<void> {
+    if(!(this.voterSession)) {
+      throw new InvalidStateError('Cannot challenge ballot, no user session')
+    }
+
+    this.bulletinBoard.submitCommitmentOpenings(this.clientCommitmentOpening)
   }
 
   /**

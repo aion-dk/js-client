@@ -10,6 +10,7 @@ export interface IAVClient {
   spoilBallot(): Promise<string>
   castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
   purgeData(): void
+  challengeBallot(): void
 }
 
 /**
@@ -192,7 +193,7 @@ export interface SpoilRequestItem extends BaseBoardItem {
   type: "SpoilRequestItem"
 }
 
-export interface BoardCommitmentOpening {
+export interface CommitmentOpening {
   randomizers: ContestMap<string[]>
   commitmentRandomness: string
 }
