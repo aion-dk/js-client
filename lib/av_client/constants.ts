@@ -8,7 +8,7 @@ export const CAST_REQUEST_ITEM: BoardItemType = "CastRequestItem";
 export const SPOIL_REQUEST_ITEM: BoardItemType = "SpoilRequestItem";
 export const VERIFIER_ITEM: BoardItemType = "VerifierItem";
 export const VERIFICATION_START_ITEM: BoardItemType =  "VerificationStartItem";
-
+export const VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM = "VoterEncryptionCommitmentOpeningItem"
 
 export const MAX_POLL_ATTEMPTS = 60;
 export const POLLING_INTERVAL_MS = 500;

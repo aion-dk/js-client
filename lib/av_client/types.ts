@@ -132,8 +132,8 @@ export type BoardItemType =
   "VerificationStartItem" |
   "VerifierItem" |
   "VoterEncryptionCommitmentItem" |
-  "VoterSessionItem"
-
+  "VoterSessionItem" |
+  "VoterEncryptionCommitmentOpeningItem"
 
 interface BaseBoardItem {
   address: string
