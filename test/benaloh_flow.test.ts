@@ -24,7 +24,7 @@ describe('entire benaloh flow', () => {
     // Cleanup
   });
 
-  it.skip('spoils a ballot', async () => {
+  it.only('spoils a ballot', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
@@ -32,37 +32,47 @@ describe('entire benaloh flow', () => {
 
       const trackingCode = await placeVote(client) as string
       const cryptogramAddress = await verifier.findBallot(trackingCode)
-      await client.spoilBallot()
 
-      let spoilRequestAddress : any
       let verifierItem : any
       let appVerifierItem : any
-      if(cryptogramAddress){ // We found a ballot using the tracking code
-        // The verifier starts polling for spoil request
-        spoilRequestAddress = await verifier.pollForSpoilRequest(cryptogramAddress)
 
-        // The verifier found a spoil request and now submits it's public key in a VerifierItem
-        verifierItem = await verifier.submitVerifierKey(spoilRequestAddress)
+      // The verifier starts polling for spoil request
+      const pollForSpoilPromise = verifier.pollForSpoilRequest(cryptogramAddress)
+        .then(verifierSpoilRequestAddress => {
+          return verifier.submitVerifierKey(verifierSpoilRequestAddress)
+        })
+        .then(item => verifierItem = item)
 
-        appVerifierItem = await client.pollForVerifierItem(spoilRequestAddress)
-        
-        // Emulating a pairing the app and verifier tracking codes
-        expect(verifierItem.address).to.eql(appVerifierItem.address)
+      const clientSpoilRequestAddress = await client.spoilBallot();
 
-        // App creates the voterCommitmentOpening
+      // The verifier found a spoil request and now submits it's public key in a VerifierItem
 
-        // Verifier polls for commitment openings
+      appVerifierItem = await client.pollForVerifierItem(clientSpoilRequestAddress)
+      
+      await Promise.all([pollForSpoilPromise]);
 
-        // The app polls for a verifier item (and finds one)
+      // Emulating a pairing the app and verifier tracking codes
+      expect(verifierItem.address).to.eql(appVerifierItem.address)
 
-        // The app confirms the verifier codes matches
+      // App creates the voterCommitmentOpening
+      await client.challengeBallot();
 
-        // The app creates the commitment openings and submits them
+      // Verifier polls for commitment openings
+      //const boardCommitmentOpenings = await verifier.pollForCommitmentOpening();
 
-        // The verifier should get the commitment openings
+      // The app polls for a verifier item (and finds one)
 
-        // The verifier decrypts the ballot
-      }
+      // The app confirms the verifier codes matches
+
+      // The app creates the commitment openings and submits them
+
+      // The verifier should get the commitment openings
+
+      // The verifier decrypts the ballot
+      const { boardCommitmentOpening, clientCommitmentOpening } = client.testGetCommitmentOpenings();
+
+      const votes = verifier.decryptBallot(boardCommitmentOpening, clientCommitmentOpening);  // Temporary. Will be fetched inside verifier
+      expect(votes).to.equal({ "a": 1 });
     }
 
     await performTest()
