@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!-- saved from url=(0059)https://getbootstrap.com/docs/4.0/examples/floating-labels/ -->
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>AVX Verifier</title>
+
+    <link href="./files/bootstrap.min.css" rel="stylesheet">
+    <link href="./files/verifier.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <form class="form-signin" action="#">
+      <div class="text-center mb-4">
+        <h1 class="h3 mb-3 font-weight-normal">AVX Verifier</h1>
+
+        <p>Insert the Ballot Code found on your Mobile Voting App, to verify your choices. This process will spoil and invalidate your votes.</p>
+      </div>
+
+      <div class="form-label-group">
+        <input type="text" id="verifier[code]" name="verifier[]" class="form-control" placeholder="Verifier Cofe" required />
+        <!-- <label for="inputPassword">Code</label> -->
+      </div>
+
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Find Ballot</button>
+    </form>
+
+    <script src="./files/jquery-3.6.0.min.js"></script>
+    <script src="./files/bootstrap.min.js"></script>
+    <script src="../dist/lib/av_verifier.js"></script>
+    <script src="./files/app.js"></script>
+  </body>
+</html>
