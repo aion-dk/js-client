@@ -46,9 +46,8 @@ describe('entire benaloh flow', () => {
       const clientSpoilRequestAddress = await client.spoilBallot();
 
       // The verifier found a spoil request and now submits it's public key in a VerifierItem
-
       appVerifierItem = await client.pollForVerifierItem()
-      
+
       await Promise.all([pollForSpoilPromise]);
 
       // Emulating a pairing the app and verifier tracking codes

@@ -2,13 +2,17 @@ import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
-import { VerifierItem } from './av_client/types';
+import { CommitmentOpening, VerifierItem } from './av_client/types';
+import { isValidPedersenCommitment } from './av_client/crypto/pedersen_commitment';
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
   private verifierPrivateKey: string | undefined
   private cryptogramAddress: string
   private verifierItem: VerifierItem
+  private voterCommitment: string;
+  private boardCommitment: string;
+  private ballotCryptograms: any;
 
   private bulletinBoard: BulletinBoard;
     /**
@@ -22,9 +26,14 @@ export class AVVerifier {
     public async findBallot(verificationStartAddress: string): Promise<string> {
       let cryptogramAddress = ''
       await this.bulletinBoard.getVotingTrack(verificationStartAddress).then(response => {
+        // TODO: Validate item payloads and receipt
+        // and verificationTrackStartItem === ballot checking code
         if (['voterCommitmentItem', 'serverCommitmentItem', 'ballotCryptogramsItem', 'verificationTrackStartItem']
           .every(p => Object.keys(response.data).includes(p))){
             this.cryptogramAddress = response.data.ballotCryptogramsItem.address
+            this.voterCommitment = response.data.voterCommitmentItem.content.commitment;
+            this.boardCommitment = response.data.serverCommitmentItem.content.commitment;
+            this.ballotCryptograms = response.data.ballotCryptogramsItem.content;
         }
       })
 
@@ -45,7 +54,30 @@ export class AVVerifier {
 
       const signedVerifierItem = signPayload(verfierItem, keyPair.privateKey)
       this.verifierItem = (await this.bulletinBoard.submitVerifierItem(signedVerifierItem)).data
+      // TODO: Validate payload and receipt
+      // check verifierItem.previousAddress === verificationTrackStartItem address
       return this.verifierItem
+    }
+
+    public decryptBallot(boardCommitmentOpening: CommitmentOpening, voterCommitmentOpening: CommitmentOpening) {
+      this.validateBoardCommitmentOpening(boardCommitmentOpening, this.boardCommitment);
+      this.validateVoterCommitmentOpening(voterCommitmentOpening, this.voterCommitment);
+
+      
+    }
+
+    private validateBoardCommitmentOpening(commitmentOpening: CommitmentOpening, commitment: string) {
+      if(!this.validateCommitmentOpening(commitmentOpening, commitment))
+        throw new Error("The board lied!!!");
+    }
+
+    private validateVoterCommitmentOpening(commitmentOpening: CommitmentOpening, commitment: string) {
+      if(!this.validateCommitmentOpening(commitmentOpening, commitment))
+        throw new Error("The voter lied!!!");
+    }
+
+    private validateCommitmentOpening(commitmentOpening: CommitmentOpening, commitment: string): boolean {
+      return isValidPedersenCommitment(commitment, commitmentOpening.randomizers, commitmentOpening.commitmentRandomness);
     }
 
     public async pollForSpoilRequest(): Promise<string> {
@@ -54,6 +86,7 @@ export class AVVerifier {
       const executePoll = async (resolve, reject) => {
         const result = await this.bulletinBoard.getSpoilRequestItem(this.cryptogramAddress).catch(error => {
           // console.error(error)
+
         });
         attempts++;
 

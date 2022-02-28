@@ -45,7 +45,6 @@ import { signPayload, validatePayload, validateReceipt } from './av_client/sign'
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
-import { throws } from 'assert';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -461,6 +460,13 @@ export class AVClient implements IAVClient {
     }
 
     this.bulletinBoard.submitCommitmentOpenings(commitmentOpenings)
+  }
+
+  public testGetCommitmentOpenings() {
+    return {
+      boardCommitmentOpening: this.boardCommitmentOpening,
+      clientCommitmentOpening: this.clientCommitmentOpening
+    }
   }
 
   /**
