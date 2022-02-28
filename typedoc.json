@@ -1,5 +1,5 @@
 {
-  "entryPoints": ["lib/av_client.ts"],
+  "entryPoints": ["lib/av_client.ts", "lib/av_verifier.ts"],
   "out": "docs",
   "excludePrivate": true,
   "excludeInternal": true,
