@@ -163,6 +163,22 @@ export interface BoardCommitmentItem extends BaseBoardItem {
   type: "BoardEncryptionCommitmentItem"
 }
 
+export interface VoterCommitmentOpeningItem extends BaseBoardItem {
+  content: {
+    commitment: string
+  } 
+
+  type: "VoterEncryptionCommitmentOpeningItem"
+}
+
+export interface BoardCommitmentOpeningItem extends BaseBoardItem {
+  content: {
+    commitment: string
+  } 
+
+  type: "BoardEncryptionCommitmentOpeningItem"
+}
+
 export interface VoterCommitmentItem extends BaseBoardItem {
   content: {
     commitment: string

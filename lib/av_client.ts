@@ -462,13 +462,6 @@ export class AVClient implements IAVClient {
     this.bulletinBoard.submitCommitmentOpenings(commitmentOpenings)
   }
 
-  public testGetCommitmentOpenings() {
-    return {
-      boardCommitmentOpening: this.boardCommitmentOpening,
-      clientCommitmentOpening: this.clientCommitmentOpening
-    }
-  }
-
   /**
    * Purges internal data.
    */
@@ -514,7 +507,7 @@ export class AVClient implements IAVClient {
    
    const executePoll = async (resolve, reject) => {
       const result = await this.bulletinBoard.getVerifierItem(this.spoilRequest.address).catch(error => {
-        // console.error(error)
+        console.error(error.response.data.error_message)
       });
 
       attempts++;

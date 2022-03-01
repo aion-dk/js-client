@@ -1,9 +1,9 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
 import { randomKeyPair } from './av_client/generate_key_pair';
-import { signPayload } from './av_client/sign';
+import { signPayload, validateReceipt } from './av_client/sign';
 import { isValidPedersenCommitment } from './av_client/crypto/pedersen_commitment';
-import { CommitmentOpening, BoardCommitmentItem, VerifierItem, VoterCommitmentItem } from './av_client/types';
+import { CommitmentOpening, BoardCommitmentItem, VerifierItem, VoterCommitmentItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem } from './av_client/types';
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -13,8 +13,8 @@ export class AVVerifier {
   private voterCommitment: string;
   private boardCommitment: string;
   private ballotCryptograms: any;
-  private voterCommitmentOpening: VoterCommitmentItem
-  private boardCommitmentOpening: BoardCommitmentItem
+  private boardCommitmentOpening: VoterCommitmentOpeningItem
+  private voterCommitmentOpening: BoardCommitmentOpeningItem
 
   private bulletinBoard: BulletinBoard;
     /**
@@ -27,7 +27,7 @@ export class AVVerifier {
 
     public async findBallot(verificationStartAddress: string): Promise<string> {
       await this.bulletinBoard.getVotingTrack(verificationStartAddress).then(response => {
-        // TODO: Validate item payloads and receipt
+        // TODO: Validate item payloads and receipt.... How can I validate the payload, when I dont know what to expect?
         // and verificationTrackStartItem === ballot checking code
         if (['voterCommitment', 'serverCommitment', 'ballotCryptograms', 'verificationTrackStart']
           .every(p => Object.keys(response.data).includes(p))){
@@ -86,8 +86,7 @@ export class AVVerifier {
       
       const executePoll = async (resolve, reject) => {
         const result = await this.bulletinBoard.getSpoilRequestItem(this.cryptogramAddress).catch(error => {
-          // console.error(error)
-
+          console.error(error.response.data.error_message)
         });
         attempts++;
 
@@ -110,13 +109,14 @@ export class AVVerifier {
 
       const executePoll = async (resolve, reject) => {
         const result = await this.bulletinBoard.getCommitmentOpenings(this.verifierItem.address).catch(error => {
-          // console.error(error)
+          console.error(error.response.data.error_message)
         });
 
         attempts++;
         if (result?.data?.voterCommitmentOpening && result?.data?.boardCommitmentOpening) {
           this.boardCommitmentOpening = result.data.boardCommitmentOpening
           this.voterCommitmentOpening = result.data.voterCommitmentOpening
+        
           return resolve(result.data);
         } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
           return reject(new Error('Exceeded max attempts'));
