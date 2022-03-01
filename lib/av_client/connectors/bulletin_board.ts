@@ -61,6 +61,10 @@ export class BulletinBoard {
     return this.backend.get(`verification/vote_track/${verificationStartAddress}`)
   }
 
+  getCommitmentOpenings(verifierItemAddress: string): Promise<AxiosResponse> {
+    return this.backend.get(`verification/commitment_openings/${verifierItemAddress}`)
+  }
+
   getSpoilRequestItem(ballotCryptogramAddress: string): Promise<AxiosResponse> {
     return this.backend.get(`verification/spoil_status/${ballotCryptogramAddress}`)
   }
@@ -71,6 +75,14 @@ export class BulletinBoard {
 
   submitVerifierItem(signedVerifierItem): Promise<AxiosResponse> {
     return this.backend.post('verification/verifier', signedVerifierItem)
+  }
+
+  submitCommitmentOpenings(content): Promise<AxiosResponse> {
+    return this.backend.post('verification/commitment_openings', content, {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
   }
 
   submitCommitment(signedCommit): Promise<AxiosResponse> {

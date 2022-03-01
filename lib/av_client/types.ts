@@ -8,8 +8,9 @@ export interface IAVClient {
   registerVoter(): Promise<void>
   constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
   spoilBallot(): Promise<string>
-  castBallot (affidavit: Affidavit): Promise<string>
+  castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
   purgeData(): void
+  challengeBallot(): void
 }
 
 /**
@@ -131,8 +132,8 @@ export type BoardItemType =
   "VerificationStartItem" |
   "VerifierItem" |
   "VoterEncryptionCommitmentItem" |
-  "VoterSessionItem"
-
+  "VoterSessionItem" |
+  "VoterEncryptionCommitmentOpeningItem"
 
 interface BaseBoardItem {
   address: string
@@ -179,6 +180,22 @@ export interface BallotCryptogramItem extends BaseBoardItem {
 
 export interface VerificationStartItem extends BaseBoardItem {
   type: "VerificationStartItem"
+}
+
+export interface VerifierItem extends BaseBoardItem {
+  content: {
+    publicKey: string
+  }
+  type: "VerifierItem"
+}
+
+export interface SpoilRequestItem extends BaseBoardItem {
+  type: "SpoilRequestItem"
+}
+
+export interface CommitmentOpening {
+  randomizers: ContestMap<string[]>
+  commitmentRandomness: string
 }
 
 export interface ItemExpectation {

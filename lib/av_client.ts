@@ -3,7 +3,7 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
-import { KeyPair, CastVoteRecord, Affidavit, BoardItemType } from './av_client/types';
+import { KeyPair, CastVoteRecord, Affidavit, BoardItemType, VerifierItem, CommitmentOpening, SpoilRequestItem } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import * as jwt from 'jsonwebtoken';
 
@@ -32,6 +32,7 @@ import {
   AccessCodeInvalid,
   BulletinBoardError,
   CorruptCvrError,
+  TimeoutError,
   EmailDoesNotMatchVoterRecordError,
   InvalidConfigError,
   InvalidStateError,
@@ -43,7 +44,8 @@ import { signPayload, validatePayload, validateReceipt } from './av_client/sign'
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
-import { VOTER_SESSION_ITEM } from './av_client/constants';
+import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
+import { throws } from 'assert';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -90,7 +92,11 @@ export class AVClient implements IAVClient {
   private serverEnvelopes: ContestMap<string[]>;
   private voterSession: VoterSessionItem;
   private boardCommitment: BoardCommitmentItem;
+  private verifierItem: VerifierItem
   private ballotCryptogramItem: BallotCryptogramItem;
+  private boardCommitmentOpening: CommitmentOpening;
+  private clientCommitmentOpening: CommitmentOpening;
+  private spoilRequest: SpoilRequestItem
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -304,6 +310,11 @@ export class AVClient implements IAVClient {
     } = constructBallotCryptograms(state, cvr);
 
     this.clientEnvelopes = envelopes;
+    
+    this.clientCommitmentOpening = {
+      commitmentRandomness: commitment.randomizer,
+      randomizers: envelopeRandomizers
+    }
  
     const {
       voterCommitment,     // TODO: Required when spoiling
@@ -352,14 +363,14 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-    public async castBallot(_affidavit?: Affidavit): Promise<string> {
+    public async castBallot(_affidavit?: Affidavit): Promise<BallotBoxReceipt> {
       if(!(this.voterSession)) {
         throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
       }
 
       const castRequestItem = {
           parentAddress: this.ballotCryptogramItem.address,
-          type: 'CastRequestItem' as BoardItemType,
+          type: CAST_REQUEST_ITEM,
           content: {}
       };
 
@@ -406,21 +417,50 @@ export class AVClient implements IAVClient {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
     }
+
     const spoilRequestItem = {
-      parentAddress: this.ballotCryptogramItem.address,
-      type: 'SpoilRequestItem' as BoardItemType,
-      content: {}
+        parentAddress: this.ballotCryptogramItem.address,
+        type: SPOIL_REQUEST_ITEM,
+        content: {}
     }
 
     const signedPayload = signPayload(spoilRequestItem, this.privateKey());
     
-    const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload));
-    const { spoilRequest, receipt } = response.data;
+    const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload))
+
+    const { spoilRequest, receipt, boardCommitmentOpening } = response.data;
+
+    this.spoilRequest = spoilRequest
+    this.boardCommitmentOpening = boardCommitmentOpening
 
     validatePayload(spoilRequest, spoilRequestItem);
     validateReceipt([spoilRequest], receipt, this.getDbbPublicKey());
+    
+    return spoilRequest.address
+  }
 
-    return receipt;
+  public async challengeBallot(): Promise<void> {
+    if(!(this.voterSession)) {
+      throw new InvalidStateError('Cannot challenge ballot, no user session')
+    }
+    
+    const clientCommitmentOpeningItem = {
+      parentAddress: this.verifierItem.address,
+      type: VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM,
+      content: this.clientCommitmentOpening
+    }
+
+    const signedClientCommitmentOpeningItem = signPayload(clientCommitmentOpeningItem, this.privateKey())
+
+    const commitmentOpenings = {
+      commitmentOpenings: {
+        parentAddress: this.verifierItem.address,
+        boardCommitmentOpening: this.boardCommitmentOpening,
+        clientCommitmentOpening: signedClientCommitmentOpeningItem
+      }
+    }
+
+    this.bulletinBoard.submitCommitmentOpenings(commitmentOpenings)
   }
 
   /**
@@ -462,6 +502,28 @@ export class AVClient implements IAVClient {
   private publicKey(): ECPoint {
     return this.keyPair.publicKey
   }
+
+  public async pollForVerifierItem(): Promise<VerifierItem> {
+   let attempts = 0;
+   
+   const executePoll = async (resolve, reject) => {
+      const result = await this.bulletinBoard.getVerifierItem(this.spoilRequest.address).catch(error => {
+        // console.error(error)
+      });
+
+      attempts++;
+      if (result?.data?.verifier?.type === VERIFIER_ITEM) {
+        this.verifierItem = result.data.verifier
+        return resolve(result.data.verifier);
+      } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
+        return reject(new Error('Exceeded max attempts'));
+      } else  {
+        setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
+      }
+    };
+  
+   return new Promise(executePoll);
+  }
 }
 
 type BigNum = string;
@@ -490,6 +552,7 @@ export {
   AccessCodeInvalid,
   BulletinBoardError,
   CorruptCvrError,
+  TimeoutError,
   EmailDoesNotMatchVoterRecordError,
   InvalidConfigError,
   InvalidStateError,
