@@ -22,13 +22,13 @@ export class AVVerifier {
     public async findBallot(verificationStartAddress: string): Promise<string> {
       let cryptogramAddress = ''
       await this.bulletinBoard.getVotingTrack(verificationStartAddress).then(response => {
-        if (['voterCommitmentItem', 'serverCommitmentItem', 'ballotCryptogramsItem', 'verificationTrackStartItem']
+        if (['voterCommitment', 'serverCommitment', 'ballotCryptograms', 'verificationTrackStart']
           .every(p => Object.keys(response.data).includes(p))){
-            this.cryptogramAddress = response.data.ballotCryptogramsItem.address
+            this.cryptogramAddress = response.data.ballotCryptograms.address
         }
       })
 
-      return cryptogramAddress
+      return this.cryptogramAddress
     }
 
     public async submitVerifierKey(spoilRequestAddress: string): Promise<VerifierItem> {
@@ -44,7 +44,7 @@ export class AVVerifier {
       }
 
       const signedVerifierItem = signPayload(verfierItem, keyPair.privateKey)
-      this.verifierItem = (await this.bulletinBoard.submitVerifierItem(signedVerifierItem)).data
+      this.verifierItem = (await this.bulletinBoard.submitVerifierItem(signedVerifierItem)).data.verifier
       return this.verifierItem
     }
 
@@ -57,9 +57,9 @@ export class AVVerifier {
         });
         attempts++;
 
-        if (result?.data?.type === SPOIL_REQUEST_ITEM) {
-          return resolve(result.data.address);
-        } else if (result?.data?.type === CAST_REQUEST_ITEM){
+        if (result?.data?.item?.type === SPOIL_REQUEST_ITEM) {
+          return resolve(result.data.item.address);
+        } else if (result?.data?.item?.type === CAST_REQUEST_ITEM){
           return reject(new Error('Ballot has been cast and cannot be spoiled'))
         }  else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
           return reject(new Error('Exceeded max attempts'));
