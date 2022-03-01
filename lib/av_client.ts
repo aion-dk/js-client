@@ -512,7 +512,6 @@ export class AVClient implements IAVClient {
       });
 
       attempts++;
-      console.log(attempts, this.spoilRequest.address)
       if (result?.data?.verifier?.type === VERIFIER_ITEM) {
         this.verifierItem = result.data.verifier
         return resolve(result.data.verifier);

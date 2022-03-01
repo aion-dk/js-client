@@ -2,13 +2,15 @@ import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
-import { VerifierItem } from './av_client/types';
+import { BoardCommitmentItem, VerifierItem, VoterCommitmentItem } from './av_client/types';
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
   private verifierPrivateKey: string | undefined
   private cryptogramAddress: string
   private verifierItem: VerifierItem
+  private voterCommitmentOpening: VoterCommitmentItem
+  private boardCommitmentOpening: BoardCommitmentItem
 
   private bulletinBoard: BulletinBoard;
     /**
@@ -81,6 +83,8 @@ export class AVVerifier {
 
         attempts++;
         if (result?.data?.voterCommitmentOpening && result?.data?.boardCommitmentOpening) {
+          this.boardCommitmentOpening = result.data.boardCommitmentOpening
+          this.voterCommitmentOpening = result.data.voterCommitmentOpening
           return resolve(result.data);
         } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
           return reject(new Error('Exceeded max attempts'));

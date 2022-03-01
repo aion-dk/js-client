@@ -24,7 +24,7 @@ describe('entire benaloh flow', () => {
     // Cleanup
   });
 
-  it.only('spoils a ballot', async () => {
+  it.skip('spoils a ballot', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
@@ -58,11 +58,9 @@ describe('entire benaloh flow', () => {
       await client.challengeBallot();
 
       // Verifier polls for commitment openings
-      const boardCommitmentOpenings = await verifier.pollForCommitmentOpening();
+      await verifier.pollForCommitmentOpening();
 
       // The verifier decrypts the ballot
-      //const { boardCommitmentOpening, clientCommitmentOpening } = client.testGetCommitmentOpenings();
-
       //const votes = verifier.decryptBallot(boardCommitmentOpening, clientCommitmentOpening);  // Temporary. Will be fetched inside verifier
       //expect(votes).to.equal({ "a": 1 });
     }
