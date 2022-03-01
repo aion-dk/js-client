@@ -31,10 +31,10 @@ export class AVVerifier {
         // and verificationTrackStartItem === ballot checking code
         if (['voterCommitment', 'serverCommitment', 'ballotCryptograms', 'verificationTrackStart']
           .every(p => Object.keys(response.data).includes(p))){
-            this.cryptogramAddress = response.data.ballotCryptogramsItem.address
-            this.voterCommitment = response.data.voterCommitmentItem.content.commitment;
-            this.boardCommitment = response.data.serverCommitmentItem.content.commitment;
-            this.ballotCryptograms = response.data.ballotCryptogramsItem.content;
+            this.cryptogramAddress = response.data.ballotCryptograms.address
+            this.voterCommitment = response.data.voterCommitment.content.commitment;
+            this.boardCommitment = response.data.serverCommitment.content.commitment;
+            this.ballotCryptograms = response.data.ballotCryptograms.content;
         }
       })
 
