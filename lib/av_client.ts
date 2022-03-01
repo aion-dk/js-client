@@ -518,10 +518,9 @@ export class AVClient implements IAVClient {
       });
 
       attempts++;
-
-      if (result?.data?.type === VERIFIER_ITEM) {
-        this.verifierItem = result.data
-        return resolve(result.data);
+      if (result?.data?.verifier?.type === VERIFIER_ITEM) {
+        this.verifierItem = result.data.verifier
+        return resolve(result.data.verifier);
       } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
         return reject(new Error('Exceeded max attempts'));
       } else  {

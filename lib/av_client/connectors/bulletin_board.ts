@@ -1,4 +1,3 @@
-import { VoterSessionItem } from '../types';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { BulletinBoardError, NetworkError, UnsupportedServerReplyError } from "../errors";
 
