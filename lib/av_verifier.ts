@@ -22,7 +22,6 @@ export class AVVerifier {
     }
 
     public async findBallot(verificationStartAddress: string): Promise<string> {
-      let cryptogramAddress = ''
       await this.bulletinBoard.getVotingTrack(verificationStartAddress).then(response => {
         if (['voterCommitment', 'serverCommitment', 'ballotCryptograms', 'verificationTrackStart']
           .every(p => Object.keys(response.data).includes(p))){

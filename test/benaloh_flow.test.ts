@@ -34,7 +34,6 @@ describe('entire benaloh flow', () => {
       await verifier.findBallot(trackingCode)
 
       let verifierItem : any
-      let appVerifierItem : any
 
       // The verifier starts polling for spoil request
       const pollForSpoilPromise = verifier.pollForSpoilRequest()
@@ -43,11 +42,11 @@ describe('entire benaloh flow', () => {
         })
         .then(item => verifierItem = item)
 
-      const clientSpoilRequestAddress = await client.spoilBallot();
+      await client.spoilBallot();
 
       // The verifier found a spoil request and now submits it's public key in a VerifierItem
 
-      appVerifierItem = await client.pollForVerifierItem()
+      const appVerifierItem = await client.pollForVerifierItem()
       
       await Promise.all([pollForSpoilPromise]);
 
