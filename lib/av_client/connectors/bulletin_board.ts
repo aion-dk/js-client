@@ -1,4 +1,3 @@
-import { VoterSessionItem } from '../types';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { BulletinBoardError, NetworkError, UnsupportedServerReplyError } from "../errors";
 
@@ -60,6 +59,10 @@ export class BulletinBoard {
 
   getVotingTrack(verificationStartAddress: string): Promise<AxiosResponse> {
     return this.backend.get(`verification/vote_track/${verificationStartAddress}`)
+  }
+
+  getCommitmentOpenings(verifierItemAddress: string): Promise<AxiosResponse> {
+    return this.backend.get(`verification/commitment_openings/${verifierItemAddress}`)
   }
 
   getSpoilRequestItem(ballotCryptogramAddress: string): Promise<AxiosResponse> {

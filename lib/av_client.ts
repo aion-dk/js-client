@@ -44,7 +44,7 @@ import { signPayload, validatePayload, validateReceipt } from './av_client/sign'
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
-import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
+import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
 import { throws } from 'assert';
 
 /** @internal */
@@ -92,9 +92,11 @@ export class AVClient implements IAVClient {
   private serverEnvelopes: ContestMap<string[]>;
   private voterSession: VoterSessionItem;
   private boardCommitment: BoardCommitmentItem;
+  private verifierItem: VerifierItem
   private ballotCryptogramItem: BallotCryptogramItem;
   private boardCommitmentOpening: CommitmentOpening;
-  private clientCommitmentOpening: CommitmentOpening
+  private clientCommitmentOpening: CommitmentOpening;
+  private spoilRequest: SpoilRequestItem
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -428,6 +430,7 @@ export class AVClient implements IAVClient {
 
     const { spoilRequest, receipt, boardCommitmentOpening } = response.data;
 
+    this.spoilRequest = spoilRequest
     this.boardCommitmentOpening = boardCommitmentOpening
 
     validatePayload(spoilRequest, spoilRequestItem);
@@ -440,8 +443,24 @@ export class AVClient implements IAVClient {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot challenge ballot, no user session')
     }
+    
+    const clientCommitmentOpeningItem = {
+      parentAddress: this.verifierItem.address,
+      type: VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM,
+      content: this.clientCommitmentOpening
+    }
 
-    this.bulletinBoard.submitCommitmentOpenings(this.clientCommitmentOpening)
+    const signedClientCommitmentOpeningItem = signPayload(clientCommitmentOpeningItem, this.privateKey())
+
+    const commitmentOpenings = {
+      commitmentOpenings: {
+        parentAddress: this.verifierItem.address,
+        boardCommitmentOpening: this.boardCommitmentOpening,
+        clientCommitmentOpening: signedClientCommitmentOpeningItem
+      }
+    }
+
+    this.bulletinBoard.submitCommitmentOpenings(commitmentOpenings)
   }
 
   /**
@@ -484,18 +503,18 @@ export class AVClient implements IAVClient {
     return this.keyPair.publicKey
   }
 
-  public async pollForVerifierItem(spoilRequestAddres: string): Promise<VerifierItem> {
+  public async pollForVerifierItem(): Promise<VerifierItem> {
    let attempts = 0;
    
    const executePoll = async (resolve, reject) => {
-      const result = await this.bulletinBoard.getVerifierItem(spoilRequestAddres).catch(error => {
-        console.error(error)
+      const result = await this.bulletinBoard.getVerifierItem(this.spoilRequest.address).catch(error => {
+        // console.error(error)
       });
 
       attempts++;
-
-      if (result?.data?.type === VERIFIER_ITEM) {
-        return resolve(result.data);
+      if (result?.data?.verifier?.type === VERIFIER_ITEM) {
+        this.verifierItem = result.data.verifier
+        return resolve(result.data.verifier);
       } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
         return reject(new Error('Exceeded max attempts'));
       } else  {

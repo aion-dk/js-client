@@ -31,38 +31,37 @@ describe('entire benaloh flow', () => {
       const client = new AVClient('http://us-avx:3000/dbb/us/api');
 
       const trackingCode = await placeVote(client) as string
-      const cryptogramAddress = await verifier.findBallot(trackingCode)
-      await client.spoilBallot()
+      await verifier.findBallot(trackingCode)
 
-      let spoilRequestAddress : any
       let verifierItem : any
-      let appVerifierItem : any
-      if(cryptogramAddress){ // We found a ballot using the tracking code
-        // The verifier starts polling for spoil request
-        spoilRequestAddress = await verifier.pollForSpoilRequest(cryptogramAddress)
 
-        // The verifier found a spoil request and now submits it's public key in a VerifierItem
-        verifierItem = await verifier.submitVerifierKey(spoilRequestAddress)
+      // The verifier starts polling for spoil request
+      const pollForSpoilPromise = verifier.pollForSpoilRequest()
+        .then(verifierSpoilRequestAddress => {
+          return verifier.submitVerifierKey(verifierSpoilRequestAddress)
+        })
+        .then(item => verifierItem = item)
 
-        appVerifierItem = await client.pollForVerifierItem(spoilRequestAddress)
-        
-        // Emulating a pairing the app and verifier tracking codes
-        expect(verifierItem.address).to.eql(appVerifierItem.address)
+      await client.spoilBallot();
 
-        // App creates the voterCommitmentOpening
+      // The verifier found a spoil request and now submits it's public key in a VerifierItem
 
-        // Verifier polls for commitment openings
+      const appVerifierItem = await client.pollForVerifierItem()
+      
+      await Promise.all([pollForSpoilPromise]);
 
-        // The app polls for a verifier item (and finds one)
+      // Emulating a pairing the app and verifier tracking codes
+      expect(verifierItem.address).to.eql(appVerifierItem.address)
 
-        // The app confirms the verifier codes matches
+      // App creates the voterCommitmentOpening
+      await client.challengeBallot();
 
-        // The app creates the commitment openings and submits them
+      // Verifier polls for commitment openings
+      await verifier.pollForCommitmentOpening();
 
-        // The verifier should get the commitment openings
-
-        // The verifier decrypts the ballot
-      }
+      // The verifier decrypts the ballot
+      //const votes = verifier.decryptBallot(boardCommitmentOpening, clientCommitmentOpening);  // Temporary. Will be fetched inside verifier
+      //expect(votes).to.equal({ "a": 1 });
     }
 
     await performTest()
@@ -86,7 +85,7 @@ describe('entire benaloh flow', () => {
       expect(cryptogramAddress.length).to.eql(64)
 
       // We should receive an error which tells us the ballot we are trying to spoil has already been cast
-      const spoilRequest = await verifier.pollForSpoilRequest(cryptogramAddress).catch(error => {
+      const spoilRequest = await verifier.pollForSpoilRequest().catch(error => {
         expect(error.message).to.eql('Ballot has been cast and cannot be spoiled')
       })
 
@@ -110,7 +109,7 @@ describe('entire benaloh flow', () => {
       expect(cryptogramAddress.length).to.eql(64)
 
       // We should receive an error which tells us the ballot we are looking for has no spoil request
-      const spoilRequest = await verifier.pollForSpoilRequest(cryptogramAddress).catch(error => {
+      const spoilRequest = await verifier.pollForSpoilRequest().catch(error => {
         expect(error.message).to.eql('Exceeded max attempts')
       })
 

@@ -103,7 +103,7 @@ export async function recordResponses(callback) {
 
 type SynchronousFunction = () => void
 
-export async function expectError(promise: (Promise<any>|SynchronousFunction), errorType: any, message: string): Promise<any> {
+export async function expectError(promise: (Promise<unknown>|SynchronousFunction), errorType: any, message: string): Promise<unknown> {
   if (typeof promise == 'object') { // Async promise
     return promise
       .then(() => expect.fail('Expected promise to be rejected'))

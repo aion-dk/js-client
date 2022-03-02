@@ -2,11 +2,15 @@ import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
-import { VerifierItem } from './av_client/types';
+import { BoardCommitmentItem, VerifierItem, VoterCommitmentItem } from './av_client/types';
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
   private verifierPrivateKey: string | undefined
+  private cryptogramAddress: string
+  private verifierItem: VerifierItem
+  private voterCommitmentOpening: VoterCommitmentItem
+  private boardCommitmentOpening: BoardCommitmentItem
 
   private bulletinBoard: BulletinBoard;
     /**
@@ -18,15 +22,14 @@ export class AVVerifier {
     }
 
     public async findBallot(verificationStartAddress: string): Promise<string> {
-      let cryptogramAddress = ''
       await this.bulletinBoard.getVotingTrack(verificationStartAddress).then(response => {
-        if (['voterCommitmentItem', 'serverCommitmentItem', 'ballotCryptogramsItem', 'verificationTrackStartItem']
+        if (['voterCommitment', 'serverCommitment', 'ballotCryptograms', 'verificationTrackStart']
           .every(p => Object.keys(response.data).includes(p))){
-            cryptogramAddress = response.data.ballotCryptogramsItem.address
+            this.cryptogramAddress = response.data.ballotCryptograms.address
         }
       })
 
-      return cryptogramAddress
+      return this.cryptogramAddress
     }
 
     public async submitVerifierKey(spoilRequestAddress: string): Promise<VerifierItem> {
@@ -42,25 +45,47 @@ export class AVVerifier {
       }
 
       const signedVerifierItem = signPayload(verfierItem, keyPair.privateKey)
-      const verifierItem: VerifierItem = (await this.bulletinBoard.submitVerifierItem(signedVerifierItem)).data
-      return verifierItem
+      this.verifierItem = (await this.bulletinBoard.submitVerifierItem(signedVerifierItem)).data.verifier
+      return this.verifierItem
     }
 
-    public async pollForSpoilRequest(ballotCryptogramsAddress: string): Promise<string> {
+    public async pollForSpoilRequest(): Promise<string> {
       let attempts = 0;
       
       const executePoll = async (resolve, reject) => {
-        const result = await this.bulletinBoard.getSpoilRequestItem(ballotCryptogramsAddress).catch(error => {
-          console.error(error)
+        const result = await this.bulletinBoard.getSpoilRequestItem(this.cryptogramAddress).catch(error => {
+          // console.error(error)
+        });
+        attempts++;
+
+        if (result?.data?.item?.type === SPOIL_REQUEST_ITEM) {
+          return resolve(result.data.item.address);
+        } else if (result?.data?.item?.type === CAST_REQUEST_ITEM){
+          return reject(new Error('Ballot has been cast and cannot be spoiled'))
+        }  else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
+          return reject(new Error('Exceeded max attempts'));
+        } else  {
+          setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
+        }
+      };
+    
+      return new Promise(executePoll);
+    }
+
+    public async pollForCommitmentOpening() {
+      let attempts = 0;
+
+      const executePoll = async (resolve, reject) => {
+        const result = await this.bulletinBoard.getCommitmentOpenings(this.verifierItem.address).catch(error => {
+          // console.error(error)
         });
 
         attempts++;
-
-        if (result?.data?.type === SPOIL_REQUEST_ITEM) {
-          return resolve(result.data.address);
-        } else if (result?.data?.type === CAST_REQUEST_ITEM){
-          return reject(new Error('Ballot has been cast and cannot be spoiled'))
-        }  else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
+        if (result?.data?.voterCommitmentOpening && result?.data?.boardCommitmentOpening) {
+          this.boardCommitmentOpening = result.data.boardCommitmentOpening
+          this.voterCommitmentOpening = result.data.voterCommitmentOpening
+          return resolve(result.data);
+        } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
           return reject(new Error('Exceeded max attempts'));
         } else  {
           setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
