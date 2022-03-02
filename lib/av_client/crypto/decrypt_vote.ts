@@ -2,6 +2,7 @@ import {
   bignumToHex,
   bignumFromHex,
   pointToHex,
+  pointFromHex
 } from "./util";
 
 import { pointToVote } from "./vote_converter";
@@ -21,13 +22,14 @@ export const decryptVote = (markingType: MarkingType, cryptograms: string[], ran
   return pointToVote(points[0]).vote;
 }
 
-function decryptVotePoint(cryptogram: string, decryptionKey: string, encryptionKey: string): string {
+function decryptVotePoint(cryptogram: string, randomizer: string, encryptionKey: string): string {
   const elGamalCryptogram = crypto.ElGamalPointCryptogram.fromString(cryptogram);
-  const decryptionKeyBn = bignumFromHex(decryptionKey).toBn();
+  const publicKey = pointFromHex(encryptionKey).toEccPoint();
+  const randomizerBn = bignumFromHex(randomizer).toBn();
 
-  // TODO: Replace elgamalcryptogram R-value with encryption key
-  // and then decrypt (talk to Stefan)
+  // invert cryptogram so you can decrypt using the randomness
+  const newCryptogram = new crypto.ElGamalPointCryptogram(publicKey, elGamalCryptogram.ciphertext_point)
+  const decryptedPoint = new Point(newCryptogram.decrypt(randomizerBn))
 
-  const point = elGamalCryptogram.decrypt(decryptionKeyBn);
-  return pointToHex(new Point(point));
+  return pointToHex(decryptedPoint)
 }

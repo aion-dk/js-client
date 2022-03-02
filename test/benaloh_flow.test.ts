@@ -24,11 +24,17 @@ describe('entire benaloh flow', () => {
     // Cleanup
   });
 
-  it.skip('spoils a ballot', async () => {
+  it('spoils a ballot', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
       const client = new AVClient('http://us-avx:3000/dbb/us/api');
+
+      await verifier.initialize();
+      await client.initialize(undefined, {
+        privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
+        publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
+      });
 
       const trackingCode = await placeVote(client) as string
       await verifier.findBallot(trackingCode)
@@ -60,8 +66,12 @@ describe('entire benaloh flow', () => {
       await verifier.pollForCommitmentOpening();
 
       // The verifier decrypts the ballot
-      //const votes = verifier.decryptBallot(boardCommitmentOpening, clientCommitmentOpening);  // Temporary. Will be fetched inside verifier
-      //expect(votes).to.equal({ "a": 1 });
+      const votes = verifier.decryptBallot();
+
+      expect(votes).to.eql({
+        'f7a04384-1458-5911-af38-7e08a46136e7': '1',
+        '026ca870-537e-57b2-b313-9bb5d9fbe78b': '3'
+      });
     }
 
     await performTest()
@@ -121,11 +131,6 @@ describe('entire benaloh flow', () => {
   }).timeout(10000);
 
   async function placeVote(client: AVClient) {
-    await client.initialize(undefined, {
-      privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
-      publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
-    });
-
     const voterId = 'A00000000006'
     const voterEmail = 'mvptuser@yahoo.com'
     await client.requestAccessCode(voterId, voterEmail).catch((e) => {
