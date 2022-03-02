@@ -15,7 +15,8 @@ https://aion-dk.github.io/js-client/
 
 ### Optional docker setup
 ```bash
-$ docker run --rm -it --entrypoint /bin/sh js-client
+$ docker build -t js-client:latest .
+$ bin/docker-sh
 ```
 
 ## Testing
