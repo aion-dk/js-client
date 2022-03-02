@@ -1,37 +1,33 @@
 const urlSearchParams = new URLSearchParams(window.location.search);
 const params = Object.fromEntries(urlSearchParams.entries());
-const verifier = new AssemblyVoting.AVVerifier("https://avx.com/dbb/" + params.election + "/api");
-var ballotCryptogramsAddress;
+const verifier = new AssemblyVoting.AVVerifier("http://us-avx:3000/dbb/us/api");
 
 $(document).ready(() => {
   $("form#findBallot").submit((event) => {
     event.preventDefault();
-
-    const findBallotView = $(this);
-    const address = findBallotView.find("input#verifier-code").value();
+    const address = $("form#findBallot").find("input#verifier-code").val();
 
     verifier.findBallot(address).then((response) => {
       const verifyKeyView = $("#submitVerifierKey");
-
-      ballotCryptogramsAddress = response.address
+      console.log('ballot', response)
       verifyKeyView.find("#verification-code").text(response.address);
-
-      findBallotView.collapse("hide");
+      
       verifyKeyView.collapse("show");
-    });
-  });
 
-  $("form#submitVerifierKey").submit((event) => {
-    event.preventDefault();
+      verifier.pollForSpoilRequest().then((spoilRequestAddress) => {
+        console.log('spoil address', spoilRequestAddress)
 
-    const verifyKeyView = $(this);
+        verifier.submitVerifierKey(spoilRequestAddress).then(verifierItem => {
+          console.log('verifier', verifierItem)
+          $("form#submitVerifierKey #verification-code").text(verifierItem.address)
 
-    verifyKeyView.collapse("hide");
-    loading.collapse("show");
-    verifier.pollForSpoilRequest().then((response) => {
-      console.log(response)
-      loading.collapse("hide");
-      showChoices.collapse("show");
+          verifier.pollForCommitmentOpening().then(commitmentOpenings => {
+            console.log('commitment openings', commitmentOpenings)
+            $('#showChoices').collapse("show");
+            $("#choices").text(JSON.stringify(commitmentOpenings))
+          })
+        })
+      });
     });
   });
 });

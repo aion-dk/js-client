@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- saved from url=(0059)https://getbootstrap.com/docs/4.0/examples/floating-labels/ -->
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -27,28 +26,29 @@
         <button class="btn btn-lg btn-primary btn-block" type="submit">Find Ballot</button>
       </form>
 
+      <hr>
+      
       <form id="submitVerifierKey" class="collapse" action="#">
         <div class="text-center mb-4">
-          <h1 class="h3 mb-3 font-weight-normal">AVX Verifier</h1>
-
-          <p>Insert the Ballot Code found on your Mobile Voting App, to verify your choices. This process will spoil and invalidate your votes.</p>
+          <h2 class="h3 mb-3 font-weight-normal">Ballot found!</h2>
         </div>
-
         <div class="form-label-group">
-          <span id="verification-code">--code--</span>
+          <span>Ballot checking code:</span>
+          <br>
+          <span id="verification-code">Waiting for you to spoil the ballot in the voting app</span>
         </div>
-
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Confirm</button>
       </form>
+
+      <hr>
 
       <div id="showChoices" class="collapse">
         <div class="text-center mb-4">
-          <h1 class="h3 mb-3 font-weight-normal">AVX Verifier</h1>
+          <h2 class="h3 mb-3 font-weight-normal">Ballot</h2>
         </div>
 
         <div class="form-label-group">
           <ol id="choices">
-            <li class="template">--template--</li>
+            <li class="template">Waiting for you to confirm the code matches in the voting app</li>
           </ol>
         </div>
       </div>

@@ -17,7 +17,8 @@
     "docs": "typedoc --plugin none --out docs --includes test/",
     "build": "tsc && cp lib/av_client/*.js dist/lib/av_client",
     "prepublish": "tsc && cp lib/av_client/*.js dist/lib/av_client",
-    "lint": "eslint lib/ test/"
+    "lint": "eslint lib/ test/",
+    "webpack": "webpack --config webpack.config.js"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^8.5.8",
