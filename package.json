@@ -19,6 +19,9 @@
     "prepublish": "tsc && cp lib/av_client/*.js dist/lib/av_client",
     "lint": "eslint lib/"
   },
+  "engines" : {
+    "node": ">=14.0.0"
+  },
   "dependencies": {
     "axios": "^0.25.0",
     "xml-js": "^1.6.11"
