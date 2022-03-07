@@ -20,7 +20,7 @@
     "lint": "eslint lib/"
   },
   "engines" : {
-    "node": ">=14.0.0"
+    "node": ">=14.17.0"
   },
   "dependencies": {
     "axios": "^0.25.0",
