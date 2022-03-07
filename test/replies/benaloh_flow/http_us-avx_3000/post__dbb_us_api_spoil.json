@@ -1,0 +1,24 @@
+{
+  "spoilRequest": {
+    "address": "e91175bb745f889a27ea50a661ee2599dda76f18211a2522d2c6c6a6b8e55fe6",
+    "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
+    "parentAddress": "c142c3f2cbcdd3a456617ab804c20d0bacee30d8d53d0fadbb10112defd10d5e",
+    "previousAddress": "c142c3f2cbcdd3a456617ab804c20d0bacee30d8d53d0fadbb10112defd10d5e",
+    "content": {},
+    "registeredAt": "2022-03-04T12:41:07.119Z",
+    "signature": "19cb5e1254f615e9cce132718c14bceccbef8882ca8b00ac112c1d63f8a94fd8,7aea473f4b30b7731465cbfee3b1de7971cd3ed7858b413ce1a0ccca8efea136",
+    "type": "SpoilRequestItem"
+  },
+  "receipt": "acb95da14a979e10813c66c14fc469929d85cca27160010960a2ced20a255b07,dddaba30df8e143776700715e61c5525de4ab0dfa43c40d4f44fe6304ab8ae07",
+  "boardCommitmentOpening": {
+    "randomizers": {
+      "f7a04384-1458-5911-af38-7e08a46136e7": [
+        "d9dc9a56376c14e8b34e0418071ac562a9108f12f24826b23dd253e4b2c834f4"
+      ],
+      "026ca870-537e-57b2-b313-9bb5d9fbe78b": [
+        "e7afc03625edc7d8d6f39d749344cd48da40689f7fe0f91652fc34c5854e6281"
+      ]
+    },
+    "commitmentRandomness": "ff888a552cec1949980f50c3977e900b71d78d30a4e79662ec13a1ee4a9ee2b6"
+  }
+}
