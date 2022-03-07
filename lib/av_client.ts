@@ -36,8 +36,7 @@ import {
   EmailDoesNotMatchVoterRecordError,
   InvalidConfigError,
   InvalidStateError,
-  NetworkError,
-  InvalidTokenError
+  NetworkError
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
@@ -214,7 +213,7 @@ export class AVClient implements IAVClient {
     const decoded = jwt.decode(authToken); // TODO: Verify against dbb pubkey: this.getElectionConfig().services.voterAuthorizer.public_key);
 
     if(decoded === null)
-      throw new InvalidTokenError('Auth token could not be decoded');
+      throw new Error('Auth token could not be decoded');
 
     const voterSessionItemExpectation = {
       type: VOTER_SESSION_ITEM,
@@ -521,7 +520,7 @@ export class AVClient implements IAVClient {
    * @throws {@link TimeoutError | TimeoutError} if the verifier doesn't register itself to the DBB in time
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async waitForVerfierRegistration(): Promise<string> {
+  public async pollForVerifierItem(): Promise<string> {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot challenge ballot, no user session')
     }

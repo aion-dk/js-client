@@ -112,3 +112,12 @@ export class TimeoutError extends AvClientError {
     Object.setPrototypeOf(this, CorruptCvrError.prototype);
   }
 }
+
+export class InvalidTokenError extends AvClientError {
+  readonly name = "InvalidTokenError";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, CorruptCvrError.prototype);
+  }
+}
