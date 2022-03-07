@@ -38,6 +38,5 @@
     "registeredAt": "2022-03-07T14:44:09.309Z",
     "signature": "1ee32284803fa5e51a8be9d0d5e9fdf0451a69101fbdf9556fea0a46c75e18d6,9899003b784161b481ad5547014407c3afcb40246448bf8780efd6fccbe39acc",
     "type": "BoardEncryptionCommitmentOpeningItem"
-  },
-  "receipt": "2024392d52d86a9728e63acdf52391db46df24610eff1b3749ea414597b231b0,d600e0f1889545b3e76637f3bc37b42ea97bdb86d13462d9e99895fe344fd943"
+  }
 }

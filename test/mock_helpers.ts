@@ -3,10 +3,12 @@ import * as fs from 'fs';
 import * as path from 'path'
 
 export function prepareRecording(namespace: string){
-
   function useRecordedResponse( scope: string, method: string, path: string ){
     const fileName = filenameFromRequest(namespace, scope, method, path)
-    return nock(scope)[method.toLowerCase()](path).replyWithFile(200, fileName)
+
+    return nock(scope)[method.toLowerCase()](path)
+      .query(true) // this will bypass query as 
+      .replyWithFile(200, fileName)
   }
 
   async function recordResponses(callback: () => any){
@@ -29,7 +31,6 @@ export function prepareRecording(namespace: string){
 
   return {
     useRecordedResponse,
-    recordResponses,
     recordable
   }
 }
@@ -76,10 +77,12 @@ function cleanup(){
 function filenameFromRequest(namespace: string, scope: string, httpMethod: string, url: string) {
   const targetDir = path.join(__dirname, 'replies', serializePathSegment(namespace))
 
+  const pathPart = url.split('?')[0]
+
   return path.join(
     targetDir, 
     serializePathSegment(scope.replace(/\/$/, '')),
-    `${serializePathSegment(`${httpMethod}_${url}`)}.json`
+    `${serializePathSegment(`${httpMethod}_${pathPart}`)}.json`
   )
 }
 

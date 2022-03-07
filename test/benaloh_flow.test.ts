@@ -7,11 +7,10 @@ import { prepareRecording } from './mock_helpers'
 import { AVVerifier } from '../lib/av_verifier';
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
-import { equal } from 'assert';
 
 const USE_MOCK = true;
 
-const { useRecordedResponse, recordResponses, recordable } = prepareRecording('benaloh_flow')
+const { useRecordedResponse, recordable } = prepareRecording('benaloh_flow')
 
 describe('entire benaloh flow', () => {
   let sandbox;
@@ -33,10 +32,10 @@ describe('entire benaloh flow', () => {
         useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/verification/verifier'),
 
         // NOTE! The following requests need to be updated when a new recordings are done.
-        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/vote_track/462683b3a792b64c621d3b65e80b47474f4602cde4e7ec41837bd7557629b032'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/verifier/e91175bb745f889a27ea50a661ee2599dda76f18211a2522d2c6c6a6b8e55fe6'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/spoil_status/c142c3f2cbcdd3a456617ab804c20d0bacee30d8d53d0fadbb10112defd10d5e'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/commitment_openings/04a7b04475f135a40aebf430a487e904bcb8b41080ba286cbb60616c544c2cc8'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/vote_track'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/verifier'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/spoil_status'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/commitment_openings'),
       ];
     }
   });
@@ -49,8 +48,6 @@ describe('entire benaloh flow', () => {
   });
 
   it('spoils a ballot', recordable(USE_MOCK, async () => {
-    // For recording, remember to reset AVX database and update oneTimePassword fixture value
-
     const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
     const client = new AVClient('http://us-avx:3000/dbb/us/api');
 
