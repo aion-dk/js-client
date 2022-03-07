@@ -502,7 +502,7 @@ export class AVClient implements IAVClient {
    * @throws {@link TimeoutError | TimeoutError} if the verifier doesn't register itself to the DBB in time
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async waitForVerfierRegistration(): Promise<string> {
+  public async waitForVerifierRegistration(): Promise<string> {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot challenge ballot, no user session')
     }

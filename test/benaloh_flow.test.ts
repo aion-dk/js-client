@@ -52,7 +52,7 @@ describe('entire benaloh flow', () => {
 
       // The verifier found a spoil request and now submits it's public key in a VerifierItem
 
-      const veriferAddress = await client.waitForVerfierRegistration()
+      const veriferAddress = await client.waitForVerifierRegistration()
       
       await Promise.all([pollForSpoilPromise]);
 
