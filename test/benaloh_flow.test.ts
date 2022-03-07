@@ -52,15 +52,15 @@ describe('entire benaloh flow', () => {
 
       // The verifier found a spoil request and now submits it's public key in a VerifierItem
 
-      const appVerifierItem = await client.pollForVerifierItem()
+      const veriferAddress = await client.pollForVerifierItem()
       
       await Promise.all([pollForSpoilPromise]);
 
       // Emulating a pairing the app and verifier tracking codes
-      expect(verifierItem.address).to.eql(appVerifierItem.address)
+      expect(verifierItem.address).to.eql(veriferAddress)
 
       // App creates the voterCommitmentOpening
-      await client.challengeBallot();
+      await client.challengeBallot()
 
       // Verifier polls for commitment openings
       await verifier.pollForCommitmentOpening();
