@@ -438,6 +438,15 @@ export class AVClient implements IAVClient {
     return spoilRequest.address
   }
 
+
+  /**
+   * Should be called when the voter has 'paired' the verifier and the voting app.
+   * Computes and encrypts the clientEncryptionCommitment and posts it to the DBB
+   *
+   * @returns Returns void if the computation was succesful
+   * @throws {@link InvalidStateError | InvalidStateError } if called before required data is available
+   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
+   */
   public async challengeBallot(): Promise<void> {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot challenge ballot, no user session')
@@ -502,7 +511,20 @@ export class AVClient implements IAVClient {
     return this.keyPair.publicKey
   }
 
-  public async pollForVerifierItem(): Promise<VerifierItem> {
+  /**
+   * Should be called after spoilBallot.
+   * Gets the verifier public key from the DBB
+   *
+   * @returns Returns the pairing code based on the address of the verifier item in the DBB
+   * @throws {@link InvalidStateError | InvalidStateError } if called before required data is available
+   * @throws {@link TimeoutError | TimeoutError} if the verifier doesn't register itself to the DBB in time
+   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
+   */
+  public async pollForVerifierItem(): Promise<string> {
+    if(!(this.voterSession)) {
+      throw new InvalidStateError('Cannot challenge ballot, no user session')
+    }
+
    let attempts = 0;
    
    const executePoll = async (resolve, reject) => {
@@ -513,9 +535,9 @@ export class AVClient implements IAVClient {
       attempts++;
       if (result?.data?.verifier?.type === VERIFIER_ITEM) {
         this.verifierItem = result.data.verifier
-        return resolve(result.data.verifier);
+        return resolve(result.data.verifier.address);
       } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
-        return reject(new Error('Exceeded max attempts'));
+        return reject(new TimeoutError('Exceeded max attempts'));
       } else  {
         setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
       }
