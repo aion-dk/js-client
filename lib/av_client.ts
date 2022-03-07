@@ -36,7 +36,8 @@ import {
   EmailDoesNotMatchVoterRecordError,
   InvalidConfigError,
   InvalidStateError,
-  NetworkError
+  NetworkError,
+  InvalidTokenError
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
@@ -213,7 +214,7 @@ export class AVClient implements IAVClient {
     const decoded = jwt.decode(authToken); // TODO: Verify against dbb pubkey: this.getElectionConfig().services.voterAuthorizer.public_key);
 
     if(decoded === null)
-      throw new Error('Auth token could not be decoded');
+      throw new InvalidTokenError('Auth token could not be decoded');
 
     const voterSessionItemExpectation = {
       type: VOTER_SESSION_ITEM,
@@ -385,25 +386,6 @@ export class AVClient implements IAVClient {
     }
 
   /**
-   * @deprecated
-   *
-   * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
-   * Should be called before {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}.
-   *
-   * Generates an encryption key that is used to add another encryption layer to vote cryptograms when they are spoiled.
-   *
-   * The generateTestCode is used in case {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms} is called afterwards.
-   *
-   * @returns Returns the test code. Example:
-   * ```javascript
-   * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
-   * ```
-   */
-  public generateTestCode(): void {
-    throw new Error('Not implemented yet');
-  }
-
-  /**
    * Should be called when voter chooses to test the encryption of their ballot.
    * Gets commitment opening of the digital ballot box and validates it.
    *
@@ -520,7 +502,7 @@ export class AVClient implements IAVClient {
    * @throws {@link TimeoutError | TimeoutError} if the verifier doesn't register itself to the DBB in time
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async pollForVerifierItem(): Promise<string> {
+  public async waitForVerfierRegistration(): Promise<string> {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot challenge ballot, no user session')
     }
