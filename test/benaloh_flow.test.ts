@@ -1,71 +1,102 @@
 import axios from 'axios';
 import nock = require('nock');
-import {
-  resetDeterminism,
-  vaHost,
-  bbHost,
-  otpHost,
-  expectError
-} from './test_helpers';
-import { recordResponses } from './test_helpers'
+import { resetDeterminism } from './test_helpers';
+import { bulletinBoardHost, voterAuthorizerHost, OTPProviderHost } from './test_helpers'
+import { prepareRecording } from './mock_helpers'
+
 import { AVVerifier } from '../lib/av_verifier';
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
-import { equal } from 'assert';
 
 const USE_MOCK = true;
 
+const { useRecordedResponse, recordable } = prepareRecording('benaloh_flow')
+
 describe('entire benaloh flow', () => {
+  let sandbox;
+  let expectedNetworkRequests : nock.Scope[] = [];
+
   beforeEach(() => {
-    // Add expected responses
+    sandbox = resetDeterminism();
+    if(USE_MOCK) {
+      expectedNetworkRequests = [
+        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/election_config'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/election_config'),
+        useRecordedResponse(voterAuthorizerHost, 'post', '/create_session'),
+        useRecordedResponse(voterAuthorizerHost, 'post', '/request_authorization'),
+        useRecordedResponse(OTPProviderHost, 'post', '/authorize'),
+        useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/registrations'),
+        useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/commitments'),
+        useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/votes'),
+        useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/spoil'),
+        useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/verification/verifier'),
+
+        // NOTE! The following requests need to be updated when a new recordings are done.
+        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/vote_track'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/verifier'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/spoil_status'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/commitment_openings'),
+      ];
+    }
   });
 
   afterEach(() => {
-    // Cleanup
+    if (USE_MOCK) {
+      sandbox.restore();
+      nock.cleanAll();
+    }
   });
 
-  it.skip('spoils a ballot', async () => {
-    // For recording, remember to reset AVX database and update oneTimePassword fixture value
-    const performTest = async () => {
-      const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
-      const client = new AVClient('http://us-avx:3000/dbb/us/api');
+  it('spoils a ballot', recordable(USE_MOCK, async () => {
+    const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
+    const client = new AVClient('http://us-avx:3000/dbb/us/api');
 
-      const trackingCode = await placeVote(client) as string
-      await verifier.findBallot(trackingCode)
+    await verifier.initialize()
+    await client.initialize(undefined, {
+      privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
+      publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
+    });
 
-      let verifierItem : any
+    const trackingCode = await placeVote(client) as string
+    await verifier.findBallot(trackingCode)
 
-      // The verifier starts polling for spoil request
-      const pollForSpoilPromise = verifier.pollForSpoilRequest()
-        .then(verifierSpoilRequestAddress => {
-          return verifier.submitVerifierKey(verifierSpoilRequestAddress)
-        })
-        .then(item => verifierItem = item)
+    let verifierItem : any
 
-      await client.spoilBallot();
+    // The verifier starts polling for spoil request
+    const pollForSpoilPromise = verifier.pollForSpoilRequest()
+      .then(verifierSpoilRequestAddress => {
+        return verifier.submitVerifierKey(verifierSpoilRequestAddress)
+      })
+      .then(item => verifierItem = item)
 
-      // The verifier found a spoil request and now submits it's public key in a VerifierItem
+    await client.spoilBallot();
 
-      const appVerifierItem = await client.pollForVerifierItem()
-      
-      await Promise.all([pollForSpoilPromise]);
+    // The verifier found a spoil request and now submits it's public key in a VerifierItem
 
-      // Emulating a pairing the app and verifier tracking codes
-      expect(verifierItem.address).to.eql(appVerifierItem.address)
+    const appVerifierItem = await client.pollForVerifierItem()
+    
+    await Promise.all([pollForSpoilPromise]);
 
-      // App creates the voterCommitmentOpening
-      await client.challengeBallot();
+    // Emulating a pairing the app and verifier tracking codes
+    expect(verifierItem.address).to.eql(appVerifierItem.address)
 
-      // Verifier polls for commitment openings
-      await verifier.pollForCommitmentOpening();
+    // App creates the voterCommitmentOpening
+    await client.challengeBallot();
 
-      // The verifier decrypts the ballot
-      //const votes = verifier.decryptBallot(boardCommitmentOpening, clientCommitmentOpening);  // Temporary. Will be fetched inside verifier
-      //expect(votes).to.equal({ "a": 1 });
-    }
+    // Verifier polls for commitment openings
+    await verifier.pollForCommitmentOpening();
 
-    await performTest()
-  }).timeout(10000);
+    // The verifier decrypts the ballot
+    const votes = verifier.decryptBallot();
+
+    expect(votes).to.eql({
+      'f7a04384-1458-5911-af38-7e08a46136e7': '1',
+      '026ca870-537e-57b2-b313-9bb5d9fbe78b': '3'
+    });
+
+    if( USE_MOCK ) expectedNetworkRequests.forEach((mock) => mock.done());
+
+  })).timeout(10000);
 
   it.skip('cannot spoil ballot because it has already been cast', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
@@ -121,19 +152,13 @@ describe('entire benaloh flow', () => {
   }).timeout(10000);
 
   async function placeVote(client: AVClient) {
-    await client.initialize(undefined, {
-      privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
-      publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
-    });
-
     const voterId = 'A00000000006'
     const voterEmail = 'mvptuser@yahoo.com'
     await client.requestAccessCode(voterId, voterEmail).catch((e) => {
       console.error(e);
     });
 
-    const oneTimePassword = await extractOTPFromEmail();
-    
+    const oneTimePassword = USE_MOCK ? '12345' : await extractOTPFromEmail()
     await client.validateAccessCode(oneTimePassword).catch((e) => {
       console.error(e);
     });
