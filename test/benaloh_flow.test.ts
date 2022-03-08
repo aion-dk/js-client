@@ -41,8 +41,8 @@ describe('entire benaloh flow', () => {
   });
 
   afterEach(() => {
+    sandbox.restore()
     if (USE_MOCK) {
-      sandbox.restore();
       nock.cleanAll();
     }
   });
