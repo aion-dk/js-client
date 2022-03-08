@@ -14,8 +14,9 @@ npm install @aion-dk/js-client
 https://aion-dk.github.io/js-client/
 
 ### Optional docker setup
+
 ```bash
-$ docker build -t js-client:latest .
+$ bin/docker-build
 $ bin/docker-sh
 ```
 
@@ -39,7 +40,7 @@ In the `js-client` go to `walkthrough.test.ts` and disable mocks by changing `co
 
 Uncomment `// return await recordResponses(async function() {` in `returns a receipt` test. Remember the closing brackets at the end of the test.
 
-The recorded responses should be saved the the `test/replies/otp_flow`-folder.
+The recorded responses should be saved the `test/replies/otp_flow`-folder.
 
 The folder can be copy pasted to the `ionic-app`-repo by replacing the folder `tests/e2e/fixtures/otp_flow`
 
