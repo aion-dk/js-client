@@ -1,0 +1,18 @@
+{
+  "voterSession": {
+    "address": "5c27350fbf9128005554ae7cd88f29f0fc10025ffb2627f06ba4b59c9e0c4470",
+    "author": "02fd04ed259ae43a8d9d955591af2373693dc720cec3c583061f164b8e5e3f821c",
+    "parentAddress": "3ff32964ad4e10037b8e752771781a19a47b058b71b0e0cefb96c4711f590117",
+    "previousAddress": "fd8ec2c7039de04ef0bbdb7407fcafb2d79b9336a2ac9279a1e858333f7f546c",
+    "content": {
+      "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiZmJlMDg0MGE5MTI4ZTIyZGRlMWYwNGRiOTIwNTFiZWZhMGRlNzM5OSIsInB1YmxpY19rZXkiOiIwM2I4N2Q3ZmU3OTNhNjIxZGYyN2Y0NGMyMGY0NjBmZjcxMWQ1NTU0NWM1ODcyOWYyMGIzZmI2ZTg3MWM1M2M0OWMiLCJ2b3Rlcl9ncm91cF9rZXkiOiI0Iiwic2VnbWVudDEiOiI0IiwiZWNfdG9rZW5fZmluZ2VycHJpbnQiOiJjMWI4YzU1OWNjODIwMWJjYTJkMzQxZTc1MDE5MWU1Y2Q0M2VmZGEwIiwiYXVkIjoiYXZ4OmJjMWIxZWQwLTk0M2UtNDY0Ny1iZmMxLTA2MzNiYTA4YzA1ZSIsImlhdCI6MTY0NjY2NDI0OCwiZXhwIjoxNjQ2NjY2MDQ4fQ.pRSvaw3cbutRO5bI9iIHD6ox91qcHf5q-xtZz6m6hiANqhQmts_C51x8INQogrhWln-Hc3z3qw2-Fx39gUUZmw",
+      "identifier": "fbe0840a9128e22dde1f04db92051befa0de7399",
+      "voterGroup": "4",
+      "publicKey": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c"
+    },
+    "registeredAt": "2022-03-07T14:44:08.045Z",
+    "signature": "101e65a36a8d942f2fa3a3be00da20e5377c903eacd312f4f20a5ee3a3b76fff,82526b65905a4cd7fbaee1634a31a5c60ed175a15fe945997874d1c55a7d0ce9",
+    "type": "VoterSessionItem"
+  },
+  "receipt": "d62722d1a7dd304d2f455fbe43ef0515b42817e430de3330ee07558dddf40c5a,599345165ac1c5868f801bc97e3f432a61d9fe466ed0f15d698399ae25dff2d9"
+}

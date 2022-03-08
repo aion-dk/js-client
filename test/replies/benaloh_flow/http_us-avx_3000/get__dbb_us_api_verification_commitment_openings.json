@@ -1,0 +1,42 @@
+{
+  "voterCommitmentOpening": {
+    "address": "d6b13eb1eaa613247179c54465ca0e2ea86038af44be7f7889e68b16d7d654fc",
+    "author": "02fd04ed259ae43a8d9d955591af2373693dc720cec3c583061f164b8e5e3f821c",
+    "parentAddress": "bca0668fe443a63d7691242567fd0da52631a8722fe039dae8ea06585f64c930",
+    "previousAddress": "b03d93b4114692a7e0a4ff0e96e810988e1aa2045c0e41c792ed884546531fc0",
+    "content": {
+      "commitmentRandomness": "0c00000b00000a000009000008000007000006000005000004000003000002",
+      "randomizers": {
+        "f7a04384-1458-5911-af38-7e08a46136e7": [
+          "0a000009000008000007000006000005000004000003000002000001000000"
+        ],
+        "026ca870-537e-57b2-b313-9bb5d9fbe78b": [
+          "0b00000a000009000008000007000006000005000004000003000002000001"
+        ]
+      }
+    },
+    "registeredAt": "2022-03-07T14:44:09.300Z",
+    "signature": "6769924b1a45638ca76727d3a0c64ad1a4aa1b61abebaec8cb08df20f27ba490,2e5f62f3ac63ce29b7111e0cc7674eb165c96f6be0e8a7d280ed4f9558c58c38",
+    "type": "VoterEncryptionCommitmentOpeningItem"
+  },
+  "boardCommitmentOpening": {
+    "address": "6a57bd81cdb32f5d404b1d7a18f56c286279d242ef69ab810f141e5e7e0b9d79",
+    "author": "02fd04ed259ae43a8d9d955591af2373693dc720cec3c583061f164b8e5e3f821c",
+    "parentAddress": "d6b13eb1eaa613247179c54465ca0e2ea86038af44be7f7889e68b16d7d654fc",
+    "previousAddress": "b03d93b4114692a7e0a4ff0e96e810988e1aa2045c0e41c792ed884546531fc0",
+    "content": {
+      "commitmentRandomness": "d0037f035d0ae09471b73c3e0b0590f76fc08621117654bc09081c247fc2afd4",
+      "randomizers": {
+        "f7a04384-1458-5911-af38-7e08a46136e7": [
+          "6ed63f4c374ea929e61e17cf67b4833c16c51975ced44ec622ed996837b6033e"
+        ],
+        "026ca870-537e-57b2-b313-9bb5d9fbe78b": [
+          "649e7e740f31ced2023e3d4b7fbb835b029642d29a5fccde73254e9d396cf955"
+        ]
+      }
+    },
+    "registeredAt": "2022-03-07T14:44:09.309Z",
+    "signature": "1ee32284803fa5e51a8be9d0d5e9fdf0451a69101fbdf9556fea0a46c75e18d6,9899003b784161b481ad5547014407c3afcb40246448bf8780efd6fccbe39acc",
+    "type": "BoardEncryptionCommitmentOpeningItem"
+  }
+}

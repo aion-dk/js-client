@@ -58,19 +58,19 @@ export class BulletinBoard {
   }
 
   getVotingTrack(verificationStartAddress: string): Promise<AxiosResponse> {
-    return this.backend.get(`verification/vote_track/${verificationStartAddress}`)
+    return this.backend.get(`verification/vote_track?id=${verificationStartAddress}`)
   }
 
   getCommitmentOpenings(verifierItemAddress: string): Promise<AxiosResponse> {
-    return this.backend.get(`verification/commitment_openings/${verifierItemAddress}`)
+    return this.backend.get(`verification/commitment_openings?id=${verifierItemAddress}`)
   }
 
   getSpoilRequestItem(ballotCryptogramAddress: string): Promise<AxiosResponse> {
-    return this.backend.get(`verification/spoil_status/${ballotCryptogramAddress}`)
+    return this.backend.get(`verification/spoil_status?id=${ballotCryptogramAddress}`)
   }
 
   getVerifierItem(spoilRequestAddress: string): Promise<AxiosResponse> {
-    return this.backend.get(`verification/verifier/${spoilRequestAddress}`)
+    return this.backend.get(`verification/verifier?id=${spoilRequestAddress}`)
   }
 
   submitVerifierItem(signedVerifierItem): Promise<AxiosResponse> {

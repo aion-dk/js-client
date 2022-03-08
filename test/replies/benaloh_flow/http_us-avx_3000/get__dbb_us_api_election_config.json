@@ -1,0 +1,98 @@
+{
+  "electionConfig": {
+    "dbbPublicKey": "02fd04ed259ae43a8d9d955591af2373693dc720cec3c583061f164b8e5e3f821c",
+    "encryptionKey": "02d4eb9be98f92f46ec0a21ee8cc7ce4f2af6970ee57c594b7cf8ca4b28def4ab5",
+    "services": {
+      "address": "3ff32964ad4e10037b8e752771781a19a47b058b71b0e0cefb96c4711f590117",
+      "voterAuthorizer": {
+        "electionContextUuid": "d918a292-1bc4-4dd4-8752-d698ac7d8feb",
+        "publicKey": "02989eccf9b8e926d42425c0192bea11bd9c30b7c669d7198990cd2e156f2fcc7c",
+        "url": "http://authorizer.local.assemblyvoting.net:1234/"
+      },
+      "otpProvider": {
+        "electionContextUuid": "bc397593-4326-4a29-acc9-55bc2e73a62f",
+        "publicKey": "0368b5e2f124d9e5f85ae862eb20e0c5b327a426e1a6e6b92e80d3486d63936115",
+        "url": "http://otp-provider.local.assemblyvoting.net:1111/"
+      }
+    },
+    "ballotConfigs": {
+      "3": {
+        "contestUuids": [
+          "f7a04384-1458-5911-af38-7e08a46136e7",
+          "026ca870-537e-57b2-b313-9bb5d9fbe78b"
+        ]
+      },
+      "4": {
+        "contestUuids": [
+          "f7a04384-1458-5911-af38-7e08a46136e7",
+          "026ca870-537e-57b2-b313-9bb5d9fbe78b"
+        ]
+      }
+    },
+    "contestConfigs": {
+      "f7a04384-1458-5911-af38-7e08a46136e7": {
+        "markingType": {
+          "style": "regular",
+          "handleSize": 1,
+          "minMarks": 1,
+          "maxMarks": 1
+        },
+        "options": [
+          {
+            "handle": 1,
+            "title": {
+              "en": "Option 1"
+            }
+          },
+          {
+            "handle": 2,
+            "title": {
+              "en": "Option 2"
+            }
+          }
+        ],
+        "title": {
+          "en": "First ballot"
+        },
+        "resultType": {
+          "name": "resultType name not matter right now"
+        }
+      },
+      "026ca870-537e-57b2-b313-9bb5d9fbe78b": {
+        "markingType": {
+          "style": "regular",
+          "handleSize": 1,
+          "minMarks": 1,
+          "maxMarks": 1
+        },
+        "options": [
+          {
+            "handle": 3,
+            "title": {
+              "en": "Option 3"
+            }
+          },
+          {
+            "handle": 4,
+            "title": {
+              "en": "Option 4"
+            }
+          },
+          {
+            "handle": 5,
+            "title": {
+              "en": "Option 5"
+            }
+          }
+        ],
+        "title": {
+          "en": "Second ballot"
+        },
+        "resultType": {
+          "name": "resultType name not matter right now"
+        }
+      }
+    }
+  },
+  "receipt": "daa397352c313fda357a5753319753bd41018a0c8662b54d7571143349a93705,c92612ca0e3f3d9ee0373d9307ca3c24f7fde104ae6d5c4add495ab9da4220df"
+}
