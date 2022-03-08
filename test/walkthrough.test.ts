@@ -34,8 +34,8 @@ describe('entire voter flow using OTP authorization', () => {
   });
 
   afterEach(() => {
+    sandbox.restore()
     if (USE_MOCK) {
-      sandbox.restore();
       nock.cleanAll();
     }
   });
