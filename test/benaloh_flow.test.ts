@@ -8,7 +8,7 @@ import { AVVerifier } from '../lib/av_verifier';
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 
-const USE_MOCK = false;
+const USE_MOCK = true;
 
 const { useRecordedResponse, recordable } = prepareRecording('benaloh_flow')
 
@@ -71,21 +71,20 @@ describe('entire benaloh flow', () => {
 
     await client.spoilBallot();
 
-
-    
     await Promise.all([pollForSpoilPromise]);
 
     // The verifier found a spoil request and now submits it's public key in a VerifierItem
     const veriferAddress = await client.waitForVerifierRegistration()
       
-      await Promise.all([pollForSpoilPromise]);
+    await Promise.all([pollForSpoilPromise]);
 
-      // Emulating a pairing the app and verifier tracking codes
-      expect(verifierItem.address).to.eql(veriferAddress)
+    // Emulating a pairing the app and verifier tracking codes
+    expect(verifierItem.address).to.eql(veriferAddress)
 
-      // App creates the voterCommitmentOpening
-      await client.challengeBallot()
+    // App creates the voterCommitmentOpening
+    await client.challengeBallot()
 
+    await verifier.pollForCommitmentOpening()
     // The verifier decrypts the ballot
     const votes = verifier.decryptBallot();
 
