@@ -46,6 +46,7 @@ function setupRecording() {
 
 function stopRecording() {
   nock.restore()
+  nock.activate()
 }
 
 function saveFiles(namespace: string) {

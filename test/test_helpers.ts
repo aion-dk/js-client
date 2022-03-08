@@ -128,7 +128,8 @@ function setupRecording() {
 }
 
 function stopRecording() {
-  nock.restore();
+  nock.restore()
+  nock.activate()
 }
 
 function saveFiles() {
