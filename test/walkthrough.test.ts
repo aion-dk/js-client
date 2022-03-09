@@ -77,7 +77,7 @@ describe('entire voter flow using OTP authorization', () => {
       const contestsChoices = Object.keys(contestConfigs)
         .map((uuid: string) => [
           uuid,
-          contestConfigs[uuid].options[0].handle
+          contestConfigs[uuid].options[0].reference
         ])
 
       const cvr = Object.fromEntries(contestsChoices)

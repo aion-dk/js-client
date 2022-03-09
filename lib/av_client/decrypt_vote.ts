@@ -1,15 +1,17 @@
-import { CastVoteRecord, CommitmentOpening, ContestMap, MarkingType } from "./types";
+import { CastVoteRecord, ContestConfig, CommitmentOpening, ContestMap, MarkingType } from "./types";
 import { decryptVote } from './crypto/decrypt_vote';
+import { codesToCvr } from './cvr_conversion';
 import { addBigNums } from './aion_crypto';
 
 export const decrypt = (
+  contestConfigs: ContestConfig,
   markingType: MarkingType,
   encryptionKey: string,
   cryptograms: ContestMap<string[]>, 
   boardCommitmentOpening: CommitmentOpening, 
   voterCommitmentOpening: CommitmentOpening
 ): CastVoteRecord => {
-  const contestSelections = {}
+  const cvrCodes = {}
 
   Object.keys(cryptograms).forEach(function(contestId) {
     const contestCryptograms = cryptograms[contestId]
@@ -20,8 +22,8 @@ export const decrypt = (
       return addBigNums(voterRandomizers[index], boardRandomizers[index])
     })
 
-    contestSelections[contestId] = decryptVote(markingType, contestCryptograms, randomizers, encryptionKey)
+    cvrCodes[contestId] = decryptVote(markingType, contestCryptograms, randomizers, encryptionKey)
   })
 
-  return contestSelections
+  return codesToCvr(contestConfigs, cvrCodes)
 }

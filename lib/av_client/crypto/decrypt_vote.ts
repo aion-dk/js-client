@@ -1,5 +1,4 @@
 import {
-  bignumToHex,
   bignumFromHex,
   pointToHex,
   pointFromHex

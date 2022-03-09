@@ -22,7 +22,7 @@ import { generatePedersenCommitment } from '../crypto/pedersen_commitment';
 
 const DEFAULT_MARKING_TYPE = {
   style: "regular",
-  handleSize: 1,
+  codeSize: 1,
   minMarks: 1,
   maxMarks: 1
 };
@@ -61,6 +61,7 @@ export const constructBallotCryptograms = (state: ClientState, cvr: CastVoteReco
   }
 
   const envelopes = EncryptVotes.encrypt(
+    state.electionConfig.contestConfigs,
     cvr,
     DEFAULT_MARKING_TYPE,
     encryptionKey

@@ -1,10 +1,10 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
 import { randomKeyPair } from './av_client/generate_key_pair';
-import { signPayload, validateReceipt } from './av_client/sign';
+import { signPayload } from './av_client/sign';
 import { decrypt } from './av_client/decrypt_vote';
 import { isValidPedersenCommitment } from './av_client/crypto/pedersen_commitment';
-import { CommitmentOpening, BoardCommitmentItem, VerifierItem, VoterCommitmentItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem } from './av_client/types';
+import { CommitmentOpening, VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem } from './av_client/types';
 
 import {
   fetchElectionConfig,
@@ -95,12 +95,13 @@ export class AVVerifier {
 
     const defaultMarkingType = {
       style: "regular",
-      handleSize: 1,
+      codeSize: 1,
       minMarks: 1,
       maxMarks: 1
     }
 
     return decrypt(
+      this.electionConfig.contestConfigs,
       defaultMarkingType,
       this.electionConfig.encryptionKey,
       this.ballotCryptograms.content.cryptograms, 

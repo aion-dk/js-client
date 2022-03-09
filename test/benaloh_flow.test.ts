@@ -60,23 +60,18 @@ describe('entire benaloh flow', () => {
     const trackingCode = await placeVote(client) as string
     await verifier.findBallot(trackingCode)
 
-    let verifierItem : any
-
     // The verifier starts polling for spoil request
     const pollForSpoilPromise = verifier.pollForSpoilRequest()
       .then(verifierSpoilRequestAddress => {
         return verifier.submitVerifierKey(verifierSpoilRequestAddress)
       })
-      .then(item => verifierItem = item)
 
     await client.spoilBallot();
 
-    await Promise.all([pollForSpoilPromise]);
+    const [verifierItem] = await Promise.all([pollForSpoilPromise]);
 
     // The verifier found a spoil request and now submits it's public key in a VerifierItem
     const veriferAddress = await client.waitForVerifierRegistration()
-      
-    await Promise.all([pollForSpoilPromise]);
 
     // Emulating a pairing the app and verifier tracking codes
     expect(verifierItem.address).to.eql(veriferAddress)
@@ -89,8 +84,8 @@ describe('entire benaloh flow', () => {
     const votes = verifier.decryptBallot();
 
     expect(votes).to.eql({
-      'f7a04384-1458-5911-af38-7e08a46136e7': '1',
-      '026ca870-537e-57b2-b313-9bb5d9fbe78b': '3'
+      'f7a04384-1458-5911-af38-7e08a46136e7': 'option ref 1',
+      '026ca870-537e-57b2-b313-9bb5d9fbe78b': 'option ref 3'
     });
 
     if( USE_MOCK ) expectedNetworkRequests.forEach((mock) => mock.done());
@@ -170,7 +165,7 @@ describe('entire benaloh flow', () => {
     const contestsChoices = Object.keys(contestConfigs)
       .map((uuid: string) => [
         uuid,
-        contestConfigs[uuid].options[0].handle
+        contestConfigs[uuid].options[0].reference
       ])
 
     const cvr = Object.fromEntries(contestsChoices)

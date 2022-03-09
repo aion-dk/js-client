@@ -22,7 +22,7 @@ describe('AVClient functions call order', () => {
 
   it('throws an error when constructBallotCryptograms is called first', async () => {
     await expectError(
-      client.constructBallotCryptograms({ '1': 1, '2': 4 }),
+      client.constructBallotCryptograms({ '1': '1', '2': '4' }),
       InvalidStateError,
       'Cannot construct cryptograms. Voter identity unknown'
     );

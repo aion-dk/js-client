@@ -1,4 +1,5 @@
 import { BallotConfig, CastVoteRecord, ContestConfig } from './types';
+import { flattenOptions } from './flatten_options'
 
 type ValidationResult = ':okay'
   | ':invalid_option'
@@ -25,7 +26,7 @@ const validateCvr = (
     if(!contest)
       return false;
 
-    const validOptions = contest.options.map(option => option.handle);
+    const validOptions = flattenOptions(contest.options).map(option => option.reference)
     const selectedOption = cvr[contestUuid];
 
     return validOptions.includes(selectedOption);
