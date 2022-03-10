@@ -2,6 +2,9 @@ const path = require('path');
 
 module.exports = {
   entry: './dist/lib/av_verifier.js',
+  resolve: {
+    fallback: {"crypto": false}
+  },
   optimization: {
     minimize: false,
   },

@@ -22,7 +22,7 @@ $(document).ready(() => {
           verifier.pollForCommitmentOpening().then(commitmentOpenings => {
             const selections = verifier.decryptBallot()
             var el = $("#choices")
-            el.html("")
+            el.html()
             Object.keys(selections).forEach(key => {
                 el.append(`<li>Contest: ${key} - Choice: ${selections[key]}</li>`)
             })
