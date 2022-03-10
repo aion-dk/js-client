@@ -1,19 +1,23 @@
-import { CastVoteRecord, ContestMap, MarkingType, OpenableEnvelope } from "./types";
+import { CastVoteRecord, ContestConfig, ContestMap, MarkingType, OpenableEnvelope } from "./types";
 import { encryptVote } from './crypto/encrypt_vote';
+import { cvrToCodes } from './cvr_conversion';
 import { hashString, ElGamalPointCryptogram } from './aion_crypto';
 import Uniformer from "../util/uniformer";
 
 const encrypt = (
+  contestConfigs: ContestConfig,
   contestSelections: CastVoteRecord,
   markingType: MarkingType,
   encryptionKey: string): ContestMap<OpenableEnvelope> => {
+
+  const cvrCodes = cvrToCodes(contestConfigs, contestSelections)
 
   const response = {};
 
   Object.keys(contestSelections).forEach(function(contestId) {
     const { cryptograms, randomness } = encryptVote(
       markingType,
-      contestSelections[contestId].toString(),
+      cvrCodes[contestId].toString(),
       encryptionKey
     );
 

@@ -66,7 +66,9 @@ export interface Ballot {
 }
 
 export interface Option {
-  handle: number;
+  reference: string;
+  code: number;
+  children?: Option[];
   title: LocalString;
   subtitle: LocalString;
   description: LocalString;
@@ -89,7 +91,7 @@ export interface Election {
  * A structure that contains the choice(s) of a voter.
  *
  * Key is an electionId.
- * Value is the chosen option represented by a handle-string
+ * Value is the chosen option represented by a reference-string
  *
  * Example of a CastVoteRecord:
  * ```javascript
@@ -99,7 +101,7 @@ export interface Election {
  * }
  * ```
  */
- export type CastVoteRecord = ContestMap<number>
+ export type CastVoteRecord = ContestMap<string>
 
  /**
  * Example of a receipt:
@@ -245,7 +247,7 @@ export type ContestConfig = {
 
 export type MarkingType = {
   style: string
-  handleSize: number
+  codeSize: number
   minMarks: number
   maxMarks: number
 }

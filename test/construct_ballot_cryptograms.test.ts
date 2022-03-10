@@ -44,8 +44,8 @@ describe('AVClient#constructBallotCryptograms', () => {
       await client.registerVoter()
 
       const cvr = {
-        'f7a04384-1458-5911-af38-7e08a46136e7': 1,
-        '026ca870-537e-57b2-b313-9bb5d9fbe78b': 3
+        'f7a04384-1458-5911-af38-7e08a46136e7': 'option ref 1',
+        '026ca870-537e-57b2-b313-9bb5d9fbe78b': 'option ref 3'
       };
 
       const trackingCode = await client.constructBallotCryptograms(cvr);
@@ -60,7 +60,10 @@ describe('AVClient#constructBallotCryptograms', () => {
       await client.validateAccessCode('1234');
       await client.registerVoter()
 
-      const cvr = { '1': 1, '3': 4 };
+      const cvr = { 
+        'f7a04384-1458-5911-af38-7e08a46136e7': 'option ref 1', 
+        'bogus contest uuid': 'option ref 4'
+      };
 
       await expectError(
         client.constructBallotCryptograms(cvr),
@@ -75,8 +78,8 @@ describe('AVClient#constructBallotCryptograms', () => {
       await client.registerVoter()
 
       const cvr = {
-        'f7a04384-1458-5911-af38-7e08a46136e7': 1,
-        '026ca870-537e-57b2-b313-9bb5d9fbe78b': 2
+        'f7a04384-1458-5911-af38-7e08a46136e7': 'option ref 1',
+        '026ca870-537e-57b2-b313-9bb5d9fbe78b': 'bogus reference'
       };
 
       await expectError(

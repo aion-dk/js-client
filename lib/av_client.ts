@@ -3,7 +3,7 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
-import { KeyPair, CastVoteRecord, Affidavit, BoardItemType, VerifierItem, CommitmentOpening, SpoilRequestItem } from './av_client/types';
+import { KeyPair, CastVoteRecord, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import * as jwt from 'jsonwebtoken';
 
@@ -317,7 +317,7 @@ export class AVClient implements IAVClient {
     }
  
     const {
-      voterCommitment,     // TODO: Required when spoiling
+      // voterCommitment,     // TODO: Required when spoiling
       boardCommitment,
       serverEnvelopes
     } = await submitVoterCommitment(
