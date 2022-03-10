@@ -4,3 +4,5 @@ services:
     image: js-client:latest
     volumes:
       - .:/usr/src/app
+    ports:
+      - 3005:3005
