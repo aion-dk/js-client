@@ -23,7 +23,7 @@ describe('entire voter flow using OTP authorization', () => {
       'd866a7d7-15df-4765-9950-651c0ca1313d': '2'
     };
 
-    const trackingCode  = await client.constructBallotCryptograms(cvr);
+    const trackingCode  = await client.constructBallot(cvr);
     expect(trackingCode.length).to.eq(64);
 
     const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
