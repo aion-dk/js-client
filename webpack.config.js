@@ -13,8 +13,5 @@ module.exports = {
     filename: 'bundle.js',
     libraryTarget: 'var',
     library: 'AssemblyVoting'
-  },
-  optimization: {
-    minimize: false
   }
 };
