@@ -41,7 +41,7 @@ jobs:
       - name: Private actions checkout
         uses: daspn/private-actions-checkout@v2
         with:
-          actions_list: '["aion-dk/build-and-push-action@v1.0.2"]'
+          actions_list: '["aion-dk/build-and-push-action@v1.0.6"]'
           checkout_base_path: ./.github/actions
           ssh_private_key: ${{ secrets.ACTIONS_REPO_DEPLOY_TOKEN }}
       - name: "Build and push docker image"
