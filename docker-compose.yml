@@ -1,6 +1,9 @@
 version: '3'
 services:
   js-client:
-    image: js-client:latest
+    image: "js-client:latest"
+    command: "npm run server"
     volumes:
-      - .:/usr/src/app
+      - ".:/usr/src/app"
+    ports:
+      - "3005:3005"

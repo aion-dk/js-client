@@ -293,7 +293,7 @@ export class AVClient implements IAVClient {
    * @throws {@link CorruptCvrError | CorruptCvrError } if the cast vote record is invalid
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async constructBallotCryptograms(cvr: CastVoteRecord): Promise<string> {
+  public async constructBallot(cvr: CastVoteRecord): Promise<string> {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot construct cryptograms. Voter identity unknown')
     }

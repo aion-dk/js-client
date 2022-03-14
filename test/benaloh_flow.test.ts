@@ -170,7 +170,7 @@ describe('entire benaloh flow', () => {
 
     const cvr = Object.fromEntries(contestsChoices)
 
-    const trackingCode = await client.constructBallotCryptograms(cvr).catch((e) => {
+    const trackingCode = await client.constructBallot(cvr).catch((e) => {
       console.error(e);
     });
     return trackingCode

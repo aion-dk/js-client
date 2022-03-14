@@ -82,7 +82,7 @@ describe('entire voter flow using OTP authorization', () => {
 
       const cvr = Object.fromEntries(contestsChoices)
 
-      const _trackingCode = await client.constructBallotCryptograms(cvr).catch((e) => {
+      const _trackingCode = await client.constructBallot(cvr).catch((e) => {
         console.error(e);
         expect.fail('AVClient#constructBallotCryptograms failed');
       });
