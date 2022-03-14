@@ -32,9 +32,21 @@ jobs:
           else
             echo 'Coverage remains the same'
           fi
-      - name: Push committed coverage badge
-        if: success() && github.ref == 'refs/heads/main'
-        uses: ad-m/github-push-action@8407731efefc0d8f72af254c74276b7a90be36e1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+  - name: Push committed coverage badge
+    if: success() && github.ref == 'refs/heads/main'
+    uses: ad-m/github-push-action@8407731efefc0d8f72af254c74276b7a90be36e1
+    with:
+      github_token: ${{ secrets.GITHUB_TOKEN }}
+      branch: ${{ github.ref }}
+  - name: Private actions checkout
+    uses: daspn/private-actions-checkout@v2
+    with:
+      actions_list: '["aion-dk/build-and-push-action@v1.0.6"]'
+      checkout_base_path: ./.github/actions
+      ssh_private_key: ${{ secrets.ACTIONS_REPO_DEPLOY_TOKEN }}
+  - name: "Build and push docker image"
+    uses: ./.github/actions/build-and-push-action
+    with:
+      image_name: js-client
+      ecr_access_key_id: ${{ secrets.AWS_RW_ACCESS_KEY_ID }}
+      ecr_secret_key: ${{ secrets.AWS_RW_SECRET_KEY }}
