@@ -51,7 +51,7 @@ describe('AVClient#submitBallotCryptograms', () => {
         'd866a7d7-15df-4765-9950-651c0ca1313d': '2'
       };
 
-      await client.constructBallotCryptograms(cvr)
+      await client.constructBallot(cvr)
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       const receipt = await client.castBallot(affidavit);
@@ -72,7 +72,7 @@ describe('AVClient#submitBallotCryptograms', () => {
         'd866a7d7-15df-4765-9950-651c0ca1313d': '2'
       };
 
-      await client.constructBallotCryptograms(cvr);
+      await client.constructBallot(cvr);
 
       // change the proof of ballot 1
       const randomness = 'corrupted_randomness!';

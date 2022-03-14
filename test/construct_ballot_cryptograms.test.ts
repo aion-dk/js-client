@@ -48,7 +48,7 @@ describe('AVClient#constructBallotCryptograms', () => {
         '026ca870-537e-57b2-b313-9bb5d9fbe78b': 'option ref 3'
       };
 
-      const trackingCode = await client.constructBallotCryptograms(cvr);
+      const trackingCode = await client.constructBallot(cvr);
 
       expect(typeof trackingCode === "string").to.be.true;
     });
@@ -66,7 +66,7 @@ describe('AVClient#constructBallotCryptograms', () => {
       };
 
       await expectError(
-        client.constructBallotCryptograms(cvr),
+        client.constructBallot(cvr),
         CorruptCvrError,
         'Corrupt CVR: Not eligible'
       );
@@ -83,7 +83,7 @@ describe('AVClient#constructBallotCryptograms', () => {
       };
 
       await expectError(
-        client.constructBallotCryptograms(cvr),
+        client.constructBallot(cvr),
         CorruptCvrError,
         'Corrupt CVR: Contains invalid option'
       );
