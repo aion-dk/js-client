@@ -17,7 +17,7 @@ $(document).ready(() => {
       verifier.pollForSpoilRequest().then((spoilRequestAddress) => {
 
         verifier.submitVerifierKey(spoilRequestAddress).then(verifierItem => {
-          $("form#submitVerifierKey #verification-code").text(verifierItem.address)
+          $("form#submitVerifierKey #verification-code").text(verifierItem.shortAddress)
 
           verifier.pollForCommitmentOpening().then(commitmentOpenings => {
             const selections = verifier.decryptBallot()

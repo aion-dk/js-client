@@ -57,8 +57,8 @@ export class BulletinBoard {
     });
   }
 
-  getVotingTrack(verificationStartAddress: string): Promise<AxiosResponse> {
-    return this.backend.get(`verification/vote_track?id=${verificationStartAddress}`)
+  getVotingTrack(trackingCode: string): Promise<AxiosResponse> {
+    return this.backend.get(`verification/vote_track?id=${trackingCode}`)
   }
 
   getCommitmentOpenings(verifierItemAddress: string): Promise<AxiosResponse> {
