@@ -22,7 +22,7 @@
     "server": "http-server --cors -a 0.0.0.0 -p 3005 -c -1"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=14.17.0"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^8.5.8",

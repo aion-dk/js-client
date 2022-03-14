@@ -2,14 +2,12 @@ FROM node:14.17.0-alpine
 
 WORKDIR /usr/src/app
 
+RUN apk add curl
+
 COPY package*.json ./
 
 RUN npm install
 
 COPY . .
 
-EXPOSE 3005
-
-RUN npm run build && npm run webpack
-
-CMD ["http-server", "--cors", "-a 0.0.0.0", "-p 3005", "-c -1"]
+RUN npm run build
