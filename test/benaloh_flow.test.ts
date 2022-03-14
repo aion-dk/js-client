@@ -74,7 +74,7 @@ describe('entire benaloh flow', () => {
     const veriferAddress = await client.waitForVerifierRegistration()
 
     // Emulating a pairing the app and verifier tracking codes
-    expect(verifierItem.address).to.eql(veriferAddress)
+    expect(verifierItem.shortAddress).to.eql(veriferAddress)
 
     // App creates the voterCommitmentOpening
     await client.challengeBallot()

@@ -54,8 +54,8 @@ export class AVVerifier {
     }
   }
 
-  public async findBallot(verificationStartAddress: string): Promise<string> {
-    await this.bulletinBoard.getVotingTrack(verificationStartAddress).then(response => {
+  public async findBallot(trackingCode: string): Promise<string> {
+    await this.bulletinBoard.getVotingTrack(trackingCode).then(response => {
       // TODO: Validate item payloads and receipt.... How can I validate the payload, when I dont know what to expect?
       // and verificationTrackStartItem === ballot checking code
       if (['voterCommitment', 'serverCommitment', 'ballotCryptograms', 'verificationTrackStart']
