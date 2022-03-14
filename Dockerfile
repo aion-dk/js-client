@@ -12,5 +12,4 @@ EXPOSE 3005
 
 RUN npm run build && npm run webpack
 
-CMD ["http-server", "--cors","-a0.0.0.0", "-p3005", "-c-1", "/usr/src/app"]
-
+CMD ["http-server", "--cors", "-a 0.0.0.0", "-p 3005", "-c -1"]
