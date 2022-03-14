@@ -32,7 +32,6 @@ jobs:
           else
             echo 'Coverage remains the same'
           fi
-    env:
       - name: Push committed coverage badge
         if: success() && github.ref == 'refs/heads/main'
         uses: ad-m/github-push-action@8407731efefc0d8f72af254c74276b7a90be36e1
