@@ -146,6 +146,11 @@ interface BaseBoardItem {
   registeredAt: string
   signature: string
 }
+
+export interface BaseVerificationItem extends BaseBoardItem{
+  shortAddress: string
+}
+
 export interface VoterSessionItem extends BaseBoardItem {
   content: {
     authToken: string
@@ -166,12 +171,12 @@ export interface BoardCommitmentItem extends BaseBoardItem {
   type: "BoardEncryptionCommitmentItem"
 }
 
-export interface VoterCommitmentOpeningItem extends BaseBoardItem {
+export interface VoterCommitmentOpeningItem extends BaseVerificationItem {
   content: CommitmentOpening
   type: "VoterEncryptionCommitmentOpeningItem"
 }
 
-export interface BoardCommitmentOpeningItem extends BaseBoardItem {
+export interface BoardCommitmentOpeningItem extends BaseVerificationItem {
   content: CommitmentOpening
   type: "BoardEncryptionCommitmentOpeningItem"
 }
@@ -191,11 +196,11 @@ export interface BallotCryptogramItem extends BaseBoardItem {
   type: "BallotCryptogramsItem"
 }
 
-export interface VerificationStartItem extends BaseBoardItem {
+export interface VerificationStartItem extends BaseVerificationItem {
   type: "VerificationStartItem"
 }
 
-export interface VerifierItem extends BaseBoardItem {
+export interface VerifierItem extends BaseVerificationItem {
   content: {
     publicKey: string
   }

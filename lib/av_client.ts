@@ -341,7 +341,7 @@ export class AVClient implements IAVClient {
     );
 
     this.ballotCryptogramItem = ballotCryptogramItem;
-    return verificationStartItem.address;
+    return verificationStartItem.shortAddress;
   }
 
     /**
@@ -517,7 +517,7 @@ export class AVClient implements IAVClient {
       attempts++;
       if (result?.data?.verifier?.type === VERIFIER_ITEM) {
         this.verifierItem = result.data.verifier
-        return resolve(result.data.verifier.address);
+        return resolve(result.data.verifier.shortAddress);
       } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
         return reject(new TimeoutError('Exceeded max attempts'));
       } else  {
