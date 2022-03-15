@@ -11,7 +11,7 @@ $(document).ready(() => {
     verifier.findBallot(address).then((response) => {
       const verifyKeyView = $("#submitVerifierKey");
       verifyKeyView.find("#verification-code").text(response.address);
-      
+
       verifyKeyView.collapse("show");
 
       verifier.pollForSpoilRequest().then((spoilRequestAddress) => {
@@ -24,7 +24,7 @@ $(document).ready(() => {
             var el = $("#choices")
             el.html()
             Object.keys(selections).forEach(key => {
-                el.append(`<li>Contest: ${key} - Choice: ${selections[key]}</li>`)
+              el.append(`<li>Contest: ${key} - Choice: ${selections[key]}</li>`)
             })
 
             $('#showChoices').collapse("show");
