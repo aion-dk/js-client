@@ -103,3 +103,30 @@ export class CorruptCvrError extends AvClientError {
     Object.setPrototypeOf(this, CorruptCvrError.prototype);
   }
 }
+
+export class TimeoutError extends AvClientError {
+  readonly name = "TimeoutError";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, TimeoutError.prototype);
+  }
+}
+
+export class InvalidTokenError extends AvClientError {
+  readonly name = "InvalidTokenError";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, InvalidTokenError.prototype);
+  }
+}
+
+export class VoterSessionTimeoutError extends AvClientError {
+  readonly name = "VoterSessionTimeoutError";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, VoterSessionTimeoutError.prototype);
+  }
+}

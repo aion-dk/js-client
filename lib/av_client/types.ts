@@ -6,10 +6,12 @@ export interface IAVClient {
   requestAccessCode(opaqueVoterId: string, email: string): Promise<void>
   validateAccessCode(code: string): Promise<void>
   registerVoter(): Promise<void>
-  constructBallotCryptograms(cvr: CastVoteRecord): Promise<string>
-  spoilBallotCryptograms(): Promise<void>
-  submitBallotCryptograms(affidavit: Affidavit): Promise<BallotBoxReceipt>
+  constructBallot(cvr: CastVoteRecord): Promise<string>
+  waitForVerifierRegistration(): Promise<string>
+  spoilBallot(): Promise<string>
+  castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
   purgeData(): void
+  challengeBallot(): void
 }
 
 /**
@@ -44,13 +46,13 @@ export interface EmptyCryptogram {
 export type Affidavit = string
 
 export interface OpenableEnvelope {
-  cryptogram: string
-  randomness: string
+  cryptograms: string[]
+  randomness: string[]
 }
 
 export interface SealedEnvelope {
-  cryptogram: string
-  proof: string
+  cryptograms: string[]
+  proofs: string[]
 }
 
 export interface Ballot {
@@ -64,8 +66,9 @@ export interface Ballot {
 }
 
 export interface Option {
-  id: number;
-  handle: string;
+  reference: string;
+  code: number;
+  children?: Option[];
   title: LocalString;
   subtitle: LocalString;
   description: LocalString;
@@ -88,7 +91,7 @@ export interface Election {
  * A structure that contains the choice(s) of a voter.
  *
  * Key is an electionId.
- * Value is the chosen option represented by a handle-string
+ * Value is the chosen option represented by a reference-string
  *
  * Example of a CastVoteRecord:
  * ```javascript
@@ -113,12 +116,143 @@ export interface Election {
  * ```
  */
  export type BallotBoxReceipt = {
-  previousBoardHash: HashValue
-  boardHash: HashValue
+  address: string
   registeredAt: string
-  serverSignature: Signature
-  voteSubmissionId: string
+  signature: Signature
+}
+
+export type BoardItem =
+  VoterSessionItem |
+  VoterCommitmentItem |
+  BoardCommitmentItem |
+  BallotCryptogramItem
+
+export type BoardItemType =
+  "BallotCryptogramsItem" |
+  "BoardEncryptionCommitmentItem" |
+  "CastRequestItem" |
+  "SpoilRequestItem" |
+  "VerificationStartItem" |
+  "VerifierItem" |
+  "VoterEncryptionCommitmentItem" |
+  "VoterSessionItem" |
+  "VoterEncryptionCommitmentOpeningItem"
+
+interface BaseBoardItem {
+  address: string
+  author: string
+  parentAddress: string
+  previousAddress: string
+  registeredAt: string
+  signature: string
+}
+
+export interface BaseVerificationItem extends BaseBoardItem{
+  shortAddress: string
+}
+
+export interface VoterSessionItem extends BaseBoardItem {
+  content: {
+    authToken: string
+    identifier: string
+    voterGroup: string
+    publicKey: string
+  }
+
+  type: "VoterSessionItem"
+  // Segments...
+}
+
+export interface BoardCommitmentItem extends BaseBoardItem {
+  content: {
+    commitment: string
+  } 
+
+  type: "BoardEncryptionCommitmentItem"
+}
+
+export interface VoterCommitmentOpeningItem extends BaseVerificationItem {
+  content: CommitmentOpening
+  type: "VoterEncryptionCommitmentOpeningItem"
+}
+
+export interface BoardCommitmentOpeningItem extends BaseVerificationItem {
+  content: CommitmentOpening
+  type: "BoardEncryptionCommitmentOpeningItem"
+}
+
+export interface VoterCommitmentItem extends BaseBoardItem {
+  content: {
+    commitment: string
+  } 
+
+  type: "VoterEncryptionCommitmentItem"
+}
+
+export interface BallotCryptogramItem extends BaseBoardItem {
+  content: {
+    cryptograms: ContestMap<string[]>
+  } 
+  type: "BallotCryptogramsItem"
+}
+
+export interface VerificationStartItem extends BaseVerificationItem {
+  type: "VerificationStartItem"
+}
+
+export interface VerifierItem extends BaseVerificationItem {
+  content: {
+    publicKey: string
+  }
+  type: "VerifierItem"
+}
+
+export interface SpoilRequestItem extends BaseBoardItem {
+  type: "SpoilRequestItem"
+}
+
+export interface CommitmentOpening {
+  randomizers: ContestMap<string[]>
+  commitmentRandomness: string
+}
+
+export interface ItemExpectation {
+  content?: {
+    [k: string]: unknown
+  }
+  type: BoardItemType
+  parentAddress: string
+}
+export interface ClientState {
+  electionConfig?: ElectionConfig
+  voterSession?: VoterSessionItem
 }
 
 export type Signature = string;
 export type HashValue = string;
+
+export type BallotConfig = {
+  [voterGroupId: string]: {
+    contestUuids: string[]
+  }
+};
+
+export type ContestConfig = {
+  [contestUuid: string]: {
+    options: Option[]
+    markingType: MarkingType
+    resultType: {
+      name: string
+    }
+    title: LocalString
+    subtitle: LocalString
+    description: LocalString
+  }
+}
+
+export type MarkingType = {
+  style: string
+  codeSize: number
+  minMarks: number
+  maxMarks: number
+}

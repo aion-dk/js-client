@@ -10,4 +10,6 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+RUN npm run build && npm run webpack
+
+CMD ["npm run server"]

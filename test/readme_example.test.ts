@@ -6,8 +6,8 @@ describe('entire voter flow using OTP authorization', () => {
   beforeEach(() => readmeTestSetup());
   afterEach(() => readmeTestTeardown());
 
-  it('returns a receipt', async () => {
-    const client = new AVClient('http://us-avx:3000/mobile-api/us');
+  it.skip('returns a receipt', async () => {
+    const client = new AVClient('http://us-avx:3000/dbb/us/api');
     await client.initialize()
 
     await client.requestAccessCode('123', 'us-voter-123@aion.dk');
@@ -18,19 +18,17 @@ describe('entire voter flow using OTP authorization', () => {
 
     await client.registerVoter();
 
-    const cvr = { '1': 'option1', '2': 'optiona' };
-    const trackingCode  = await client.constructBallotCryptograms(cvr);
+    const cvr = {
+      '50422d0f-e795-4324-8289-50e3d3459196': '1',
+      'd866a7d7-15df-4765-9950-651c0ca1313d': '2'
+    };
+
+    const trackingCode  = await client.constructBallot(cvr);
     expect(trackingCode.length).to.eq(64);
 
     const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
-    const receipt = await client.submitBallotCryptograms(affidavit);
-    expect(receipt).to.have.keys(
-      'boardHash',
-      'previousBoardHash',
-      'registeredAt',
-      'serverSignature',
-      'voteSubmissionId'
-    );
-    expect(receipt.previousBoardHash.length).to.eql(64);
+    const ballotTrackingCode = await client.castBallot(affidavit);
+
+    expect(typeof ballotTrackingCode === "string").to.be.true;
   });
 });

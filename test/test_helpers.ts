@@ -1,13 +1,51 @@
 import { expect } from 'chai';
 import nock = require('nock');
 import sinon = require('sinon');
-const fs = require('fs');
-const sjcl = require('../lib/av_client/sjcl');
+import * as fs from 'fs';
+import * as sjcl from '../lib/av_client/sjcl';
 
 export const bulletinBoardHost = 'http://us-avx:3000/';
-export const OTPProviderHost = 'http://localhost:1111/';
+export const OTPProviderHost = 'http://otp-provider.local.assemblyvoting.net:1111/';
 export const OTPProviderElectionContextId = 'cca2b217-cedd-4d58-a103-d101ba472eb8';
-export const voterAuthorizerHost = 'http://localhost:1234/';
+export const voterAuthorizerHost = 'http://authorizer.local.assemblyvoting.net:1234/';
+
+export const bbHost = {
+  get_election_config: () => nock(bulletinBoardHost)
+      .get('/dbb/us/api/election_config')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_us_api_election_config.json'),
+
+  post_registrations: () => nock(bulletinBoardHost)
+      .post('/dbb/us/api/registrations')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_registrations.json'),
+
+  post_commitments: () => nock(bulletinBoardHost)
+      .post('/dbb/us/api/commitments')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_commitments.json'),
+
+  post_votes: () => nock(bulletinBoardHost)
+      .post('/dbb/us/api/votes')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_votes.json'),
+
+  post_cast: () => nock(bulletinBoardHost)
+      .post('/dbb/us/api/cast')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_cast.json')
+};
+
+export const vaHost = {
+  post_create_session: () => nock(voterAuthorizerHost)
+      .post('/create_session')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json'),
+
+  post_request_authorization: () => nock(voterAuthorizerHost)
+      .post('/request_authorization')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
+}
+
+export const otpHost = {
+  post_authorize: () => nock(OTPProviderHost)
+      .post('/authorize')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json')
+};
 
 export function resetDeterminism() {
   const sandbox = sinon.createSandbox();
@@ -26,7 +64,7 @@ export function deterministicRandomWords(nwords, _paranoia) {
   }
 
   let nextRandomInt = global.deterministicOffset;
-  let output : number[] = []
+  const output : number[] = []
   for (let i = 0; i < nwords; i++) {
     if (nextRandomInt > highestValidNumber) {
       nextRandomInt = lowestValidNumber
@@ -39,7 +77,7 @@ export function deterministicRandomWords(nwords, _paranoia) {
 }
 
 export function readJSON(path) {
-  const data = fs.readFileSync(require.resolve(path));
+  const data = fs.readFileSync(require.resolve(path), 'utf-8');
   const json = JSON.parse(data);
   return json;
 }
@@ -63,7 +101,9 @@ export async function recordResponses(callback) {
   cleanup();
 }
 
-export async function expectError(promise: (Promise<any>|Function), errorType: any, message: string): Promise<any> {
+type SynchronousFunction = () => void
+
+export async function expectError(promise: (Promise<unknown>|SynchronousFunction), errorType: any, message: string): Promise<unknown> {
   if (typeof promise == 'object') { // Async promise
     return promise
       .then(() => expect.fail('Expected promise to be rejected'))
@@ -88,7 +128,8 @@ function setupRecording() {
 }
 
 function stopRecording() {
-  nock.restore();
+  nock.restore()
+  nock.activate()
 }
 
 function saveFiles() {

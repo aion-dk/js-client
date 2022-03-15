@@ -1,0 +1,13 @@
+{
+  "castRequest": {
+    "address": "3d2c3416d476b627f1b3c82f772d04afcbcf16e34d47e65a8f3087335af70913",
+    "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
+    "parentAddress": "7165c112c3539525c4f388a79198d72ecd62a665849d0c4e63b00c5cb0904575",
+    "previousAddress": "7165c112c3539525c4f388a79198d72ecd62a665849d0c4e63b00c5cb0904575",
+    "content": {},
+    "registeredAt": "2022-03-14T12:43:16.127Z",
+    "signature": "42cc715b7ab69d0fb068046b8ee3d74c8eec268948cd64e1709dcd8d79a22965,2535e837dd1ae2f7422a0bcc50f3ba7fa720cf5495900d899ba829608e234c8f",
+    "type": "CastRequestItem"
+  },
+  "receipt": "0a46a80078a3878af69981e4791cc67766aabdf4eafb57a1ded5adfd90ebdaab,48ad94b2c06bb79c1042fb9be6fb3aa25fdb65ece9a6f4fd6983bd94d58d40de"
+}

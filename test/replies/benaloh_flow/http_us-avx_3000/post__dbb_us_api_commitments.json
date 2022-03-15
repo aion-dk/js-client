@@ -1,0 +1,35 @@
+{
+  "voterCommitment": {
+    "address": "a5653653178f08c6dcc15a0009a447197784bf38c8ce666a8bd662c2ba44c1bb",
+    "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
+    "parentAddress": "d363c0528a84574a247c5b0ca043eb50549507c3304726e03f1c718a329dfe18",
+    "previousAddress": "d363c0528a84574a247c5b0ca043eb50549507c3304726e03f1c718a329dfe18",
+    "content": {
+      "commitment": "0390ce7b54f658644bdc57b7d698ef8511694a9643b8bf3dd0798b8a178a4b05ef"
+    },
+    "registeredAt": "2022-03-14T15:40:09.172Z",
+    "signature": "857a600db2bf706ab7904ec6a8383cbf65e088885ad612cc209b4289af950e0f,a294f48da9e180d02cf08650a2b6dc97162019966dd6e31a15c47f5651b8afd7",
+    "type": "VoterEncryptionCommitmentItem"
+  },
+  "boardCommitment": {
+    "address": "dca0883d345ed96cd640311f6affa6569e96533ea2ae1fd635d270edc5638074",
+    "author": "02e065e2ea825b567025bf612bc9cf1e8aab31d3caf90b4c42e84eef443687b117",
+    "parentAddress": "a5653653178f08c6dcc15a0009a447197784bf38c8ce666a8bd662c2ba44c1bb",
+    "previousAddress": "a5653653178f08c6dcc15a0009a447197784bf38c8ce666a8bd662c2ba44c1bb",
+    "content": {
+      "commitment": "03554bca47bc1fe07c228cbbffd00cd9de5e92270e936149a07781a99d23c43979"
+    },
+    "registeredAt": "2022-03-14T15:40:09.190Z",
+    "signature": "29c8a05011f193f47627ab7cb99f4644e799c84c84cc63507027b7ff1c132cf9,4b67a148e7af4d7c9ec4786ac6dd5479db16f4ce65e479665dfa39b9d243141d",
+    "type": "BoardEncryptionCommitmentItem"
+  },
+  "envelopes": {
+    "f7a04384-1458-5911-af38-7e08a46136e7": [
+      "039fa47edf8bcb2269416f7e6fdc3f572ead5198d2dd538f5b1fd2492a9c3e1dcd,03a4a35b7301786e1045f18275df07924cceb524eacfcb6f49ccdc7c430908286c"
+    ],
+    "026ca870-537e-57b2-b313-9bb5d9fbe78b": [
+      "0361061f9c0e427a2d781d70770b43b2248ce7d555f68aec56e40aa3440971a8ea,03dafaefecee8953d1699c2db5bb64343f325d25b6c1663ebf444f7a342e4ac532"
+    ]
+  },
+  "receipt": "a1c6726cc06a9b7c950e738ecd45266211214b13dd080defa663782a5f230ee2,f8654eee01d0cc42f5966d2f421adce8c4fbf18cec3c6f94cbc58ed812af57bf"
+}

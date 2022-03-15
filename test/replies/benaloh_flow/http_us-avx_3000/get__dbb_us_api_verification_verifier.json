@@ -1,0 +1,14 @@
+{
+  "verifier": {
+    "author": "02e065e2ea825b567025bf612bc9cf1e8aab31d3caf90b4c42e84eef443687b117",
+    "address": "716f0d8ea1155015b3e3bb6f6778e3cac5cb35901e066d94bcb9a66177e56af5",
+    "shortAddress": "716f0d8ea11",
+    "parentAddress": "3c92a7309eb47eec20ddc65694da9b7f5d2e2809ab32e85206d1a573db5fb498",
+    "type": "VerifierItem",
+    "content": {
+      "publicKey": "034e4f6245a96d8b352c9dfaab21ae9cd76cc775bd4cf37fb6fe9a4d16544110d3"
+    },
+    "signature": "0f155d2ca2c0c1ef0933de225069356ab9eb4689355ed22763eba60c4a36e391,9dc603fdc754d24a372b920c65ff263a9eae00ddb60eaacfa7ca58a4ff2612ca",
+    "registeredAt": "2022-03-14T16:40:09.959+01:00"
+  }
+}

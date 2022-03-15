@@ -1,4 +1,3 @@
-import { ContestMap, SealedEnvelope } from '../types';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { BulletinBoardError, NetworkError, UnsupportedServerReplyError } from "../errors";
 
@@ -22,13 +21,13 @@ export class BulletinBoard {
   }
 
   getElectionConfig(): Promise<AxiosResponse> {
-    return this.backend.get('config');
+    return this.backend.get('election_config');
   }
 
-  registerVoter(authToken: string, signature: string): Promise<AxiosResponse> {
-    return this.backend.post('register', {
-      auth_token: authToken,
-      signature: signature
+  async createVoterRegistration(authToken: string, parentAddress: string): Promise<AxiosResponse> {
+    const response = await this.backend.post('registrations', {
+      authToken,
+      parentAddress
     }).catch(error => {
       const response = error.response as AxiosResponse<BulletinBoardData>;
       if (error.request && !response) {
@@ -46,33 +45,64 @@ export class BulletinBoard {
 
       throw error;
     });
+
+    return response;
   }
 
-  challengeEmptyCryptograms(challenges: ContestMap<string>): Promise<AxiosResponse> {
-    return this.backend.post('challenge_empty_cryptograms', {
-        challenges
-      }, {
-        headers: {
-          'X-Voter-Session': this.voterSessionUuid
-        }
-      });
-  }
-
-  getBoardHash(): Promise<AxiosResponse> {
-    return this.backend.get('get_latest_board_hash', {
+  submitVotes(signedBallotCryptogramsItem): Promise<AxiosResponse> {
+    return this.backend.post('votes', signedBallotCryptogramsItem, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }
     });
   }
 
-  submitVotes(contentHash: string, signature: string, cryptogramsWithProofs: ContestMap<SealedEnvelope>, encryptedAffidavit: string): Promise<AxiosResponse> {
-    return this.backend.post('submit_votes', {
-      content_hash: contentHash,
-      encrypted_affidavit: encryptedAffidavit,
-      signature,
-      votes: cryptogramsWithProofs
-    }, {
+  getVotingTrack(trackingCode: string): Promise<AxiosResponse> {
+    return this.backend.get(`verification/vote_track?id=${trackingCode}`)
+  }
+
+  getCommitmentOpenings(verifierItemAddress: string): Promise<AxiosResponse> {
+    return this.backend.get(`verification/commitment_openings?id=${verifierItemAddress}`)
+  }
+
+  getSpoilRequestItem(ballotCryptogramAddress: string): Promise<AxiosResponse> {
+    return this.backend.get(`verification/spoil_status?id=${ballotCryptogramAddress}`)
+  }
+
+  getVerifierItem(spoilRequestAddress: string): Promise<AxiosResponse> {
+    return this.backend.get(`verification/verifier?id=${spoilRequestAddress}`)
+  }
+
+  submitVerifierItem(signedVerifierItem): Promise<AxiosResponse> {
+    return this.backend.post('verification/verifier', signedVerifierItem)
+  }
+
+  submitCommitmentOpenings(content): Promise<AxiosResponse> {
+    return this.backend.post('verification/commitment_openings', content, {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
+  }
+
+  submitCommitment(signedCommit): Promise<AxiosResponse> {
+    return this.backend.post('commitments', signedCommit, {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
+  }
+
+  submitCastRequest(content): Promise<AxiosResponse> {
+    return this.backend.post('cast', content, {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
+  }
+
+  submitSpoilRequest(content): Promise<AxiosResponse> {
+    return this.backend.post('spoil', content, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }

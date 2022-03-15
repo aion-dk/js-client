@@ -2,9 +2,10 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');
 import {
-  bulletinBoardHost,
   expectError,
-  voterAuthorizerHost
+  voterAuthorizerHost,
+  bbHost,
+  vaHost
 } from './test_helpers';
 import {
   EmailDoesNotMatchVoterRecordError,
@@ -16,15 +17,12 @@ import {
 
 describe('AVClient#requestAccessCode', () => {
   let client: AVClient;
-  const expectedNetworkRequests : any[] = [];
+  const expectedNetworkRequests : nock.Scope[] = [];
 
   beforeEach(async () => {
-    expectedNetworkRequests.push(
-      nock(bulletinBoardHost).get('/mobile-api/us/config')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_config.json')
-    );
+    expectedNetworkRequests.push(bbHost.get_election_config());
 
-    client = new AVClient('http://us-avx:3000/mobile-api/us');
+    client = new AVClient('http://us-avx:3000/dbb/us/api');
     await client.initialize()
   });
 
@@ -34,17 +32,14 @@ describe('AVClient#requestAccessCode', () => {
 
   context('Voter Authorization Coordinator & OTP Provider work', () => {
     it('resolves without errors', async () => {
-      expectedNetworkRequests.push(
-        nock(voterAuthorizerHost).post('/create_session')
-          .reply(200)
-      );
+      expectedNetworkRequests.push(vaHost.post_create_session());
 
       return client.requestAccessCode('voter123', 'test@test.dk').then(
         (result) => {
           expect(result).to.eql(undefined);
           expectedNetworkRequests.forEach((mock) => mock.done());
         },
-        (error) => {
+        (_error) => {
           expect.fail('Expected a resolved promise');
         }
       );

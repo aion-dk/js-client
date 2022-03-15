@@ -41,7 +41,7 @@ export default class Uniformer {
 
         return this.toSortedKeyValuePairs(obj);
       default:
-        throw new Error(`Unknown parameter type '${typeof obj}.`);
+        throw new Error(`Unknown parameter type '${typeof obj}'.`);
     }
   }
 }

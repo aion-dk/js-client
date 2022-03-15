@@ -4,9 +4,9 @@ import axios from 'axios';
 import nock = require('nock');
 import {
   resetDeterminism,
-  bulletinBoardHost,
-  OTPProviderHost,
-  voterAuthorizerHost
+  vaHost,
+  bbHost,
+  otpHost
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 
@@ -14,43 +14,40 @@ const USE_MOCK = true;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;
-  let expectedNetworkRequests : any[] = [];
+  let expectedNetworkRequests : nock.Scope[] = [];
 
   beforeEach(() => {
+    sandbox = resetDeterminism();
+
     if(USE_MOCK) {
-      sandbox = resetDeterminism();
-      expectedNetworkRequests = [];
-      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/mobile-api/us/config')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_config.json'));
-      expectedNetworkRequests.push(nock(voterAuthorizerHost).post('/create_session')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json'));
-      expectedNetworkRequests.push(nock(voterAuthorizerHost).post('/request_authorization')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json'));
-      expectedNetworkRequests.push(nock(OTPProviderHost).post('/authorize')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/register')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_register.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/challenge_empty_cryptograms')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_challenge_empty_cryptograms.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).get('/mobile-api/us/get_latest_board_hash')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_get_latest_board_hash.json'));
-      expectedNetworkRequests.push(nock(bulletinBoardHost).post('/mobile-api/us/submit_votes')
-        .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_submit_votes.json'));
+      expectedNetworkRequests = [
+        bbHost.get_election_config(),
+        vaHost.post_create_session(),
+        vaHost.post_request_authorization(),
+        otpHost.post_authorize(),
+        bbHost.post_registrations(),
+        bbHost.post_commitments(),
+        bbHost.post_votes(),
+        bbHost.post_cast(),
+      ];
     }
   });
 
   afterEach(() => {
+    sandbox.restore()
     if (USE_MOCK) {
-      sandbox.restore();
       nock.cleanAll();
     }
   });
 
   it('returns a receipt', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
-    // return await recordResponses(async function() {
-      const client = new AVClient('http://us-avx:3000/mobile-api/us');
-      await client.initialize()
+    const performTest = async () => {
+      const client = new AVClient('http://us-avx:3000/dbb/us/api');
+      await client.initialize(undefined, {
+        privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
+        publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
+      });
 
       const voterId = 'A00000000006'
       const voterEmail = 'mvptuser@yahoo.com'
@@ -66,7 +63,7 @@ describe('entire voter flow using OTP authorization', () => {
         oneTimePassword = await extractOTPFromEmail();
       }
 
-      const confirmationToken = await client.validateAccessCode(oneTimePassword).catch((e) => {
+      const _confirmationToken = await client.validateAccessCode(oneTimePassword).catch((e) => {
         console.error(e);
         expect.fail('AVClient#validateAccessCode failed');
       });
@@ -75,35 +72,39 @@ describe('entire voter flow using OTP authorization', () => {
         console.error(e);
         expect.fail('AVClient#registerVoter failed');
       })
-
+      const { contestConfigs } = client.getElectionConfig()
       // We expect CVR value to look something like this: { '1': 'option1', '2': 'optiona' }
-      const firstChoicesAsCVR = Object.fromEntries(client.getElectionConfig().ballots.map((ballot: any) =>
-        [
-          ballot.id,
-          ballot.options[0].handle
-        ]
-      ));
+      const contestsChoices = Object.keys(contestConfigs)
+        .map((uuid: string) => [
+          uuid,
+          contestConfigs[uuid].options[0].reference
+        ])
 
-      const trackingCode = await client.constructBallotCryptograms(firstChoicesAsCVR).catch((e) => {
+      const cvr = Object.fromEntries(contestsChoices)
+
+      const _trackingCode = await client.constructBallot(cvr).catch((e) => {
         console.error(e);
         expect.fail('AVClient#constructBallotCryptograms failed');
       });
-      expect(trackingCode.length).to.eql(64)
+      // expect(trackingCode.length).to.eql(64)
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
-      const receipt = await client.submitBallotCryptograms(affidavit);
-
-      expect(receipt).to.have.keys(
-        'boardHash',
-        'previousBoardHash',
-        'registeredAt',
-        'serverSignature',
-        'voteSubmissionId'
-      )
-      expect(receipt.previousBoardHash.length).to.eql(64)
+      const receipt = await client.castBallot(affidavit);
+      expect(typeof receipt === "string").to.be.true;
 
       if(USE_MOCK)
         expectedNetworkRequests.forEach((mock) => mock.done());
+    };
+
+    if(USE_MOCK) {
+      await performTest();
+    } else {
+      return await recordResponses(async function() {
+        await performTest();
+      });
+    }
+
+
     // });
   }).timeout(10000);
 
@@ -131,3 +132,4 @@ describe('entire voter flow using OTP authorization', () => {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 });
+

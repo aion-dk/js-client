@@ -66,7 +66,7 @@ describe('Uniformer', () => {
       const input = ['1', 2, 3];
 
       expect(new Uniformer().formString(input))
-        .to.equal('[\"1\",2,3]');
+        .to.equal('["1",2,3]');
     });
   });
 

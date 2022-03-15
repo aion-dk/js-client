@@ -1,14 +1,14 @@
 import { AVClient } from '../lib/av_client';
 import { CorruptCvrError } from '../lib/av_client/errors';
-import { expect } from 'chai';
 import nock = require('nock');
 import {
   expectError,
   resetDeterminism,
-  bulletinBoardHost,
-  OTPProviderHost,
-  voterAuthorizerHost
+  bbHost,
+  vaHost,
+  otpHost
 } from './test_helpers';
+import { expect } from 'chai';
 
 describe('AVClient#constructBallotCryptograms', () => {
   let client: AVClient;
@@ -17,25 +17,19 @@ describe('AVClient#constructBallotCryptograms', () => {
   beforeEach(async () => {
     sandbox = resetDeterminism();
 
-    nock(bulletinBoardHost).get('/mobile-api/us/config')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_config.json');
-    nock(voterAuthorizerHost).post('/create_session')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json');
-    nock(voterAuthorizerHost).post('/request_authorization')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json');
+    bbHost.get_election_config();
+    vaHost.post_create_session();
+    vaHost.post_request_authorization();
+    otpHost.post_authorize();
+    bbHost.post_registrations();
+    bbHost.post_commitments();
+    bbHost.post_votes();
 
-    nock(OTPProviderHost).post('/authorize')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json');
-
-    nock(bulletinBoardHost).post('/mobile-api/us/register')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_register.json');
-    nock(bulletinBoardHost).post('/mobile-api/us/challenge_empty_cryptograms')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_challenge_empty_cryptograms.json');
-    nock(bulletinBoardHost).get('/mobile-api/us/get_latest_board_hash')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_app_get_latest_board_hash.json');
-
-    client = new AVClient('http://us-avx:3000/mobile-api/us');
-    await client.initialize()
+    client = new AVClient('http://us-avx:3000/dbb/us/api');
+    await client.initialize(undefined, {
+      privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
+      publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
+    });
   });
 
   afterEach(() => {
@@ -49,26 +43,32 @@ describe('AVClient#constructBallotCryptograms', () => {
       await client.validateAccessCode('1234');
       await client.registerVoter()
 
-      const cvr = { '1': 'option1', '2': 'optiona' };
+      const cvr = {
+        'f7a04384-1458-5911-af38-7e08a46136e7': 'option ref 1',
+        '026ca870-537e-57b2-b313-9bb5d9fbe78b': 'option ref 3'
+      };
 
-      const trackingCode = await client.constructBallotCryptograms(cvr);
+      const trackingCode = await client.constructBallot(cvr);
 
-      expect(trackingCode.length).to.eql(64);
+      expect(typeof trackingCode === "string").to.be.true;
     });
   });
 
   context('given invalid CVR', () => {
-    it('encryption fails when voting on invalid contest', async () => {
+    it('cvr not matching voter group eligibility', async () => {
       await client.requestAccessCode('voter123', 'voter@foo.bar');
       await client.validateAccessCode('1234');
       await client.registerVoter()
 
-      const cvr = { '1': 'option1', '3': 'optiona' };
+      const cvr = { 
+        'f7a04384-1458-5911-af38-7e08a46136e7': 'option ref 1', 
+        'bogus contest uuid': 'option ref 4'
+      };
 
       await expectError(
-        client.constructBallotCryptograms(cvr),
+        client.constructBallot(cvr),
         CorruptCvrError,
-        'Corrupt CVR: Contains invalid contest'
+        'Corrupt CVR: Not eligible'
       );
     });
 
@@ -77,10 +77,13 @@ describe('AVClient#constructBallotCryptograms', () => {
       await client.validateAccessCode('1234');
       await client.registerVoter()
 
-      const cvr = { '1': 'option1', '2': 'wrong_option' };
+      const cvr = {
+        'f7a04384-1458-5911-af38-7e08a46136e7': 'option ref 1',
+        '026ca870-537e-57b2-b313-9bb5d9fbe78b': 'bogus reference'
+      };
 
       await expectError(
-        client.constructBallotCryptograms(cvr),
+        client.constructBallot(cvr),
         CorruptCvrError,
         'Corrupt CVR: Contains invalid option'
       );

@@ -1,0 +1,12 @@
+{
+  "item": {
+    "address": "3c92a7309eb47eec20ddc65694da9b7f5d2e2809ab32e85206d1a573db5fb498",
+    "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
+    "parentAddress": "ed5a058823188dbaf53612fb30fcf5d6d0cbe06997b96ade97b496f86030052f",
+    "previousAddress": "ed5a058823188dbaf53612fb30fcf5d6d0cbe06997b96ade97b496f86030052f",
+    "content": {},
+    "registeredAt": "2022-03-14T15:40:09.424Z",
+    "signature": "df770a953630bcff6b34e3385e5d53396985cef192ad529f6254e1bdf92f4565,b10f4b1891b989ac2d2d7641b37f904ffab204b6e9525fe081e6e9a0f478eef3",
+    "type": "SpoilRequestItem"
+  }
+}

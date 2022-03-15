@@ -1,5 +1,4 @@
-import { AVClient } from '../lib/av_client';
-import { expect } from 'chai';
+import { AVClient, ElectionConfig } from '../lib/av_client';
 import {
   expectError,
   readJSON
@@ -8,16 +7,16 @@ import { InvalidConfigError } from '../lib/av_client/errors';
 
 describe('election configuration validation', () => {
   let client: AVClient;
-  let electionConfig: any;
+  let electionConfig: ElectionConfig;
 
   beforeEach(async () => {
-    client = new AVClient('http://us-avx:3000/mobile-api/us');
-    electionConfig = readJSON('./replies/otp_flow/get_us_app_config.json');
+    client = new AVClient('http://nothing.local');
+    electionConfig = readJSON('./replies/otp_flow/get_dbb_us_api_election_config.json').electionConfig;
   });
 
   context('OTP provider URL is empty', () => {
     it('fails with an error', async () => {
-      electionConfig.services.otp_provider.url = '';
+      electionConfig.services.otpProvider.url = '';
 
       await expectError(
         client.initialize(electionConfig),
@@ -29,7 +28,7 @@ describe('election configuration validation', () => {
 
   context('Voter Authorizer URL is empty', () => {
     it('fails with an error', async () => {
-      electionConfig.services.voter_authorizer.url = '';
+      electionConfig.services.voterAuthorizer.url = '';
 
       await expectError(
         client.initialize(electionConfig),
@@ -41,7 +40,7 @@ describe('election configuration validation', () => {
 
   context('services key is missing', () => {
     it('fails with an error', async () => {
-      delete electionConfig.services;
+      delete (electionConfig as any).services;
 
       await expectError(
         client.initialize(electionConfig),

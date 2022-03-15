@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>AVX Verifier</title>
+
+    <link href="./files/bootstrap.min.css" rel="stylesheet">
+    <link href="./files/verifier.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class="text-center mb-12">
+      <form id="findBallot" action="#">
+        <div class="text-center mb-4">
+          <h1 class="h3 mb-3 font-weight-normal">AVX Verifier</h1>
+
+          <p>Insert the 'Ballot Checking Code' found on your Mobile Voting App, to verify your choices. This process will spoil and invalidate your votes.</p>
+        </div>
+
+        <div class="form-label-group">
+          <input type="text" id="verifier-code" name="verifier[code]" class="form-control" placeholder="Verifier Cofe" required />
+        </div>
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit" id="tracking-btn">Find Ballot</button>
+      </form>
+
+      <hr>
+      
+      <form id="submitVerifierKey" class="collapse" action="#">
+        <div class="text-center mb-4">
+          <h2 class="h3 mb-3 font-weight-normal">Ballot found!</h2>
+        </div>
+        <div class="form-label-group">
+          <span>Please confirm the following code in the voting application, so the process can continue.</span>
+          <br>
+          <span id="verification-code">Waiting for you to spoil the ballot in the voting app</span>
+        </div>
+      </form>
+
+      <hr>
+
+      <div id="showChoices" class="collapse">
+        <div class="text-center mb-4">
+          <h2 class="h3 mb-3 font-weight-normal">Ballot</h2>
+        </div>
+
+        <div class="form-label-group">
+          <ol id="choices">
+            <li class="template">Waiting for you to confirm the code matches in the voting app</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <script src="./files/jquery-3.6.0.min.js"></script>
+    <script src="./files/bootstrap.min.js"></script>
+    <script src="../dist/bundle.js"></script>
+    <script src="./files/app.js"></script>
+  </body>
+</html>

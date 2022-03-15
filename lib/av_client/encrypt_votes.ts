@@ -1,37 +1,50 @@
-import { CastVoteRecord, ContestMap, OpenableEnvelope } from "./types";
-import { encryptVote, hashString } from './aion_crypto'
+import { CastVoteRecord, ContestConfig, ContestMap, MarkingType, OpenableEnvelope } from "./types";
+import { encryptVote } from './crypto/encrypt_vote';
+import { cvrToCodes } from './cvr_conversion';
+import { hashString, ElGamalPointCryptogram } from './aion_crypto';
+import Uniformer from "../util/uniformer";
 
 const encrypt = (
+  contestConfigs: ContestConfig,
   contestSelections: CastVoteRecord,
-  emptyCryptograms: ContestMap<string>,
-  contestEncodingTypes: ContestMap<number>,
+  markingType: MarkingType,
   encryptionKey: string): ContestMap<OpenableEnvelope> => {
 
-  const response = {}
+  const cvrCodes = cvrToCodes(contestConfigs, contestSelections)
+
+  const response = {};
 
   Object.keys(contestSelections).forEach(function(contestId) {
-    const { cryptogram, randomness } = encryptVote(
-      contestEncodingTypes[contestId],
-      contestSelections[contestId],
-      emptyCryptograms[contestId],
+    const { cryptograms, randomness } = encryptVote(
+      markingType,
+      cvrCodes[contestId].toString(),
       encryptionKey
     );
 
-    response[contestId] = { cryptogram, randomness }
+    response[contestId] = { cryptograms, randomness }
   })
 
   return response;
 }
 
-const fingerprint = (cryptograms: ContestMap<Cryptogram>): string => {
-  const string = JSON.stringify(cryptograms)
+const fingerprint = (cryptograms: ContestMap<Cryptogram[]>): string => {
+  const uniformedString = new Uniformer().formString(cryptograms)
 
-  return hashString(string)
+  return hashString(uniformedString)
+}
+
+const homomorphicallyAddCryptograms = (cryptogram1: string, cryptogram2: string) => {
+  const point1 = ElGamalPointCryptogram.fromString(cryptogram1);
+  const point2 = ElGamalPointCryptogram.fromString(cryptogram2);
+  
+  point1.homomorphicallyAddCryptogram(point2);
+  return point1.toString();
 }
 
 export default {
   encrypt,
-  fingerprint
+  fingerprint,
+  homomorphicallyAddCryptograms
 }
 
 type Cryptogram = string;

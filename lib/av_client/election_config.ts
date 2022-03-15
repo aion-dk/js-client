@@ -1,5 +1,5 @@
 import { BulletinBoard } from "./connectors/bulletin_board";
-import { Ballot, Election } from "./types";
+import { Ballot, BallotConfig, ContestConfig, Election } from "./types";
 import { InvalidConfigError } from "./errors";
 
 export interface ElectionConfig {
@@ -10,21 +10,26 @@ export interface ElectionConfig {
   ballots: Ballot[];
   availableLocales: string[];
   currentLocale: string;
-  //...
+
+  dbbPublicKey: string
+
+  contestConfigs: ContestConfig
+  ballotConfigs: BallotConfig;
 
   // appended data:
   affidavit: AffidavitConfig;
 
   services: {
-    'voter_authorizer': Service,
-    'otp_provider': Service
+    'address': string
+    'voterAuthorizer': Service,
+    'otpProvider': Service
   };
 }
 
 interface Service {
   url: string;
-  election_context_uuid: string;
-  public_key: string;
+  electionContextUuid: string;
+  publicKey: string;
 }
 
 interface AffidavitConfig {
@@ -35,8 +40,8 @@ interface AffidavitConfig {
 export async function fetchElectionConfig(bulletinBoard: BulletinBoard): Promise<ElectionConfig> {
   return bulletinBoard.getElectionConfig()
     .then(
-      (response: { data: ElectionConfig }) => {
-        const configData = response.data;
+      (response: { data: { electionConfig: ElectionConfig } }) => {
+        const configData = response.data.electionConfig;
 
         // const privKey = 'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9'
         const pubKey = '03e9858b6e48eb93d8f27aa76b60806298c4c7dd94077ad6c3ff97c44937888647'
@@ -46,6 +51,10 @@ export async function fetchElectionConfig(bulletinBoard: BulletinBoard): Promise
         }
 
         return configData;
+      })
+      .catch((error) => {
+        console.error()
+        throw error;
       });
 }
 
@@ -75,26 +84,26 @@ export function validateElectionConfig(config: ElectionConfig): void {
 }
 
 function containsOTPProviderURL(config: ElectionConfig) {
-  return config?.services?.otp_provider?.url?.length > 0;
+  return config?.services?.otpProvider?.url?.length > 0;
 }
 
 function containsOTPProviderContextId(config: ElectionConfig) {
-  return config?.services?.otp_provider?.election_context_uuid?.length > 0;
+  return config?.services?.otpProvider?.electionContextUuid?.length > 0;
 }
 
 function containsOTPProviderPublicKey(config: ElectionConfig) {
-  return config?.services?.otp_provider?.public_key?.length > 0;
+  return config?.services?.otpProvider?.publicKey?.length > 0;
 }
 
 function containsVoterAuthorizerURL(config: ElectionConfig) {
-  return config?.services?.voter_authorizer?.url?.length > 0;
+  return config?.services?.voterAuthorizer?.url?.length > 0;
 }
 
 function containsVoterAuthorizerContextId(config: ElectionConfig) {
-  return config?.services?.voter_authorizer?.election_context_uuid?.length > 0;
+  return config?.services?.voterAuthorizer?.electionContextUuid?.length > 0;
 }
 
 function containsVoterAuthorizerPublicKey(config: ElectionConfig) {
-  return config?.services?.voter_authorizer?.public_key?.length > 0;
+  return config?.services?.voterAuthorizer?.publicKey?.length > 0;
 }
 
