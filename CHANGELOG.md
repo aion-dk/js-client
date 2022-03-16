@@ -1,5 +1,12 @@
 # AV Client Library Changelog
 
+## 1.0.1
+* Remove jsonwebtoken package
+* Verifier UX improvements
+
+## 1.0.0
+* Support new DBB structure
+
 ## 0.1.14
 * Auth token replaces registration token and session token.
 
