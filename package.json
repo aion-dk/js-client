@@ -1,6 +1,6 @@
 {
   "name": "@aion-dk/js-client",
-  "version": "0.1.14",
+  "version": "1.0.1",
   "license": "MIT",
   "description": "Assembly Voting JS client",
   "main": "dist/lib/av_client.js",
@@ -25,9 +25,8 @@
     "node": ">=14.17.0"
   },
   "dependencies": {
-    "@types/jsonwebtoken": "^8.5.8",
     "axios": "^0.25.0",
-    "jsonwebtoken": "^8.5.1",
+    "jose": "^4.6.0",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {

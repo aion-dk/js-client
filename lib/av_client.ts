@@ -5,7 +5,7 @@ import * as NistConverter from './util/nist_converter';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
 import { KeyPair, CastVoteRecord, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
-import * as jwt from 'jsonwebtoken';
+import * as jwt from 'jose';
 
 
 import {
@@ -211,7 +211,7 @@ export class AVClient implements IAVClient {
 
     const { authToken } = authorizationResponse.data;
 
-    const decoded = jwt.decode(authToken); // TODO: Verify against dbb pubkey: this.getElectionConfig().services.voterAuthorizer.public_key);
+    const decoded = jwt.decodeJwt(authToken); // TODO: Verify against dbb pubkey: this.getElectionConfig().services.voterAuthorizer.public_key);
 
     if(decoded === null)
       throw new InvalidTokenError('Auth token could not be decoded');

@@ -3,7 +3,5 @@ services:
   js-client:
     image: "js-client:latest"
     command: "npm run server"
-    volumes:
-      - ".:/usr/src/app"
     ports:
       - "3005:3005"
