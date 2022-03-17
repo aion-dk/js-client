@@ -37,7 +37,7 @@ describe('validateCvr', () => {
 
       const ballotConfigs = {
         [VOTER_GROUP]: {
-          contestUuids: [ "a", "b" ]
+          contestReferences: [ "a", "b" ]
         }
       };
 

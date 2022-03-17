@@ -11,7 +11,7 @@ export const checkEligibility = (
   if(!voterGroupConfig)
     throw new Error(`Ballot config not found for voter group: ${voterGroup}`);
 
-  if(isVoterGroupContestsMatchingCvr(cvr, voterGroupConfig.contestUuids)) {
+  if(isVoterGroupContestsMatchingCvr(cvr, voterGroupConfig.contestReferences)) {
     return ":okay";
   }
 
@@ -20,12 +20,12 @@ export const checkEligibility = (
 
 const isVoterGroupContestsMatchingCvr = (
   cvr: CastVoteRecord,
-  voterGroupContestUuids: string[]
+  voterGroupContestReferences: string[]
   ): boolean => {
 
   const cvrKeys = Object.keys(cvr).sort();
-  const contestUuids = [...voterGroupContestUuids].sort();
+  const contestReferences = [...voterGroupContestReferences].sort();
 
-  return cvrKeys.length === contestUuids.length
-    && cvrKeys.every((key, i) => key === contestUuids[i])
+  return cvrKeys.length === contestReferences.length
+    && cvrKeys.every((key, i) => key === contestReferences[i])
 }

@@ -70,7 +70,7 @@ export const constructBallotCryptograms = (state: ClientState, cvr: CastVoteReco
   // TODO:
   // Do we need: const numberOfCryptogramsNeeded = this.calculateNumberOfRequiredCryptograms(cvr, ballots[voterGroup]);
   
-  const randomizersMap = Object.fromEntries(Object.entries(envelopes).map(([contestUuid, envelope]) => [contestUuid, envelope.randomness]));
+  const randomizersMap = Object.fromEntries(Object.entries(envelopes).map(([contestReference, envelope]) => [contestReference, envelope.randomness]));
   const result = generatePedersenCommitment(randomizersMap);
 
   const trackingCode = EncryptVotes.fingerprint(extractCryptograms(envelopes));

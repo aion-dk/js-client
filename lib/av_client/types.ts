@@ -233,12 +233,12 @@ export type HashValue = string;
 
 export type BallotConfig = {
   [voterGroupId: string]: {
-    contestUuids: string[]
+    contestReferences: string[]
   }
 };
 
 export type ContestConfig = {
-  [contestUuid: string]: {
+  [contestReference: string]: {
     options: Option[]
     markingType: MarkingType
     resultType: {
