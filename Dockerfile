@@ -13,5 +13,6 @@ RUN npm install
 COPY . .
 
 RUN npm run build && npm run webpack
-COPY ./dist/bundle.js ./public/
+#COPY ./dist/bundle.js ./public/
+
 CMD ["npm run server"]

@@ -11,7 +11,7 @@ module.exports = {
     minimize: false,
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'public'),
     filename: 'bundle.js',
     libraryTarget: 'var',
     library: 'AssemblyVoting'
