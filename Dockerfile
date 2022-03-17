@@ -6,12 +6,12 @@ RUN apk add curl
 
 COPY package*.json ./
 
-COPY ./dist/bundle.js ./public/
+
 
 RUN npm install
 
 COPY . .
 
 RUN npm run build && npm run webpack
-
+COPY ./dist/bundle.js ./public/
 CMD ["npm run server"]
