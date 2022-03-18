@@ -1,36 +1,36 @@
 {
   "electionConfig": {
-    "dbbPublicKey": "02e065e2ea825b567025bf612bc9cf1e8aab31d3caf90b4c42e84eef443687b117",
-    "encryptionKey": "0222770b597997bb2fa4d6531f46cb022d4769f7b22cc32db53bc14f0662818378",
+    "dbbPublicKey": "03e15f6728d17332d7686ea6bb36b6817f7da23a3bf7aa130354b51515bf8d6929",
+    "encryptionKey": "033821781942130adbd711b7ddd040879041727832b4aec890feec70be7ff47cda",
     "services": {
-      "address": "aec908867911152e76dd6e250e395e6ed588e889b5fdc04f1a6add7938ab99ea",
+      "address": "2dd8deb77ab0499e9a470a8a7b106de97790fa1f78a8c26b7ca914f5e3dfd8e4",
       "voterAuthorizer": {
-        "electionContextUuid": "6a47ae30-8913-4c8b-a128-808127d7de3e",
-        "publicKey": "02ba88aebb83151f03d9596058aa84d290cd12dcdbed7370ed78e220f9c4c38f00",
+        "electionContextUuid": "330c77fc-ed35-448e-adb0-6b4e5667ba0c",
+        "publicKey": "03c832a0ceed8d36cc3e4ce4609f8a37260a4de35e911abd0c5deecfcf99e15763",
         "url": "http://authorizer.local.assemblyvoting.net:1234/"
       },
       "otpProvider": {
-        "electionContextUuid": "3f868f10-7c63-4ddf-92f1-9b5e9078aec9",
-        "publicKey": "02eedd00a4a280790e44be6c3ecf3f961aebd07888c4152a83b0f1d5a1aaa22cdc",
+        "electionContextUuid": "6eefafc8-2599-4d92-a917-5da149d42596",
+        "publicKey": "020d656656b2b553f8944d72479868b37283e40c9bd7eb25acbb8afc7c2b480267",
         "url": "http://otp-provider.local.assemblyvoting.net:1111/"
       }
     },
     "ballotConfigs": {
       "3": {
-        "contestUuids": [
-          "f7a04384-1458-5911-af38-7e08a46136e7",
-          "026ca870-537e-57b2-b313-9bb5d9fbe78b"
+        "contestReferences": [
+          "contest ref 1",
+          "contest ref 2"
         ]
       },
       "4": {
-        "contestUuids": [
-          "f7a04384-1458-5911-af38-7e08a46136e7",
-          "026ca870-537e-57b2-b313-9bb5d9fbe78b"
+        "contestReferences": [
+          "contest ref 1",
+          "contest ref 2"
         ]
       }
     },
     "contestConfigs": {
-      "f7a04384-1458-5911-af38-7e08a46136e7": {
+      "contest ref 1": {
         "markingType": {
           "style": "regular",
           "codeSize": 1,
@@ -60,7 +60,7 @@
           "name": "resultType name not matter right now"
         }
       },
-      "026ca870-537e-57b2-b313-9bb5d9fbe78b": {
+      "contest ref 2": {
         "markingType": {
           "style": "regular",
           "codeSize": 1,
@@ -99,5 +99,5 @@
       }
     }
   },
-  "receipt": "3240fbfdef0af7683ce77acacc77148c9922348fccb348faa743bcbbe32e5d5b,9c5ea2dcaebf1a67855ed90d9afdd4f63547dae7ec99b8e485a5b64f652d782d"
+  "receipt": "04b533dacfbe3476f738dc43a42612cbe783c5419ba736ab49a6c64d7c5eb0d4,b778d2192d47a9881d2150b28082288a8c439f1e589f73e876a78fb8d8ceb409"
 }

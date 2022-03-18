@@ -1,24 +1,24 @@
 {
   "spoilRequest": {
-    "address": "3c92a7309eb47eec20ddc65694da9b7f5d2e2809ab32e85206d1a573db5fb498",
+    "address": "d49aba8bd695ecd27f6510700974a8a5e6d7a64fc7234ee145d1b298d96d7d94",
     "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
-    "parentAddress": "ed5a058823188dbaf53612fb30fcf5d6d0cbe06997b96ade97b496f86030052f",
-    "previousAddress": "ed5a058823188dbaf53612fb30fcf5d6d0cbe06997b96ade97b496f86030052f",
+    "parentAddress": "310f833bb300858856e4818c8c8cc10ffcb2b82870563d16e0c12b6292d2593d",
+    "previousAddress": "310f833bb300858856e4818c8c8cc10ffcb2b82870563d16e0c12b6292d2593d",
     "content": {},
-    "registeredAt": "2022-03-14T15:40:09.424Z",
-    "signature": "df770a953630bcff6b34e3385e5d53396985cef192ad529f6254e1bdf92f4565,b10f4b1891b989ac2d2d7641b37f904ffab204b6e9525fe081e6e9a0f478eef3",
+    "registeredAt": "2022-03-17T11:47:34.096Z",
+    "signature": "890520da78c9af66baed21b12d9f8f860b862c86a664e90040e6d55b4293b016,d3a9ff5d34df6ee880809be6c626c9b5e150bc673247d1e3ec18c39c9fb4d2ab",
     "type": "SpoilRequestItem"
   },
-  "receipt": "9b4d04de4aeccecfd8e285ee46359e31c21ce98e3022d99aa82da67157d8838c,ac2877f287a1834e30e45a01a14f700dc69dd7f200439b76207a1fc4a10d4bee",
+  "receipt": "bcc212bcbce63c12c6b2e47d1aef79d50003d3c9ef869f5844e4c1dd7c56f36a,7937b48ef68dc852ec668b4615706d14f8c16c52ca301d71bb1e93273a9506ea",
   "boardCommitmentOpening": {
     "randomizers": {
-      "f7a04384-1458-5911-af38-7e08a46136e7": [
-        "7a067794b5427365a3ccb8640b6a6dba61721861670e5c8f7aaa2acb753a1264"
+      "contest ref 1": [
+        "bc1a5e789a65801f10a41b63a0aeade8f1c8b3313da8f963036fdb4212a9b50b"
       ],
-      "026ca870-537e-57b2-b313-9bb5d9fbe78b": [
-        "c6c5f6f206f36bb656a9f47ea35e37fa58ab57fde79f4a3906fe83128767b774"
+      "contest ref 2": [
+        "e34d96ef0e66530fb30ef57269e87af8f7fcc759ac72a94e53fea5c14da1fa53"
       ]
     },
-    "commitmentRandomness": "0c7e0dbdb7a55a90ee57b1304d2e87789deadc6340fd6343f061669bf5d85893"
+    "commitmentRandomness": "e2beb817ab1c6ef80ff092a37ce877005c38cb3f1408c97c411001f3b05e50be"
   }
 }

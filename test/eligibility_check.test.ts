@@ -7,8 +7,8 @@ describe('Eligibility Check', () => {
       const voterGroup = "4";
 
       const ballotConfigs = {
-        "4": { contestUuids: ['a', 'b'] },
-        "5": { contestUuids: ['c', 'd'] }
+        "4": { contestReferences: ['a', 'b'] },
+        "5": { contestReferences: ['c', 'd'] }
       };
 
       const cvr1 = { 'a': '1', 'b': '4' };

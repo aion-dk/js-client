@@ -84,8 +84,8 @@ describe('entire benaloh flow', () => {
     const votes = verifier.decryptBallot();
 
     expect(votes).to.eql({
-      'f7a04384-1458-5911-af38-7e08a46136e7': 'option ref 1',
-      '026ca870-537e-57b2-b313-9bb5d9fbe78b': 'option ref 3'
+      'contest ref 1': 'option ref 1',
+      'contest ref 2': 'option ref 3'
     });
 
     if( USE_MOCK ) expectedNetworkRequests.forEach((mock) => mock.done());
@@ -163,9 +163,9 @@ describe('entire benaloh flow', () => {
     const { contestConfigs } = client.getElectionConfig()
     // We expect CVR value to look something like this: { '1': 'option1', '2': 'optiona' }
     const contestsChoices = Object.keys(contestConfigs)
-      .map((uuid: string) => [
-        uuid,
-        contestConfigs[uuid].options[0].reference
+      .map((references: string) => [
+        references,
+        contestConfigs[references].options[0].reference
       ])
 
     const cvr = Object.fromEntries(contestsChoices)
