@@ -59,6 +59,25 @@ describe("Pedersen Commitments", () => {
     // TODO: assert actual commitment result
   });
 
+  it("generate same commitment independant of order of contests", () => {
+    const randomizer = "01";
+    const messages1 = {
+      "1": [ "01" ],
+      "2": [ "02" ]
+    };
+    const messages2 = {
+      "2": [ "02" ],
+      "1": [ "01" ]
+    };
+
+    const result1 = generatePedersenCommitment(messages1, { randomizer });
+    const result2 = generatePedersenCommitment(messages2, { randomizer })
+
+    expect(result1.commitment).to.eq("03f501e31a38c043e75958fdffccc9485b6938c508a6743e969f8b4d8b1b7c9b99");
+    expect(result2.commitment).to.eq("03f501e31a38c043e75958fdffccc9485b6938c508a6743e969f8b4d8b1b7c9b99");
+    // TODO: assert actual commitment result
+  });
+
   it("generator/verifier ignores casing of messages", () => {
     const lowerCaseMessages = { "1": [ "d70d319fd1c7867af1ca477878d381e4" ] };
     const upperCaseMessages = { "1": [ lowerCaseMessages["1"][0].toUpperCase() ] } ;

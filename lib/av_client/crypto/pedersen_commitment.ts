@@ -1,6 +1,6 @@
 import { ContestMap } from "../types";
-import Bignum from "./bignum";
-import Point from "./point";
+import {Bignum} from "./bignum";
+import {Point} from "./point";
 import {
   addPoints,
   bignumFromHex,
@@ -15,11 +15,11 @@ import {
 } from "./util";
 
 class PedersenCommitment {
-  static computeGenerator(contestUuid: string, index: number): Point {
+  static computeGenerator(contestReference: string, index: number): Point {
     const baseGeneratorPrefix = () => pointToHex(new Point(Curve.G));
     const secp256k1_curve_prime = new Bignum(Curve.field.modulus);
 
-    const target = [baseGeneratorPrefix(), contestUuid, index].join(',');
+    const target = [baseGeneratorPrefix(), contestReference, index].join(',');
     let x = hashToBignum(target).mod(secp256k1_curve_prime);
 
     let point: Point | null = null;
@@ -43,10 +43,10 @@ class PedersenCommitment {
 
   static generate(messages: ContestMap<Bignum[]>, commitmentRandomizer: Bignum): Point {
     const initialPoint = new Point(Curve.G).mult(commitmentRandomizer);
-    const terms = Object.entries(messages).flatMap(([contestUuid, messages]) => {
+    const terms = Object.entries(messages).flatMap(([contestReference, messages]) => {
       
       const terms = messages.map((message, index) => {
-        const generator = PedersenCommitment.computeGenerator(contestUuid, index);
+        const generator = PedersenCommitment.computeGenerator(contestReference, index);
         return generator.mult(message);
       });
 
@@ -58,12 +58,12 @@ class PedersenCommitment {
 }
 
 const stringMapToBignumMap = (stringMap: ContestMap<string[]>): ContestMap<Bignum[]> => {
-  const entries = Object.entries(stringMap).map(([contestUuid, messages]) => {
+  const entries = Object.entries(stringMap).map(([contestReference, messages]) => {
     if(messages.some(m => !isValidHexString(m)))
       throw new Error("Input is not a valid hex string");
 
     return [
-      contestUuid,
+      contestReference,
       messages.map(m => bignumFromHex(m))
     ];
   });

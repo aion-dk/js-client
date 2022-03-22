@@ -1,5 +1,3 @@
-import { ElectionConfig } from "./election_config";
-
 export interface IAVClient {
   initialize(electionConfig: ElectionConfig): Promise<void>
   initialize(): Promise<void>
@@ -233,12 +231,12 @@ export type HashValue = string;
 
 export type BallotConfig = {
   [voterGroupId: string]: {
-    contestUuids: string[]
+    contestReferences: string[]
   }
 };
 
 export type ContestConfig = {
-  [contestUuid: string]: {
+  [contestReference: string]: {
     options: Option[]
     markingType: MarkingType
     resultType: {
@@ -255,4 +253,39 @@ export type MarkingType = {
   codeSize: number
   minMarks: number
   maxMarks: number
+}
+
+export interface ElectionConfig {
+  app_url: string;
+  encryptionKey: string;
+  signingPublicKey: string;
+  election: Election;
+  ballots: Ballot[];
+  availableLocales: string[];
+  currentLocale: string;
+
+  dbbPublicKey: string
+
+  contestConfigs: ContestConfig
+  ballotConfigs: BallotConfig;
+
+  // appended data:
+  affidavit: AffidavitConfig;
+
+  services: {
+    'address': string
+    'voterAuthorizer': Service,
+    'otpProvider': Service
+  };
+}
+
+interface Service {
+  url: string;
+  electionContextUuid: string;
+  publicKey: string;
+}
+
+interface AffidavitConfig {
+  curve: string;
+  encryptionKey: string;
 }

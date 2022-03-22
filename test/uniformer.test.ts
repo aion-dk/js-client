@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import Uniformer from '../lib/util/uniformer';
+import {Uniformer} from '../lib/util/uniformer';
 
 describe('Uniformer', () => {
   context('when object is a Hash', () => {

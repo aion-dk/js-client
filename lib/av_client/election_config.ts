@@ -1,41 +1,6 @@
 import { BulletinBoard } from "./connectors/bulletin_board";
-import { Ballot, BallotConfig, ContestConfig, Election } from "./types";
+import { ElectionConfig } from "./types";
 import { InvalidConfigError } from "./errors";
-
-export interface ElectionConfig {
-  app_url: string;
-  encryptionKey: string;
-  signingPublicKey: string;
-  election: Election;
-  ballots: Ballot[];
-  availableLocales: string[];
-  currentLocale: string;
-
-  dbbPublicKey: string
-
-  contestConfigs: ContestConfig
-  ballotConfigs: BallotConfig;
-
-  // appended data:
-  affidavit: AffidavitConfig;
-
-  services: {
-    'address': string
-    'voterAuthorizer': Service,
-    'otpProvider': Service
-  };
-}
-
-interface Service {
-  url: string;
-  electionContextUuid: string;
-  publicKey: string;
-}
-
-interface AffidavitConfig {
-  curve: string;
-  encryptionKey: string;
-}
 
 export async function fetchElectionConfig(bulletinBoard: BulletinBoard): Promise<ElectionConfig> {
   return bulletinBoard.getElectionConfig()

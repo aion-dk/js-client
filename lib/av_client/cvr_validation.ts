@@ -15,19 +15,19 @@ const validateCvr = (
   const ballotConfig = ballotConfigs[voterGroup];
 
   const hasOnlyVotedForValidContests = Object.keys(cvr)
-    .map(cvrUuid => ballotConfig.contestUuids.includes(cvrUuid))
+    .map(contestReference => ballotConfig.contestReferences.includes(contestReference))
     .every(found => found);
 
-  const hasVotedForAllContests = ballotConfig.contestUuids.every(uuid => cvr[uuid] !== undefined);
+  const hasVotedForAllContests = ballotConfig.contestReferences.every(reference => cvr[reference] !== undefined);
 
-  const areSelectedOptionsValid = Object.keys(cvr).every(contestUuid => {
-    const contest = allContests[contestUuid];
+  const areSelectedOptionsValid = Object.keys(cvr).every(contestReference => {
+    const contest = allContests[contestReference];
 
     if(!contest)
       return false;
 
     const validOptions = flattenOptions(contest.options).map(option => option.reference)
-    const selectedOption = cvr[contestUuid];
+    const selectedOption = cvr[contestReference];
 
     return validOptions.includes(selectedOption);
   });
