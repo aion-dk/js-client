@@ -21,7 +21,7 @@
   "verification": {
     "author": "03e15f6728d17332d7686ea6bb36b6817f7da23a3bf7aa130354b51515bf8d6929",
     "address": "762f17feb4db3160f13c4336558ef4e01c268d918356d9253f5abc522b320861",
-    "shortAddress": "762f17feb4d",
+    "shortAddress": "762f17feb4",
     "parentAddress": "a510fc209196d746af8b75b360e251d67324f92cdfa97bf51c0b7c596fd6447a",
     "type": "VerificationStartItem",
     "content": {},

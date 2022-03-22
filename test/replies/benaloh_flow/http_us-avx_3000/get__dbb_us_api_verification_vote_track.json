@@ -45,7 +45,7 @@
   "verificationTrackStart": {
     "author": "03e15f6728d17332d7686ea6bb36b6817f7da23a3bf7aa130354b51515bf8d6929",
     "address": "cba0171010bbade9bdc9b82c54ac41860fa038da06d39fd1ca69d09e820b240b",
-    "shortAddress": "cba0171010b",
+    "shortAddress": "cba0171010",
     "parentAddress": "310f833bb300858856e4818c8c8cc10ffcb2b82870563d16e0c12b6292d2593d",
     "type": "VerificationStartItem",
     "content": {},
