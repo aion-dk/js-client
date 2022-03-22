@@ -38,3 +38,16 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
+      - name: Private actions checkout
+        uses: daspn/private-actions-checkout@v2
+        with:
+          actions_list: '["aion-dk/build-and-push-action@v1.0.6"]'
+          checkout_base_path: ./.github/actions
+          ssh_private_key: ${{ secrets.PUBLIC_PROJECT_PRIVATE_REPO_ACCESS_KEY }}
+
+      - name: "Build and push docker image"
+        uses: ./.github/actions/build-and-push-action
+        with:
+          image_name: js-client
+          ecr_access_key_id: ${{ secrets.AWS_RW_ACCESS_KEY_ID }}
+          ecr_secret_key: ${{ secrets.AWS_RW_SECRET_KEY }}
