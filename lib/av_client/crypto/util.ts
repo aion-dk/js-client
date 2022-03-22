@@ -1,7 +1,7 @@
 import * as crypto from "../aion_crypto";
 import * as sjcl from "../sjcl";
-import Bignum from "./bignum";
-import Point from "./point";
+import {Bignum} from "./bignum";
+import {Point} from "./point";
 import type { BitArray } from "./bitarray";
 
 export const Curve = crypto.Curve;

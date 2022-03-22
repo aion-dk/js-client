@@ -1,5 +1,5 @@
 import * as crypto from "../aion_crypto";
-import Bignum from "./bignum";
+import {Bignum} from "./bignum";
 import type { BitArray } from "./bitarray";
 
 // As this is working with untyped SJCL classes,
@@ -7,7 +7,7 @@ import type { BitArray } from "./bitarray";
 
 /*eslint-disable @typescript-eslint/no-explicit-any*/
 
-export default class Point {
+export class Point {
   private eccPoint: any;
 
   constructor(point: any) {

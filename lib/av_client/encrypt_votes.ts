@@ -2,7 +2,7 @@ import { CastVoteRecord, ContestConfig, ContestMap, MarkingType, OpenableEnvelop
 import { encryptVote } from './crypto/encrypt_vote';
 import { cvrToCodes } from './cvr_conversion';
 import { hashString, ElGamalPointCryptogram } from './aion_crypto';
-import Uniformer from "../util/uniformer";
+import {Uniformer} from "../util/uniformer";
 
 const encrypt = (
   contestConfigs: ContestConfig,
