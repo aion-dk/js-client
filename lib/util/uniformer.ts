@@ -1,7 +1,7 @@
 type KeyValuePair = [ string, unknown ];
 type Primitive = Array<unknown> | string | number | symbol | boolean | null;
 
-export default class Uniformer {
+export class Uniformer {
 
   public formString(obj: unknown | Primitive ): string {
     const sortedEntries = this.walk(obj);

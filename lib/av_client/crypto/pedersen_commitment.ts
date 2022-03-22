@@ -1,6 +1,6 @@
 import { ContestMap } from "../types";
-import Bignum from "./bignum";
-import Point from "./point";
+import {Bignum} from "./bignum";
+import {Point} from "./point";
 import {
   addPoints,
   bignumFromHex,

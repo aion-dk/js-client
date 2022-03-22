@@ -1,6 +1,7 @@
 {
   "extends": "@istanbuljs/nyc-config-typescript",
   "all": true,
+  "sourceMap": false,
   "exclude": [
     "dist/*",
     "docs/*",
