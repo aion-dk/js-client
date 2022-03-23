@@ -1,5 +1,9 @@
 # AV Client Library Changelog
 
+## 1.0.2
+* Export verifier as part of av-client
+* Use of contest references
+
 ## 1.0.1
 * Remove jsonwebtoken package
 * Verifier UX improvements
