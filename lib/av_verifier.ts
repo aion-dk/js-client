@@ -4,7 +4,7 @@ import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
 import { decrypt } from './av_client/decrypt_vote';
 import { isValidPedersenCommitment } from './av_client/crypto/pedersen_commitment';
-import { CommitmentOpening, VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig } from './av_client/types';
+import { CommitmentOpening, VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap } from './av_client/types';
 
 import {
   fetchElectionConfig,
@@ -98,7 +98,7 @@ export class AVVerifier {
       minMarks: 1,
       maxMarks: 1
     }
-
+     
     return decrypt(
       this.electionConfig.contestConfigs,
       defaultMarkingType,
@@ -144,6 +144,21 @@ export class AVVerifier {
     };
   
     return new Promise(executePoll);
+  }
+
+  public getReadableBallot(decryptedBallot: ContestMap<string>, locale: string) {
+    const ballot = {}
+    Object.keys(decryptedBallot).forEach((contestRef) => {
+      let chosenOption = ""
+      this.electionConfig.contestConfigs[contestRef].options.forEach((opt) => {
+        if (opt.reference === decryptedBallot[contestRef]) {
+          chosenOption = opt.title[locale]
+        }
+      })
+      ballot[this.electionConfig.contestConfigs[contestRef].title[locale]] = chosenOption
+    })
+
+    return ballot
   }
 
   public async pollForCommitmentOpening() {
