@@ -1,7 +1,7 @@
 import axios from 'axios';
 import nock = require('nock');
 import { resetDeterminism } from './test_helpers';
-import { bulletinBoardHost, voterAuthorizerHost, OTPProviderHost } from './test_helpers'
+import { bulletinBoardHost, voterAuthorizerHost, OTPProviderHost, mailcatcherHost } from './test_helpers'
 import { prepareRecording } from './mock_helpers'
 
 import { AVVerifier } from '../lib/av_verifier';
@@ -48,8 +48,8 @@ describe('entire benaloh flow', () => {
   });
 
   it('spoils a ballot', recordable(USE_MOCK, async () => {
-    const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
-    const client = new AVClient('http://us-avx:3000/dbb/us/api');
+    const verifier = new AVVerifier(bulletinBoardHost + 'dbb/us/api');
+    const client = new AVClient(bulletinBoardHost + 'dbb/us/api');
 
     await verifier.initialize()
     await client.initialize(undefined, {
@@ -96,8 +96,8 @@ describe('entire benaloh flow', () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       // Setup
-      const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
-      const client = new AVClient('http://us-avx:3000/dbb/us/api');
+      const verifier = new AVVerifier(bulletinBoardHost + 'dbb/us/api');
+      const client = new AVClient(bulletinBoardHost + 'dbb/us/api');
       const trackingCode = await placeVote(client) as string
 
       // Find ballot a ballot with corresponding tracking code
@@ -124,8 +124,8 @@ describe('entire benaloh flow', () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       // Setup
-      const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
-      const client = new AVClient('http://us-avx:3000/dbb/us/api');
+      const verifier = new AVVerifier(bulletinBoardHost + 'dbb/us/api');
+      const client = new AVClient(bulletinBoardHost + 'dbb/us/api');
       const trackingCode = await placeVote(client) as string
       // Find ballot a ballot with corresponding tracking code
       const cryptogramAddress = await verifier.findBallot(trackingCode)
@@ -178,13 +178,13 @@ describe('entire benaloh flow', () => {
 
   async function extractOTPFromEmail() {
     await sleep(500);
-    const messages = await axios.get('http://localhost:1080/messages')
+    const messages = await axios.get(`${mailcatcherHost}messages`)
       .then((response) => response.data);
     if (messages.length == 0) {
       throw 'Email message with an OTP was not found';
     }
     const lastMessageId = messages[messages.length - 1].id;
-    const message = await axios.get(`http://localhost:1080/messages/${lastMessageId}.plain`)
+    const message = await axios.get(`${mailcatcherHost}messages/${lastMessageId}.plain`)
       .then((response) => response.data);
     const otpPattern = /\d{5}/g;
 

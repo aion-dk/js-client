@@ -1,6 +1,7 @@
 import nock = require('nock');
 import * as fs from 'fs';
 import * as path from 'path'
+import { mailcatcherHost } from './test_helpers'
 
 export function prepareRecording(namespace: string){
   function useRecordedResponse( scope: string, method: string, path: string ){
@@ -53,7 +54,7 @@ function saveFiles(namespace: string) {
   const indentationSpaces = 2
   nock.recorder.play().forEach(record => {
     // Exclude getting OTP code from email requests
-    if (record.scope == 'http://localhost:1080') {
+    if (record.scope == mailcatcherHost.replace(/\/$/, '')) {
       return;
     }
 

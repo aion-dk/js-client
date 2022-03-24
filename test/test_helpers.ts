@@ -4,10 +4,17 @@ import sinon = require('sinon');
 import * as fs from 'fs';
 import * as sjcl from '../lib/av_client/sjcl';
 
-export const bulletinBoardHost = 'http://us-avx:3000/';
-export const OTPProviderHost = 'http://otp-provider.local.assemblyvoting.net:1111/';
+function getEnvVar(name: string): string {
+  const variable = process.env[name]
+  if( variable ) return variable
+  throw new Error(`Missing expected environment variable ${name}`)
+}
+
+export const bulletinBoardHost = getEnvVar('AVX_URL')
+export const voterAuthorizerHost = getEnvVar('VOTER_AUTHORIZER_URL')
+export const OTPProviderHost = getEnvVar('OTP_PROVIDER_URL')
+export const mailcatcherHost = getEnvVar('MAILCATCHER_URL')
 export const OTPProviderElectionContextId = 'cca2b217-cedd-4d58-a103-d101ba472eb8';
-export const voterAuthorizerHost = 'http://authorizer.local.assemblyvoting.net:1234/';
 
 export const bbHost = {
   get_election_config: () => nock(bulletinBoardHost)
@@ -136,7 +143,7 @@ function saveFiles() {
   const indentationSpaces = 2;
   nock.recorder.play().forEach(function(record) {
     // Exclude getting OTP code from email requests
-    if (record.scope == 'http://localhost:1080') {
+    if (record.scope == mailcatcherHost.replace(/\/$/, '')) {
       return;
     }
     const filePath = filenameFromRequest(record.method, record.path);

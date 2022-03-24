@@ -25,7 +25,7 @@ describe('AVClient#validateAccessCode', () => {
     expectedNetworkRequests.push(bbHost.get_election_config());
     expectedNetworkRequests.push(vaHost.post_create_session());
 
-    client = new AVClient('http://us-avx:3000/dbb/us/api');
+    client = new AVClient(bulletinBoardHost + 'dbb/us/api');
     await client.initialize()
   });
 

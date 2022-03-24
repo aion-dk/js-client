@@ -6,7 +6,8 @@ import {
   resetDeterminism,
   bbHost,
   vaHost,
-  otpHost
+  otpHost,
+  bulletinBoardHost
 } from './test_helpers';
 import * as Crypto from '../lib/av_client/aion_crypto';
 
@@ -31,7 +32,7 @@ describe('AVClient#submitBallotCryptograms', () => {
     // nock(bulletinBoardHost).post('/mobile-api/us/submit_votes')
     //   .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_app_submit_votes.json');
 
-    client = new AVClient('http://us-avx:3000/dbb/us/api');
+    client = new AVClient(bulletinBoardHost + 'dbb/us/api');
     await client.initialize()
   });
 
