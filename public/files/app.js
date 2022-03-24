@@ -33,11 +33,12 @@ $(document).ready(() => {
           verifier.pollForCommitmentOpening().then(commitmentOpenings => {
             verifyKeyView.collapse("hide")
             window.clearInterval(timer)
-            const selections = verifier.decryptBallot()
+            let selections = verifier.decryptBallot()
+            selections = verifier.getReadableBallot(selections, 'en');
             var el = $("#choices")
             el.html()
             Object.keys(selections).forEach(key => {
-              el.append(`<li>Contest: ${key} - Choice: ${selections[key]}</li>`)
+              el.append(`<li>${key} -> ${selections[key]}</li>`)
             })
 
             $('#showChoices').collapse("show");
