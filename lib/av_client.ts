@@ -45,6 +45,7 @@ import { signPayload, validatePayload, validateReceipt } from './av_client/sign'
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
+import { hexToShortCode } from './av_client/short_codes';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -340,7 +341,10 @@ export class AVClient implements IAVClient {
     );
 
     this.ballotCryptogramItem = ballotCryptogramItem;
-    return verificationStartItem.shortAddress;
+
+    const trackingCode = hexToShortCode(verificationStartItem.shortAddress)
+
+    return trackingCode
   }
 
     /**
@@ -516,7 +520,8 @@ export class AVClient implements IAVClient {
       attempts++;
       if (result?.data?.verifier?.type === VERIFIER_ITEM) {
         this.verifierItem = result.data.verifier
-        return resolve(result.data.verifier.shortAddress);
+        const pairingCode = hexToShortCode(result.data.verifier.shortAddress)
+        return resolve(pairingCode);
       } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
         return reject(new TimeoutError('Exceeded max attempts'));
       } else  {

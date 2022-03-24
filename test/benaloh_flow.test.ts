@@ -7,6 +7,7 @@ import { prepareRecording } from './mock_helpers'
 import { AVVerifier } from '../lib/av_verifier';
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
+import { hexToShortCode } from '../lib/av_client/short_codes';
 
 const USE_MOCK = true;
 
@@ -30,8 +31,6 @@ describe('entire benaloh flow', () => {
         useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/votes'),
         useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/spoil'),
         useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/verification/verifier'),
-
-        // NOTE! The following requests need to be updated when a new recordings are done.
         useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/vote_track'),
         useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/verifier'),
         useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/spoil_status'),
@@ -71,10 +70,12 @@ describe('entire benaloh flow', () => {
     const [verifierItem] = await Promise.all([pollForSpoilPromise]);
 
     // The verifier found a spoil request and now submits it's public key in a VerifierItem
-    const veriferAddress = await client.waitForVerifierRegistration()
+    const clientPairingCode = await client.waitForVerifierRegistration()
+
+    const verifierPairingCode = hexToShortCode(verifierItem.shortAddress)
 
     // Emulating a pairing the app and verifier tracking codes
-    expect(verifierItem.shortAddress).to.eql(veriferAddress)
+    expect(verifierPairingCode).to.eql(clientPairingCode)
 
     // App creates the voterCommitmentOpening
     await client.challengeBallot()
