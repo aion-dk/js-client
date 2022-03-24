@@ -3,6 +3,7 @@ import nock = require('nock');
 import sinon = require('sinon');
 import * as fs from 'fs';
 import * as sjcl from '../lib/av_client/sjcl';
+import 'dotenv/config'
 
 function getEnvVar(name: string): string {
   const variable = process.env[name]
