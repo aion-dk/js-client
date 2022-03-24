@@ -98,9 +98,6 @@ export class AVVerifier {
       minMarks: 1,
       maxMarks: 1
     }
-
-    console.log('contest configt: ', this.electionConfig.contestConfigs);
-    console.log('ballot cryptograms', this.ballotCryptograms);
      
     return decrypt(
       this.electionConfig.contestConfigs,
