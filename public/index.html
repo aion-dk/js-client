@@ -21,9 +21,12 @@
       </div>
 
       <div class="row">
-        <div class="col-sm-12 col-md-6">
-          <h2>Step-by-Step Instructions</h1>
-          <p>It's simple. Follow these 4 simple steps:</p>
+        <div class="col-sm-12 col-md-6" style="margin: auto;">
+          <div class="text-center">
+            <h2>Step-by-Step Instructions</h1>
+              <p>It's simple. Follow these 4 simple steps:</p>
+          </div>
+
 
           <ol>
             <li>Enter the ballot checking code displayed in the Mark.It app.</li>
@@ -34,9 +37,10 @@
           </ol>
         </div>
 
-        <div class="col-sm-12 col-md-6">
+        <div class="col-sm-12 col-md-12">
+          <hr>
           <div class="container-fluid">
-            <form id="findBallot" action="#">
+            <form id="findBallot" class="collapse" action="#">
               <div class="text-center mb-4">
                 <span>Enter Ballot Checking Code:</span>
               </div>
@@ -48,27 +52,24 @@
               <button id="tracking-btn" class="btn btn-lg btn-primary btn-block" type="submit">ENTER</button>
             </form>
 
-            <hr>
-
-            <form id="submitVerifierKey" class="collapse" action="#">
+            <form id="submitTrackingCode" class="collapse" action="#">
               <div class="text-center mb-4">
                 <h2 class="h3 mb-3 font-weight-normal">Ballot found!</h2>
-              </div>
-              <p id="verification-code"></p>
-              <div class="form-label-group">
-                <p>Does the passkey displayed above match the passkey displayed in the Mark.It app? Tap <b>Yes</b> or <b>No</b> in the Mark.It app.</p>
-                <p>Your unsealed ballot will then display below.</p>
+                <p>Waiting for your choice in the Mark.It app.</p>
               </div>
             </form>
 
-            <hr>
+            <form id="submitVerifierKey" class="form-label-group collapse">
+              <p id="verification-code" style="text-align: center; font-weight: 400;"></p>
+              <p>Does the passkey displayed above match the passkey displayed in the Mark.It app? Tap <b>Yes</b> or <b>No</b> in the Mark.It app.</p>
+            </form>
 
             <div id="showChoices" class="collapse">
               <div class="text-center mb-4">
                 <h2 class="h3 mb-3 font-weight-normal">Ballot</h2>
               </div>
 
-              <div class="form-label-group">
+              <div class="form-label-group col-sm-12" style="margin: auto;">
                 <span class="template">Here is your unsealed ballot:</span>
 
                 <ol id="choices"></ol>

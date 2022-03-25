@@ -8,7 +8,7 @@ import { pointToVote } from "./vote_converter";
 
 import * as crypto from "../aion_crypto";
 import { MarkingType } from "../types";
-import Point from "./point";
+import {Point} from "./point";
 
 export const decryptVote = (markingType: MarkingType, cryptograms: string[], randomizers: string[], encryptionKey: string): string => {
 

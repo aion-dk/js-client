@@ -9,7 +9,7 @@ export interface IAVClient {
   spoilBallot(): Promise<string>
   castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
   purgeData(): void
-  challengeBallot(): void
+  challengeBallot(): Promise<void>
 }
 
 /**

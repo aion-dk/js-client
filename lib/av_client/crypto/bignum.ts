@@ -5,7 +5,7 @@ import * as sjcl from "../sjcl";
 
 /*eslint-disable @typescript-eslint/no-explicit-any*/
 
-export default class Bignum {
+export class Bignum {
   private bn: any;
 
   constructor(data: any) {
