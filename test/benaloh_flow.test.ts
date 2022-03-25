@@ -1,12 +1,13 @@
 import axios from 'axios';
 import nock = require('nock');
 import { resetDeterminism } from './test_helpers';
-import { bulletinBoardHost, voterAuthorizerHost, OTPProviderHost } from './test_helpers'
+import { bulletinBoardHost, voterAuthorizerHost, OTPProviderHost, mailcatcherHost } from './test_helpers'
 import { prepareRecording } from './mock_helpers'
 
 import { AVVerifier } from '../lib/av_verifier';
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
+import { hexToShortCode } from '../lib/av_client/short_codes';
 
 const USE_MOCK = true;
 
@@ -30,8 +31,6 @@ describe('entire benaloh flow', () => {
         useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/votes'),
         useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/spoil'),
         useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/verification/verifier'),
-
-        // NOTE! The following requests need to be updated when a new recordings are done.
         useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/vote_track'),
         useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/verifier'),
         useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/spoil_status'),
@@ -48,8 +47,8 @@ describe('entire benaloh flow', () => {
   });
 
   it('spoils a ballot', recordable(USE_MOCK, async () => {
-    const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
-    const client = new AVClient('http://us-avx:3000/dbb/us/api');
+    const verifier = new AVVerifier(bulletinBoardHost + 'dbb/us/api');
+    const client = new AVClient(bulletinBoardHost + 'dbb/us/api');
 
     await verifier.initialize()
     await client.initialize(undefined, {
@@ -71,10 +70,12 @@ describe('entire benaloh flow', () => {
     const [verifierItem] = await Promise.all([pollForSpoilPromise]);
 
     // The verifier found a spoil request and now submits it's public key in a VerifierItem
-    const veriferAddress = await client.waitForVerifierRegistration()
+    const clientPairingCode = await client.waitForVerifierRegistration()
+
+    const verifierPairingCode = hexToShortCode(verifierItem.shortAddress)
 
     // Emulating a pairing the app and verifier tracking codes
-    expect(verifierItem.shortAddress).to.eql(veriferAddress)
+    expect(verifierPairingCode).to.eql(clientPairingCode)
 
     // App creates the voterCommitmentOpening
     await client.challengeBallot()
@@ -96,8 +97,8 @@ describe('entire benaloh flow', () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       // Setup
-      const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
-      const client = new AVClient('http://us-avx:3000/dbb/us/api');
+      const verifier = new AVVerifier(bulletinBoardHost + 'dbb/us/api');
+      const client = new AVClient(bulletinBoardHost + 'dbb/us/api');
       const trackingCode = await placeVote(client) as string
 
       // Find ballot a ballot with corresponding tracking code
@@ -124,8 +125,8 @@ describe('entire benaloh flow', () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       // Setup
-      const verifier = new AVVerifier('http://us-avx:3000/dbb/us/api');
-      const client = new AVClient('http://us-avx:3000/dbb/us/api');
+      const verifier = new AVVerifier(bulletinBoardHost + 'dbb/us/api');
+      const client = new AVClient(bulletinBoardHost + 'dbb/us/api');
       const trackingCode = await placeVote(client) as string
       // Find ballot a ballot with corresponding tracking code
       const cryptogramAddress = await verifier.findBallot(trackingCode)
@@ -178,13 +179,13 @@ describe('entire benaloh flow', () => {
 
   async function extractOTPFromEmail() {
     await sleep(500);
-    const messages = await axios.get('http://localhost:1080/messages')
+    const messages = await axios.get(`${mailcatcherHost}messages`)
       .then((response) => response.data);
     if (messages.length == 0) {
       throw 'Email message with an OTP was not found';
     }
     const lastMessageId = messages[messages.length - 1].id;
-    const message = await axios.get(`http://localhost:1080/messages/${lastMessageId}.plain`)
+    const message = await axios.get(`${mailcatcherHost}messages/${lastMessageId}.plain`)
       .then((response) => response.data);
     const otpPattern = /\d{5}/g;
 

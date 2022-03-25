@@ -5,12 +5,12 @@ import { signPayload } from './av_client/sign';
 import { decrypt } from './av_client/decrypt_vote';
 import { isValidPedersenCommitment } from './av_client/crypto/pedersen_commitment';
 import { CommitmentOpening, VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap } from './av_client/types';
+import { shortCodeToHex } from './av_client/short_codes';
 
 import {
   fetchElectionConfig,
   validateElectionConfig
 } from './av_client/election_config';
-
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -54,7 +54,8 @@ export class AVVerifier {
   }
 
   public async findBallot(trackingCode: string): Promise<string> {
-    await this.bulletinBoard.getVotingTrack(trackingCode).then(response => {
+    const shortAddress = shortCodeToHex(trackingCode)
+    await this.bulletinBoard.getVotingTrack(shortAddress).then(response => {
       // TODO: Validate item payloads and receipt.... How can I validate the payload, when I dont know what to expect?
       // and verificationTrackStartItem === ballot checking code
       if (['voterCommitment', 'serverCommitment', 'ballotCryptograms', 'verificationTrackStart']

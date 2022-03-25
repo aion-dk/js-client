@@ -1,0 +1,43 @@
+{
+  "voterCommitmentOpening": {
+    "address": "c5f13d060317a8dd1c5a2866f0c200df5384d3ecbafa620c2b40942558f14739",
+    "author": "036ea8144ca6f1e7c6e6a2fa1cbbb14f68f2fc51878240a90d6bce954baeab1a6e",
+    "parentAddress": "c33552169d14ac8f303d9a002f2862c757654b247deea7c593ae269291d973ee",
+    "previousAddress": "cfe1b4e5d11c7e02aa7a52511b4cacc0a2899c005cc0a7a3fb7ec4da50001a71",
+    "content": {
+      "commitmentRandomness": "0c00000b00000a000009000008000007000006000005000004000003000002",
+      "randomizers": {
+        "contest ref 1": [
+          "0a000009000008000007000006000005000004000003000002000001000000"
+        ],
+        "contest ref 2": [
+          "0b00000a000009000008000007000006000005000004000003000002000001"
+        ]
+      }
+    },
+    "registeredAt": "2022-03-24T12:01:54.283Z",
+    "signature": "381cf0b09ba7ddce4bdd0a4e6aeb48d13ff88bceb9bef75786a4c5e4ed101082,352bb4abcdaa7eb883d2907dd54b5649315abfa3b58ccf31c6421f3f39cb5c7e",
+    "type": "VoterEncryptionCommitmentOpeningItem"
+  },
+  "boardCommitmentOpening": {
+    "address": "804cf25114378bd42855944bdaccaece815fef0e5c76468c89b6f09a0fe8d54c",
+    "author": "036ea8144ca6f1e7c6e6a2fa1cbbb14f68f2fc51878240a90d6bce954baeab1a6e",
+    "parentAddress": "c5f13d060317a8dd1c5a2866f0c200df5384d3ecbafa620c2b40942558f14739",
+    "previousAddress": "cfe1b4e5d11c7e02aa7a52511b4cacc0a2899c005cc0a7a3fb7ec4da50001a71",
+    "content": {
+      "commitmentRandomness": "417b2c7de68f1a774161b983a1da4863dd6ea4769b9101ea96c64416b3ef18a6",
+      "randomizers": {
+        "contest ref 1": [
+          "aff0f2aeec888ff589eb19dc8d021a7d06ee7216875b05fdcbcd6cc24a88d14e"
+        ],
+        "contest ref 2": [
+          "cc4aa0e98daa12a24f240f88b89449f73f1256199d0826664b64d7cc9b68f679"
+        ]
+      }
+    },
+    "registeredAt": "2022-03-24T12:01:54.302Z",
+    "signature": "165f195f370bbf6f15908c99b600e65ff15642603dd32b8acc6b883c1a9dc5a5,cf127d7b0f8932a0f14f041224419b83fd1687081d357685683482234b5f257c",
+    "type": "BoardEncryptionCommitmentOpeningItem"
+  },
+  "receipt": "cc61dd85169e626a6846275706a41812a2e6cd14d583c713e7b2a261e89e2033,f60d340607e7a6a6594ca38eb48fce9143079b01cc0a6ed5721761206ac569a9"
+}

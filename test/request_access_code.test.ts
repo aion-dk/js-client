@@ -4,6 +4,7 @@ import nock = require('nock');
 import {
   expectError,
   voterAuthorizerHost,
+  bulletinBoardHost,
   bbHost,
   vaHost
 } from './test_helpers';
@@ -22,7 +23,7 @@ describe('AVClient#requestAccessCode', () => {
   beforeEach(async () => {
     expectedNetworkRequests.push(bbHost.get_election_config());
 
-    client = new AVClient('http://us-avx:3000/dbb/us/api');
+    client = new AVClient(bulletinBoardHost + 'dbb/us/api');
     await client.initialize()
   });
 

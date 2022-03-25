@@ -1,0 +1,32 @@
+{
+  "vote": {
+    "address": "69448edc7869c31f580243a4a01605fc642626cf813c876d80e43c5e4715d7da",
+    "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
+    "parentAddress": "089c830c54a57731d3f8f630effdceed56db3eafb00fb44b294a90eb022001b3",
+    "previousAddress": "089c830c54a57731d3f8f630effdceed56db3eafb00fb44b294a90eb022001b3",
+    "content": {
+      "cryptograms": {
+        "contest ref 1": [
+          "02c90082d75fdc9693f28aea82eee5a3c0864b7adb8576a470a9a2c16af4f0b1bb,02747f6a207cf320a22b818c2fe7480a716501556d057a07217c68c3fba80b3868"
+        ],
+        "contest ref 2": [
+          "0249c38892bc2740f9343818de1ff03548691bdb182e0228e6844d849d780848fe,03d96dc4612c00f3e62a4da8faa6c0f5477f7c5c149f1b55bdedf96d6e7e9bdd1a"
+        ]
+      }
+    },
+    "registeredAt": "2022-03-24T12:01:53.456Z",
+    "signature": "350e76c006a3b5a59d5aea3312ae344154abf0aab175e3a035e5235a690edb04,1d6ad752a4c6cbb466c57b9eb3fec30650bdfa3e91faf2158f4ae4d4305016e3",
+    "type": "BallotCryptogramsItem"
+  },
+  "verification": {
+    "author": "036ea8144ca6f1e7c6e6a2fa1cbbb14f68f2fc51878240a90d6bce954baeab1a6e",
+    "address": "333cad4435f03ac147e96677149ea5634ae0877df34bbdfc663f1d205b88ea60",
+    "shortAddress": "333cad4435",
+    "parentAddress": "69448edc7869c31f580243a4a01605fc642626cf813c876d80e43c5e4715d7da",
+    "type": "VerificationStartItem",
+    "content": {},
+    "signature": "49adfd4dc3a08c1129e7f6d72c82815a1ab8950b118befc24f07c9bfea260e30,f57febd16ef2c9b2546b2d445fdfda5351303928c0d7a7f647a26179437db2b5",
+    "registeredAt": "2022-03-24T13:01:53.473+01:00"
+  },
+  "receipt": "f7bb0de168886b1f14a50b5c2243fc3f1d1019f44f434c9a21a5e66fa38d292c,9f23eafa7bc02cd16dfed8cfa199f8f44f1e8332c921332f37590fe552d61eea"
+}
