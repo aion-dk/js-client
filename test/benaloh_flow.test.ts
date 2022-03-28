@@ -67,12 +67,12 @@ describe('entire benaloh flow', () => {
 
     await client.spoilBallot();
 
-    const [verifierItem] = await Promise.all([pollForSpoilPromise]);
+    const [verfierPairingCode] = await Promise.all([pollForSpoilPromise]);
 
     // The verifier found a spoil request and now submits it's public key in a VerifierItem
     const clientPairingCode = await client.waitForVerifierRegistration()
 
-    const verifierPairingCode = hexToShortCode(verifierItem.shortAddress)
+    const verifierPairingCode = verfierPairingCode
 
     // Emulating a pairing the app and verifier tracking codes
     expect(verifierPairingCode).to.eql(clientPairingCode)

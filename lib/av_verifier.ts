@@ -5,7 +5,7 @@ import { signPayload } from './av_client/sign';
 import { decrypt } from './av_client/decrypt_vote';
 import { isValidPedersenCommitment } from './av_client/crypto/pedersen_commitment';
 import { CommitmentOpening, VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap } from './av_client/types';
-import { shortCodeToHex } from './av_client/short_codes';
+import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 
 import {
   fetchElectionConfig,
@@ -70,7 +70,7 @@ export class AVVerifier {
     return this.cryptogramAddress
   }
 
-  public async submitVerifierKey(spoilRequestAddress: string): Promise<VerifierItem> {
+  public async submitVerifierKey(spoilRequestAddress: string): Promise<string> {
     const keyPair = randomKeyPair()
     this.verifierPrivateKey = keyPair.privateKey
 
@@ -86,7 +86,8 @@ export class AVVerifier {
     // TODO: Validate payload and receipt
     // check verifierItem.previousAddress === verificationTrackStartItem address
     this.verifierItem = (await this.bulletinBoard.submitVerifierItem(signedVerifierItem)).data.verifier
-    return this.verifierItem
+    const pairingCode = hexToShortCode(this.verifierItem.shortAddress)
+    return pairingCode
   }
 
   public decryptBallot() {

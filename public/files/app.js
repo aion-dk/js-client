@@ -22,13 +22,12 @@ $(document).ready(() => {
         window.clearInterval(timer)
         trackingCodeEl.collapse("hide")        
         
-        verifier.submitVerifierKey(spoilRequestAddress).then(verifierItem => {
+        verifier.submitVerifierKey(spoilRequestAddress).then(pairingCode => {
           const verifyKeyView = $("#submitVerifierKey");
           verifyKeyView.collapse("show")
           startTimer(30, verifyKeyView)
 
-          console.log(verifierItem);
-          verifyKeyView.find("#verification-code")[0].innerHTML = verifierItem.shortAddress
+          verifyKeyView.find("#verification-code")[0].innerHTML = pairingCode
 
           verifier.pollForCommitmentOpening().then(commitmentOpenings => {
             verifyKeyView.collapse("hide")
