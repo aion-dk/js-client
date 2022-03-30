@@ -51,8 +51,8 @@ describe('entire voter flow using OTP authorization', () => {
         publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
       });
 
-      const voterId = 'A00000000006'
-      const voterEmail = 'mvptuser@yahoo.com'
+      const voterId = 'B00000000001'
+      const voterEmail = 'markitmarchtest@osetinstitute.org'
       await client.requestAccessCode(voterId, voterEmail).catch((e) => {
         console.error(e);
         expect.fail('AVClient#requestAccessCode failed.');

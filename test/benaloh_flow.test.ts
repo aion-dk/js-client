@@ -89,66 +89,20 @@ describe('entire benaloh flow', () => {
       'contest ref 2': 'option ref 3'
     });
 
+    const readableBallot = verifier.getReadableBallot(votes, "en")
+
+    expect(readableBallot).to.eql({
+      'Second ballot': 'Option 3', 
+      'First ballot': 'Option 1'
+    });
+
     if( USE_MOCK ) expectedNetworkRequests.forEach((mock) => mock.done());
 
   })).timeout(10000);
 
-  it.skip('cannot spoil ballot because it has already been cast', async () => {
-    // For recording, remember to reset AVX database and update oneTimePassword fixture value
-    const performTest = async () => {
-      // Setup
-      const verifier = new AVVerifier(bulletinBoardHost + 'dbb/us/api');
-      const client = new AVClient(bulletinBoardHost + 'dbb/us/api');
-      const trackingCode = await placeVote(client) as string
-
-      // Find ballot a ballot with corresponding tracking code
-      const cryptogramAddress = await verifier.findBallot(trackingCode)
-
-      // Casting ballot rather than spoiling
-      await client.castBallot()
-
-      // We should have found a ballot
-      expect(cryptogramAddress.length).to.eql(64)
-
-      // We should receive an error which tells us the ballot we are trying to spoil has already been cast
-      const spoilRequest = await verifier.pollForSpoilRequest().catch(error => {
-        expect(error.message).to.eql('Ballot has been cast and cannot be spoiled')
-      })
-
-      expect(spoilRequest).to.eql(undefined)
-    }
-
-    await performTest()
-  }).timeout(10000);
-
-  it.skip('finds a ballot but spoil request isnt registered in time', async () => {
-    // For recording, remember to reset AVX database and update oneTimePassword fixture value
-    const performTest = async () => {
-      // Setup
-      const verifier = new AVVerifier(bulletinBoardHost + 'dbb/us/api');
-      const client = new AVClient(bulletinBoardHost + 'dbb/us/api');
-      const trackingCode = await placeVote(client) as string
-      // Find ballot a ballot with corresponding tracking code
-      const cryptogramAddress = await verifier.findBallot(trackingCode)
-
-      // We should have found a ballot
-      expect(cryptogramAddress.length).to.eql(64)
-
-      // We should receive an error which tells us the ballot we are looking for has no spoil request
-      const spoilRequest = await verifier.pollForSpoilRequest().catch(error => {
-        expect(error.message).to.eql('Exceeded max attempts')
-      })
-
-      expect(spoilRequest).to.eql(undefined)
-    }
-    
-    await performTest()
-      
-  }).timeout(10000);
-
   async function placeVote(client: AVClient) {
-    const voterId = 'A00000000006'
-    const voterEmail = 'mvptuser@yahoo.com'
+    const voterId = 'B00000000001'
+    const voterEmail = 'markitmarchtest@osetinstitute.org'
     await client.requestAccessCode(voterId, voterEmail).catch((e) => {
       console.error(e);
     });

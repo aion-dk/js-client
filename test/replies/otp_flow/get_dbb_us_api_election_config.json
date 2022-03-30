@@ -1,18 +1,18 @@
 {
   "electionConfig": {
-    "dbbPublicKey": "036ea8144ca6f1e7c6e6a2fa1cbbb14f68f2fc51878240a90d6bce954baeab1a6e",
-    "encryptionKey": "024307bc80e06d6ccbbb133ba6ad4114e4c0ca37642be42055eda87e2b277134cc",
+    "dbbPublicKey": "039acf6efbbdde5444c6ab88bd8389feac38fb9f79f4d3c47e69ae19d6ad368351",
+    "encryptionKey": "0314290ed03437f925b1c6b8bb88735ed74ea4fb8b3ff36ab5a8ffd87e142c41d7",
     "services": {
-      "address": "7fb50f088cb275cb2378206836de152f39bbfcc016cbaa70cae2fc299239cd64",
+      "address": "fad5df82ad47f5513fb2ea427ba7614d312a94d2d6860700d77bade00e45e079",
       "voterAuthorizer": {
-        "electionContextUuid": "bf629650-3674-4ed4-b225-f8519743cb64",
-        "publicKey": "020cbe3947f68b2adc583a20af6d3dcec36c7936d0aef2e0e3777b667196cde930",
-        "url": "http://voter-authorizer:3000/"
+        "electionContextUuid": "414f5f77-6aca-4c80-b21b-6570164a921e",
+        "publicKey": "02d3931002e2d53f49343a6f2e0c823a22bad358c9e5fa24a8b1720960b45a4174",
+        "url": "http://voter-authorizer:3002/"
       },
       "otpProvider": {
-        "electionContextUuid": "05d94860-5ccc-40c5-a89b-04f0f654cc3c",
-        "publicKey": "02c5dc48ff875838f86a28c4286792439a10ce80d345cf438e2d13cd113f9107f0",
-        "url": "http://otp-provider:3000/"
+        "electionContextUuid": "633ec492-b850-4a32-9205-df767383283d",
+        "publicKey": "020a13213ec3b604bff14b6bdcc3c34cb11b1f0f418f3dee61a15aabae8d212913",
+        "url": "http://otp-provider:3001/"
       }
     },
     "ballotConfigs": {
@@ -99,5 +99,5 @@
       }
     }
   },
-  "receipt": "af54c788c50027fa9a587bc73406b4ccc69ac268e2eab2eb31cb0757c92b99a7,206bb31fd18eee173e7ec08c443af4b035a0d3e490b7ce623bcdee6f4b9f3e9b"
+  "receipt": "1bda6067a28d3e2f845e4b7e848ed139c6a27b47db988f680b7374092aa7caf8,c5049c968ce6c517f52dc4da447c9fd4b2f72490c554aa5059bbd4911405265f"
 }

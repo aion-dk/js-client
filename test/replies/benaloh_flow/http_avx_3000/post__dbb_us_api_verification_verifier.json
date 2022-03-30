@@ -1,15 +1,15 @@
 {
   "verifier": {
-    "author": "036ea8144ca6f1e7c6e6a2fa1cbbb14f68f2fc51878240a90d6bce954baeab1a6e",
-    "address": "c33552169d14ac8f303d9a002f2862c757654b247deea7c593ae269291d973ee",
-    "shortAddress": "c33552169d",
-    "parentAddress": "cfe1b4e5d11c7e02aa7a52511b4cacc0a2899c005cc0a7a3fb7ec4da50001a71",
+    "author": "0332570bf64ffeacfd8327bfa347975c77323014487fb4066fa97266fcf949ef26",
+    "address": "266ee3c2cad738f4119e7ac790a37014dad0b44d618da46fe09ae8225f1ed6e9",
+    "shortAddress": "266ee3c2ca",
+    "parentAddress": "8c7c95d52fc48b3bcde0c6247927641f54bae20b491634c010d7b5414bfc9b58",
     "type": "VerifierItem",
     "content": {
       "publicKey": "034e4f6245a96d8b352c9dfaab21ae9cd76cc775bd4cf37fb6fe9a4d16544110d3"
     },
-    "signature": "80884201d62eaaf07044f9166f5c1727f9f96c356c9936d3c28096b606936534,d9e12584533b6348e7571b7def2ea2ea4bb9381ae6b6904e5e76b96f2b428b85",
-    "registeredAt": "2022-03-24T13:01:54.176+01:00"
+    "signature": "53f9a4d5a63db7d61073fe8c52491b8a1b6e50be62daf5302d581db3ec1ab496,361c1266319698ba0322fc140f6e4589a5856c4d367af1235fecf8596a74968f",
+    "registeredAt": "2022-03-30T13:35:41.197+02:00"
   },
-  "receipt": "ac8ae4c3eea8a296a14d91aabd343e68aeb8213f265d5322bfaccd3aba734e14,b96305b5c4e97485109f289212135d070784f7a9b80719fa925441949f56edc8"
+  "receipt": "d031839e62acefe27ab4411e4c062f65bb81155fb0337edcd935b42ccb3ba18a,bfda4a6045c2d8eb8b1252f9fd733a87f8bff5b519c919dd12b2977e210a80ba"
 }
