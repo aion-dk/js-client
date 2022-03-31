@@ -87,7 +87,7 @@ const defaultMarkingType = {
 describe('decryptBallot', () => {
   context('given valid CVR', () => {
     it('decrypts a ballot', async () => {
-      let decryptedBallot = decrypt(
+      const decryptedBallot = decrypt(
         contestConfig,
         defaultMarkingType,
         encryptionKey,
