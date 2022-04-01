@@ -1,5 +1,5 @@
-import { decrypt } from "../lib/av_client/decrypt_vote";
-import { ContestConfig } from "../lib/av_client/types";
+import { decrypt } from "../../lib/av_client/decrypt_vote";
+import { ContestConfig } from "../../lib/av_client/types";
 import { expect } from 'chai';
 const contestConfig : ContestConfig= {
   "contest ref 1": {
