@@ -11,7 +11,7 @@ import {
   fetchElectionConfig,
   validateElectionConfig
 } from './av_client/election_config';
-import { InvalidTrackingCodeError } from './av_client/errors';
+import { InvalidContestError, InvalidOptionError, InvalidTrackingCodeError } from './av_client/errors';
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -154,11 +154,17 @@ export class AVVerifier {
     const ballot = {}
     Object.keys(decryptedBallot).forEach((contestRef) => {
       let chosenOption = ""
+      if (!this.electionConfig.contestConfigs[contestRef]) {
+        throw new InvalidContestError("Contest is not present in the election")
+      } 
       this.electionConfig.contestConfigs[contestRef].options.forEach((opt) => {
         if (opt.reference === decryptedBallot[contestRef]) {
           chosenOption = opt.title[locale]
         }
       })
+      if (!chosenOption) {
+        throw new InvalidOptionError("Option is not present in the contest")
+      }
       ballot[this.electionConfig.contestConfigs[contestRef].title[locale]] = chosenOption
     })
 

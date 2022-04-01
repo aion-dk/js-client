@@ -138,3 +138,21 @@ export class InvalidTrackingCodeError extends AvClientError {
     Object.setPrototypeOf(this, InvalidTrackingCodeError.prototype);
   }
 }
+
+export class InvalidContestError extends AvClientError {
+  readonly name = "InvalidContestError";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, InvalidContestError.prototype);
+  }
+}
+
+export class InvalidOptionError extends AvClientError {
+  readonly name = "InvalidOptionError";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, InvalidOptionError.prototype);
+  }
+}
