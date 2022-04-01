@@ -130,3 +130,11 @@ export class VoterSessionTimeoutError extends AvClientError {
     Object.setPrototypeOf(this, VoterSessionTimeoutError.prototype);
   }
 }
+export class InvalidTrackingCodeError extends AvClientError {
+  readonly name = "InvalidTrackingCodeError";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, InvalidTrackingCodeError.prototype);
+  }
+}
