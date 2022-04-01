@@ -50,12 +50,12 @@ export function dhDecrypt(decryptionKeyHex: string, payload: Payload){
 
 export class Payload {
   public curveName: string
-  public ciphertext: any
-  public tag: any
-  public iv: any
-  public ephemeralPublicKey: any
+  public ciphertext
+  public tag
+  public iv
+  public ephemeralPublicKey
 
-  constructor(ciphertext: any, tag: any, iv: any, ephemeralPublicKey: any){
+  constructor(ciphertext, tag, iv, ephemeralPublicKey){
     this.ciphertext = ciphertext
     this.tag = tag
     this.iv = iv
@@ -75,7 +75,7 @@ export class Payload {
 
 // --------- Private functions ---------
 
-function encrypt(symmetricKey: any, message: string){
+function encrypt(symmetricKey, message: string){
   const prf = new sjcl.cipher.aes(symmetricKey);
   const plaintext = sjcl.codec.utf8String.toBits(message)
   const iv = sjcl.bitArray.clamp(sjcl.random.randomWords(4), 12 * 8)
@@ -91,7 +91,7 @@ function encrypt(symmetricKey: any, message: string){
   return [ciphertext, tag, iv]
 }
 
-function decrypt(symmetricKey: any, ciphertext: any, tag: any, iv: any){
+function decrypt(symmetricKey, ciphertext, tag, iv){
   const prf = new sjcl.cipher.aes(symmetricKey);
   const ciphertextAndTag = sjcl.bitArray.concat(ciphertext, tag)
   const adata = ''
@@ -101,7 +101,7 @@ function decrypt(symmetricKey: any, ciphertext: any, tag: any, iv: any){
   return sjcl.codec.utf8String.fromBits(plaintext)
 }
 
-function deriveKey(privateKey: any, publicKey: any){
+function deriveKey(privateKey, publicKey){
   const sharedSecret = privateKey.dhJavaEc(publicKey)
   const keyLength = 256
   const salt = ''
