@@ -33,7 +33,7 @@ describe('getReadbleBallot', () => {
 
   context('given a contest thats not present  in the election config', () => {
     const decryptedBallot = {
-      'contest ref 3': 'option ref 1',
+      'not present': 'option ref 1',
       'contest ref 2': 'option ref 3'
     };
 
@@ -44,7 +44,7 @@ describe('getReadbleBallot', () => {
 
   context('given a option thats not present in the contest', () => {
     const decryptedBallot = {
-      'contest ref 1': 'option ref 7',
+      'contest ref 1': 'not present',
       'contest ref 2': 'option ref 3'
     };
     
