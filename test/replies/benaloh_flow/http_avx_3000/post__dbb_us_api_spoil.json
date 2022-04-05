@@ -1,24 +1,24 @@
 {
   "spoilRequest": {
-    "address": "8c7c95d52fc48b3bcde0c6247927641f54bae20b491634c010d7b5414bfc9b58",
+    "address": "3e082c57c7f8aea656cfe9e1ea9df65205036d52dab5bd63f5e4b5022d96b117",
     "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
-    "parentAddress": "d4f18b8bde2edf6d574f2f5013db2f9a8da226bcd71dc557b5cc9f859afbaa8b",
-    "previousAddress": "d4f18b8bde2edf6d574f2f5013db2f9a8da226bcd71dc557b5cc9f859afbaa8b",
+    "parentAddress": "a89bcfb67247f645f54ec5849058c8b82af0ab51f895b5dbf49a5f84fc816683",
+    "previousAddress": "a89bcfb67247f645f54ec5849058c8b82af0ab51f895b5dbf49a5f84fc816683",
     "content": {},
-    "registeredAt": "2022-03-30T11:35:40.634Z",
-    "signature": "1d532b6fb34af0bc70688366648439e11c454b38ea7f3c205efa91eab5683f3a,ff8705ef7eaf4bb4bac174d9c66adf3d350682229747cbb064dd866545e2fcca",
+    "registeredAt": "2022-04-05T07:35:16.656Z",
+    "signature": "72d1094fd663de1616692a2b987bfdcfaf1ea733a8d1348f7aa245f7e14e8066,61b383046246b70657247a169d7b04b0433f762f694236c434b29a22afd431fa",
     "type": "SpoilRequestItem"
   },
-  "receipt": "ca841e1f0d4114f9eb17014c9aa9fb2eb082aa72b716bdc0c0843c18c09a98bf,e8f446bd381602b0e6403b18d76a63620226b2fd9bd478ac52eed69d3f20d615",
+  "receipt": "be2f668d132a1a99bc1b91bc1c8ad608a0b63ddbe7e021ab4b533043ae4ca413,138ef85b249bd36b33c78bfe5f1e9f889aadfeea9fad0bfaf61056787f77e2c7",
   "boardCommitmentOpening": {
     "randomizers": {
       "contest ref 1": [
-        "fdb68ae6b3db7ba7cf532d2951af6acc86d502d911541d9f9403b8f9d4f61085"
+        "ef0b5e958e493d0b5fe61d24f58b87959a692f483e1f718bf3559fc0d8071d93"
       ],
       "contest ref 2": [
-        "bc7b696215ae0296de10e45bef1f60059fe44d1ac5937d47071b2e3a7c3c4f67"
+        "5715acc34b151ec633e6b77e64c630b287723282892522e020e1a61d0416a08f"
       ]
     },
-    "commitmentRandomness": "5f45277ee8ee442552f600ec1397c5a4802127b4f5a6c50b1fb3b2d2aab5b19a"
+    "commitmentRandomness": "27777dce25b9821567ce415b4bbac07b4af4320919798285870b55df014491f2"
   }
 }
