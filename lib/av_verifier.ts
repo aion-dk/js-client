@@ -3,15 +3,14 @@ import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUES
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
 import { decrypt } from './av_client/decrypt_vote';
-import { isValidPedersenCommitment } from './av_client/crypto/pedersen_commitment';
-import { CommitmentOpening, VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap, EncryptedCommitmentOpening } from './av_client/types';
+import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap } from './av_client/types';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
-import { dhDecrypt, Payload } from './av_client/crypto/aes';
 
 import {
   fetchElectionConfig,
   validateElectionConfig
 } from './av_client/election_config';
+import { decryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -92,11 +91,15 @@ export class AVVerifier {
   }
 
   public decryptBallot() {
-    const boardCommitmentOpening = this.decryptCommitmentOpening(this.boardCommitmentOpening.content.commitmentOpening)
-    const voterCommitmentOpening = this.decryptCommitmentOpening(this.voterCommitmentOpening.content.commitmentOpening)
+    if( !this.verifierPrivateKey ){
+      throw new Error('Verifier private key not present')
+    }
 
-    this.validateBoardCommitmentOpening(boardCommitmentOpening, this.boardCommitment);
-    this.validateVoterCommitmentOpening(voterCommitmentOpening, this.voterCommitment);
+    const boardCommitmentOpening = decryptCommitmentOpening(this.verifierPrivateKey, this.boardCommitmentOpening.content.commitmentOpening)
+    const voterCommitmentOpening = decryptCommitmentOpening(this.verifierPrivateKey, this.voterCommitmentOpening.content.commitmentOpening)    
+
+    validateCommmitmentOpening(boardCommitmentOpening, this.boardCommitment, 'Board commitment not valid')
+    validateCommmitmentOpening(voterCommitmentOpening, this.voterCommitment, 'Voter commitment not valid')
 
     const defaultMarkingType = {
       style: "regular",
@@ -113,29 +116,6 @@ export class AVVerifier {
       boardCommitmentOpening,
       voterCommitmentOpening
     )
-  }
-
-  private validateBoardCommitmentOpening(commitmentOpening: CommitmentOpening, commitment: string) {
-    if(!this.validateCommitmentOpening(commitmentOpening, commitment))
-      throw new Error("The board lied!!!");
-  }
-
-  private validateVoterCommitmentOpening(commitmentOpening: CommitmentOpening, commitment: string) {
-    if(!this.validateCommitmentOpening(commitmentOpening, commitment))
-      throw new Error("The voter lied!!!");
-  }
-
-  private validateCommitmentOpening(commitmentOpening: CommitmentOpening, commitment: string): boolean {
-    return isValidPedersenCommitment(commitment, commitmentOpening.randomizers, commitmentOpening.commitmentRandomness);
-  }
-
-  private decryptCommitmentOpening( encryptedCommitmentOpening: EncryptedCommitmentOpening ): CommitmentOpening {
-    if( !this.verifierPrivateKey ){
-      throw new Error("Verifier private key not present")
-    }
-
-    const payload = Payload.fromString(encryptedCommitmentOpening)
-    return JSON.parse(dhDecrypt(this.verifierPrivateKey, payload))
   }
 
   public async pollForSpoilRequest(): Promise<string> {

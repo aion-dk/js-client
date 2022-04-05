@@ -47,8 +47,7 @@ import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
 import { hexToShortCode } from './av_client/short_codes';
-import { dhEncrypt } from './av_client/crypto/aes'
-import { isValidPedersenCommitment } from './av_client/crypto/pedersen_commitment';
+import { encryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -416,14 +415,11 @@ export class AVClient implements IAVClient {
 
     const { spoilRequest, receipt, boardCommitmentOpening } = response.data;
 
-    if( !isValidPedersenCommitment(this.boardCommitment.content.commitment, boardCommitmentOpening.randomizers, boardCommitmentOpening.commitmentRandomness) ){
-      throw new Error('Board commitment opening is not valid')
-    }
-
     this.spoilRequest = spoilRequest
 
     validatePayload(spoilRequest, spoilRequestItem);
     validateReceipt([spoilRequest], receipt, this.getDbbPublicKey());
+    validateCommmitmentOpening(boardCommitmentOpening, this.boardCommitment.content.commitment, 'Board commitment is not valid')
 
     return spoilRequest.address
   }
@@ -442,13 +438,11 @@ export class AVClient implements IAVClient {
       throw new InvalidStateError('Cannot challenge ballot, no user session')
     }
 
-    const payload = dhEncrypt(this.verifierItem.content.publicKey, JSON.stringify(this.voterCommitmentOpening))
-
     const voterCommitmentOpeningItem = {
       parentAddress: this.verifierItem.address,
       type: VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM,
       content: {
-        commitmentOpening: payload.toString()
+        commitmentOpening: encryptCommitmentOpening(this.verifierItem.content.publicKey, this.voterCommitmentOpening)
       }
     }
 
