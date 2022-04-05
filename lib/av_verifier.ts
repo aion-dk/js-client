@@ -4,9 +4,8 @@ import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
 import { decrypt } from './av_client/decrypt_vote';
 import { isValidPedersenCommitment } from './av_client/crypto/pedersen_commitment';
-import { CommitmentOpening, VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap, EncryptedCommitmentOpening } from './av_client/types';
+import { CommitmentOpening, VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap } from './av_client/types';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
-import { dhDecrypt, Payload } from './av_client/crypto/aes';
 
 import {
   fetchElectionConfig,
@@ -92,11 +91,8 @@ export class AVVerifier {
   }
 
   public decryptBallot() {
-    const boardCommitmentOpening = this.decryptCommitmentOpening(this.boardCommitmentOpening.content.commitmentOpening)
-    const voterCommitmentOpening = this.decryptCommitmentOpening(this.voterCommitmentOpening.content.commitmentOpening)
-
-    this.validateBoardCommitmentOpening(boardCommitmentOpening, this.boardCommitment);
-    this.validateVoterCommitmentOpening(voterCommitmentOpening, this.voterCommitment);
+    this.validateBoardCommitmentOpening(this.boardCommitmentOpening.content, this.boardCommitment);
+    this.validateVoterCommitmentOpening(this.voterCommitmentOpening.content, this.voterCommitment);
 
     const defaultMarkingType = {
       style: "regular",
@@ -104,14 +100,14 @@ export class AVVerifier {
       minMarks: 1,
       maxMarks: 1
     }
-
+     
     return decrypt(
       this.electionConfig.contestConfigs,
       defaultMarkingType,
       this.electionConfig.encryptionKey,
-      this.ballotCryptograms.content.cryptograms,
-      boardCommitmentOpening,
-      voterCommitmentOpening
+      this.ballotCryptograms.content.cryptograms, 
+      this.boardCommitmentOpening.content, 
+      this.voterCommitmentOpening.content
     )
   }
 
@@ -127,15 +123,6 @@ export class AVVerifier {
 
   private validateCommitmentOpening(commitmentOpening: CommitmentOpening, commitment: string): boolean {
     return isValidPedersenCommitment(commitment, commitmentOpening.randomizers, commitmentOpening.commitmentRandomness);
-  }
-
-  private decryptCommitmentOpening( encryptedCommitmentOpening: EncryptedCommitmentOpening ): CommitmentOpening {
-    if( !this.verifierPrivateKey ){
-      throw new Error("Verifier private key not present")
-    }
-
-    const payload = Payload.fromString(encryptedCommitmentOpening)
-    return JSON.parse(dhDecrypt(this.verifierPrivateKey, payload))
   }
 
   public async pollForSpoilRequest(): Promise<string> {

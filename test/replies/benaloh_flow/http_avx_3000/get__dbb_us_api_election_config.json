@@ -1,28 +1,28 @@
 {
   "electionConfig": {
-    "dbbPublicKey": "035a44966c1b57e0984f86f6e42a391a254d000845bda653b2561798b99486e01b",
-    "encryptionKey": "023909a883a926e1817a8bdf37aef3226313ba6279729b590e3977fd3987382ca8",
+    "dbbPublicKey": "0332570bf64ffeacfd8327bfa347975c77323014487fb4066fa97266fcf949ef26",
+    "encryptionKey": "023ceebd2b484f087a231c0f34b897ab352d04b5b213586209269b8b519261fa9e",
     "services": {
-      "address": "8b32e5824735b183134526c7d9e72b57dfc76a99bea01c40e36c1c586c7fb9ed",
+      "address": "ad6533ecf1562abb8dd07ae883611d06f3da379aaf65193b5e14521795af3c23",
       "voterAuthorizer": {
-        "electionContextUuid": "7634d711-2877-42a8-8d1d-d754fcb9a894",
-        "publicKey": "0332f900bab8f24501800a4ffc26702c84ba4aeeead5ae9f85bfb2dd51c811efce",
+        "electionContextUuid": "e4db9c60-c0f6-450f-9023-bebdda8eb420",
+        "publicKey": "03508e07484f5cc6114b764ac0f6b31c4babca5c8bd8568e5831215b78b62f381b",
         "url": "http://voter-authorizer:3002/"
       },
       "otpProvider": {
-        "electionContextUuid": "8b146778-a2d4-4bbe-b90a-a19dda014648",
-        "publicKey": "0320f6d642ade9f4baf07ff60b0c5ecfcafd1e12af24cb6fcf8d63840a5a051963",
+        "electionContextUuid": "03c6d830-2754-4ab2-98c2-1a42e184dcd6",
+        "publicKey": "03537efcbc5e7c4b97768c1ef3d1479457dde6ec21aa1e00f4230565a4f8662b97",
         "url": "http://otp-provider:3001/"
       }
     },
     "ballotConfigs": {
-      "precinct_4_bedrock": {
+      "3": {
         "contestReferences": [
           "contest ref 1",
           "contest ref 2"
         ]
       },
-      "precinct_3_spaceport": {
+      "4": {
         "contestReferences": [
           "contest ref 1",
           "contest ref 2"
@@ -30,36 +30,6 @@
       }
     },
     "contestConfigs": {
-      "contest ref 1": {
-        "markingType": {
-          "style": "regular",
-          "codeSize": 1,
-          "minMarks": 1,
-          "maxMarks": 1
-        },
-        "options": [
-          {
-            "reference": "option ref 1",
-            "code": 1,
-            "title": {
-              "en": "Option 1"
-            }
-          },
-          {
-            "reference": "option ref 2",
-            "code": 2,
-            "title": {
-              "en": "Option 2"
-            }
-          }
-        ],
-        "title": {
-          "en": "First ballot"
-        },
-        "resultType": {
-          "name": "resultType name not matter right now"
-        }
-      },
       "contest ref 2": {
         "markingType": {
           "style": "regular",
@@ -96,8 +66,38 @@
         "resultType": {
           "name": "resultType name not matter right now"
         }
+      },
+      "contest ref 1": {
+        "markingType": {
+          "style": "regular",
+          "codeSize": 1,
+          "minMarks": 1,
+          "maxMarks": 1
+        },
+        "options": [
+          {
+            "reference": "option ref 1",
+            "code": 1,
+            "title": {
+              "en": "Option 1"
+            }
+          },
+          {
+            "reference": "option ref 2",
+            "code": 2,
+            "title": {
+              "en": "Option 2"
+            }
+          }
+        ],
+        "title": {
+          "en": "First ballot"
+        },
+        "resultType": {
+          "name": "resultType name not matter right now"
+        }
       }
     }
   },
-  "receipt": "b637772e2dc5299bd2c7b360296ffe3b46a3152274aefae8f26f594648d3d4ba,71a2414c70ada52d57691962686865f172b2062f5ffa64c9fd7bacf53cf8c93e"
+  "receipt": "b68ac1bfa556ea782d7b11a2a1737227c0a0c1d41296f08614629e89377e4cbe,fa6bb066dd712fabcf1b1f8d3aa6c77b5ca46c4f39b56d6e8b5e1e7678baacda"
 }

@@ -77,8 +77,8 @@ export class BulletinBoard {
     return this.backend.post('verification/verifier', signedVerifierItem)
   }
 
-  submitCommitmentOpenings(signedVoterCommitmentOpeningItem): Promise<AxiosResponse> {
-    return this.backend.post('verification/commitment_openings', signedVoterCommitmentOpeningItem, {
+  submitCommitmentOpenings(content): Promise<AxiosResponse> {
+    return this.backend.post('verification/commitment_openings', content, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }
