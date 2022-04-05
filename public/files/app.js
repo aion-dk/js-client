@@ -1,7 +1,7 @@
 
 const urlSearchParams = new URLSearchParams(window.location.search);
 const params = Object.fromEntries(urlSearchParams.entries());
-const verifier = new AssemblyVoting.AVVerifier(`https://web.us-avx.dev.container.assembly-voting.com`);
+const verifier = new AssemblyVoting.AVVerifier(`https://web.us-avx.dev.container.assembly-voting.com/dbb/${params["slug"]}/api`);
 verifier.initialize()
 
 $(document).ready(() => {
