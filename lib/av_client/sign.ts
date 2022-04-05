@@ -1,6 +1,5 @@
 import { BoardItem, ContestMap, ItemExpectation, OpenableEnvelope } from './types'
 import * as Crypto from './aion_crypto';
-import * as sjcl from './sjcl';
 import {Uniformer} from '../util/uniformer';
 
 
