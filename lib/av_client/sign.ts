@@ -14,15 +14,6 @@ export type AffidavitConfig = {
   encryptionKey: string;
 }
 
-export function encryptAES(payload: string, encryptionConfig: AffidavitConfig): string {
-  const pubKey = new sjcl.ecc.elGamal.publicKey(
-    sjcl.ecc.curves[encryptionConfig.curve],
-    Crypto.pointFromBits(sjcl.codec.hex.toBits(encryptionConfig.encryptionKey))
-  )
-
-  return sjcl.encrypt(pubKey, payload)
-}
-
 export function fingerprint(encryptedAffidavid: string): string {
   return Crypto.hashString(encryptedAffidavid)
 }
