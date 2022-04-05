@@ -1,32 +1,32 @@
 {
   "vote": {
-    "address": "77e45af0902f54c6a2f57436648114e3d4adcf8607faa1254fe15c897e061b8c",
+    "address": "6232be2020e0e92a85f314923c191d22e06f244784508107f2d33d1a8f41d12c",
     "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
-    "parentAddress": "1ada2c4fc554cf15da5fbd59d0cc2fbb0e08c8763ad3a5209a1ad1eb809e90c0",
-    "previousAddress": "1ada2c4fc554cf15da5fbd59d0cc2fbb0e08c8763ad3a5209a1ad1eb809e90c0",
+    "parentAddress": "43efe4a40b15903ab397e6493edef2a23df071ff4684c6a52180a1ae4010aa6b",
+    "previousAddress": "43efe4a40b15903ab397e6493edef2a23df071ff4684c6a52180a1ae4010aa6b",
     "content": {
       "cryptograms": {
         "contest ref 1": [
-          "0264ae391960d42df6576ec6a2307275dc069d95a2d8117f3a242026a20514a517,0354c941c94dd47c2d661421dfc92288641278ee59ca8e5d70437652b9a670482e"
+          "0360c209b574cf57586a491549eb46f500c57e7772bd303c0e5a8ad476eca0b065,02fae9ac379764edc61898d2ae6c91c85accee30a767dc0af640cb4b8fb72f5cbf"
         ],
         "contest ref 2": [
-          "038d1a63e6d1a7e5e62b0d7f4a681efb685b95ce92413faf27c1dd71df7ebadbc9,0350ae595e21ef892442b591c7c97d7b9f1cbf888535014a8a7badebdbc5430dcf"
+          "03ed159f044193930a3488a9ce41d89c2aa7fff9f1c9adabe0fd8599989d6e1514,03d4de657034303f0783c0d4a45222f9434c40af1876afd8a48d0b68415d35ca80"
         ]
       }
     },
-    "registeredAt": "2022-03-30T12:03:53.739Z",
-    "signature": "e62d4b55e8ab981424979f3be5caae495d8da3702b8cd935f242a9348e608440,b7ad513e52ba6eb6da127b7239fb0cdb9506cf16fc0aaf3cf54a55c3d5fc6d3d",
+    "registeredAt": "2022-04-05T07:34:54.804Z",
+    "signature": "e9246ea76ff8dc58f8aaa976c4e2a85c416bea37fb3e317e81933c93798d1803,78734f7a22040c2fe63f59d0bb04b42f0712b897d9bc78f1a67b2d7cc76847c8",
     "type": "BallotCryptogramsItem"
   },
   "verification": {
-    "author": "039acf6efbbdde5444c6ab88bd8389feac38fb9f79f4d3c47e69ae19d6ad368351",
-    "address": "3413b619d3376c7dc1763e122df442c009cf28cc4acee5c37c69f83d9e2b0afa",
-    "shortAddress": "3413b619d3",
-    "parentAddress": "77e45af0902f54c6a2f57436648114e3d4adcf8607faa1254fe15c897e061b8c",
+    "author": "035a44966c1b57e0984f86f6e42a391a254d000845bda653b2561798b99486e01b",
+    "address": "82cd833a54632bb9d70996103db2e70507e3a7bc0b4fea8477ca2df6515de81b",
+    "shortAddress": "82cd833a54",
+    "parentAddress": "6232be2020e0e92a85f314923c191d22e06f244784508107f2d33d1a8f41d12c",
     "type": "VerificationStartItem",
     "content": {},
-    "signature": "5e0348f8b07593e14957ad6a4e8ff895114931d809814c2461b424eb371653cc,6870b8c919d3a0ee0810698e8cd85dd8129bede2f4c33e666016bf2d75e61991",
-    "registeredAt": "2022-03-30T14:03:53.909+02:00"
+    "signature": "9c4ccace055bf8a22f1ccfb84a337e03c19b2ce2edf24ac03beb699c6447cd19,24aa2460c95ea6c82ae7bfe92d6f8825754468f7af48ba4878c62ebc9bad48e7",
+    "registeredAt": "2022-04-05T09:34:54.821+02:00"
   },
-  "receipt": "cda1cbbe95bc8203a05b0b7122e310c661ef14b41dee4e31eab66538fafbfe45,53fa3c766948623d1648500194c0e826fdeac8127cadffa2ffd399ddde449b37"
+  "receipt": "5368ba9af78c1d8d3abf201384c75388f1f7165fdb4721ba019de986633ca07d,dd191817c26ad2e46c6359a46641ab584bff69ce223a53d5916ee13ecbd250a3"
 }

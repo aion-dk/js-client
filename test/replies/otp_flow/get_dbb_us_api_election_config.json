@@ -1,28 +1,28 @@
 {
   "electionConfig": {
-    "dbbPublicKey": "039acf6efbbdde5444c6ab88bd8389feac38fb9f79f4d3c47e69ae19d6ad368351",
-    "encryptionKey": "0314290ed03437f925b1c6b8bb88735ed74ea4fb8b3ff36ab5a8ffd87e142c41d7",
+    "dbbPublicKey": "035a44966c1b57e0984f86f6e42a391a254d000845bda653b2561798b99486e01b",
+    "encryptionKey": "023909a883a926e1817a8bdf37aef3226313ba6279729b590e3977fd3987382ca8",
     "services": {
-      "address": "fad5df82ad47f5513fb2ea427ba7614d312a94d2d6860700d77bade00e45e079",
+      "address": "8b32e5824735b183134526c7d9e72b57dfc76a99bea01c40e36c1c586c7fb9ed",
       "voterAuthorizer": {
-        "electionContextUuid": "414f5f77-6aca-4c80-b21b-6570164a921e",
-        "publicKey": "02d3931002e2d53f49343a6f2e0c823a22bad358c9e5fa24a8b1720960b45a4174",
+        "electionContextUuid": "7634d711-2877-42a8-8d1d-d754fcb9a894",
+        "publicKey": "0332f900bab8f24501800a4ffc26702c84ba4aeeead5ae9f85bfb2dd51c811efce",
         "url": "http://voter-authorizer:3002/"
       },
       "otpProvider": {
-        "electionContextUuid": "633ec492-b850-4a32-9205-df767383283d",
-        "publicKey": "020a13213ec3b604bff14b6bdcc3c34cb11b1f0f418f3dee61a15aabae8d212913",
+        "electionContextUuid": "8b146778-a2d4-4bbe-b90a-a19dda014648",
+        "publicKey": "0320f6d642ade9f4baf07ff60b0c5ecfcafd1e12af24cb6fcf8d63840a5a051963",
         "url": "http://otp-provider:3001/"
       }
     },
     "ballotConfigs": {
-      "3": {
+      "precinct_4_bedrock": {
         "contestReferences": [
           "contest ref 1",
           "contest ref 2"
         ]
       },
-      "4": {
+      "precinct_3_spaceport": {
         "contestReferences": [
           "contest ref 1",
           "contest ref 2"
@@ -99,5 +99,5 @@
       }
     }
   },
-  "receipt": "1bda6067a28d3e2f845e4b7e848ed139c6a27b47db988f680b7374092aa7caf8,c5049c968ce6c517f52dc4da447c9fd4b2f72490c554aa5059bbd4911405265f"
+  "receipt": "b637772e2dc5299bd2c7b360296ffe3b46a3152274aefae8f26f594648d3d4ba,71a2414c70ada52d57691962686865f172b2062f5ffa64c9fd7bacf53cf8c93e"
 }
