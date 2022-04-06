@@ -11,6 +11,7 @@ import {
   fetchElectionConfig,
   validateElectionConfig
 } from './av_client/election_config';
+import { InvalidContestError, InvalidOptionError, InvalidTrackingCodeError } from './av_client/errors';
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -56,8 +57,9 @@ export class AVVerifier {
   public async findBallot(trackingCode: string): Promise<string> {
     const shortAddress = shortCodeToHex(trackingCode)
     await this.bulletinBoard.getVotingTrack(shortAddress).then(response => {
-      // TODO: Validate item payloads and receipt.... How can I validate the payload, when I dont know what to expect?
-      // and verificationTrackStartItem === ballot checking code
+      if (shortAddress !== response.data.verificationTrackStart.shortAddress) {
+        throw new InvalidTrackingCodeError("Tracking code and short address from respose doesn't match")
+      }
       if (['voterCommitment', 'serverCommitment', 'ballotCryptograms', 'verificationTrackStart']
         .every(p => Object.keys(response.data).includes(p))){
           this.cryptogramAddress = response.data.ballotCryptograms.address
@@ -152,11 +154,17 @@ export class AVVerifier {
     const ballot = {}
     Object.keys(decryptedBallot).forEach((contestRef) => {
       let chosenOption = ""
+      if (!this.electionConfig.contestConfigs[contestRef]) {
+        throw new InvalidContestError("Contest is not present in the election")
+      } 
       this.electionConfig.contestConfigs[contestRef].options.forEach((opt) => {
         if (opt.reference === decryptedBallot[contestRef]) {
           chosenOption = opt.title[locale]
         }
       })
+      if (!chosenOption) {
+        throw new InvalidOptionError("Option is not present in the contest")
+      }
       ballot[this.electionConfig.contestConfigs[contestRef].title[locale]] = chosenOption
     })
 
