@@ -7,9 +7,9 @@ const curve = crypto.Curve
  * Encrypt an arbitrary amount of (string) data symmetrically.
  * @param {string} encryptionKeyHex The public key of the External Verifier.
  * @param {string} message The plaintext to be encrypted.
- * @return {Payload} A payload object with the ciphertext, the tag, the iv, and the ephemeral public key.
+ * @return {DHPackage} A package object with the ciphertext, the tag, the iv, and the ephemeral public key.
  */
-export function dhEncrypt(encryptionKeyHex: string, message: string): Payload {
+export function dhEncrypt(encryptionKeyHex: string, message: string): DHPackage {
   // convert hex values to keys
   const point = crypto.pointFromBits(sjcl.codec.hex.toBits(encryptionKeyHex));
   const encryptionKey = new sjcl.ecc.elGamal.publicKey(crypto.Curve, point);
@@ -23,7 +23,7 @@ export function dhEncrypt(encryptionKeyHex: string, message: string): Payload {
 
   const ephemeralPublicKey = ephemeralKeyPair.pub
 
-  return new Payload(
+  return new DHPackage(
     ciphertext,
     tag,
     iv,
@@ -36,20 +36,19 @@ export function dhEncrypt(encryptionKeyHex: string, message: string): Payload {
 /** 
  * Decrypts an arbitrary amount of (string) data symmetrically.
  * @param {string} decryptionKeyHex The decryption key.
- * @param {Payload} payload The payload as returned by the dhEncrypt.
+ * @param {DHPackage} dhPackage The package as returned by the dhEncrypt.
  * @return {string} The plaintext.
  */
-export function dhDecrypt(decryptionKeyHex: string, payload: Payload){
+export function dhDecrypt(decryptionKeyHex: string, dhPackage: DHPackage){
   const exponent = sjcl.bn.fromBits(sjcl.codec.hex.toBits(decryptionKeyHex));
   const decryptionKey = new sjcl.ecc.elGamal.secretKey(curve, exponent);  
-  const symmetricKey = deriveKey(decryptionKey, payload.ephemeralPublicKey)
+  const symmetricKey = deriveKey(decryptionKey, dhPackage.ephemeralPublicKey)
 
-  return decrypt(symmetricKey, payload.ciphertext, payload.tag, payload.iv)
+  return decrypt(symmetricKey, dhPackage.ciphertext, dhPackage.tag, dhPackage.iv)
 }
 
 
-export class Payload {
-  public curveName: string
+export class DHPackage {
   public ciphertext
   public tag
   public iv
@@ -62,12 +61,12 @@ export class Payload {
     this.ephemeralPublicKey = ephemeralPublicKey
   }
 
-  toString(){
-    return payloadToString(this)
+  toString(): string {
+    return dhPackageToString(this)
   }
 
-  static fromString(json: string){
-    return payloadFromString(json)
+  static fromString(json: string): DHPackage {
+    return dhPackageFromString(json)
   }
 
 }
@@ -109,7 +108,7 @@ function deriveKey(privateKey, publicKey){
   return sjcl.misc.hkdf(sharedSecret, keyLength, salt, info)
 }
 
-function payloadFromString(json){
+function dhPackageFromString(json: string): DHPackage {
   const encoded = JSON.parse(json)
 
   const ciphertext = sjcl.codec.base64.toBits(encoded.ciphertext)
@@ -120,7 +119,7 @@ function payloadFromString(json){
     crypto.pointFromBits(sjcl.codec.hex.toBits(encoded.ephemeralPublicKey))
   )
 
-  return new Payload(
+  return new DHPackage(
     ciphertext,
     tag,
     iv,
@@ -128,11 +127,11 @@ function payloadFromString(json){
   )
 }
 
-function payloadToString(payload: Payload){
-  const ciphertext = sjcl.codec.base64.fromBits(payload.ciphertext)
-  const tag = sjcl.codec.base64.fromBits(payload.tag)
-  const iv = sjcl.codec.base64.fromBits(payload.iv)
-  const ephemeralPublicKey = sjcl.codec.hex.fromBits(crypto.pointToBits(payload.ephemeralPublicKey._point, true))
+function dhPackageToString(dhPackage: DHPackage): string {
+  const ciphertext = sjcl.codec.base64.fromBits(dhPackage.ciphertext)
+  const tag = sjcl.codec.base64.fromBits(dhPackage.tag)
+  const iv = sjcl.codec.base64.fromBits(dhPackage.iv)
+  const ephemeralPublicKey = sjcl.codec.hex.fromBits(crypto.pointToBits(dhPackage.ephemeralPublicKey._point, true))
 
   return JSON.stringify({
     ciphertext,
