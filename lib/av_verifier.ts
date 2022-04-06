@@ -97,8 +97,8 @@ export class AVVerifier {
       throw new Error('Verifier private key not present')
     }
 
-    const boardCommitmentOpening = decryptCommitmentOpening(this.verifierPrivateKey, this.boardCommitmentOpening.content.commitmentOpening)
-    const voterCommitmentOpening = decryptCommitmentOpening(this.verifierPrivateKey, this.voterCommitmentOpening.content.commitmentOpening)    
+    const boardCommitmentOpening = decryptCommitmentOpening(this.verifierPrivateKey, this.boardCommitmentOpening.content.package)
+    const voterCommitmentOpening = decryptCommitmentOpening(this.verifierPrivateKey, this.voterCommitmentOpening.content.package)
 
     validateCommmitmentOpening(boardCommitmentOpening, this.boardCommitment, 'Board commitment not valid')
     validateCommmitmentOpening(voterCommitmentOpening, this.voterCommitment, 'Voter commitment not valid')

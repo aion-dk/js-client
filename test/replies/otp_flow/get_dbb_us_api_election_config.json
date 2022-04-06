@@ -1,17 +1,17 @@
 {
   "electionConfig": {
-    "dbbPublicKey": "035a44966c1b57e0984f86f6e42a391a254d000845bda653b2561798b99486e01b",
-    "encryptionKey": "023909a883a926e1817a8bdf37aef3226313ba6279729b590e3977fd3987382ca8",
+    "dbbPublicKey": "037785b5fd838fb6e622ffb2923a1a5a46c4bda16b353394b0a7764c9862906dba",
+    "encryptionKey": "02277790237b28b71cef881aec998f96779364f85f2e6a871f83ddcc8a01f3e32b",
     "services": {
-      "address": "8b32e5824735b183134526c7d9e72b57dfc76a99bea01c40e36c1c586c7fb9ed",
+      "address": "a4d3a3985e68aa0831f7723fb0d914a72203f8264529ce2523a6f661d33c3ec0",
       "voterAuthorizer": {
-        "electionContextUuid": "7634d711-2877-42a8-8d1d-d754fcb9a894",
-        "publicKey": "0332f900bab8f24501800a4ffc26702c84ba4aeeead5ae9f85bfb2dd51c811efce",
+        "electionContextUuid": "8fa2abf3-de83-4b05-b9b7-77a61e48b5f9",
+        "publicKey": "03f75b038035b30f9749b19a9245f33a6616d202b806cc38bb55f2530c64b31b2d",
         "url": "http://voter-authorizer:3002/"
       },
       "otpProvider": {
-        "electionContextUuid": "8b146778-a2d4-4bbe-b90a-a19dda014648",
-        "publicKey": "0320f6d642ade9f4baf07ff60b0c5ecfcafd1e12af24cb6fcf8d63840a5a051963",
+        "electionContextUuid": "bac19bcf-6584-4e3f-ad37-1850fb41707a",
+        "publicKey": "026a4fd82b86aaf63b1742ae3b56a87bf6363588e49b1191599422b34385fd77e7",
         "url": "http://otp-provider:3001/"
       }
     },
@@ -99,5 +99,5 @@
       }
     }
   },
-  "receipt": "b637772e2dc5299bd2c7b360296ffe3b46a3152274aefae8f26f594648d3d4ba,71a2414c70ada52d57691962686865f172b2062f5ffa64c9fd7bacf53cf8c93e"
+  "receipt": "166caeaee94305effcc2512416668690e4a3122463a36277a2f2e56ba729c79c,a1e656176b2151a2529f2a2e15a94658cc55938314965e771a63516de37deb99"
 }

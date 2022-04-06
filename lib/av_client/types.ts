@@ -171,14 +171,14 @@ export interface BoardCommitmentItem extends BaseBoardItem {
 
 export interface VoterCommitmentOpeningItem extends BaseVerificationItem {
   content: {
-    commitmentOpening: EncryptedCommitmentOpening
+    package: EncryptedCommitmentOpening
   }
   type: "VoterEncryptionCommitmentOpeningItem"
 }
 
 export interface BoardCommitmentOpeningItem extends BaseVerificationItem {
   content: {
-    commitmentOpening: EncryptedCommitmentOpening
+    package: EncryptedCommitmentOpening
   }
   type: "BoardEncryptionCommitmentOpeningItem"
 }

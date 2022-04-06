@@ -442,7 +442,7 @@ export class AVClient implements IAVClient {
       parentAddress: this.verifierItem.address,
       type: VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM,
       content: {
-        commitmentOpening: encryptCommitmentOpening(this.verifierItem.content.publicKey, this.voterCommitmentOpening)
+        package: encryptCommitmentOpening(this.verifierItem.content.publicKey, this.voterCommitmentOpening)
       }
     }
 
