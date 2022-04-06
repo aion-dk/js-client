@@ -1,4 +1,5 @@
 import * as base from 'base-x'
+import { InvalidTrackingCodeError } from './errors'
 import * as sjcl from './sjcl'
 
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
@@ -23,7 +24,7 @@ export function hexToShortCode(input: string): string {
   const byteArray = leftTrim(Uint8Array.from(bytes))
 
   if( byteArray.length > 5 ){
-    throw new Error("Invalid input. Only up to 40 bits are supported.")
+    throw new InvalidTrackingCodeError("Invalid input. Only up to 40 bits are supported.")
   }
 
   const encoded = bs58.encode(byteArray)
@@ -40,7 +41,7 @@ export function hexToShortCode(input: string): string {
 export function shortCodeToHex(input: string): string {
   const byteArray = leftTrim(bs58.decode(input))
   if( byteArray.length > 5 ){
-    throw new Error("Invalid input. Only up to 40 bits are supported.")
+    throw new InvalidTrackingCodeError("Invalid input. Only up to 40 bits are supported.")
   }
 
   const bits = sjcl.codec.bytes.toBits(byteArray)
