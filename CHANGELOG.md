@@ -1,4 +1,7 @@
 # AV Client Library Changelog
+## 1.0.4
+- Encrypted commitment openings
+- Added tests
 ## 1.0.3
 - Introduced Base58 short codes
 - Usage of env variables for various services
