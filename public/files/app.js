@@ -1,11 +1,14 @@
-
-const urlSearchParams = new URLSearchParams(window.location.search);
-const params = Object.fromEntries(urlSearchParams.entries());
-const verifier = new AssemblyVoting.AVVerifier(`http://avx:3000/dbb/${params["slug"]}/api`);
-verifier.initialize()
+let verifier = {}
 
 $(document).ready(() => {
-  $("form#findBallot").collapse("show")
+  $("form#initialize").collapse("show")
+  $("form#initialize").submit((event) => {
+    verifier = new AssemblyVoting.AVVerifier($("form#initialize").find("input#election-url").val())
+    verifier.initialize()
+    $("form#findBallot").collapse("show")
+    $("form#initialize").collapse("hide")
+  });
+
   $("form#findBallot").submit((event) => {
     event.preventDefault();
     const address = $("form#findBallot").find("input#verifier-code").val();
