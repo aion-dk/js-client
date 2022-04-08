@@ -1,6 +1,5 @@
 import { BoardItem, ContestMap, ItemExpectation, OpenableEnvelope } from './types'
 import * as Crypto from './aion_crypto';
-import * as sjcl from './sjcl';
 import {Uniformer} from '../util/uniformer';
 
 
@@ -12,15 +11,6 @@ export type AcknowledgedBoardHash = {
 export type AffidavitConfig = {
   curve: string;
   encryptionKey: string;
-}
-
-export function encryptAES(payload: string, encryptionConfig: AffidavitConfig): string {
-  const pubKey = new sjcl.ecc.elGamal.publicKey(
-    sjcl.ecc.curves[encryptionConfig.curve],
-    Crypto.pointFromBits(sjcl.codec.hex.toBits(encryptionConfig.encryptionKey))
-  )
-
-  return sjcl.encrypt(pubKey, payload)
 }
 
 export function fingerprint(encryptedAffidavid: string): string {

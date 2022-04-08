@@ -7,7 +7,6 @@ import { prepareRecording } from './mock_helpers'
 import { AVVerifier } from '../lib/av_verifier';
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
-import { hexToShortCode } from '../lib/av_client/short_codes';
 
 const USE_MOCK = true;
 

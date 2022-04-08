@@ -47,6 +47,7 @@ import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
 import { hexToShortCode } from './av_client/short_codes';
+import { encryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -95,8 +96,7 @@ export class AVClient implements IAVClient {
   private boardCommitment: BoardCommitmentItem;
   private verifierItem: VerifierItem
   private ballotCryptogramItem: BallotCryptogramItem;
-  private boardCommitmentOpening: CommitmentOpening;
-  private clientCommitmentOpening: CommitmentOpening;
+  private voterCommitmentOpening: CommitmentOpening;
   private spoilRequest: SpoilRequestItem
 
   /**
@@ -311,8 +311,8 @@ export class AVClient implements IAVClient {
     } = constructBallotCryptograms(state, cvr);
 
     this.clientEnvelopes = envelopes;
-    
-    this.clientCommitmentOpening = {
+
+    this.voterCommitmentOpening = {
       commitmentRandomness: commitment.randomizer,
       randomizers: envelopeRandomizers
     }
@@ -410,17 +410,17 @@ export class AVClient implements IAVClient {
     }
 
     const signedPayload = signPayload(spoilRequestItem, this.privateKey());
-    
+
     const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload))
 
     const { spoilRequest, receipt, boardCommitmentOpening } = response.data;
 
     this.spoilRequest = spoilRequest
-    this.boardCommitmentOpening = boardCommitmentOpening
 
     validatePayload(spoilRequest, spoilRequestItem);
     validateReceipt([spoilRequest], receipt, this.getDbbPublicKey());
-    
+    validateCommmitmentOpening(boardCommitmentOpening, this.boardCommitment.content.commitment, 'Board commitment is not valid')
+
     return spoilRequest.address
   }
 
@@ -437,24 +437,18 @@ export class AVClient implements IAVClient {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot challenge ballot, no user session')
     }
-    
-    const clientCommitmentOpeningItem = {
+
+    const voterCommitmentOpeningItem = {
       parentAddress: this.verifierItem.address,
       type: VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM,
-      content: this.clientCommitmentOpening
-    }
-
-    const signedClientCommitmentOpeningItem = signPayload(clientCommitmentOpeningItem, this.privateKey())
-
-    const commitmentOpenings = {
-      commitmentOpenings: {
-        parentAddress: this.verifierItem.address,
-        boardCommitmentOpening: this.boardCommitmentOpening,
-        clientCommitmentOpening: signedClientCommitmentOpeningItem
+      content: {
+        package: encryptCommitmentOpening(this.verifierItem.content.publicKey, this.voterCommitmentOpening)
       }
     }
 
-    this.bulletinBoard.submitCommitmentOpenings(commitmentOpenings)
+    const signedVoterCommitmentOpeningItem = signPayload(voterCommitmentOpeningItem, this.privateKey())
+
+    this.bulletinBoard.submitCommitmentOpenings(signedVoterCommitmentOpeningItem)
   }
 
   /**

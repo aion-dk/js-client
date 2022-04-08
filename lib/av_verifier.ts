@@ -3,14 +3,14 @@ import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUES
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
 import { decrypt } from './av_client/decrypt_vote';
-import { isValidPedersenCommitment } from './av_client/crypto/pedersen_commitment';
-import { CommitmentOpening, VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap } from './av_client/types';
+import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap } from './av_client/types';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 
 import {
   fetchElectionConfig,
   validateElectionConfig
 } from './av_client/election_config';
+import { decryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
 import { InvalidContestError, InvalidOptionError, InvalidTrackingCodeError } from './av_client/errors';
 
 export class AVVerifier {
@@ -93,8 +93,15 @@ export class AVVerifier {
   }
 
   public decryptBallot() {
-    this.validateBoardCommitmentOpening(this.boardCommitmentOpening.content, this.boardCommitment);
-    this.validateVoterCommitmentOpening(this.voterCommitmentOpening.content, this.voterCommitment);
+    if( !this.verifierPrivateKey ){
+      throw new Error('Verifier private key not present')
+    }
+
+    const boardCommitmentOpening = decryptCommitmentOpening(this.verifierPrivateKey, this.boardCommitmentOpening.content.package)
+    const voterCommitmentOpening = decryptCommitmentOpening(this.verifierPrivateKey, this.voterCommitmentOpening.content.package)
+
+    validateCommmitmentOpening(boardCommitmentOpening, this.boardCommitment, 'Board commitment not valid')
+    validateCommmitmentOpening(voterCommitmentOpening, this.voterCommitment, 'Voter commitment not valid')
 
     const defaultMarkingType = {
       style: "regular",
@@ -102,29 +109,15 @@ export class AVVerifier {
       minMarks: 1,
       maxMarks: 1
     }
-     
+
     return decrypt(
       this.electionConfig.contestConfigs,
       defaultMarkingType,
       this.electionConfig.encryptionKey,
-      this.ballotCryptograms.content.cryptograms, 
-      this.boardCommitmentOpening.content, 
-      this.voterCommitmentOpening.content
+      this.ballotCryptograms.content.cryptograms,
+      boardCommitmentOpening,
+      voterCommitmentOpening
     )
-  }
-
-  private validateBoardCommitmentOpening(commitmentOpening: CommitmentOpening, commitment: string) {
-    if(!this.validateCommitmentOpening(commitmentOpening, commitment))
-      throw new Error("The board lied!!!");
-  }
-
-  private validateVoterCommitmentOpening(commitmentOpening: CommitmentOpening, commitment: string) {
-    if(!this.validateCommitmentOpening(commitmentOpening, commitment))
-      throw new Error("The voter lied!!!");
-  }
-
-  private validateCommitmentOpening(commitmentOpening: CommitmentOpening, commitment: string): boolean {
-    return isValidPedersenCommitment(commitment, commitmentOpening.randomizers, commitmentOpening.commitmentRandomness);
   }
 
   public async pollForSpoilRequest(): Promise<string> {

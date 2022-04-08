@@ -164,18 +164,22 @@ export interface VoterSessionItem extends BaseBoardItem {
 export interface BoardCommitmentItem extends BaseBoardItem {
   content: {
     commitment: string
-  } 
+  }
 
   type: "BoardEncryptionCommitmentItem"
 }
 
 export interface VoterCommitmentOpeningItem extends BaseVerificationItem {
-  content: CommitmentOpening
+  content: {
+    package: EncryptedCommitmentOpening
+  }
   type: "VoterEncryptionCommitmentOpeningItem"
 }
 
 export interface BoardCommitmentOpeningItem extends BaseVerificationItem {
-  content: CommitmentOpening
+  content: {
+    package: EncryptedCommitmentOpening
+  }
   type: "BoardEncryptionCommitmentOpeningItem"
 }
 
@@ -213,6 +217,8 @@ export interface CommitmentOpening {
   randomizers: ContestMap<string[]>
   commitmentRandomness: string
 }
+
+export type EncryptedCommitmentOpening = string;
 
 export interface ItemExpectation {
   content?: {
