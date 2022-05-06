@@ -20,20 +20,20 @@ describe('entire benaloh flow', () => {
     sandbox = resetDeterminism();
     if(USE_MOCK) {
       expectedNetworkRequests = [
-        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/election_config'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/election_config'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration'),
         useRecordedResponse(voterAuthorizerHost, 'post', '/create_session'),
         useRecordedResponse(voterAuthorizerHost, 'post', '/request_authorization'),
         useRecordedResponse(OTPProviderHost, 'post', '/authorize'),
-        useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/registrations'),
-        useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/commitments'),
-        useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/votes'),
-        useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/spoil'),
-        useRecordedResponse(bulletinBoardHost, 'post', '/dbb/us/api/verification/verifier'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/vote_track'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/verifier'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/spoil_status'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/commitment_openings'),
+        useRecordedResponse(bulletinBoardHost, 'post', '/us/voting/registrations'),
+        useRecordedResponse(bulletinBoardHost, 'post', '/us/voting/commitments'),
+        useRecordedResponse(bulletinBoardHost, 'post', '/us/voting/votes'),
+        useRecordedResponse(bulletinBoardHost, 'post', '/us/voting/spoil'),
+        useRecordedResponse(bulletinBoardHost, 'post', '/us/verification/verifiers'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/verifiers/'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/spoil_status'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/commitment_openings'),
       ];
     }
   });
@@ -45,9 +45,9 @@ describe('entire benaloh flow', () => {
     }
   });
 
-  it('spoils a ballot', recordable(USE_MOCK, async () => {
-    const verifier = new AVVerifier(bulletinBoardHost + 'dbb/us/api');
-    const client = new AVClient(bulletinBoardHost + 'dbb/us/api');
+  it.only('spoils a ballot', recordable(USE_MOCK, async () => {
+    const verifier = new AVVerifier(bulletinBoardHost + 'us');
+    const client = new AVClient(bulletinBoardHost + 'us');
 
     await verifier.initialize()
     await client.initialize(undefined, {

@@ -12,10 +12,10 @@ describe('getReadbleBallot', () => {
 
   beforeEach(async () => {
     expectedNetworkRequests = [
-      useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/election_config')
+      useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration')
     ]
 
-    verifier = new AVVerifier(bulletinBoardHost + 'dbb/us/api');
+    verifier = new AVVerifier(bulletinBoardHost + 'us');
     await verifier.initialize()
   });
 

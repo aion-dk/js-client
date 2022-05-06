@@ -25,7 +25,7 @@ describe('AVClient#validateAccessCode', () => {
     expectedNetworkRequests.push(bbHost.get_election_config());
     expectedNetworkRequests.push(vaHost.post_create_session());
 
-    client = new AVClient(bulletinBoardHost + 'dbb/us/api');
+    client = new AVClient(bulletinBoardHost + 'us');
     await client.initialize()
   });
 
@@ -90,7 +90,7 @@ describe('AVClient#validateAccessCode', () => {
           .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
       );
       expectedNetworkRequests.push(
-        nock(bulletinBoardHost).post('/dbb/us/api/registrations')
+        nock(bulletinBoardHost).post('/us/voting/registrations')
           .reply(404)
       );
 
