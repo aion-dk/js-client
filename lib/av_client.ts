@@ -380,11 +380,7 @@ export class AVClient implements IAVClient {
 
       const signedPayload = signPayload(castRequestItem, this.privateKey());
 
-      const packedPayload = {
-        castRequest: signedPayload
-      }
-
-      const response = (await this.bulletinBoard.submitCastRequest(packedPayload));
+      const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
       const { castRequest, receipt } = response.data;
 
       validatePayload(castRequest, castRequestItem);
@@ -415,9 +411,7 @@ export class AVClient implements IAVClient {
 
     const signedPayload = signPayload(spoilRequestItem, this.privateKey());
 
-    const packedPayload = {spoilRequest: signedPayload}
-
-    const response = (await this.bulletinBoard.submitSpoilRequest(packedPayload))
+    const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload))
 
     const { spoilRequest, receipt, boardCommitmentOpening } = response.data;
 
@@ -454,9 +448,7 @@ export class AVClient implements IAVClient {
 
     const signedVoterCommitmentOpeningItem = signPayload(voterCommitmentOpeningItem, this.privateKey())
 
-    const packedPayload = {commitmentOpening: signedVoterCommitmentOpeningItem}
-
-    this.bulletinBoard.submitCommitmentOpenings(packedPayload)
+    this.bulletinBoard.submitCommitmentOpenings(signedVoterCommitmentOpeningItem)
   }
 
   /**
