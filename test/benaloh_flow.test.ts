@@ -31,7 +31,7 @@ describe('entire benaloh flow', () => {
         useRecordedResponse(bulletinBoardHost, 'post', '/us/voting/spoil'),
         useRecordedResponse(bulletinBoardHost, 'post', '/us/verification/verifiers'),
         useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/verifiers/'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/verifiers/aab6ad1ef81fbb5372282738cace1bf732fc214071369d8783549b23408d0ea6'),
         useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/spoil_status'),
         useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/commitment_openings'),
       ];
@@ -45,7 +45,7 @@ describe('entire benaloh flow', () => {
     }
   });
 
-  it.only('spoils a ballot', recordable(USE_MOCK, async () => {
+  it('spoils a ballot', recordable(USE_MOCK, async () => {
     const verifier = new AVVerifier(bulletinBoardHost + 'us');
     const client = new AVClient(bulletinBoardHost + 'us');
 
