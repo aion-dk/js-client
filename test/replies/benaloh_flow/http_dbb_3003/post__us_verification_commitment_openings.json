@@ -1,0 +1,27 @@
+{
+  "voterCommitmentOpening": {
+    "address": "ce9ae26af29ebe0bed14b916719bb2488e5628499c9c5fc3213703ce7e840bc4",
+    "author": "03d893a631a51b8d048468f622bb97f9d122807fc486dbffdd2ac657bbf9190118",
+    "parentAddress": "d7e4afef261e23d2ec135b5d5f2864a29391fe200abea15ffd42ffc7571c6389",
+    "previousAddress": "4707f1d1caccaf259711f89d3125b9d09d45bad30370541f42bb36ebddcee2e9",
+    "content": {
+      "package": "{\"ciphertext\":\"W4POWthAkHOnbKc8t6fKRpkuIyX4X0Xo+sH8kxXQV+gP9zdUL+68PCUJYz1Diu7bNdyUOK2pjwPBrzc6xk4JqLCH6yfKbifcN/RPOA2qSSOJwndYFQvTRG+Mw/4nrFhrIXVrGz4r6o0424shbNbTHStU+1+OLGlpdy3RZfiVP+VsMltas6XIIGp8HIYgWtyLaUQ5wB+eTe52/KYn0fOpmsj8eVX4ZusCke+44uHKFUachl7gRgEGq+TtOGpbHZOq2MRC5eBbsumucsShpr+GS95TxYSsxcLp87XQ55XSvDEcFOSBrjnZnpEzgqkKTfmD+/25lPebhZMMs6c+ZNPYEd9y+9dBoNOP3N9sTxAdKA==\",\"tag\":\"dCZsDpamLITx+CSnipIKVQ==\",\"iv\":\"AAAACwAAAAwAAAAN\",\"ephemeralPublicKey\":\"034789620c73d9c2760281ab4b806eaaa67cf50f368ee21b3470f4cf5f1a42139c\"}"
+    },
+    "registeredAt": "2022-05-09T07:53:03.902Z",
+    "signature": "e2bc4960cda95d76830e35f19d6b20c861bd79fae7dd714219ce1a044e2bc53a,878fbd9aa869fec46146ded3fd8651fbe9cdd7c3dfc9a3ffea668297a2ce6372",
+    "type": "VoterEncryptionCommitmentOpeningItem"
+  },
+  "boardCommitmentOpening": {
+    "address": "82ce1c9559369a17a2995403562db4a67082bbf1c107ac2baecfdefc2535c458",
+    "author": "03d893a631a51b8d048468f622bb97f9d122807fc486dbffdd2ac657bbf9190118",
+    "parentAddress": "ce9ae26af29ebe0bed14b916719bb2488e5628499c9c5fc3213703ce7e840bc4",
+    "previousAddress": "4707f1d1caccaf259711f89d3125b9d09d45bad30370541f42bb36ebddcee2e9",
+    "content": {
+      "package": "{\"ciphertext\":\"O8Z/Ch6MFjnJzQAPicpYn7hsNJclgI7QHdvDT/q+bDEnRWIu2fi9tE+D/kcd3DaD4aQmIICRnrHYS5+244yZqybCc0i3tJGFE9lFV+MW2o7rdrT+LiddG6xYiSQPQgpSNiIx048+2hQHzr765Q29Tt/QSbZaY4CkLfpvDVhJewvOUECrzKAPOMGgS7WBJCksx339sIheteUq25vC3m0CnFWbNMqBuFCHSL+40D4V6laGJ+TNC+I976igpWd/zk92z52Z+gU0zfXx3NsoUeN5Al4ZralvGavMoYlS8BMIeteU95CFs95SNFFViYIIq0R454/LtLeyoxdy+TE24TYwJ53Cx2B6NOK3emanZYF/qtGbwZPrZw==\",\"tag\":\"OH6hYd2HRkKJzGWk304dZQ==\",\"iv\":\"2rb76519KyEpHAul\",\"ephemeralPublicKey\":\"03c98eb92419b5ced4f4fce45d253b637082c3f54d524f0a6bd8f10708de2b6da7\"}"
+    },
+    "registeredAt": "2022-05-09T07:53:03.946Z",
+    "signature": "af834be0268e013e0b802afbe1ccaeec655110e4e24c66749fa4a857e24ca25e,5075c54ee41d0874149d478bfebee2c62d66c980e4a1a099a839c55942e9e1b9",
+    "type": "BoardEncryptionCommitmentOpeningItem"
+  },
+  "receipt": "cdfe4194744975fbd137828b07cb12e1a80013a2074f3d7bed995e368a77b9c1,b70c2b983446ff46d171bf4767a91461a2fa6a1c664f45d393f7034731422fa0"
+}

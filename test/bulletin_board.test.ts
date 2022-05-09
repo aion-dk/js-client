@@ -15,7 +15,7 @@ describe('BulletinBoard#registerVoter', () => {
   let bulletinBoard: BulletinBoard;
 
   beforeEach(() => {
-    bulletinBoard = new BulletinBoard(bulletinBoardHost + 'dbb/us/api');
+    bulletinBoard = new BulletinBoard(bulletinBoardHost + 'us');
   });
 
   afterEach(() => {
@@ -24,7 +24,7 @@ describe('BulletinBoard#registerVoter', () => {
 
   context('public key already registered on Bulletin Board', () => {
     it('returns an error', async () => {
-      nock(bulletinBoardHost).post('/dbb/us/api/registrations')
+      nock(bulletinBoardHost).post('/us/voting/registrations')
         .reply(403, { error: { code: 13, description: 'Public key error' }});
 
       await expectError(
@@ -37,7 +37,7 @@ describe('BulletinBoard#registerVoter', () => {
 
   context('Bulletin Board returns unknown error', () => {
     it('returns an error', async () => {
-      nock(bulletinBoardHost).post('/dbb/us/api/registrations')
+      nock(bulletinBoardHost).post('/us/voting/registrations')
         .reply(500, { foo: 'bar' });
 
       await expectError(
@@ -50,7 +50,7 @@ describe('BulletinBoard#registerVoter', () => {
 
   context('Bulletin Board becomes unreachable', () => {
     it('returns an error', async () => {
-      nock(bulletinBoardHost).post('/dbb/us/api/registrations')
+      nock(bulletinBoardHost).post('/us/voting/registrations')
         .replyWithError('Some network error');
 
       await expectError(

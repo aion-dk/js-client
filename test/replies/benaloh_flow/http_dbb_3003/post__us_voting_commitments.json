@@ -1,0 +1,35 @@
+{
+  "voterCommitment": {
+    "address": "2818365bea32189f717ffc73d7c20590b87ff44706cfd933fe935a62a2a13f75",
+    "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
+    "parentAddress": "29daa4f1596ae0dcffdd6e9a9e42f6333e39d5193b16efbeee4063c88d6fa88e",
+    "previousAddress": "29daa4f1596ae0dcffdd6e9a9e42f6333e39d5193b16efbeee4063c88d6fa88e",
+    "content": {
+      "commitment": "0332f1125dd7f4315649b9341829fd4ad5ae6f3dc563b0b1615a918cf9fa54a1ec"
+    },
+    "registeredAt": "2022-05-09T07:53:02.423Z",
+    "signature": "b3a4933c31743161acd1d1bdf8fafe62f50ee4d39edfdaf5ccdddf7b5dad7923,63d5567650a4689764a2fed4acf9ed14f298033fc02ba4f179d1f0c2b613db17",
+    "type": "VoterEncryptionCommitmentItem"
+  },
+  "boardCommitment": {
+    "address": "5400419a97ed083448d2127e19a2897ed96bdfc32bddc86b212f764078956e7a",
+    "author": "03d893a631a51b8d048468f622bb97f9d122807fc486dbffdd2ac657bbf9190118",
+    "parentAddress": "2818365bea32189f717ffc73d7c20590b87ff44706cfd933fe935a62a2a13f75",
+    "previousAddress": "2818365bea32189f717ffc73d7c20590b87ff44706cfd933fe935a62a2a13f75",
+    "content": {
+      "commitment": "02b3e7d4cd004b4ceb062df2f61b4c8ad0b21b3cba30c592d73c69000817b63f6b"
+    },
+    "registeredAt": "2022-05-09T07:53:02.459Z",
+    "signature": "5c83042094a3dfc310790f0558800f0475d087e9980d62a9a182227244f86afd,8fc96d0baafab3532d0744b718010a6355a6c6b98f42c57b37391108ca8e8400",
+    "type": "BoardEncryptionCommitmentItem"
+  },
+  "envelopes": {
+    "contest ref 1": [
+      "02c4a789474d88c5a4759f23acb26de99c4a25d9af1366e725ea3ebb96386e2a9a,02c95d3b15ab73d24fea0ad95d8c32120e7c658fa935d56d03541e0a731dd92e80"
+    ],
+    "contest ref 2": [
+      "023285ff7657c4a6598f18c97181ca84d915ec60bcb2454b8834a6af3ed8426ed0,0291ee038e27303191f34df14441f260b86bf38a28b1d0a3258eb33411f21f4192"
+    ]
+  },
+  "receipt": "9f497f815efad5b8e65007dde6544ca2434d2c4c012dfbf2559c0e9f542ad128,5b53a4a5cef6319890056c913249da1e433ed8424c03b9faa44d09452d7027e6"
+}

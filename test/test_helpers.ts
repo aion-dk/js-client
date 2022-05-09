@@ -11,7 +11,7 @@ function getEnvVar(name: string): string {
   throw new Error(`Missing expected environment variable ${name}`)
 }
 
-export const bulletinBoardHost = getEnvVar('AVX_URL')
+export const bulletinBoardHost = getEnvVar('DBB_URL')
 export const voterAuthorizerHost = getEnvVar('VOTER_AUTHORIZER_URL')
 export const OTPProviderHost = getEnvVar('OTP_PROVIDER_URL')
 export const mailcatcherHost = getEnvVar('MAILCATCHER_URL')
@@ -19,24 +19,24 @@ export const OTPProviderElectionContextId = 'cca2b217-cedd-4d58-a103-d101ba472eb
 
 export const bbHost = {
   get_election_config: () => nock(bulletinBoardHost)
-      .get('/dbb/us/api/election_config')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_dbb_us_api_election_config.json'),
+      .get('/us/configuration')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_configuration.json'),
 
   post_registrations: () => nock(bulletinBoardHost)
-      .post('/dbb/us/api/registrations')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_registrations.json'),
+      .post('/us/voting/registrations')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_voting_registrations.json'),
 
   post_commitments: () => nock(bulletinBoardHost)
-      .post('/dbb/us/api/commitments')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_commitments.json'),
+      .post('/us/voting/commitments')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_voting_commitments.json'),
 
   post_votes: () => nock(bulletinBoardHost)
-      .post('/dbb/us/api/votes')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_votes.json'),
+      .post('/us/voting/votes')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_voting_votes.json'),
 
   post_cast: () => nock(bulletinBoardHost)
-      .post('/dbb/us/api/cast')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_dbb_us_api_cast.json')
+      .post('/us/voting/cast')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_voting_cast.json')
 };
 
 export const vaHost = {

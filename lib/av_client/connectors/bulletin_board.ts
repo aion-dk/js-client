@@ -21,11 +21,12 @@ export class BulletinBoard {
   }
 
   getElectionConfig(): Promise<AxiosResponse> {
-    return this.backend.get('election_config');
+    return this.backend.get('configuration');
   }
 
+  // Voting
   async createVoterRegistration(authToken: string, parentAddress: string): Promise<AxiosResponse> {
-    const response = await this.backend.post('registrations', {
+    const response = await this.backend.post('voting/registrations', {
       authToken,
       parentAddress
     }).catch(error => {
@@ -50,13 +51,38 @@ export class BulletinBoard {
   }
 
   submitVotes(signedBallotCryptogramsItem): Promise<AxiosResponse> {
-    return this.backend.post('votes', signedBallotCryptogramsItem, {
+    return this.backend.post('voting/votes', {vote: signedBallotCryptogramsItem}, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }
     });
   }
 
+  submitCommitment(signedCommitmentItem): Promise<AxiosResponse> {
+    return this.backend.post('voting/commitments', {commitment: signedCommitmentItem}, {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
+  }
+
+  submitCastRequest(signedCastRequestItem): Promise<AxiosResponse> {
+    return this.backend.post('voting/cast', {castRequest: signedCastRequestItem}, {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
+  }
+
+  submitSpoilRequest(signedSpoilRequestItem): Promise<AxiosResponse> {
+    return this.backend.post('voting/spoil', {spoilRequest: signedSpoilRequestItem}, {
+      headers: {
+        'X-Voter-Session': this.voterSessionUuid
+      }
+    });
+  }
+
+  // Verification
   getVotingTrack(shortAddress: string): Promise<AxiosResponse> {
     return this.backend.get(`verification/vote_track?id=${shortAddress}`)
   }
@@ -70,39 +96,15 @@ export class BulletinBoard {
   }
 
   getVerifierItem(spoilRequestAddress: string): Promise<AxiosResponse> {
-    return this.backend.get(`verification/verifier?id=${spoilRequestAddress}`)
+    return this.backend.get(`verification/verifiers/${spoilRequestAddress}`)
   }
 
   submitVerifierItem(signedVerifierItem): Promise<AxiosResponse> {
-    return this.backend.post('verification/verifier', signedVerifierItem)
+    return this.backend.post('verification/verifiers', {verifier: signedVerifierItem})
   }
 
   submitCommitmentOpenings(signedVoterCommitmentOpeningItem): Promise<AxiosResponse> {
-    return this.backend.post('verification/commitment_openings', signedVoterCommitmentOpeningItem, {
-      headers: {
-        'X-Voter-Session': this.voterSessionUuid
-      }
-    });
-  }
-
-  submitCommitment(signedCommit): Promise<AxiosResponse> {
-    return this.backend.post('commitments', signedCommit, {
-      headers: {
-        'X-Voter-Session': this.voterSessionUuid
-      }
-    });
-  }
-
-  submitCastRequest(content): Promise<AxiosResponse> {
-    return this.backend.post('cast', content, {
-      headers: {
-        'X-Voter-Session': this.voterSessionUuid
-      }
-    });
-  }
-
-  submitSpoilRequest(content): Promise<AxiosResponse> {
-    return this.backend.post('spoil', content, {
+    return this.backend.post('verification/commitment_openings', {commitmentOpening: signedVoterCommitmentOpeningItem}, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }

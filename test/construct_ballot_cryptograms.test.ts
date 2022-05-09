@@ -26,7 +26,7 @@ describe('AVClient#constructBallotCryptograms', () => {
     bbHost.post_commitments();
     bbHost.post_votes();
 
-    client = new AVClient(bulletinBoardHost + 'dbb/us/api');
+    client = new AVClient(bulletinBoardHost + 'us');
     await client.initialize(undefined, {
       privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
       publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'

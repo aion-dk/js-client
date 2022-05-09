@@ -23,7 +23,7 @@ describe('AVClient#requestAccessCode', () => {
   beforeEach(async () => {
     expectedNetworkRequests.push(bbHost.get_election_config());
 
-    client = new AVClient(bulletinBoardHost + 'dbb/us/api');
+    client = new AVClient(bulletinBoardHost + 'us');
     await client.initialize()
   });
 

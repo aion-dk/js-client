@@ -14,24 +14,24 @@ describe('findBallot', () => {
 
   beforeEach(async () => {
     expectedNetworkRequests = [
-      useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/election_config')
+      useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration')
     ]
 
-    verifier = new AVVerifier(bulletinBoardHost + 'dbb/us/api');
+    verifier = new AVVerifier(bulletinBoardHost + 'us');
     await verifier.initialize()
   });
 
   context('given valid tracking code', () => {    
     let shortAddress = ""
     before(async () => {
-      expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/vote_track'));
-      const bulletinBoard = new BulletinBoard(bulletinBoardHost + 'dbb/us/api/');
+      expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'));
+      const bulletinBoard = new BulletinBoard(bulletinBoardHost + 'us');
       const result = await bulletinBoard.getVotingTrack('test')
       shortAddress = hexToShortCode(result.data.verificationTrackStart.shortAddress)
     })
 
     it('finds a ballot', async () => {
-      expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/vote_track'));
+      expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'));
       const cryptogramAddress = await verifier.findBallot(shortAddress)
       expect(cryptogramAddress.length).to.eql(64)
     });
@@ -49,7 +49,7 @@ describe('findBallot', () => {
 
   context('given non-matching tracking code', () => {
     it('throws "InvalidTrackingCodeError" error', async () => {
-      expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/dbb/us/api/verification/vote_track'));
+      expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'));
       await expectError(
         verifier.findBallot('test'),
         InvalidTrackingCodeError,

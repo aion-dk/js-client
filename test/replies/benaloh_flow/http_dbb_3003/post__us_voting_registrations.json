@@ -1,0 +1,18 @@
+{
+  "voterSession": {
+    "address": "29daa4f1596ae0dcffdd6e9a9e42f6333e39d5193b16efbeee4063c88d6fa88e",
+    "author": "03d893a631a51b8d048468f622bb97f9d122807fc486dbffdd2ac657bbf9190118",
+    "parentAddress": "c5e827ac80443bd3f27e09dc42d5cb9fdb4c300241082c88efd33934df7cfa44",
+    "previousAddress": "ab686876e65db309510c31b5b7217c4eaca896ab116310af3d7a6362e44a09d5",
+    "content": {
+      "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiYzgyYWVlN2IwYTdkOTI0NDhkYjAzYTNhOGQ3ODk4YWM1MWRjYWU3ZCIsInB1YmxpY19rZXkiOiIwM2I4N2Q3ZmU3OTNhNjIxZGYyN2Y0NGMyMGY0NjBmZjcxMWQ1NTU0NWM1ODcyOWYyMGIzZmI2ZTg3MWM1M2M0OWMiLCJ2b3Rlcl9ncm91cF9rZXkiOiJwcmVjaW5jdF80X2JlZHJvY2siLCJzZWdtZW50MSI6InByZWNpbmN0XzRfYmVkcm9jayIsImVjX3Rva2VuX2ZpbmdlcnByaW50IjoiODQ2N2QxZmFiMDhmMzI4NGQ5ZWI3ZThiOTUwYzFjNGNkNzUwODY5MSIsImF1ZCI6ImF2eDpiYzFiMWVkMC05NDNlLTQ2NDctYmZjMS0wNjMzYmEwOGMwNWUiLCJpYXQiOjE2NTIwODI3ODIsImV4cCI6MTY1MjA4NDU4Mn0.l-QnhDEbHjEMRlKrcCnQgnUznnKQNS-J4PLN6z6Nj9i4FDTDhbpn2f2jKTIHh3HWVWd3lMl3dFZ14RCJOEaXgA",
+      "identifier": "c82aee7b0a7d92448db03a3a8d7898ac51dcae7d",
+      "voterGroup": "precinct_4_bedrock",
+      "publicKey": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c"
+    },
+    "registeredAt": "2022-05-09T07:53:02.161Z",
+    "signature": "0d12a0e6dec113a0e5a511897ec0afd4e72d24fa635d535b72ea06c5c519d9bf,b255dd8fa734957a589b446c469dce5036d0cb94aabacdca6deff7a23458226f",
+    "type": "VoterSessionItem"
+  },
+  "receipt": "fd2bdcb88e479265925c4ca97ce57cc0e4d4c493b95a201c90603077c0519ca1,f50059fdbaa207db879b1f5a48d8a206ded57ec5cc55853431075f1f27b840e7"
+}
