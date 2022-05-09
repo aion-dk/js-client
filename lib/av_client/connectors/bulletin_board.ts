@@ -51,31 +51,31 @@ export class BulletinBoard {
   }
 
   submitVotes(signedBallotCryptogramsItem): Promise<AxiosResponse> {
-    return this.backend.post('voting/votes', signedBallotCryptogramsItem, {
+    return this.backend.post('voting/votes', {vote: signedBallotCryptogramsItem}, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }
     });
   }
 
-  submitCommitment(signedCommit): Promise<AxiosResponse> {
-    return this.backend.post('voting/commitments', signedCommit, {
+  submitCommitment(signedCommitmentItem): Promise<AxiosResponse> {
+    return this.backend.post('voting/commitments', {commitment: signedCommitmentItem}, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }
     });
   }
 
-  submitCastRequest(content): Promise<AxiosResponse> {
-    return this.backend.post('voting/cast', content, {
+  submitCastRequest(signedCastRequestItem): Promise<AxiosResponse> {
+    return this.backend.post('voting/cast', {castRequest: signedCastRequestItem}, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }
     });
   }
 
-  submitSpoilRequest(content): Promise<AxiosResponse> {
-    return this.backend.post('voting/spoil', content, {
+  submitSpoilRequest(signedSpoilRequestItem): Promise<AxiosResponse> {
+    return this.backend.post('voting/spoil', {spoilRequest: signedSpoilRequestItem}, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }
@@ -100,11 +100,11 @@ export class BulletinBoard {
   }
 
   submitVerifierItem(signedVerifierItem): Promise<AxiosResponse> {
-    return this.backend.post('verification/verifiers', signedVerifierItem)
+    return this.backend.post('verification/verifiers', {verifier: signedVerifierItem})
   }
 
   submitCommitmentOpenings(signedVoterCommitmentOpeningItem): Promise<AxiosResponse> {
-    return this.backend.post('verification/commitment_openings', signedVoterCommitmentOpeningItem, {
+    return this.backend.post('verification/commitment_openings', {commitmentOpening: signedVoterCommitmentOpeningItem}, {
       headers: {
         'X-Voter-Session': this.voterSessionUuid
       }
