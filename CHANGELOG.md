@@ -1,4 +1,8 @@
 # AV Client Library Changelog
+## 1.0.5
+- Packing payloads to DBB
+- Customizable URL in Verifier-POC
+
 ## 1.0.4
 - Encrypted commitment openings
 - Added tests
