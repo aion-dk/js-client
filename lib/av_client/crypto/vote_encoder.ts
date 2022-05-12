@@ -19,7 +19,7 @@ export const bytesToPoints = (bytes: Uint8Array, pointCount: number): any[] => {
     // compute the `bn` used to increment the adjusting byte
     let incrementer = computeIncrementer()
 
-    let points = []
+    let points: any[] = []
     for (let i=0; i<pointCount; i++) {
         let offset = i * pointContentSize
         let bytesPartial = paddedBytes.slice(offset, offset + pointContentSize)
