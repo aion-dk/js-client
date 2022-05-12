@@ -8,7 +8,7 @@ const ADJUSTING_BYTE_COUNT = 1
  * @param {pointCount} the amount of points to be returned.
  * @return {array of sjcl.ecc.point} An array of points representing encoding the bytes
  */
-export const bytesToPoints = (bytes: Uint8Array, pointCount: Number): any[] => {
+export const bytesToPoints = (bytes: Uint8Array, pointCount: number): any[] => {
     let pointContentSize = computePointContentSize()
     if (Math.ceil(bytes.length / pointContentSize) > pointCount)
         throw new Error("Too many bytes to be encoded as points");
@@ -35,7 +35,7 @@ export const bytesToPoints = (bytes: Uint8Array, pointCount: Number): any[] => {
  * @param {byteCount} the amount of bytes to be returned. This is calculated as the largest size a vote could have.
  * @return {Uint8Array} The array of bytes
  */
-export const pointsToBytes = (points: any[], byteCount: Number): Uint8Array => {
+export const pointsToBytes = (points: any[], byteCount: number): Uint8Array => {
     let pointContentSize = computePointContentSize()
     if (points.length * pointContentSize < byteCount)
         throw new Error("Too many bytes to be decoded from points");
@@ -52,7 +52,7 @@ export const pointsToBytes = (points: any[], byteCount: Number): Uint8Array => {
     return Uint8Array.from(contentBytes)
 }
 
-const bytesToPoint = (bytes: Number[], incrementer: any): any => {
+const bytesToPoint = (bytes: number[], incrementer: any): any => {
     // turn bytes into bignum (used as x coordinate of the point) by:
     // [adjusting bytes] + [0x00 padding bytes] + [bytes]
     // padding doesn't happen in case `bytes` is of exact size
@@ -86,7 +86,7 @@ const bytesToPoint = (bytes: Number[], incrementer: any): any => {
     throw new Error("point encoding adjusting bytes exhausted")
 }
 
-const pointToBytes = (point: any, contentSize: Number): Number[]  => {
+const pointToBytes = (point: any, contentSize: number): number[]  => {
     // parse the x coordinate of the point as:
     // [adjusting bytes] + [`contentSize` bytes]
 
@@ -100,7 +100,7 @@ const pointToBytes = (point: any, contentSize: Number): Number[]  => {
     return sjcl.codec.bytes.fromBits(contentBits)
 }
 
-const padBytes = (size: Number, bytes: Number[]): Uint8Array => {
+const padBytes = (size: number, bytes: Uint8Array): Uint8Array => {
     let paddedBytes = new Uint8Array(size)
     paddedBytes.fill(0)
     paddedBytes.set(bytes, 0)                                   // pad on the right
@@ -120,7 +120,7 @@ const computeIncrementer = (): any => {
     return sjcl.bn.fromBits(sjcl.codec.bytes.toBits(incrementerBytes))
 }
 
-const computePointContentSize = (): Number => {
+const computePointContentSize = (): number => {
     let pointSize = Math.floor(crypto.Curve.field.prototype.exponent / 8)
     let pointContentSize = pointSize - ADJUSTING_BYTE_COUNT
 
