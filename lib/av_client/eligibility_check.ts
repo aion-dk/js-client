@@ -1,9 +1,9 @@
-import { BallotConfig, CastVoteRecord } from "./types";
+import { BallotConfigMap, CastVoteRecord } from "./types";
 
 export const checkEligibility = (
   voterGroup: string,
   cvr: CastVoteRecord,
-  ballotConfigs: BallotConfig
+  ballotConfigs: BallotConfigMap
 ): ":okay" | ":not_eligible" => {
 
   const voterGroupConfig = ballotConfigs[voterGroup];

@@ -1,4 +1,4 @@
-import { BallotConfig, CastVoteRecord, ContestConfigMap } from './types';
+import { BallotConfigMap, CastVoteRecord, ContestConfigMap } from './types';
 import { flattenOptions } from './flatten_options'
 
 type ValidationResult = ':okay'
@@ -9,7 +9,7 @@ type ValidationResult = ':okay'
 const validateCvr = (
   cvr: CastVoteRecord,
   voterGroup: string,
-  ballotConfigs: BallotConfig,
+  ballotConfigs: BallotConfigMap,
   allContests: ContestConfigMap) : ValidationResult => {
 
   const ballotConfig = ballotConfigs[voterGroup];

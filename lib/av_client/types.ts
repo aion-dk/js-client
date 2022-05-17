@@ -235,7 +235,7 @@ export interface ClientState {
 export type Signature = string;
 export type HashValue = string;
 
-export type BallotConfig = {
+export type BallotConfigMap = {
   [voterGroupId: string]: {
     contestReferences: string[]
   }
@@ -273,7 +273,7 @@ export interface ElectionConfig {
   dbbPublicKey: string
 
   contestConfigs: ContestConfigMap
-  ballotConfigs: BallotConfig;
+  ballotConfigs: BallotConfigMap;
 
   // appended data:
   affidavit: AffidavitConfig;
