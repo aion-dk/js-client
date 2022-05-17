@@ -1,7 +1,7 @@
 import { decrypt } from "../../lib/av_client/decrypt_vote";
-import { ContestConfig } from "../../lib/av_client/types";
+import { ContestConfigMap } from "../../lib/av_client/types";
 import { expect } from 'chai';
-const contestConfig : ContestConfig= {
+const contestConfig : ContestConfigMap = {
   "contest ref 1": {
       "markingType": {
           "style": "regular",

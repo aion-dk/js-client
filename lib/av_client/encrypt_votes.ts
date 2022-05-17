@@ -1,11 +1,11 @@
-import { CastVoteRecord, ContestConfig, ContestMap, MarkingType, OpenableEnvelope } from "./types";
+import { CastVoteRecord, ContestConfigMap, ContestMap, MarkingType, OpenableEnvelope } from "./types";
 import { encryptVote } from './crypto/encrypt_vote';
 import { cvrToCodes } from './cvr_conversion';
 import { hashString, ElGamalPointCryptogram } from './aion_crypto';
 import {Uniformer} from "../util/uniformer";
 
 const encrypt = (
-  contestConfigs: ContestConfig,
+  contestConfigs: ContestConfigMap,
   contestSelections: CastVoteRecord,
   markingType: MarkingType,
   encryptionKey: string): ContestMap<OpenableEnvelope> => {

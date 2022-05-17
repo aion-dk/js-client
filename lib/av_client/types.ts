@@ -241,7 +241,7 @@ export type BallotConfig = {
   }
 };
 
-export type ContestConfig = {
+export type ContestConfigMap = {
   [contestReference: string]: {
     options: Option[]
     markingType: MarkingType
@@ -272,7 +272,7 @@ export interface ElectionConfig {
 
   dbbPublicKey: string
 
-  contestConfigs: ContestConfig
+  contestConfigs: ContestConfigMap
   ballotConfigs: BallotConfig;
 
   // appended data:
