@@ -236,10 +236,13 @@ export type Signature = string;
 export type HashValue = string;
 
 export type BallotConfigMap = {
-  [voterGroupId: string]: {
-    contestReferences: string[]
-  }
+  [voterGroupId: string]: BallotConfig
 };
+
+export type BallotConfig = {
+  voterGroup: string
+  contestReferences: string[]
+}
 
 export type ContestConfigMap = {
   [contestReference: string]: ContestConfig
