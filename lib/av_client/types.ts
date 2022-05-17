@@ -242,16 +242,19 @@ export type BallotConfigMap = {
 };
 
 export type ContestConfigMap = {
-  [contestReference: string]: {
-    options: Option[]
-    markingType: MarkingType
-    resultType: {
-      name: string
-    }
-    title: LocalString
-    subtitle: LocalString
-    description: LocalString
+  [contestReference: string]: ContestConfig
+}
+
+export type ContestConfig = {
+  reference: string
+  options: Option[]
+  markingType: MarkingType
+  resultType: {
+    name: string
   }
+  title: LocalString
+  subtitle: LocalString
+  description: LocalString
 }
 
 export type MarkingType = {

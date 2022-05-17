@@ -22,9 +22,9 @@ const template = {
 describe('validateCvr', () => {
   context('given invalid CVR', () => {
     it('fails when voting on invalid contests or invalid options', async () => {
-      const contest1 = { ...template, options: createOptions(['1', '2']) };
-      const contest2 = { ...template, options: createOptions(['3', '4']) };
-      const contest3 = { ...template, options: createOptions(['5', '6']) };
+      const contest1 = { ...template, reference: 'a', options: createOptions(['1', '2']) };
+      const contest2 = { ...template, reference: 'b', options: createOptions(['3', '4']) };
+      const contest3 = { ...template, reference: 'c', options: createOptions(['5', '6']) };
 
       const allContests = {a: contest1, b: contest2, c: contest3 };
 
