@@ -235,23 +235,29 @@ export interface ClientState {
 export type Signature = string;
 export type HashValue = string;
 
-export type BallotConfig = {
-  [voterGroupId: string]: {
-    contestReferences: string[]
-  }
+export type BallotConfigMap = {
+  [voterGroupId: string]: BallotConfig
 };
 
+export type BallotConfig = {
+  voterGroup: string
+  contestReferences: string[]
+}
+
+export type ContestConfigMap = {
+  [contestReference: string]: ContestConfig
+}
+
 export type ContestConfig = {
-  [contestReference: string]: {
-    options: Option[]
-    markingType: MarkingType
-    resultType: {
-      name: string
-    }
-    title: LocalString
-    subtitle: LocalString
-    description: LocalString
+  reference: string
+  options: Option[]
+  markingType: MarkingType
+  resultType: {
+    name: string
   }
+  title: LocalString
+  subtitle: LocalString
+  description: LocalString
 }
 
 export type MarkingType = {
@@ -272,8 +278,8 @@ export interface ElectionConfig {
 
   dbbPublicKey: string
 
-  contestConfigs: ContestConfig
-  ballotConfigs: BallotConfig;
+  contestConfigs: ContestConfigMap
+  ballotConfigs: BallotConfigMap;
 
   // appended data:
   affidavit: AffidavitConfig;

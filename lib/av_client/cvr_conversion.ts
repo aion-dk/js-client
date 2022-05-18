@@ -1,12 +1,12 @@
 import {
-  ContestConfig,
+  ContestConfigMap,
   CastVoteRecord,
   ContestMap,
 } from './types';
 
 import { flattenOptions } from './flatten_options'
 
-export function cvrToCodes(contestConfigs: ContestConfig, cvr: CastVoteRecord){
+export function cvrToCodes(contestConfigs: ContestConfigMap, cvr: CastVoteRecord){
   const cvrCodes = {}
   Object.keys(cvr).forEach(contestId => {
     const flatOptions = flattenOptions(contestConfigs[contestId].options)
@@ -17,7 +17,7 @@ export function cvrToCodes(contestConfigs: ContestConfig, cvr: CastVoteRecord){
   return cvrCodes
 }
 
-export function codesToCvr(contestConfigs: ContestConfig, cvrCodes: ContestMap<number>){
+export function codesToCvr(contestConfigs: ContestConfigMap, cvrCodes: ContestMap<number>){
   const cvr = {}
   Object.keys(cvrCodes).forEach(contestId => {
     const flatOptions = flattenOptions(contestConfigs[contestId].options)

@@ -1,10 +1,10 @@
-import { CastVoteRecord, ContestConfig, CommitmentOpening, ContestMap, MarkingType } from "./types";
+import { CastVoteRecord, ContestConfigMap, CommitmentOpening, ContestMap, MarkingType } from "./types";
 import { decryptVote } from './crypto/decrypt_vote';
 import { codesToCvr } from './cvr_conversion';
 import { addBigNums } from './aion_crypto';
 
 export const decrypt = (
-  contestConfigs: ContestConfig,
+  contestConfigs: ContestConfigMap,
   markingType: MarkingType,
   encryptionKey: string,
   cryptograms: ContestMap<string[]>, 
