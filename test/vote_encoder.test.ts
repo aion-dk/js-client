@@ -6,26 +6,18 @@ import * as crypto from "../lib/av_client/aion_crypto";
 describe('encode bytes into ec points', () => {
   it('converts bytes to points', () => {
     const bytes = Uint8Array.from([1, 2, 3])
-    const pointCount = 2
-    const points = bytesToPoints(bytes, pointCount)
+    const points = bytesToPoints(bytes)
 
-    expect(points.length).to.equal(pointCount)
+    expect(points.length).to.equal(1)
   })
 
   it('converts a black vote into none infinity points', () => {
     const bytes = Uint8Array.from([0, 0, 0])
-    const pointCount = 2
-    const points = bytesToPoints(bytes, pointCount)
+    const points = bytesToPoints(bytes)
 
     expect(points.every((point) => !point.isIdentity)).to.be.true
   })
 
-  it('fails when there are too many bytes for the available points', () => {
-    const bytes = new Uint8Array(100).fill(1)
-    const pointCount = 1
-
-    expect(() => bytesToPoints(bytes, pointCount)).to.throw(Error, "Too many bytes to be encoded as points")
-  })
 
   it('converts points to bytes', () => {
     const point1Hex = '020101020300000000000000000000000000000000000000000000000000000000'
@@ -59,8 +51,7 @@ describe('encode bytes into ec points', () => {
 
   it('converts bytes to points and back', () => {
     const bytes = Uint8Array.from([1, 2, 3, 0, 255])
-    const pointCount = 3
-    const points = bytesToPoints(bytes, pointCount)
+    const points = bytesToPoints(bytes)
     const bytesBack = pointsToBytes(points, bytes.length)
 
     expect(bytes.length === bytesBack.length &&

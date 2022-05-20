@@ -5,13 +5,11 @@ const ADJUSTING_BYTE_COUNT = 1
 
 /**
  * @param {bytes} the bytes to be encoded as points.
- * @param {pointCount} the amount of points to be returned.
  * @return {array of sjcl.ecc.point} An array of points representing encoding the bytes
  */
-export const bytesToPoints = (bytes: Uint8Array, pointCount: number): any[] => {
+export const bytesToPoints = (bytes: Uint8Array): any[] => {
     const pointContentSize = computePointContentSize()
-    if (Math.ceil(bytes.length / pointContentSize) > pointCount)
-        throw new Error("Too many bytes to be encoded as points");
+    const pointCount = Math.ceil(bytes.length / pointContentSize)
 
     // pad the byte array with 0x00 on the right side
     const paddedBytes = padBytes(pointCount * pointContentSize, bytes)
