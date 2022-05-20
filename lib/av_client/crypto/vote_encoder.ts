@@ -72,9 +72,9 @@ const bytesToPoint = (bytes: number[], incrementer: any): any => {
 
     while (x < crypto.Curve.field.modulus) {
         try {
-            let xBits = x.toBits(fieldBitLength)
-            let pointBits = sjcl.bitArray.concat(flagBits, xBits)
-            let point = crypto.pointFromBits(pointBits)
+            const xBits = x.toBits(fieldBitLength)
+            const pointBits = sjcl.bitArray.concat(flagBits, xBits)
+            const point = crypto.pointFromBits(pointBits)
 
             return point
         } catch (err) {
