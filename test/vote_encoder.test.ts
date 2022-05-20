@@ -18,6 +18,19 @@ describe('encode bytes into ec points', () => {
     expect(points.every((point) => !point.isIdentity)).to.be.true
   })
 
+  it('converts max byte values to one point', () => {
+    const bytes = Uint8Array.from(Array(31).fill(255))
+    const points = bytesToPoints(bytes)
+
+    expect(points.length).to.equal(1)
+  })
+
+  it('converts bytes to two points', () => {
+    const bytes = Uint8Array.from(Array(40).fill(10))
+    const points = bytesToPoints(bytes)
+
+    expect(points.length).to.equal(2)
+  })
 
   it('converts points to bytes', () => {
     const point1Hex = '020101020300000000000000000000000000000000000000000000000000000000'
