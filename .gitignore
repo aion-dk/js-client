@@ -5,9 +5,3 @@ dist
 node_modules
 package
 **/bundle.js
-
-# Editor settings: Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
-*.iml
-.idea/
-*.ipr
-*.iws
