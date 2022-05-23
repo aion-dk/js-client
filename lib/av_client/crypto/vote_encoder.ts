@@ -15,9 +15,6 @@ export const bytesToPoints = (bytes: Uint8Array): any[] => {
     // pad the byte array with 0x00 on the right side
     const paddedBytes = padBytes(pointCount * POINT_CONTENT_SIZE, bytes)
 
-    // compute the `bn` used to increment the adjusting byte
-    const incrementer = computeIncrementer()
-
     const points: any[] = []
     for (let i=0; i<pointCount; i++) {
         const offset = i * POINT_CONTENT_SIZE
