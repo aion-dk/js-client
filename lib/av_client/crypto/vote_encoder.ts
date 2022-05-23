@@ -2,27 +2,28 @@ import * as sjcl from '../sjcl';
 import * as crypto from "../aion_crypto";
 
 const ADJUSTING_BYTE_COUNT = 1
+const INCREMENTER = computeIncrementer()
+const POINT_CONTENT_SIZE = computePointContentSize()
 
 /**
  * @param {bytes} the bytes to be encoded as points.
  * @return {array of sjcl.ecc.point} An array of points representing encoding the bytes
  */
 export const bytesToPoints = (bytes: Uint8Array): any[] => {
-    const pointContentSize = computePointContentSize()
-    const pointCount = Math.ceil(bytes.length / pointContentSize)
+    const pointCount = Math.ceil(bytes.length / POINT_CONTENT_SIZE)
 
     // pad the byte array with 0x00 on the right side
-    const paddedBytes = padBytes(pointCount * pointContentSize, bytes)
+    const paddedBytes = padBytes(pointCount * POINT_CONTENT_SIZE, bytes)
 
     // compute the `bn` used to increment the adjusting byte
     const incrementer = computeIncrementer()
 
     const points: any[] = []
     for (let i=0; i<pointCount; i++) {
-        const offset = i * pointContentSize
-        const bytesPartial = paddedBytes.slice(offset, offset + pointContentSize)
+        const offset = i * POINT_CONTENT_SIZE
+        const bytesPartial = paddedBytes.slice(offset, offset + POINT_CONTENT_SIZE)
         const byteArray = Array.from(bytesPartial)
-        points.push(bytesToPoint(byteArray, incrementer))
+        points.push(bytesToPoint(byteArray))
     }
 
     return points
@@ -34,12 +35,11 @@ export const bytesToPoints = (bytes: Uint8Array): any[] => {
  * @return {Uint8Array} The array of bytes
  */
 export const pointsToBytes = (points: any[], byteCount: number): Uint8Array => {
-    const pointContentSize = computePointContentSize()
-    if (points.length * pointContentSize < byteCount)
+    if (points.length * POINT_CONTENT_SIZE < byteCount)
         throw new Error("Too many bytes to be decoded from points");
 
     const bytes = points
-        .map((point) => pointToBytes(point, pointContentSize))
+        .map((point) => pointToBytes(point))
         .flat()
 
     const contentBytes = bytes.slice(0, byteCount)
@@ -50,7 +50,7 @@ export const pointsToBytes = (points: any[], byteCount: number): Uint8Array => {
     return Uint8Array.from(contentBytes)
 }
 
-const bytesToPoint = (bytes: number[], incrementer: any): any => {
+const bytesToPoint = (bytes: number[]): any => {
     // turn bytes into bignum (used as x coordinate of the point) by:
     // [adjusting bytes] + [0x00 padding bytes] + [bytes]
     // padding doesn't happen in case `bytes` is of exact size
@@ -77,14 +77,14 @@ const bytesToPoint = (bytes: number[], incrementer: any): any => {
             return point
         } catch (err) {
             // increment
-            x = x.add(incrementer)
+            x = x.add(INCREMENTER)
         }
     }
 
     throw new Error("point encoding adjusting bytes exhausted")
 }
 
-const pointToBytes = (point: any, contentSize: number): number[]  => {
+const pointToBytes = (point: any): number[]  => {
     // parse the x coordinate of the point as:
     // [adjusting bytes] + [`contentSize` bytes]
 
@@ -92,7 +92,7 @@ const pointToBytes = (point: any, contentSize: number): number[]  => {
         throw new Error("identity point is not a valid point encoding")
 
     const xBits = point.x.toBits()
-    const offset = sjcl.bitArray.bitLength(xBits) - (contentSize * 8)
+    const offset = sjcl.bitArray.bitLength(xBits) - (POINT_CONTENT_SIZE * 8)
     const contentBits = sjcl.bitArray.bitSlice(xBits, offset)
 
     return sjcl.codec.bytes.fromBits(contentBits)
@@ -107,7 +107,7 @@ const padBytes = (size: number, bytes: Uint8Array): Uint8Array => {
     return paddedBytes
 }
 
-const computeIncrementer = (): any => {
+function computeIncrementer(): any {
     const pointSize = Math.floor(crypto.Curve.field.prototype.exponent / 8)
     const incrementerSize = pointSize - ADJUSTING_BYTE_COUNT + 1
 
@@ -118,7 +118,7 @@ const computeIncrementer = (): any => {
     return sjcl.bn.fromBits(sjcl.codec.bytes.toBits(incrementerBytes))
 }
 
-const computePointContentSize = (): number => {
+function computePointContentSize(): number {
     const pointSize = Math.floor(crypto.Curve.field.prototype.exponent / 8)
     const pointContentSize = pointSize - ADJUSTING_BYTE_COUNT
 
