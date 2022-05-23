@@ -47,20 +47,20 @@ export const pointsToBytes = (points: any[], byteCount: number): Uint8Array => {
     return Uint8Array.from(contentBytes)
 }
 
+/**
+ * It turns bytes into a bignum (used as x coordinate of the point) by:
+ * [adjusting bytes] + [0x00 padding bytes] + [bytes]
+ * Padding doesn't happen in case `bytes` is of exact size.
+ * The amount of adjusting bytes is configurable by setting `ADJUSTING_BYTE_COUNT`.
+ * Construct the point encoding by:
+ * [0x02 encoding flag byte] + [x coordinate bytes]
+ * Try to decode the point. If invalid, increment the adjusting bytes and retry.
+ * The adjusting bytes are incremented by adding x = x + INCREMENTER.
+ *
+ * @param {bytes} the bytes to be encoded as one point.
+ * @return {sjcl.ecc.point} The point representing encoding of the bytes
+ */
 const bytesToPoint = (bytes: number[]): any => {
-    // turn bytes into bignum (used as x coordinate of the point) by:
-    // [adjusting bytes] + [0x00 padding bytes] + [bytes]
-    // padding doesn't happen in case `bytes` is of exact size
-    // the amount of adjusting bytes is configurable by setting `ADJUSTING_BYTE_COUNT`
-    // construct the point encoding:
-    // [0x02 encoding flag byte] + [x coordinate bytes]
-    // try to decode the point. If invalid, increment the adjusting bytes and retry
-    // the adjusting bytes are incremented by adding x = x + incrementer
-
-    // FIXME: This function is ready for supporting multiple elliptic curves but it
-    // FIXME: depends on `crypto.pointFromBits()` which is currently hardcoded to work
-    // FIXME: with 32 byte length curves.
-
     const flagBits = sjcl.codec.bytes.toBits([2])
     const fieldBitLength = crypto.Curve.field.modulus.bitLength()
     let x = sjcl.bn.fromBits(sjcl.codec.bytes.toBits(bytes))
@@ -81,10 +81,13 @@ const bytesToPoint = (bytes: number[]): any => {
     throw new Error("point encoding adjusting bytes exhausted")
 }
 
+/**
+ * It parses the x coordinate of the point as:
+ * [adjusting bytes] + [`POINT_CONTENT_SIZE` bytes]
+ * @param {point} The sjcl.ec.point to be decoded into bytes.
+ * @return {array of number} The array of bytes
+ */
 const pointToBytes = (point: any): number[]  => {
-    // parse the x coordinate of the point as:
-    // [adjusting bytes] + [`contentSize` bytes]
-
     if (point.isIdentity)
         throw new Error("identity point is not a valid point encoding")
 
