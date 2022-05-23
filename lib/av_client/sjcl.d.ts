@@ -7,22 +7,22 @@ export = sjcl;
 export as namespace sjcl;
 
 declare namespace sjcl {
-    export var arrayBuffer: SjclArrayBufferModes;
-    export var bn: BigNumberStatic;
-    export var bitArray: BitArrayStatic;
-    export var codec: SjclCodecs;
-    export var hash: SjclHashes;
-    export var exception: SjclExceptions;
-    export var cipher: SjclCiphers;
-    export var mode: SjclModes;
-    export var misc: SjclMisc;
-    export var ecc: SjclEllipticCurveCryptography;
-    export var random: SjclRandom;
-    export var prng: SjclRandomStatic;
-    export var keyexchange: SjclKeyExchange;
-    export var json: SjclJson;
-    export var encrypt: SjclConvenienceEncryptor;
-    export var decrypt: SjclConvenienceDecryptor;
+    export const arrayBuffer: SjclArrayBufferModes;
+    export const bn: BigNumberStatic;
+    export const bitArray: BitArrayStatic;
+    export const codec: SjclCodecs;
+    export const hash: SjclHashes;
+    export const exception: SjclExceptions;
+    export const cipher: SjclCiphers;
+    export const mode: SjclModes;
+    export const misc: SjclMisc;
+    export const ecc: SjclEllipticCurveCryptography;
+    export const random: SjclRandom;
+    export const prng: SjclRandomStatic;
+    export const keyexchange: SjclKeyExchange;
+    export const json: SjclJson;
+    export const encrypt: SjclConvenienceEncryptor;
+    export const decrypt: SjclConvenienceDecryptor;
 
     // ________________________________________________________________________
 
@@ -149,7 +149,7 @@ declare namespace sjcl {
 
     // ________________________________________________________________________
 
-    interface BitArray extends Array<number> {}
+    type BitArray = Array<number>
 
     interface BitArrayStatic {
         /// Array slices in units of bits.
@@ -584,8 +584,8 @@ declare namespace sjcl {
         getProgress(paranoia?: number): number;
         startCollectors(): void;
         stopCollectors(): void;
-        addEventListener(name: string, cb: Function): void;
-        removeEventListener(name: string, cb: Function): void;
+        addEventListener(name: string, cb: (arg: number) => void): void;
+        removeEventListener(name: string, cb: (arg: number) => void): void;
     }
 
     interface SjclRandomStatic {
@@ -661,8 +661,8 @@ declare namespace sjcl {
     interface SjclJson {
         encrypt: SjclConvenienceEncryptor;
         decrypt: SjclConvenienceDecryptor;
-        encode(obj: Object): string;
-        decode(obj: string): Object;
+        encode(obj: Record<string, unknown>): string;
+        decode(obj: string): Record<string, unknown>;
     }
 
     // ________________________________________________________________________
