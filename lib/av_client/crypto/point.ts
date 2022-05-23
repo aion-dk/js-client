@@ -1,16 +1,11 @@
 import * as crypto from "../aion_crypto";
 import {Bignum} from "./bignum";
-import type { BitArray } from "./bitarray";
-
-// As this is working with untyped SJCL classes,
-// we need the _any_ type in this wrapper.
-
-/*eslint-disable @typescript-eslint/no-explicit-any*/
+import type { BitArray, SjclEllipticalPoint } from "../sjcl";
 
 export class Point {
-  private eccPoint: any;
+  private eccPoint: SjclEllipticalPoint;
 
-  constructor(point: any) {
+  constructor(point: SjclEllipticalPoint) {
     this.eccPoint = point;
   }
 
