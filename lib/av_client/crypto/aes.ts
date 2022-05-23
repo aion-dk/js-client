@@ -78,7 +78,7 @@ function encrypt(symmetricKey, message: string){
   const prf = new sjcl.cipher.aes(symmetricKey);
   const plaintext = sjcl.codec.utf8String.toBits(message)
   const iv = sjcl.bitArray.clamp(sjcl.random.randomWords(4), 12 * 8)
-  const adata = ''
+  const adata = []
   const ts = 128
   const ciphertextAndTag = sjcl.mode.gcm.encrypt(prf, plaintext, iv, adata, ts);
 
@@ -93,7 +93,7 @@ function encrypt(symmetricKey, message: string){
 function decrypt(symmetricKey, ciphertext, tag, iv){
   const prf = new sjcl.cipher.aes(symmetricKey);
   const ciphertextAndTag = sjcl.bitArray.concat(ciphertext, tag)
-  const adata = ''
+  const adata = []
   const ts = 128
   const plaintext = sjcl.mode.gcm.decrypt(prf, ciphertextAndTag, iv, adata, ts);
 

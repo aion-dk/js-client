@@ -44,7 +44,7 @@ export function shortCodeToHex(input: string): string {
     throw new InvalidTrackingCodeError("Invalid input. Only up to 40 bits are supported.")
   }
 
-  const bits = sjcl.codec.bytes.toBits(byteArray)
+  const bits = sjcl.codec.bytes.toBits(Array.from(byteArray))
   const hex = sjcl.codec.hex.fromBits(bits)
 
   return hex.padStart(10, HEX_PAD)
