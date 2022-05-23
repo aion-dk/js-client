@@ -13,7 +13,7 @@ export const bytesToPoints = (bytes: Uint8Array): any[] => {
     const pointCount = Math.ceil(bytes.length / POINT_CONTENT_SIZE)
 
     // pad the byte array with 0x00 on the right side
-    const paddedBytes = padBytes(pointCount * POINT_CONTENT_SIZE, bytes)
+    const paddedBytes = padBytesRight(bytes, pointCount * POINT_CONTENT_SIZE)
 
     const points: any[] = []
     for (let i=0; i<pointCount; i++) {
@@ -95,11 +95,10 @@ const pointToBytes = (point: any): number[]  => {
     return sjcl.codec.bytes.fromBits(contentBits)
 }
 
-const padBytes = (size: number, bytes: Uint8Array): Uint8Array => {
+const padBytesRight = (bytes: Uint8Array, size: number): Uint8Array => {
     const paddedBytes = new Uint8Array(size)
     paddedBytes.fill(0)
-    paddedBytes.set(bytes, 0)                                   // pad on the right
-    // paddedBytes.set(bytes, paddedBytes.length - bytes.length)   // pad on the left
+    paddedBytes.set(bytes, 0)   // pad on the right
 
     return paddedBytes
 }
