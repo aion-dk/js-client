@@ -153,7 +153,7 @@ declare namespace sjcl {
 
     interface BitArrayStatic {
         /// Array slices in units of bits.
-        bitSlice(a: BitArray, bstart: number, bend: number): BitArray;
+        bitSlice(a: BitArray, bstart: number, bend?: number): BitArray;
 
         /// Extract a number packed into a bit array.
         extract(a: BitArray, bstart: number, blength: number): number;
@@ -498,7 +498,7 @@ declare namespace sjcl {
     }
 
     interface SjclKeysGenerator<P extends SjclECCPublicKey, S extends SjclECCSecretKey> {
-        (curve: SjclEllipticalCurve | number, paranoia: number, sec?: BigNumber): SjclKeyPair<P, S>;
+        (curve: SjclEllipticalCurve | number, paranoia?: number, sec?: BigNumber): SjclKeyPair<P, S>;
     }
 
     interface SjclECCKeyPairData {
