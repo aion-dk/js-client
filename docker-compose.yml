@@ -2,6 +2,7 @@ version: '3'
 services:
   js-client:
     image: "js-client:latest"
+    build: .
     command: "npm run server"
     volumes:
       - "./:/usr/src/app"
