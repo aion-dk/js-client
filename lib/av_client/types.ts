@@ -244,6 +244,7 @@ export type BallotConfigMap = {
 };
 
 export type BallotConfig = {
+  reference: string
   voterGroup: string
   contestReferences: string[]
 }
