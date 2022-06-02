@@ -114,7 +114,7 @@ function computeIncrementer(): any {
     const incrementerBytes = new Uint8Array(incrementerSize)
     incrementerBytes.set([1])
 
-    return sjcl.bn.fromBits(sjcl.codec.bytes.toBits(incrementerBytes))
+    return sjcl.bn.fromBits(sjcl.codec.bytes.toBits(Array.from(incrementerBytes)))
 }
 
 function computePointContentSize(): number {
