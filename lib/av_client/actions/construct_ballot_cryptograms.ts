@@ -12,6 +12,7 @@ import {
   CastVoteRecord,
   ClientState,
   ContestMap,
+  MarkingType,
   OpenableEnvelope
 } from '../types';
 
@@ -20,11 +21,14 @@ import {
 } from '../errors';
 import { generatePedersenCommitment } from '../crypto/pedersen_commitment';
 
-const DEFAULT_MARKING_TYPE = {
-  style: "regular",
-  codeSize: 1,
+const DEFAULT_MARKING_TYPE: MarkingType = {
   minMarks: 1,
-  maxMarks: 1
+  maxMarks: 1,
+  encoding: {
+    codeSize: 1,
+    maxSize: 1,
+    cryptogramCount: 1
+  }
 };
 
 const _getEncodingTypes = (cvr: CastVoteRecord, ballots: Ballot[]) => {

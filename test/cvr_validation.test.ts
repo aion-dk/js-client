@@ -1,17 +1,22 @@
 import { validateCvr } from '../lib/av_client/cvr_validation';
-import { Option } from '../lib/av_client/types';
+import { MarkingType, Option } from '../lib/av_client/types';
 import { expect } from 'chai';
+
+const markingType: MarkingType = {
+  minMarks: 1,
+  maxMarks: 1,
+  encoding: {
+    codeSize: 1,
+    maxSize: 1,
+    cryptogramCount: 1
+  }
+}
 
 const template = {
   vote_encoding_type: 0,
   description: {},
   write_in: false,
-  markingType: {
-    style: "regular",
-    codeSize: 1,
-    minMarks: 1,
-    maxMarks: 1
-  },
+  markingType: markingType,
   resultType: {
     name: "Something"
   },

@@ -24,8 +24,7 @@ const VOTE_ENCODING_TYPE = Object.freeze({
 const getEncodingTypeFromMarkingType = (markingType: MarkingType) => {
   const { minMarks, maxMarks } = markingType;
 
-  if(markingType.style === "regular" &&
-    minMarks === 1 &&
+  if(minMarks === 1 &&
     maxMarks === 1) {
     return VOTE_ENCODING_TYPE.TEXT_UTF8
   }
