@@ -310,6 +310,11 @@ interface AffidavitConfig {
   encryptionKey: string;
 }
 
+export type BallotSelection = {
+  reference: string
+  contestSelections: ContestSelection[]
+}
+
 export type ContestSelection = {
   reference: string
   optionSelections: OptionSelection[]

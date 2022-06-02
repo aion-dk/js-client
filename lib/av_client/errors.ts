@@ -104,6 +104,15 @@ export class CorruptCvrError extends AvClientError {
   }
 }
 
+export class CorruptSelectionError extends AvClientError {
+  readonly name = "CorruptSelectionError";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, CorruptSelectionError.prototype);
+  }
+}
+
 export class TimeoutError extends AvClientError {
   readonly name = "TimeoutError";
 
