@@ -308,3 +308,13 @@ interface AffidavitConfig {
   curve: string;
   encryptionKey: string;
 }
+
+export type ContestSelection = {
+  reference: string
+  optionSelections: OptionSelection[]
+}
+
+export type OptionSelection = {
+  reference: string
+  text?: string
+}
