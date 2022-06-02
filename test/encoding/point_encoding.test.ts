@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import {bytesToPoints, pointsToBytes} from '../lib/av_client/crypto/vote_encoder';
-import * as sjcl from '../lib/av_client/sjcl';
-import * as crypto from "../lib/av_client/aion_crypto";
+import {bytesToPoints, pointsToBytes} from '../../lib/av_client/encoding/point_encoding';
+import * as sjcl from '../../lib/av_client/sjcl';
+import * as crypto from "../../lib/av_client/aion_crypto";
 
 describe('encode bytes into ec points', () => {
   it('converts bytes to points', () => {
