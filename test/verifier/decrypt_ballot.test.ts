@@ -1,14 +1,17 @@
 import { decrypt } from "../../lib/av_client/decrypt_vote";
-import { ContestConfigMap } from "../../lib/av_client/types";
+import { ContestConfigMap, MarkingType } from "../../lib/av_client/types";
 import { expect } from 'chai';
 const contestConfig : ContestConfigMap = {
   "contest ref 1": {
       "reference": "contest ref 1",
       "markingType": {
-          "style": "regular",
-          "codeSize": 1,
           "minMarks": 1,
-          "maxMarks": 1
+          "maxMarks": 1,
+          "encoding": {
+            "codeSize": 1,
+            "maxSize": 1,
+            "cryptogramCount": 1,
+          }
       },
       "options": [
           {
@@ -77,11 +80,14 @@ const voterCommitmentOpening = {
   }
 }
 
-const defaultMarkingType = {
-  style: "regular",
-  codeSize: 1,
+const defaultMarkingType: MarkingType = {
   minMarks: 1,
-  maxMarks: 1
+  maxMarks: 1,
+  encoding: {
+    codeSize: 1,
+    maxSize: 1,
+    cryptogramCount: 1
+  }
 }
 
 

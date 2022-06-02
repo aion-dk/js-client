@@ -70,6 +70,10 @@ export interface Option {
   title: LocalString;
   subtitle: LocalString;
   description: LocalString;
+  writeIn?: {
+    maxSize: number
+    encoding: 'utf8'
+  }
 }
 
 export interface LocalString {
@@ -261,10 +265,13 @@ export type ContestConfig = {
 }
 
 export type MarkingType = {
-  style: string
-  codeSize: number
   minMarks: number
   maxMarks: number
+  encoding: {
+    codeSize: 1 | 2
+    maxSize: number
+    cryptogramCount: number
+  }
 }
 
 export interface ElectionConfig {
