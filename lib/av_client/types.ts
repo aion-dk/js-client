@@ -244,6 +244,7 @@ export type BallotConfigMap = {
 };
 
 export type BallotConfig = {
+  reference: string
   voterGroup: string
   contestReferences: string[]
 }
@@ -307,6 +308,11 @@ interface Service {
 interface AffidavitConfig {
   curve: string;
   encryptionKey: string;
+}
+
+export type BallotSelection = {
+  reference: string
+  contestSelections: ContestSelection[]
 }
 
 export type ContestSelection = {

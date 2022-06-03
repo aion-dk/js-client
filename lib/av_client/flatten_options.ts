@@ -8,7 +8,7 @@ function flattenOption(option: Option){
   return [clone].concat(flattenOptions(children))
 }
 
-export function flattenOptions(options: Option[]){
+export function flattenOptions(options: Option[]): Option[] {
   const reducer = (list: Option[], option: Option) => list.concat(flattenOption(option))
   return options.reduce(reducer, [])
 }

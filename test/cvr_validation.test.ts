@@ -42,6 +42,7 @@ describe('validateCvr', () => {
 
       const ballotConfigs = {
         [VOTER_GROUP]: {
+          reference: VOTER_GROUP,
           voterGroup: VOTER_GROUP,
           contestReferences: [ "a", "b" ]
         }
