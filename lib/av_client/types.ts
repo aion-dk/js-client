@@ -324,3 +324,9 @@ export type OptionSelection = {
   reference: string
   text?: string
 }
+
+export type ContestEnvelope = {
+  reference: string
+  cryptograms: string[]
+  randomizers: string[]
+}

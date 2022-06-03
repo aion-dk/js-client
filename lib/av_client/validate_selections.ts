@@ -96,9 +96,3 @@ function containsSameStrings( array1: string[], array2: string[] ){
 
   return JSON.stringify(cloned1) === JSON.stringify(cloned2)
 }
-
-
-
-
-
-
