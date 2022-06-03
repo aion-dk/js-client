@@ -106,7 +106,7 @@ describe('encryptContestSelections', () => {
       }
     ]
 
-    it.only('returns an array of one contest envelope that contains 2 cryptograms and 2 randomizers', () => {
+    it('returns an array of one contest envelope that contains 2 cryptograms and 2 randomizers', () => {
       let contestEnvelopes = encryptContestSelections(contestConfigs, contestSelections, encryptionKey)
       expect(contestEnvelopes.length).to.eql(1)
 
