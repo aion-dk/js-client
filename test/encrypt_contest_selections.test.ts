@@ -49,7 +49,7 @@ describe('encryptContestSelections', () => {
 
   context('when given a valid contest selection', () => {
     it('returns an array of contest envelopes', () => {
-      let contestEnvelopes = encryptContestSelections(contestConfigs, contestSelections, encryptionKey)
+      const contestEnvelopes = encryptContestSelections(contestConfigs, contestSelections, encryptionKey)
 
       expect(contestEnvelopes.length).to.eql(1)
 
@@ -107,7 +107,7 @@ describe('encryptContestSelections', () => {
     ]
 
     it('returns an array of one contest envelope that contains 2 cryptograms and 2 randomizers', () => {
-      let contestEnvelopes = encryptContestSelections(contestConfigs, contestSelections, encryptionKey)
+      const contestEnvelopes = encryptContestSelections(contestConfigs, contestSelections, encryptionKey)
       expect(contestEnvelopes.length).to.eql(1)
 
       const contestEnvelope = contestEnvelopes[0]

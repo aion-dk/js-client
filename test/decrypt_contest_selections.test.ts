@@ -78,7 +78,7 @@ const cryptograms = prepareCombinedCryptograms(voterEnvelopes, boardEnvelopes)
 describe('decryptContestSelections', () => {
   context('when given valid arguments', () => {
     it('returns an array of contest selections', () => {
-      let contestSelections = decryptContestSelections(contestConfigs, encryptionKey, cryptograms, boardCommitmentOpening, voterCommitmentOpening)
+      const contestSelections = decryptContestSelections(contestConfigs, encryptionKey, cryptograms, boardCommitmentOpening, voterCommitmentOpening)
       
       expect(contestSelections).to.eql([
         {

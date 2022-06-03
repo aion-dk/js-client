@@ -1,6 +1,6 @@
 import { validateBallotSelection, validateContestSelection } from '../lib/av_client/validate_selections'
 import { expect } from 'chai'
-import { ContestConfig, ContestSelection, BallotSelection, BallotConfig, ContestConfigMap } from '../lib/av_client/types'
+import { ContestConfig, BallotSelection, BallotConfig, ContestConfigMap } from '../lib/av_client/types'
 import { CorruptSelectionError } from '../lib/av_client/errors'
 
 const contestOne: ContestConfig = {
