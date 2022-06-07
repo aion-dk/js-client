@@ -100,7 +100,7 @@ describe('entire benaloh flow', () => {
       {
         "reference": "contest ref 1",
         "title": "First ballot",
-        "options": [
+        "optionSelections": [
           {
             "reference": "option ref 1",
             "title": "Option 1"
@@ -110,7 +110,7 @@ describe('entire benaloh flow', () => {
       {
         "reference": "contest ref 2",
         "title": "Second ballot",
-        "options": [
+        "optionSelections": [
           {
             "reference": "option ref 3",
             "title": "Option 3"
