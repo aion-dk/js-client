@@ -10,6 +10,7 @@ import {
   bulletinBoardHost
 } from './test_helpers';
 import * as Crypto from '../lib/av_client/aion_crypto';
+import { BallotSelection } from '../lib/av_client/types';
 
 describe('AVClient#submitBallotCryptograms', () => {
   let client: AVClient;
@@ -47,12 +48,21 @@ describe('AVClient#submitBallotCryptograms', () => {
       await client.validateAccessCode('1234');
       await client.registerVoter();
 
-      const cvr = {
-        '50422d0f-e795-4324-8289-50e3d3459196': '1',
-        'd866a7d7-15df-4765-9950-651c0ca1313d': '2'
-      };
+      const ballotSelection: BallotSelection = {
+        reference: 'ballot-1',
+        contestSelections: [
+          {
+            reference: 'contest ref 1',
+            optionSelections: [{reference: 'option ref 1'}]          
+          },
+          {
+            reference: 'contest ref 2',
+            optionSelections: [{reference: 'option ref 3'}]
+          }
+        ]
+      }
 
-      await client.constructBallot(cvr)
+      await client.constructBallot(ballotSelection)
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       const receipt = await client.castBallot(affidavit);
@@ -68,12 +78,21 @@ describe('AVClient#submitBallotCryptograms', () => {
       await client.validateAccessCode('1234');
       await client.registerVoter();
 
-      const cvr = {
-        '50422d0f-e795-4324-8289-50e3d3459196': '1',
-        'd866a7d7-15df-4765-9950-651c0ca1313d': '2'
-      };
+      const ballotSelection: BallotSelection = {
+        reference: 'ballot-1',
+        contestSelections: [
+          {
+            reference: 'contest ref 1',
+            optionSelections: [{reference: 'option ref 1'}]          
+          },
+          {
+            reference: 'contest ref 2',
+            optionSelections: [{reference: 'option ref 3'}]
+          }
+        ]
+      }
 
-      await client.constructBallot(cvr);
+      await client.constructBallot(ballotSelection);
 
       // change the proof of ballot 1
       const randomness = 'corrupted_randomness!';

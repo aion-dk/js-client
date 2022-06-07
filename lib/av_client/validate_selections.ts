@@ -60,7 +60,7 @@ function getContestConfig( contestConfigs: ContestConfigMap, contestSelection: C
 function validateContestsMatching( ballotConfig: BallotConfig, ballotSelection: BallotSelection ){
   const selectedContests = ballotSelection.contestSelections.map(cs => cs.reference)
   if( !containsSameStrings(ballotConfig.contestReferences, selectedContests) ){
-    throw new CorruptSelectionError('Contest selections does not match the contests allowed by the ballot')
+    throw new CorruptSelectionError('Contest selections do not match the contests allowed by the ballot')
   }
 }
 

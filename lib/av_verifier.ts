@@ -3,7 +3,7 @@ import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUES
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
 import { decrypt } from './av_client/decrypt_vote';
-import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap, MarkingType } from './av_client/types';
+import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap, MarkingType, ContestSelection } from './av_client/types';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 
 import {
@@ -12,6 +12,8 @@ import {
 } from './av_client/election_config';
 import { decryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
 import { InvalidContestError, InvalidOptionError, InvalidTrackingCodeError } from './av_client/errors';
+import { decryptContestSelections } from './av_client/decrypt_contest_selections';
+import { makeOptionFinder } from './av_client/option_finder';
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -92,7 +94,7 @@ export class AVVerifier {
     return pairingCode
   }
 
-  public decryptBallot() {
+  public decryptBallot(): ContestSelection[] {
     if( !this.verifierPrivateKey ){
       throw new Error('Verifier private key not present')
     }
@@ -103,19 +105,8 @@ export class AVVerifier {
     validateCommmitmentOpening(boardCommitmentOpening, this.boardCommitment, 'Board commitment not valid')
     validateCommmitmentOpening(voterCommitmentOpening, this.voterCommitment, 'Voter commitment not valid')
 
-    const defaultMarkingType: MarkingType = {
-      minMarks: 1,
-      maxMarks: 1,
-      encoding: {
-        codeSize: 1,
-        maxSize: 1,
-        cryptogramCount: 1
-      }
-    }
-
-    return decrypt(
+    return decryptContestSelections(
       this.electionConfig.contestConfigs,
-      defaultMarkingType,
       this.electionConfig.encryptionKey,
       this.ballotCryptograms.content.cryptograms,
       boardCommitmentOpening,
@@ -167,6 +158,27 @@ export class AVVerifier {
     return ballot
   }
 
+  public getReadableContestSelections( contestSelections: ContestSelection[], locale: string ){
+    const localizer = makeLocalizer(locale)
+
+    return contestSelections.map(cs => {
+      const contestConfig = this.electionConfig.contestConfigs[cs.reference]
+      const optionFinder = makeOptionFinder(contestConfig.options)
+
+      return {
+        reference: cs.reference,
+        title: localizer(contestConfig.title),
+        options: cs.optionSelections.map(os => {
+          const optionConfig = optionFinder(os.reference)
+          return {
+            reference: os.reference,
+            title: localizer(optionConfig.title)
+          }
+        })
+      }
+    })
+  }
+
   public async pollForCommitmentOpening() {
     let attempts = 0;
 
@@ -189,5 +201,16 @@ export class AVVerifier {
     };
   
     return new Promise(executePoll);
+  }
+}
+
+function makeLocalizer( locale: string ){
+  return ( field: { [locale: string]: string } ) => {
+    const availableFields = Object.keys(field)
+    if( availableFields.length === 0 ){
+      throw new Error('No localized data available')
+    }
+  
+    return field[locale] || field[availableFields[0]]
   }
 }

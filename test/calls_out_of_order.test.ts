@@ -1,8 +1,5 @@
 import { AVClient } from '../lib/av_client';
-import {
-  expectError,
-  bulletinBoardHost,
-} from './test_helpers';
+import { expectError, bulletinBoardHost } from './test_helpers';
 import { InvalidStateError } from '../lib/av_client/errors';
 
 describe('AVClient functions call order', () => {
@@ -22,7 +19,7 @@ describe('AVClient functions call order', () => {
 
   it('throws an error when constructBallotCryptograms is called first', async () => {
     await expectError(
-      client.constructBallot({ '1': '1', '2': '4' }),
+      client.constructBallot({ reference: '1', contestSelections: [] }),
       InvalidStateError,
       'Cannot construct cryptograms. Voter identity unknown'
     );
