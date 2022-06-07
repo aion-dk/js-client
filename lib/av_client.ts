@@ -16,7 +16,6 @@ import {
 import {
   IAVClient,
   ContestMap,
-  OpenableEnvelope,
   BallotBoxReceipt,
   VoterSessionItem,
   BoardCommitmentItem,
@@ -467,7 +466,7 @@ export class AVClient implements IAVClient {
   }
 
   public getVoterSession(): VoterSessionItem {
-    if(!this.electionConfig){
+    if(!this.voterSession){
       throw new InvalidStateError('No voter session loaded')
     }
 
