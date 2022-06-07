@@ -4,7 +4,7 @@ import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/o
 import * as NistConverter from './util/nist_converter';
 import { AVVerifier } from './av_verifier';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
-import { KeyPair, CastVoteRecord, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, ElectionConfig } from './av_client/types';
+import { KeyPair, CastVoteRecord, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, ElectionConfig, BallotStatus } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import * as jwt from 'jose';
@@ -47,7 +47,7 @@ import { signPayload, validatePayload, validateReceipt } from './av_client/sign'
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
-import { hexToShortCode } from './av_client/short_codes';
+import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 import { encryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
 
 /** @internal */
@@ -527,6 +527,19 @@ export class AVClient implements IAVClient {
     };
   
    return new Promise(executePoll);
+  }
+
+  /**
+   * Finds the ballot status corresponding to the given trackingcode.
+   * Also returns the activities associated with the ballot
+   * 
+   * @param trackingCode base58-encoded trackingcode
+  */
+  public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
+    const shortAddres = shortCodeToHex(trackingCode)
+    const { ballotStatus } = (await this.bulletinBoard.getBallotStatus(shortAddres)).data
+
+    return ballotStatus
   }
 }
 

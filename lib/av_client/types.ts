@@ -10,6 +10,7 @@ export interface IAVClient {
   castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
   purgeData(): void
   challengeBallot(): Promise<void>
+  checkBallotStatus(trackingCode: string): Promise<BallotStatus>
 }
 
 /**
@@ -275,6 +276,14 @@ export type MarkingType = {
     codeSize: 1 | 2
     maxSize: number
     cryptogramCount: number
+  }
+}
+
+export type BallotStatus = {
+  status: string
+  activities: {
+    type: string,
+    registered_at: string
   }
 }
 
