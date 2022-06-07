@@ -330,3 +330,15 @@ export type ContestEnvelope = {
   cryptograms: string[]
   randomizers: string[]
 }
+
+export type ReadableContestSelection = {
+  reference: string
+  title: string
+  optionSelections: ReadableOptionSelection[]
+}
+
+export type ReadableOptionSelection = {
+  reference: string
+  title: string
+  text?: string
+}

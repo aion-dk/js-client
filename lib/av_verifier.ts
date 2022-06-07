@@ -3,7 +3,7 @@ import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUES
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
 import { decrypt } from './av_client/decrypt_vote';
-import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap, MarkingType, ContestSelection } from './av_client/types';
+import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap, MarkingType, ContestSelection, ReadableContestSelection } from './av_client/types';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 
 import {
@@ -158,7 +158,7 @@ export class AVVerifier {
     return ballot
   }
 
-  public getReadableContestSelections( contestSelections: ContestSelection[], locale: string ){
+  public getReadableContestSelections( contestSelections: ContestSelection[], locale: string ): ReadableContestSelection[] {
     const localizer = makeLocalizer(locale)
 
     return contestSelections.map(cs => {
@@ -168,7 +168,7 @@ export class AVVerifier {
       return {
         reference: cs.reference,
         title: localizer(contestConfig.title),
-        options: cs.optionSelections.map(os => {
+        optionSelections: cs.optionSelections.map(os => {
           const optionConfig = optionFinder(os.reference)
           return {
             reference: os.reference,
