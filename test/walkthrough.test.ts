@@ -1,7 +1,6 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import axios from 'axios';
-import { BallotBoxReceipt } from '../lib/av_client';
 import nock = require('nock');
 import {
   resetDeterminism,
