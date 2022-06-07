@@ -51,14 +51,6 @@ function contestEnvelopesRandomizers( contestEnvelopes: ContestEnvelope[] ){
 }
 
 function extractConfig( state: ClientState ){
-  if( !state.voterSession ){
-    throw new InvalidStateError('Cannot construct ballot cryptograms. Voter registration not completed successfully')
-  }
-
-  if( !state.electionConfig ){
-    throw new InvalidStateError('Cannot construct ballot cryptograms. No election configuration present')
-  }
-
   const { voterGroup } = state.voterSession.content
   const { contestConfigs, ballotConfigs, encryptionKey } = state.electionConfig
 
