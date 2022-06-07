@@ -2,8 +2,7 @@ import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
-import { decrypt } from './av_client/decrypt_vote';
-import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap, MarkingType, ContestSelection, ReadableContestSelection } from './av_client/types';
+import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap, ContestSelection, ReadableContestSelection } from './av_client/types';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 
 import {

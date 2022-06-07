@@ -2,7 +2,7 @@ import { validateBallotSelection } from './validate_selections'
 import { InvalidStateError } from './errors'
 import { generatePedersenCommitment } from './crypto/pedersen_commitment'
 import { encryptContestSelections } from './encrypt_contest_selections'
-import { BallotConfigMap, BallotSelection, ContestConfigMap, ContestEnvelope, ContestMap, ElectionConfig, VoterSessionItem } from './types'
+import { BallotConfigMap, BallotSelection, ContestConfigMap, ContestEnvelope, ContestMap } from './types'
 
 export function constructContestEnvelopes( state: ClientState, ballotSelection: BallotSelection ): ConstructResult { 
   const { contestConfigs, ballotConfig, encryptionKey } = extractConfig(state)
