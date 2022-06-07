@@ -6,6 +6,7 @@ import { AVVerifier } from './av_verifier';
 import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
 import { KeyPair, CastVoteRecord, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, ElectionConfig } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
+import { generateReceipt } from './av_client/generate_receipt';
 import * as jwt from 'jose';
 
 
@@ -382,11 +383,12 @@ export class AVClient implements IAVClient {
 
       const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
       const { castRequest, receipt } = response.data;
+      
 
       validatePayload(castRequest, castRequestItem);
       validateReceipt([castRequest], receipt, this.getDbbPublicKey());
-
-      return receipt;
+       
+      return generateReceipt(receipt, castRequest);
     }
 
   /**

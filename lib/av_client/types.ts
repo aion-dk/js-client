@@ -118,9 +118,12 @@ export interface Election {
  * ```
  */
  export type BallotBoxReceipt = {
-  address: string
-  registeredAt: string
-  signature: Signature
+  trackingCode: string
+  receipt: {
+    address: string
+    dbbSignature: string
+    voterSignature: string
+  }
 }
 
 export type BoardItem =
