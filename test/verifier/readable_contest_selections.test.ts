@@ -101,7 +101,7 @@ const minimalElectionConfig = {
   "contestConfigs": contestConfigs
 }
 
-describe.only('getReadbleContestSelections', () => {
+describe('getReadbleContestSelections', () => {
   let verifier: AVVerifier;
 
   beforeEach(async () => {
