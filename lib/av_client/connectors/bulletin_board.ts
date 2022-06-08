@@ -112,7 +112,7 @@ export class BulletinBoard {
   }
 
   getBallotStatus(shortAddress): Promise<AxiosResponse> {
-    return this.backend.get(`ballot_status?id=${shortAddress}`)
+    return this.backend.get(`ballot_status?trackingCode=${shortAddress}`)
   }
 
   private createBackendClient(baseURL: string, timeout: number) {
