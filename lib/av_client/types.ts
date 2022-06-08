@@ -34,25 +34,10 @@ export type KeyPair = {
   publicKey: string;
 }
 
-export interface EmptyCryptogram {
-  commitment_point: string;
-  empty_cryptogram: string;
-}
-
 /**
  * A Base64-encoded string containing the affidavit
  */
 export type Affidavit = string
-
-export interface OpenableEnvelope {
-  cryptograms: string[]
-  randomness: string[]
-}
-
-export interface SealedEnvelope {
-  cryptograms: string[]
-  proofs: string[]
-}
 
 export interface Ballot {
   id: number;
@@ -89,22 +74,6 @@ export interface Election {
   description: LocalString;
   //...
 }
-
-/**
- * A structure that contains the choice(s) of a voter.
- *
- * Key is an electionId.
- * Value is the chosen option represented by a reference-string
- *
- * Example of a CastVoteRecord:
- * ```javascript
- * {
- *    '1': 'option1',
- *    '2': 'optionA'
- * }
- * ```
- */
- export type CastVoteRecord = ContestMap<string>
 
  /**
  * Example of a receipt:
@@ -234,10 +203,6 @@ export interface ItemExpectation {
   }
   type: BoardItemType
   parentAddress: string
-}
-export interface ClientState {
-  electionConfig?: ElectionConfig
-  voterSession?: VoterSessionItem
 }
 
 export type Signature = string;
