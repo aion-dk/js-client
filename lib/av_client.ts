@@ -549,8 +549,13 @@ export class AVClient implements IAVClient {
   */
   public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
     const shortAddres = shortCodeToHex(trackingCode)
-    const { ballotStatus } = (await this.bulletinBoard.getBallotStatus(shortAddres)).data
+    const { status, activities } = (await this.bulletinBoard.getBallotStatus(shortAddres)).data
 
+    const ballotStatus = {
+      activities: activities,
+      status: status
+    }
+    
     return ballotStatus
   }
 }
