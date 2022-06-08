@@ -3,12 +3,11 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
 import * as NistConverter from './util/nist_converter';
 import { AVVerifier } from './av_verifier';
-import { constructBallotCryptograms } from './av_client/actions/construct_ballot_cryptograms';
-import { KeyPair, CastVoteRecord, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, ElectionConfig, BallotStatus } from './av_client/types';
+import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
+import { KeyPair, CastVoteRecord, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, ElectionConfig, BallotSelection, ContestEnvelope, BallotConfig } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import * as jwt from 'jose';
-
 
 import {
   fetchElectionConfig,
@@ -18,7 +17,6 @@ import {
 import {
   IAVClient,
   ContestMap,
-  OpenableEnvelope,
   BallotBoxReceipt,
   VoterSessionItem,
   BoardCommitmentItem,
@@ -45,10 +43,10 @@ import * as sjclLib from './av_client/sjcl';
 import { signPayload, validatePayload, validateReceipt } from './av_client/sign';
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
-import submitVoterCryptograms from './av_client/actions/submit_voter_cryptograms';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 import { encryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
+import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -70,8 +68,8 @@ export const sjcl = sjclLib;
  * |{@link AVClient.validateAccessCode | validateAccessCode }                 | Gets voter authorized to vote. |
  * |{@link AVClient.registerVoter | registerVoter }                           | Registers the voter on the bulletin board |
  * |{@link AVClient.constructBallotCryptograms | constructBallotCryptograms } | Constructs voter ballot cryptograms. |
- * |{@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms }         | Optional. Initiates process of testing the ballot encryption. |
- * |{@link AVClient.castBallot | submitBallotCryptograms }       | Finalizes the voting process. |
+ * |{@link AVClient.spoilBallot | spoilBallot }                               | Optional. Initiates process of testing the ballot encryption. |
+ * |{@link AVClient.castBallot | castBallot }                                 | Finalizes the voting process. |
  * |{@link AVClient.purgeData | purgeData }                                   | Optional. Explicitly purges internal data. |
  *
  * ## Example walkthrough test
@@ -91,7 +89,7 @@ export class AVClient implements IAVClient {
   private electionConfig?: ElectionConfig;
   private keyPair: KeyPair;
 
-  private clientEnvelopes: ContestMap<OpenableEnvelope>;
+  private clientEnvelopes: ContestEnvelope[];
   private serverEnvelopes: ContestMap<string[]>;
   private voterSession: VoterSessionItem;
   private boardCommitment: BoardCommitmentItem;
@@ -251,7 +249,7 @@ export class AVClient implements IAVClient {
   /**
    * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
    *
-   * Encrypts a {@link CastVoteRecord | cast-vote-record} (CVR) and generates vote cryptograms.
+   * Encrypts a {@link BallotSelection | ballot-selection} (CVR) and generates vote cryptograms.
    *
    * Example:
    * ```javascript
@@ -283,8 +281,8 @@ export class AVClient implements IAVClient {
    * Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
    * values internal to the AV election config.
    *
-   * Should be followed by either {@link AVClient.spoilBallotCryptograms | spoilBallotCryptograms}
-   * or {@link AVClient.castBallot | submitBallotCryptograms}.
+   * Should be followed by either {@link AVClient.spoilBallot | spoilBallot}
+   * or {@link AVClient.castBallot | castBallot}.
    *
    * @param   cvr Object containing the selections for each contest.
    * @returns Returns the ballot tracking code. Example:
@@ -295,26 +293,26 @@ export class AVClient implements IAVClient {
    * @throws {@link CorruptCvrError | CorruptCvrError } if the cast vote record is invalid
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async constructBallot(cvr: CastVoteRecord): Promise<string> {
+  public async constructBallot(ballotSelection: BallotSelection): Promise<string> {
     if(!(this.voterSession)) {
       throw new InvalidStateError('Cannot construct cryptograms. Voter identity unknown')
     }
 
     const state = {
       voterSession: this.voterSession,
-      electionConfig: this.electionConfig,
+      electionConfig: this.getElectionConfig(),
     };
 
     const {
-      commitment,
+      pedersenCommitment,
       envelopeRandomizers, // TODO: Required when spoiling
-      envelopes,
-    } = constructBallotCryptograms(state, cvr);
+      contestEnvelopes,
+    } = constructContestEnvelopes(state, ballotSelection);
 
-    this.clientEnvelopes = envelopes;
+    this.clientEnvelopes = contestEnvelopes;
 
     this.voterCommitmentOpening = {
-      commitmentRandomness: commitment.randomizer,
+      commitmentRandomness: pedersenCommitment.randomizer,
       randomizers: envelopeRandomizers
     }
  
@@ -325,7 +323,7 @@ export class AVClient implements IAVClient {
     } = await submitVoterCommitment(
       this.bulletinBoard,
       this.voterSession.address,
-      commitment.result,
+      pedersenCommitment.commitment,
       this.privateKey(),
       this.getDbbPublicKey()
     );
@@ -333,7 +331,7 @@ export class AVClient implements IAVClient {
     this.boardCommitment = boardCommitment;
     this.serverEnvelopes = serverEnvelopes;
 
-    const [ ballotCryptogramItem, verificationStartItem ]  = await submitVoterCryptograms(
+    const [ ballotCryptogramItem, verificationStartItem ]  = await submitBallotCryptograms(
       this.bulletinBoard,
       this.clientEnvelopes,
       this.serverEnvelopes,
@@ -467,6 +465,20 @@ export class AVClient implements IAVClient {
     }
 
     return this.electionConfig
+  }
+
+  public getVoterSession(): VoterSessionItem {
+    if(!this.voterSession){
+      throw new InvalidStateError('No voter session loaded')
+    }
+
+    return this.voterSession
+  }
+
+  public getVoterBallotConfig(): BallotConfig {
+    const voterSession = this.getVoterSession()
+    const { ballotConfigs } = this.getElectionConfig()
+    return ballotConfigs[voterSession.content.voterGroup]
   }
 
   public getDbbPublicKey(): string {

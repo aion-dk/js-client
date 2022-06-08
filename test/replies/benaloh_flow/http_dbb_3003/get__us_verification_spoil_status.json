@@ -1,12 +1,12 @@
 {
   "item": {
-    "address": "4707f1d1caccaf259711f89d3125b9d09d45bad30370541f42bb36ebddcee2e9",
-    "author": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
-    "parentAddress": "c67be1586be02a52600de25ca54ba98ba743f31951cc02ec201e9370b19f4ab2",
-    "previousAddress": "c67be1586be02a52600de25ca54ba98ba743f31951cc02ec201e9370b19f4ab2",
+    "address": "98d61431ea989426b7754af8552c33fc81b04535fdd5e8be900e97a7ef9447db",
+    "author": "voter-cc4100c38735d44c70e9e68078360ce25883d366",
+    "parentAddress": "8c0638e9a6dabc6dbcbdc9bb79854526c3654b5d02d86fbd14b0bda79531134d",
+    "previousAddress": "8c0638e9a6dabc6dbcbdc9bb79854526c3654b5d02d86fbd14b0bda79531134d",
     "content": {},
-    "registeredAt": "2022-05-09T07:53:03.183Z",
-    "signature": "972d1c280cfc592741b0201ef2ebd6c720f6c6769cabfcc27551afb352a22d99,88b2c04105fe139577144f32a505edd918273631438988b9c7be774c042bf8d2",
+    "registeredAt": "2022-06-07T10:34:04.202Z",
+    "signature": "fc2c177d1da1d8aeb436951d373eab5be8af0b71a5a737fd43e4aa5aa7d249c7,a7f237bd9e49bc25904f324f1e2853190b8f86cd883487da6d648c285ed2256e",
     "type": "SpoilRequestItem"
   }
 }

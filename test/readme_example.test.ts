@@ -1,6 +1,7 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import { readmeTestSetup, readmeTestTeardown } from './readme_example_helper';
+import { BallotSelection } from '../lib/av_client/types';
 
 describe('entire voter flow using OTP authorization', () => {
   beforeEach(() => readmeTestSetup());
@@ -18,12 +19,21 @@ describe('entire voter flow using OTP authorization', () => {
 
     await client.registerVoter();
 
-    const cvr = {
-      '50422d0f-e795-4324-8289-50e3d3459196': '1',
-      'd866a7d7-15df-4765-9950-651c0ca1313d': '2'
-    };
+    const ballotSelection: BallotSelection = {
+      reference: 'ballot-1',
+      contestSelections: [
+        {
+          reference: 'contest ref 1',
+          optionSelections: [{reference: 'option ref 1'}]          
+        },
+        {
+          reference: 'contest ref 2',
+          optionSelections: [{reference: 'option ref 3'}]
+        }
+      ]
+    }
 
-    const trackingCode  = await client.constructBallot(cvr);
+    const trackingCode  = await client.constructBallot(ballotSelection);
     expect(trackingCode.length).to.eq(64);
 
     const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');

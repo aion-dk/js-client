@@ -11,6 +11,7 @@ import {
   mailcatcherHost
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
+import { BallotConfig, BallotSelection, ContestConfig, ContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
 const USE_MOCK = true;
 
@@ -75,16 +76,10 @@ describe('entire voter flow using OTP authorization', () => {
         expect.fail('AVClient#registerVoter failed');
       })
       const { contestConfigs } = client.getElectionConfig()
-      // We expect CVR value to look something like this: { '1': 'option1', '2': 'optiona' }
-      const contestsChoices = Object.keys(contestConfigs)
-        .map((reference: string) => [
-          reference,
-          contestConfigs[reference].options[0].reference
-        ])
+      const ballotConfig = client.getVoterBallotConfig()
+      const ballotSelection = dummyBallotSelection(ballotConfig, contestConfigs)
 
-      const cvr = Object.fromEntries(contestsChoices)
-
-      const _trackingCode = await client.constructBallot(cvr).catch((e) => {
+      const _trackingCode = await client.constructBallot(ballotSelection).catch((e) => {
         console.error(e);
         expect.fail('AVClient#constructBallotCryptograms failed');
       });
@@ -135,3 +130,19 @@ describe('entire voter flow using OTP authorization', () => {
   }
 });
 
+
+function dummyBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap ): BallotSelection {
+  return {
+    reference: ballotConfig.reference,
+    contestSelections: ballotConfig.contestReferences.map(cr => dummyContestSelection(contestConfigs[cr]))
+  }
+}
+
+function dummyContestSelection( contestConfig: ContestConfig ): ContestSelection {
+  return {
+    reference: contestConfig.reference,
+    optionSelections: [
+      { reference: contestConfig.options[0].reference }
+    ]
+  }
+}
