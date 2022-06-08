@@ -228,7 +228,7 @@ describe('validateBallotSelection', () => {
       it('throws errors', () => {
         expect(() => {
           validateBallotSelection( ballotConfig, contestConfigs, ballotSelection)
-        }).to.throw(CorruptSelectionError, 'Contest selections does not match the contests allowed by the ballot')
+        }).to.throw(CorruptSelectionError, 'Contest selections do not match the contests allowed by the ballot')
       })
     })
 
@@ -254,7 +254,7 @@ describe('validateBallotSelection', () => {
       it('throws errors', () => {
         expect(() => {
           validateBallotSelection( ballotConfig, contestConfigs, ballotSelection)
-        }).to.throw(CorruptSelectionError, 'Contest selections does not match the contests allowed by the ballot')
+        }).to.throw(CorruptSelectionError, 'Contest selections do not match the contests allowed by the ballot')
       })
     })
   })

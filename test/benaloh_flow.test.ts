@@ -7,6 +7,7 @@ import { prepareRecording } from './mock_helpers'
 import { AVVerifier } from '../lib/av_verifier';
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
+import { BallotConfig, BallotSelection, ContestConfig, ContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
 const USE_MOCK = true;
 
@@ -31,7 +32,7 @@ describe('entire benaloh flow', () => {
         useRecordedResponse(bulletinBoardHost, 'post', '/us/voting/spoil'),
         useRecordedResponse(bulletinBoardHost, 'post', '/us/verification/verifiers'),
         useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/verifiers/4707f1d1caccaf259711f89d3125b9d09d45bad30370541f42bb36ebddcee2e9'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/verifiers/98d61431ea989426b7754af8552c33fc81b04535fdd5e8be900e97a7ef9447db'),
         useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/spoil_status'),
         useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/commitment_openings'),
       ];
@@ -81,19 +82,42 @@ describe('entire benaloh flow', () => {
 
     await verifier.pollForCommitmentOpening()
     // The verifier decrypts the ballot
-    const votes = verifier.decryptBallot();
+    const contestSelections = verifier.decryptBallot();
 
-    expect(votes).to.eql({
-      'contest ref 1': 'option ref 1',
-      'contest ref 2': 'option ref 3'
-    });
+    expect(contestSelections).to.eql([
+      {
+        reference: 'contest ref 1',
+        optionSelections: [{reference: 'option ref 1'}]
+      },{
+        reference: 'contest ref 2',
+        optionSelections: [{reference: 'option ref 3'}]
+      }
+    ]);
 
-    const readableBallot = verifier.getReadableBallot(votes, "en")
+    const readableContestSelections = verifier.getReadableContestSelections(contestSelections, "en")
 
-    expect(readableBallot).to.eql({
-      'Second ballot': 'Option 3', 
-      'First ballot': 'Option 1'
-    });
+    expect(readableContestSelections).to.deep.equal([
+      {
+        "reference": "contest ref 1",
+        "title": "First ballot",
+        "optionSelections": [
+          {
+            "reference": "option ref 1",
+            "title": "Option 1"
+          }
+        ]
+      },
+      {
+        "reference": "contest ref 2",
+        "title": "Second ballot",
+        "optionSelections": [
+          {
+            "reference": "option ref 3",
+            "title": "Option 3"
+          }
+        ]
+      }
+    ]);
 
     if( USE_MOCK ) expectedNetworkRequests.forEach((mock) => mock.done());
 
@@ -115,16 +139,10 @@ describe('entire benaloh flow', () => {
       console.error(e);
     })
     const { contestConfigs } = client.getElectionConfig()
-    // We expect CVR value to look something like this: { '1': 'option1', '2': 'optiona' }
-    const contestsChoices = Object.keys(contestConfigs)
-      .map((references: string) => [
-        references,
-        contestConfigs[references].options[0].reference
-      ])
+    const ballotConfig = client.getVoterBallotConfig()
+    const ballotSelection = dummyBallotSelection(ballotConfig, contestConfigs)
 
-    const cvr = Object.fromEntries(contestsChoices)
-
-    const trackingCode = await client.constructBallot(cvr).catch((e) => {
+    const trackingCode = await client.constructBallot(ballotSelection).catch((e) => {
       console.error(e);
     });
     return trackingCode
@@ -155,3 +173,19 @@ describe('entire benaloh flow', () => {
   }
 });
 
+
+function dummyBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap ): BallotSelection {
+  return {
+    reference: ballotConfig.reference,
+    contestSelections: ballotConfig.contestReferences.map(cr => dummyContestSelection(contestConfigs[cr]))
+  }
+}
+
+function dummyContestSelection( contestConfig: ContestConfig ): ContestSelection {
+  return {
+    reference: contestConfig.reference,
+    optionSelections: [
+      { reference: contestConfig.options[0].reference }
+    ]
+  }
+}

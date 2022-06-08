@@ -1,28 +1,32 @@
 {
   "electionConfig": {
-    "dbbPublicKey": "03d893a631a51b8d048468f622bb97f9d122807fc486dbffdd2ac657bbf9190118",
-    "encryptionKey": "0218c0360c59dcad60ac36d031de98d2ed5c04f72de44d3d9b203d7b3c77dd91a8",
+    "dbbPublicKey": "03837f6923c1f2318d3e6a49b606bb55a5d1c0e39c28c85f3b743f3a7b9e2f6941",
+    "encryptionKey": "03bbb6c547fa7f8e144f1940159306de7fcde0161925be9e58dbf0d6b17a9e07a8",
     "services": {
-      "address": "c5e827ac80443bd3f27e09dc42d5cb9fdb4c300241082c88efd33934df7cfa44",
+      "address": "86a478181b1a5fae70fa107767a9d922c276a5fd6092e9044ae229b56887d1d7",
       "voterAuthorizer": {
-        "electionContextUuid": "c0da81df-c4e3-4c50-80fb-1ac1661b6ad3",
-        "publicKey": "03b7f14b263d81d3d1964aa7d4127620c803324d04059ed0d2ee00a07290da9feb",
-        "url": "http://voter-authorizer:3002"
+        "electionContextUuid": "dee187ae-3007-40df-a075-5926f4fceb8e",
+        "publicKey": "03c74a677d7d78fa21a49783b84e4ca1da3bd7a468d82527c3e2dff56b211c12bd",
+        "url": "http://voter-authorizer:3002/"
       },
       "otpProvider": {
-        "electionContextUuid": "f9cef05c-046c-4abf-b9aa-4284d243de68",
-        "publicKey": "03b099713f1c44b725e2e9cf8f0fb9f9559bb613e30cdc800e0440b0707ea57d7f",
-        "url": "http://otp-provider:3001"
+        "electionContextUuid": "862e086b-1f93-4e11-b7fb-fdd542a054c7",
+        "publicKey": "03d02d5ad1c4a8fa3a60378e779fc8024ae12a25fa246fe41e7fbefa7690401dce",
+        "url": "http://otp-provider:3001/"
       }
     },
     "ballotConfigs": {
       "precinct_4_bedrock": {
+        "reference": "ballot-1",
+        "voterGroup": "precinct_4_bedrock",
         "contestReferences": [
           "contest ref 1",
           "contest ref 2"
         ]
       },
       "precinct_3_spaceport": {
+        "reference": "ballot-2",
+        "voterGroup": "precinct_3_spaceport",
         "contestReferences": [
           "contest ref 1",
           "contest ref 2"
@@ -31,11 +35,15 @@
     },
     "contestConfigs": {
       "contest ref 1": {
+        "reference": "contest ref 1",
         "markingType": {
-          "style": "regular",
-          "codeSize": 1,
           "minMarks": 1,
-          "maxMarks": 1
+          "maxMarks": 1,
+          "encoding": {
+            "codeSize": 1,
+            "maxSize": 1,
+            "cryptogramCount": 1
+          }
         },
         "options": [
           {
@@ -61,11 +69,15 @@
         }
       },
       "contest ref 2": {
+        "reference": "contest ref 2",
         "markingType": {
-          "style": "regular",
-          "codeSize": 1,
           "minMarks": 1,
-          "maxMarks": 1
+          "maxMarks": 1,
+          "encoding": {
+            "codeSize": 1,
+            "maxSize": 1,
+            "cryptogramCount": 1
+          }
         },
         "options": [
           {
@@ -97,7 +109,14 @@
           "name": "resultType name not matter right now"
         }
       }
-    }
+    },
+    "genesisConfig": {
+      "publicKey": "03837f6923c1f2318d3e6a49b606bb55a5d1c0e39c28c85f3b743f3a7b9e2f6941",
+      "authorizationMode": "on-demand"
+    },
+    "status": "open",
+    "sessionTimeout": 30,
+    "bcTimeout": 10
   },
-  "receipt": "55913a423e6f45f865858ce55da00ecb4db88bdcf8cf2c14acc1e8dd9c5c9a39,68622950752c94d63a37ff354368d4f05aa514d2b0c6c4c3b4ed5cb9e57f0cef"
+  "receipt": "e14f061ab391865b5cfe468ce2ae110a21940ab17e1bb82696e491f5f58fcd6a,2ed2dc18205095d49f713e243087c0e55ce3a0e94768c4200c508df259c8cc3e"
 }
