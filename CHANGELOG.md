@@ -1,4 +1,9 @@
 # AV Client Library Changelog
+
+## 1.1.0
+- Breaking changes to contest config marking type
+- Complex votes encoding added
+
 ## 1.0.5
 - Packing payloads to DBB
 - Customizable URL in Verifier-POC
