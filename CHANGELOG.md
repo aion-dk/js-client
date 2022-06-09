@@ -1,5 +1,8 @@
 # AV Client Library Changelog
 
+## 1.1.1
+- Updated the BallotBoxReceipt
+
 ## 1.1.0
 - Breaking changes to contest config marking type
 - Complex votes encoding added
