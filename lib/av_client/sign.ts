@@ -1,21 +1,6 @@
-import { BoardItem, ContestMap, ItemExpectation, OpenableEnvelope } from './types'
+import { BoardItem, ItemExpectation } from './types'
 import * as Crypto from './aion_crypto';
 import {Uniformer} from '../util/uniformer';
-
-
-export type AcknowledgedBoardHash = {
-  currentBoardHash: string;
-  currentTime: string;
-}
-
-export type AffidavitConfig = {
-  curve: string;
-  encryptionKey: string;
-}
-
-export function fingerprint(encryptedAffidavid: string): string {
-  return Crypto.hashString(encryptedAffidavid)
-}
 
 export const signPayload = (obj: Record<string, unknown>, privateKey: string) => {
   const uniformer = new Uniformer();
@@ -47,16 +32,6 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
   if(signaturePublicKey !== undefined) {
     verifySignature(item, signaturePublicKey);
   }
-}
-
-export const sealEnvelopes = (encryptedVotes: ContestMap<OpenableEnvelope>): ContestMap<string[]> => {
-  const sealEnvelope = (envelope: OpenableEnvelope): string[] => {
-    const { randomness } = envelope;
-    const proofs = randomness.map(randomizer => Crypto.generateDiscreteLogarithmProof(randomizer));
-    return proofs;
-  }
-
-  return Object.fromEntries(Object.keys(encryptedVotes).map(k => [k, sealEnvelope(encryptedVotes[k])]))
 }
 
 const verifySignature = (item: BoardItem, signaturePublicKey: string) => {

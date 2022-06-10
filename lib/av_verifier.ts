@@ -2,11 +2,11 @@ import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
-import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ElectionConfig, ContestMap, ContestSelection, ReadableContestSelection, ContestConfigMap } from './av_client/types';
+import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ContestSelection, ReadableContestSelection, ContestConfigMap } from './av_client/types';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 import { fetchElectionConfig } from './av_client/election_config';
 import { decryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
-import { InvalidContestError, InvalidOptionError, InvalidTrackingCodeError } from './av_client/errors';
+import { InvalidContestError, InvalidTrackingCodeError } from './av_client/errors';
 import { decryptContestSelections } from './av_client/decrypt_contest_selections';
 import { makeOptionFinder } from './av_client/option_finder';
 
@@ -134,27 +134,6 @@ export class AVVerifier {
     };
   
     return new Promise(executePoll);
-  }
-
-  public getReadableBallot(decryptedBallot: ContestMap<string>, locale: string) {
-    const ballot = {}
-    Object.keys(decryptedBallot).forEach((contestRef) => {
-      let chosenOption = ""
-      if (!this.electionConfig.contestConfigs[contestRef]) {
-        throw new InvalidContestError("Contest is not present in the election")
-      } 
-      this.electionConfig.contestConfigs[contestRef].options.forEach((opt) => {
-        if (opt.reference === decryptedBallot[contestRef]) {
-          chosenOption = opt.title[locale]
-        }
-      })
-      if (!chosenOption) {
-        throw new InvalidOptionError("Option is not present in the contest")
-      }
-      ballot[this.electionConfig.contestConfigs[contestRef].title[locale]] = chosenOption
-    })
-
-    return ballot
   }
 
   public getReadableContestSelections( contestSelections: ContestSelection[], locale: string ): ReadableContestSelection[] {

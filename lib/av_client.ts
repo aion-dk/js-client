@@ -4,7 +4,7 @@ import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/o
 import * as NistConverter from './util/nist_converter';
 import { AVVerifier } from './av_verifier';
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
-import { KeyPair, CastVoteRecord, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, ElectionConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus } from './av_client/types';
+import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, ElectionConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import * as jwt from 'jose';
@@ -153,7 +153,7 @@ export class AVClient implements IAVClient {
 
     return coordinator.createSession(opaqueVoterId, email)
       .then(({ data: { sessionId } }) => {
-        return sessionId
+        return sessionId as string
       })
       .then(async sessionId => {
         this.authorizationSessionId = sessionId
@@ -571,7 +571,7 @@ type AffidavitConfig = {
 export type {
   IAVClient,
   ContestMap,
-  CastVoteRecord,
+  BallotSelection,
   Affidavit,
   BallotBoxReceipt,
   HashValue,
