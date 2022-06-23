@@ -1,4 +1,4 @@
-import { extractContestSelections } from '../lib/util/nist_json_converter';
+import { extractContestSelections } from '../lib/util/nist_cvr_extractor';
 import * as fs from 'fs'
 import { expect } from 'chai';
 
