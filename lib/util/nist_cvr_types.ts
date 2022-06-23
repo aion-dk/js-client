@@ -38,10 +38,6 @@ export interface CVRContestSelection {
   SelectionPosition: SelectionPosition[]
 }
 
-interface BallotMeasureSelection {
-
-}
-
 interface SelectionPosition {
   "@type": "CVR.SelectionPosition"
   IsAllocable: "yes" | "no"
