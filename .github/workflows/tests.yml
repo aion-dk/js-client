@@ -17,21 +17,6 @@ jobs:
         run: npm run lint
       - name: Run tests with coverage report
         run: npm run coverage
-      - name: Generate code coverage badge and commit it
-        if: success() && github.ref == 'refs/heads/main'
-        run: |
-          set -x
-          coverage_percentage=`cat coverage/coverage-summary.json | jq '.total.lines.pct'`
-          curl "https://img.shields.io/badge/coverage-$coverage_percentage%25-blue" > .github/coverage_badge.svg
-          if git status | grep coverage_badge.svg; then
-            echo 'Coverage changed'
-            git config --local user.email "action@github.com"
-            git config --local user.name "Github Action"
-            git add .github/coverage_badge.svg
-            git commit -m "Updated coverage badge to $coverage_percentage %"
-          else
-            echo 'Coverage remains the same'
-          fi
       - name: Private actions checkout
         uses: daspn/private-actions-checkout@v2
         with:
