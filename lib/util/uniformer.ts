@@ -10,7 +10,7 @@ export class Uniformer {
 
   private toSortedKeyValuePairs(obj: unknown) {
     const toKeyValueTuple = ([k, v]): KeyValuePair => [k, this.walk(v)];
-    const sortByKey = (a: KeyValuePair, b: KeyValuePair) => ("" + a[0]).localeCompare(b[0]);
+    const sortByKey = (a: KeyValuePair, b: KeyValuePair) => compareUtf8Strings(a[0], b[0])
 
     const properties = Object.entries(obj as Record<string, unknown>);
 
@@ -44,4 +44,33 @@ export class Uniformer {
         throw new Error(`Unknown parameter type '${typeof obj}'.`);
     }
   }
+}
+
+/**
+ * Compares two strings against eachother considering the utf8 bytes produced
+ * @param a string 1
+ * @param b string 2
+ * @returns -1, 0 or 1 depending on order
+ */
+function compareUtf8Strings(a: string, b: string){
+  return compare(
+    utf8StringToHex(a),
+    utf8StringToHex(b)
+  )
+}
+
+function compare(a, b){
+  if( a > b ) return 1
+  if( a < b ) return -1
+  return 0
+}
+
+/**
+ * Encodes a string from utf8 bytes to hex
+ * @param string string to encode from utf8 bytes to hex
+ * @returns hex representation of string
+ */
+function utf8StringToHex(string: string){
+  const array = new TextEncoder().encode(string)
+  return array.reduce((out, i) =>  out + ('0' + i.toString(16)).slice(-2), "")
 }

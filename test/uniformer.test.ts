@@ -3,7 +3,7 @@ import {Uniformer} from '../lib/util/uniformer';
 
 describe('Uniformer', () => {
   context('when object is a Hash', () => {
-    it('(deep) sorts hashes by keys and converts keys to string', async () => {
+    it('(deep) sorts hashes by keys and converts keys to string', () => {
       const unsortedProperties = {
         b: 2,
         a: 1,
@@ -26,6 +26,21 @@ describe('Uniformer', () => {
           ]
         ]
       ]));
+    })
+
+    it('sorts hashes by utf8 bytes of the string keys', () => {
+      const unsortedProperties = {
+        "a": 1,
+        "A": 1,
+        'z': 1,
+        'Z': 1,
+        'æ': 1,
+        'Æ': 1
+      }
+
+      const result = new Uniformer().formString(unsortedProperties);
+
+      expect(result).to.equal(JSON.stringify([["A",1],["Z",1],["a",1],["z",1],["Æ",1],["æ",1]]));
     })
   });
 
