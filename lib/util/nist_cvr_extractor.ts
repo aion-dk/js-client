@@ -14,8 +14,10 @@ export function extractContestSelections(cvrJson): ContestSelection[] {
 
 function extractOptionSelections(nistContestSelection: CVRContestSelection[]): OptionSelection[] {
   const nistSelected = nistContestSelection.filter(nistOptionSelection => {
-    const nistSelectionPosition = nistOptionSelection.SelectionPosition[0]
-    return nistSelectionPosition.NumberVotes > 0
+    const nistSelectionPositions = nistOptionSelection.SelectionPosition
+    if( nistSelectionPositions.length != 1 ) throw Error('Unexpected CVR structure. Expected exactly one SelectionPosition')
+
+    return nistSelectionPositions[0].NumberVotes > 0
   })
 
   return nistSelected.map(nistOptionSelection => {
