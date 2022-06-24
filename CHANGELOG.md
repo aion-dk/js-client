@@ -1,5 +1,8 @@
 # AV Client Library Changelog
 
+## 1.1.2
+- Added nist parser
+
 ## 1.1.1
 - Updated the BallotBoxReceipt
 
