@@ -1,7 +1,7 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
-import * as NistConverter from './util/nist_converter';
+import { extractContestSelections } from './util/nist_cvr_extractor';
 import { AVVerifier } from './av_verifier';
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
 import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, ElectionConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus } from './av_client/types';
@@ -580,7 +580,7 @@ export type {
 }
 
 export {
-  NistConverter,
+  extractContestSelections,
   AVVerifier,   
   AvClientError,
   AccessCodeExpired,
