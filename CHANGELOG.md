@@ -1,5 +1,6 @@
 # AV Client Library Changelog
-
+## 1.1.3
+- Increase poll time
 ## 1.1.2
 - Added nist parser
 
