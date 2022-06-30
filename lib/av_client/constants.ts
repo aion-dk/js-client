@@ -10,5 +10,5 @@ export const VERIFIER_ITEM: BoardItemType = "VerifierItem";
 export const VERIFICATION_START_ITEM: BoardItemType =  "VerificationStartItem";
 export const VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM = "VoterEncryptionCommitmentOpeningItem"
 
-export const MAX_POLL_ATTEMPTS = 60;
-export const POLLING_INTERVAL_MS = 500;
+export const MAX_POLL_ATTEMPTS = 600;
+export const POLLING_INTERVAL_MS = 1000;
