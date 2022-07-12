@@ -201,7 +201,7 @@ export class AVClient implements IAVClient {
     const coordinatorURL = this.getElectionConfig().services.voterAuthorizer.url;
     const voterAuthorizerContextUuid = this.getElectionConfig().services.voterAuthorizer.electionContextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
-    const servicesBoardAddress = this.getElectionConfig().services.address;
+    const latestConfigAddress = this.getElectionConfig().latestConfigAddress;
 
     const authorizationResponse = await coordinator.requestPublicKeyAuthorization(
       this.authorizationSessionId,
@@ -218,7 +218,7 @@ export class AVClient implements IAVClient {
 
     const voterSessionItemExpectation = {
       type: VOTER_SESSION_ITEM,
-      parentAddress: this.getElectionConfig().services.address,
+      parentAddress: latestConfigAddress,
       content: {
         authToken: authToken,
         identifier: decoded['identifier'],
@@ -227,7 +227,7 @@ export class AVClient implements IAVClient {
       }
     }
 
-    const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
+    const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, latestConfigAddress);
     const voterSessionItem = voterSessionItemResponse.data.voterSession;
     const receipt = voterSessionItemResponse.data.receipt;
 

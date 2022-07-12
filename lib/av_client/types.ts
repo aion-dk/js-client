@@ -265,12 +265,12 @@ export interface ElectionConfig {
 
   contestConfigs: ContestConfigMap
   ballotConfigs: BallotConfigMap;
+  latestConfigAddress: string;
 
   // appended data:
   affidavit: AffidavitConfig;
 
   services: {
-    'address': string
     'voterAuthorizer': Service,
     'otpProvider': Service
   };
