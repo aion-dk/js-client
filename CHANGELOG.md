@@ -1,6 +1,10 @@
 # AV Client Library Changelog
+## 1.1.4
+- Have voter registration fetch and sign latest config item rather than latest VA config item.
+
 ## 1.1.3
 - Increase poll time
+
 ## 1.1.2
 - Added nist parser
 
