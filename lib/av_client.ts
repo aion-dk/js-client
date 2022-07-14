@@ -47,6 +47,7 @@ import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUES
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 import { encryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
+import { Curve, DiscreteLogarithmProof } from './av_client/aion_crypto'
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -239,11 +240,69 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Registers a voter
+   * Registers a voter based on the authorization mode of the Voter Authorizer
    * @returns undefined or throws an error
    */
-  public async registerVoter(): Promise<void> {
-    return this.createVoterRegistration();
+  public async registerVoter(keys?: KeyPair): Promise<void> {
+    const mode = this.getElectionConfig().services.voterAuthorizer.authorizationMode
+    if(mode === 'on-demand') {
+      return this.createVoterRegistration();
+    } else if(mode === 'pre-election' && keys) {
+      return this.registerWithProof(keys);
+    } else {
+      throw new InvalidConfigError('Unknown authorization mode of voter authorizer')
+    }
+  }
+
+  /**
+   * Registers a voter by proof of private key
+   * Used when the authorization mode of the Voter Authorizer is 'pre-election'
+   * @returns undefined or throws an error
+   */
+  public async registerWithProof(keys: KeyPair): Promise<void> {
+    const coordinatorURL = this.getElectionConfig().services.voterAuthorizer.url;
+    const voterAuthorizerContextUuid = this.getElectionConfig().services.voterAuthorizer.electionContextUuid;
+    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
+    const servicesBoardAddress = this.getElectionConfig().latestConfigAddress;
+
+    const privateKeyBn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(keys.privateKey))
+    const proofOfPrivateKey = DiscreteLogarithmProof.generate(Curve.G, privateKeyBn).toString()
+
+    const authorizationResponse = await coordinator.authorizeWithProof(
+        keys.publicKey,
+        proofOfPrivateKey
+    );
+
+    const { authToken } = authorizationResponse.data;
+
+    const decoded = jwt.decodeJwt(authToken); // TODO: Verify against dbb pubkey: this.getElectionConfig().services.voterAuthorizer.public_key);
+
+    if(decoded === null)
+      throw new InvalidTokenError('Auth token could not be decoded');
+
+    const voterSessionItemExpectation = {
+      type: VOTER_SESSION_ITEM,
+      parentAddress: servicesBoardAddress,
+      content: {
+        authToken: authToken,
+        identifier: decoded['identifier'],
+        publicKey: decoded['public_key'],
+        voterGroup: decoded['voter_group_key']
+      }
+    }
+
+    const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, servicesBoardAddress);
+    const voterSessionItem = voterSessionItemResponse.data.voterSession;
+    const receipt = voterSessionItemResponse.data.receipt;
+
+    validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
+    validateReceipt([voterSessionItem], receipt, this.getDbbPublicKey());
+
+    // Keys have been accepted, assign for later use.
+    this.keyPair = keys
+
+    this.voterSession = voterSessionItem;
+    this.bulletinBoard.setVoterSessionUuid(voterSessionItem.content.identifier);
   }
 
   /**

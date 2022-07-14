@@ -271,7 +271,7 @@ export interface ElectionConfig {
   affidavit: AffidavitConfig;
 
   services: {
-    'voterAuthorizer': Service,
+    'voterAuthorizer': VAService,
     'otpProvider': Service
   };
 }
@@ -279,6 +279,13 @@ export interface ElectionConfig {
 interface Service {
   url: string;
   electionContextUuid: string;
+  publicKey: string;
+}
+
+interface VAService {
+  url: string;
+  electionContextUuid: string;
+  authorizationMode: string,
   publicKey: string;
 }
 
