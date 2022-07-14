@@ -56,7 +56,7 @@ export default class VoterAuthorizationCoordinator {
   }
 
   authorizeWithProof(publicKey: string, proof: string): Promise<AxiosResponse> {
-    return this.backend.post('authorize_signature', {
+    return this.backend.post('authorize_proof', {
       electionContextUuid: this.electionContextUuid,
       publicKey: publicKey,
       proof: proof
