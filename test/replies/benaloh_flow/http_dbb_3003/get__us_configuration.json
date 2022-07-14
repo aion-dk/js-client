@@ -6,7 +6,8 @@
       "voterAuthorizer": {
         "electionContextUuid": "dee187ae-3007-40df-a075-5926f4fceb8e",
         "publicKey": "03c74a677d7d78fa21a49783b84e4ca1da3bd7a468d82527c3e2dff56b211c12bd",
-        "url": "http://voter-authorizer:3002/"
+        "url": "http://voter-authorizer:3002/",
+        "authorizationMode": "on-demand"
       },
       "otpProvider": {
         "electionContextUuid": "862e086b-1f93-4e11-b7fb-fdd542a054c7",
@@ -110,8 +111,7 @@
       }
     },
     "genesisConfig": {
-      "publicKey": "03837f6923c1f2318d3e6a49b606bb55a5d1c0e39c28c85f3b743f3a7b9e2f6941",
-      "authorizationMode": "on-demand"
+      "publicKey": "03837f6923c1f2318d3e6a49b606bb55a5d1c0e39c28c85f3b743f3a7b9e2f6941"
     },
     "status": "open",
     "latestConfigAddress": "86a478181b1a5fae70fa107767a9d922c276a5fd6092e9044ae229b56887d1d7",
