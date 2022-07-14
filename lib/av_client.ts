@@ -47,8 +47,7 @@ import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUES
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 import { encryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
-import { DiscreteLogarithmProof } from './av_client/aion_crypto'
-import * as crypto from "./av_client/aion_crypto"
+import { Curve, DiscreteLogarithmProof } from './av_client/aion_crypto'
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -267,7 +266,7 @@ export class AVClient implements IAVClient {
     const servicesBoardAddress = this.getElectionConfig().latestConfigAddress;
 
     const privateKeyBn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(keys.privateKey))
-    const proofOfPrivateKey = DiscreteLogarithmProof.generate(crypto.Curve.G, privateKeyBn).toString()
+    const proofOfPrivateKey = DiscreteLogarithmProof.generate(Curve.G, privateKeyBn).toString()
 
     const authorizationResponse = await coordinator.authorizeWithProof(
         keys.publicKey,
