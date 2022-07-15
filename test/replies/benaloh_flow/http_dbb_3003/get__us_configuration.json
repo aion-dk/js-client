@@ -7,7 +7,7 @@
         "electionContextUuid": "dee187ae-3007-40df-a075-5926f4fceb8e",
         "publicKey": "03c74a677d7d78fa21a49783b84e4ca1da3bd7a468d82527c3e2dff56b211c12bd",
         "url": "http://voter-authorizer:3002/",
-        "authorizationMode": "on-demand"
+        "authorizationMode": "proof-of-identity"
       },
       "otpProvider": {
         "electionContextUuid": "862e086b-1f93-4e11-b7fb-fdd542a054c7",
