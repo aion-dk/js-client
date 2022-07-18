@@ -22,15 +22,22 @@ export function validateContestSelection( contestConfig: ContestConfig, contestS
 
   const { markingType, options } = contestConfig
 
+  const isBlank = contestSelection.optionSelections.length === 0
+
+  // Validate blankSubmission
+  if( isBlank && markingType.blankSubmission == 'disabled'){
+    throw new CorruptSelectionError('Blank submissions are not allowed in this contest')
+  }
+
   // Validate that mark count is within bounds
-  if( !withinBounds(markingType.minMarks, contestSelection.optionSelections.length, markingType.maxMarks) ){
+  if( !isBlank && !withinBounds(markingType.minMarks, contestSelection.optionSelections.length, markingType.maxMarks) ){
     throw new CorruptSelectionError('Contest selection does not contain a valid amount of option selections')
-  } 
+  }
 
   // Validate duplicates - that any vote selection is not referencing the same option multiple times
   const selectedOptions = contestSelection.optionSelections.map(os => os.reference)
   if( hasDuplicates(selectedOptions) ){
-    throw new CorruptSelectionError('Same option slected multiple times')
+    throw new CorruptSelectionError('Same option selected multiple times')
   }
 
   const getOption = makeGetOption(options)

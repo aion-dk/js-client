@@ -8,6 +8,7 @@ const contestOne: ContestConfig = {
   markingType: {
     minMarks: 1,
     maxMarks: 1,
+    blankSubmission: "disabled",
     encoding: {
       codeSize: 1,
       maxSize: 1,
@@ -27,6 +28,13 @@ const contestOne: ContestConfig = {
       title: { en: 'Option 1' },
       subtitle: { en: 'Option 1' },
       description: { en: 'Option 1' },
+    },
+    {
+      reference: 'option-3',
+      code: 3,
+      title: { en: 'Option 3' },
+      subtitle: { en: 'Option 3' },
+      description: { en: 'Option 3' },
     }
   ]
 }
@@ -36,6 +44,7 @@ const contestTwo: ContestConfig = {
   markingType: {
     minMarks: 1,
     maxMarks: 2,
+    blankSubmission: "active_choice",
     encoding: {
       codeSize: 1,
       maxSize: 2,
@@ -81,33 +90,46 @@ describe('validateContestSelection', () => {
         { reference: 'option-1' }
       ]
     }
-    it('does not throw error', () => {
+    it('throws an error', () => {
       expect(() => {
         validateContestSelection( contestOne, contestSelection )
       }).to.throw(CorruptSelectionError, 'Contest selection is not matching contest config')
     })
   })
   
-  context('when given a contest selection with no selections', () => {
+  context('when given a contest selection with no selections and blank disabled', () => {
+    const contestSelection = {
+      reference: 'contest-1',
+      optionSelections: []
+    }
+    it('throws an error', () => {
+      expect(() => {
+        validateContestSelection( contestOne, contestSelection )
+      }).to.throw(CorruptSelectionError, 'Blank submissions are not allowed in this contest')
+    })
+  })
+
+  context('when given a contest selection with no selections and blank enabled', () => {
     const contestSelection = {
       reference: 'contest-2',
       optionSelections: []
     }
-    it('does not throw error', () => {
+    it('does not throw an error', () => {
       expect(() => {
         validateContestSelection( contestTwo, contestSelection )
-      }).to.throw(CorruptSelectionError, 'Contest selection does not contain a valid amount of option selections')
+      }).to.not.throw()
     })
   })
 
   context('when given a contest selection with two selections', () => {
     const contestSelection = {
-      reference: 'contest-2',
-      optionSelections: []
+      reference: 'contest-1',
+      optionSelections: [{ reference: 'option-1' },
+        { reference: 'option-3' }]
     }
-    it('does not throw error', () => {
+    it('throws an error', () => {
       expect(() => {
-        validateContestSelection( contestTwo, contestSelection )
+        validateContestSelection( contestOne, contestSelection )
       }).to.throw(CorruptSelectionError, 'Contest selection does not contain a valid amount of option selections')
     })
   })
@@ -119,7 +141,7 @@ describe('validateContestSelection', () => {
         { reference: 'option-2' }
       ]
     }
-    it('does not throw error', () => {
+    it('throws an error', () => {
       expect(() => {
         validateContestSelection( contestOne, contestSelection )
       }).to.throw(CorruptSelectionError, 'Option config not found')
@@ -136,10 +158,10 @@ describe('validateContestSelection', () => {
           { reference: 'option-a' }
         ]
       }
-      it('does not throw error', () => {
+      it('throws an error', () => {
         expect(() => {
           validateContestSelection( contestTwo, contestSelection )
-        }).to.throw(CorruptSelectionError, 'Same option slected multiple times')
+        }).to.throw(CorruptSelectionError, 'Same option selected multiple times')
       })
     })
   })
