@@ -10,6 +10,7 @@ const contestConfig: ContestConfig = {
   markingType: {
     minMarks: 1,
     maxMarks: 3,
+    blankSubmission: "disabled",
     encoding: {
       codeSize: 1,
       maxSize: 20,
