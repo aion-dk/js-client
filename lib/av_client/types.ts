@@ -237,6 +237,7 @@ export type ContestConfig = {
 export type MarkingType = {
   minMarks: number
   maxMarks: number
+  blankSubmission: "disabled" | "active_choice" | "implicit"
   encoding: {
     codeSize: 1 | 2
     maxSize: number

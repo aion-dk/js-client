@@ -9,6 +9,7 @@ const contestOne: ContestConfig = {
   markingType: {
     minMarks: 1,
     maxMarks: 1,
+    blankSubmission: "disabled",
     encoding: {
       codeSize: 1,
       maxSize: 1,
@@ -67,6 +68,7 @@ describe('encryptContestSelections', () => {
       markingType: {
         minMarks: 1,
         maxMarks: 1,
+        blankSubmission: "disabled",
         encoding: {
           codeSize: 1,
           maxSize: 41,
