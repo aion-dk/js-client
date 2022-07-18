@@ -1,4 +1,10 @@
 # AV Client Library Changelog
+## 1.1.5
+- Move authorizationMode under voterAuthorizer and rename values:
+  - proof-of-identity and proof-of-private-key
+- Allow registering as a voter by proof of identity or proof of private key 
+- Allow submitting blank if dbb config allows.
+
 ## 1.1.4
 - Have voter registration fetch and sign latest config item rather than latest VA config item.
 
