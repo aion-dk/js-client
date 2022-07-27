@@ -5,12 +5,15 @@
 Javascript API for building voter-facing election applications.
 
 ## Installing
+
 Install directly from Github into your Javascript project.
+
 ```
 npm install @aion-dk/js-client
 ```
 
 ## Documentation
+
 https://aion-dk.github.io/js-client/
 
 ### Optional docker setup
@@ -25,13 +28,13 @@ $ bin/docker-sh
 To run tests:
 
 ```
-npm run test
+yarn run test
 ````
 
 To run the tests in watch mode:
 
 ```
-npm run tdd
+yarn run tdd
 ```
 
 To record the responses
@@ -48,7 +51,13 @@ The folder can be copy pasted to the `ionic-app`-repo by replacing the folder `t
 To generate HTML documentation for external usage:
 
 ```
-npm run docs
+yarn run docs
+```
+
+## Publishing
+
+```bash
+$ bin/publish
 ```
 
 ## Sequence of client method calls, when everything works, and voter does not test encryption

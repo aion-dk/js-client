@@ -1,13 +1,13 @@
-FROM node:14.17.0-alpine
+FROM node:18-buster-slim
 
 WORKDIR /usr/src/app
 
-RUN apk add curl
+RUN yes | apt-get update && yes | apt-get install curl
 
-COPY package*.json ./
+COPY package.json yarn.lock ./
 
-RUN npm install
+RUN yarn
 
 COPY . .
 
-RUN npm run build && npm run webpack
+RUN yarn run build && yarn run webpack
