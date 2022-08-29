@@ -13,7 +13,7 @@ import {
 import { recordResponses } from './test_helpers'
 import { BallotConfig, BallotSelection, ContestConfig, ContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;
@@ -43,7 +43,7 @@ describe('entire voter flow using OTP authorization', () => {
     }
   });
 
-  it('returns a receipt', async () => {
+  it.only('returns a receipt', async () => {
     // For recording, remember to reset AVX database and update oneTimePassword fixture value
     const performTest = async () => {
       const client = new AVClient(bulletinBoardHost + 'us');
@@ -52,7 +52,7 @@ describe('entire voter flow using OTP authorization', () => {
         publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
       });
 
-      const voterId = 'B00000000001'
+      const voterId = `B0000000000${Math.random()}`
       const voterEmail = 'markitmarchtest@osetinstitute.org'
       await client.requestAccessCode(voterId, voterEmail).catch((e) => {
         console.error(e);
