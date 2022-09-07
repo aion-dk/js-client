@@ -1,0 +1,102 @@
+{
+  "electionConfig": {
+    "dbbPublicKey": "03a05ae5f22282d04ca5655bb5903d05c8f4e0d1ec37eeb34ba4c228f88c626156",
+    "encryptionKey": "0232c3623ad6dec442ac0284fe50fda0f96af187f0b1d36cbed065e3fbf1c5639f",
+    "thresholdConfig": {
+      "encryptionKey": "0232c3623ad6dec442ac0284fe50fda0f96af187f0b1d36cbed065e3fbf1c5639f",
+      "threshold": 1,
+      "trustees": [
+        {
+          "publicKey": "0232c3623ad6dec442ac0284fe50fda0f96af187f0b1d36cbed065e3fbf1c5639f",
+          "id": 22,
+          "polynomialCoefficients": []
+        }
+      ]
+    },
+    "curveName": "secp256r1",
+    "services": {
+      "voterAuthorizer": {
+        "electionContextUuid": "a5ac8cfd-ba29-4016-b559-8abbdb8c9daf",
+        "publicKey": "0290a6759edfc186fd71077ba165edfb13df8f14b2741f96c7518ab1749a8e19c5",
+        "url": "http://localhost:3005/voting/b54bf489",
+        "authorizationMode": "proof-of-election-codes"
+      },
+      "otpProvider": {
+        "electionContextUuid": "a5ac8cfd-ba29-4016-b559-8abbdb8c9daf",
+        "publicKey": "0290a6759edfc186fd71077ba165edfb13df8f14b2741f96c7518ab1749a8e19c5",
+        "url": "http://localhost:3005/voting/b54bf489"
+      }
+    },
+    "ballotConfigs": {
+      "20": {
+        "reference": "20",
+        "voterGroup": "20",
+        "contestReferences": [
+          "20"
+        ]
+      }
+    },
+    "contestConfigs": {
+      "20": {
+        "reference": "20",
+        "markingType": {
+          "blankSubmission": "active_choice",
+          "minMarks": 1,
+          "maxMarks": 1,
+          "encoding": {
+            "codeSize": 1,
+            "maxSize": 1,
+            "cryptogramCount": 1
+          }
+        },
+        "options": [
+          {
+            "reference": "2b6e8b8ed9b52fed",
+            "code": 1,
+            "title": {
+              "en": "It tolls for the fallen",
+              "da": "Den ringer for de faldne",
+              "de": "Es läutet für die Gefallenen"
+            }
+          },
+          {
+            "reference": "e30fe1fc5bc910ba",
+            "code": 2,
+            "title": {
+              "en": "It tolls for abandoned",
+              "da": "Den ringer for de efterladte",
+              "de": "Es läutet für die Verlassenen"
+            }
+          },
+          {
+            "reference": "2b842e4ff597b603",
+            "code": 3,
+            "title": {
+              "en": "It tolls for thee",
+              "da": "Den ringer for dig",
+              "de": "Es läutet für dich"
+            }
+          }
+        ],
+        "title": {
+          "en": "Example ballot",
+          "da": "Eksempel valgseddel",
+          "de": "Beispielwahlzettel"
+        },
+        "resultType": {
+          "name": "regular"
+        }
+      }
+    },
+    "genesisConfig": {
+      "publicKey": "03a05ae5f22282d04ca5655bb5903d05c8f4e0d1ec37eeb34ba4c228f88c626156",
+      "authorizationMode": null,
+      "curveName": "secp256r1"
+    },
+    "latestConfigAddress": "f6021d9a93c4e9029c47034f5b1aac617ce6be0a1ffeaa291c2f659f9f430e9e",
+    "status": "open",
+    "sessionTimeout": 5400,
+    "bcTimeout": 600
+  },
+  "receipt": "73b2ba304b971e9512c682ca2ed8886ba9d883adc13fc1fc69022c3ec30f834d,2fbad62bf787943ceb3b9299aab3e56ac7720b9e517a5a0673708d6cf5a22561"
+}

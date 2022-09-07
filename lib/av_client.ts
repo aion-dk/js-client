@@ -47,8 +47,8 @@ import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUES
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 import { encryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
-import { Curve, DiscreteLogarithmProof } from './av_client/aion_crypto'
 import {AxiosResponse} from "axios";
+import { ProofOfElectionCodes } from "./av_client/crypto/proof_of_election_codes";
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -99,6 +99,7 @@ export class AVClient implements IAVClient {
   private ballotCryptogramItem: BallotCryptogramItem;
   private voterCommitmentOpening: CommitmentOpening;
   private spoilRequest: SpoilRequestItem
+  private proofOfElectionCodes: ProofOfElectionCodes;
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -192,9 +193,13 @@ export class AVClient implements IAVClient {
     this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email);
   }
 
+  generateProofOfElectionCodes(electionCodes : Array<string>) {
+    this.proofOfElectionCodes = new ProofOfElectionCodes(electionCodes);
+  }
+
   /**
    * Registers a voter based on the authorization mode of the Voter Authorizer
-   * Authorization is done by 'proof-of-identity' or 'proof-of-private-key'
+   * Authorization is done by 'proof-of-identity' or 'proof-of-election-codes'
    */
   public async createVoterRegistration(): Promise<void> {
     const coordinatorURL = this.getElectionConfig().services.voterAuthorizer.url;
@@ -210,8 +215,11 @@ export class AVClient implements IAVClient {
         throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
 
       authorizationResponse = await this.authorizeIdentity(coordinator)
-    } else if(authorizationMode === 'proof-of-private-key') {
-      authorizationResponse = await this.authorizePrivateKeyProof(coordinator)
+    } else if(authorizationMode === 'proof-of-election-codes') {
+      if(this.proofOfElectionCodes == null)
+        throw new InvalidStateError('Cannot register voter without proof of election codes. User has not generated an election codes proof.')
+
+      authorizationResponse = await coordinator.authorizeProofOfElectionCodes(this.keyPair.publicKey, this.proofOfElectionCodes)
     } else {
       throw new InvalidConfigError('Unknown authorization mode of voter authorizer')
     }
@@ -522,20 +530,6 @@ export class AVClient implements IAVClient {
         this.authorizationSessionId,
         this.identityConfirmationToken,
         this.keyPair.publicKey
-    );
-  }
-
-  /**
-   * Registers a voter by proof of private key
-   * Used when the authorization mode of the Voter Authorizer is 'proof-of-private-key'
-   * @returns AxiosResponse or throws an error
-   */
-  private async authorizePrivateKeyProof(coordinator): Promise<AxiosResponse> {
-    const privateKeyBn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(this.keyPair.privateKey))
-    const proofOfPrivateKey = DiscreteLogarithmProof.generate(Curve.G, privateKeyBn).toString()
-    return await coordinator.authorizeProof(
-        this.keyPair.publicKey,
-        proofOfPrivateKey
     );
   }
 

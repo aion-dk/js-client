@@ -8,7 +8,8 @@ import {
   bbHost,
   otpHost,
   bulletinBoardHost,
-  mailcatcherHost
+  mailcatcherHost,
+  acvHost,
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
 import { BallotConfig, BallotSelection, ContestConfig, ContestConfigMap, ContestSelection } from '../lib/av_client/types';
@@ -129,6 +130,75 @@ describe('entire voter flow using OTP authorization', () => {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 });
+
+describe('entire voter flow using PoEC authorization', () => {
+  let sandbox;
+  let expectedNetworkRequests : nock.Scope[] = [];
+
+  beforeEach(() => {
+    sandbox = resetDeterminism();
+
+    if(USE_MOCK) {
+      expectedNetworkRequests = [
+        bbHost.get_election_config('b54bf489_3234d498d846_20'),
+        acvHost.post_authorize_proof('voting', 'b54bf489'),
+        bbHost.post_registrations('b54bf489_3234d498d846_20'),
+        bbHost.post_commitments('b54bf489_3234d498d846_20'),
+        bbHost.post_votes('b54bf489_3234d498d846_20'),
+        bbHost.post_cast('b54bf489_3234d498d846_20'),
+      ];
+    }
+  });
+
+  afterEach(() => {
+    sandbox.restore()
+    if (USE_MOCK) {
+      nock.cleanAll();
+    }
+  });
+
+  it.only('returns a receipt', async () => {
+    const performTest = async () => {
+      const client = new AVClient(bulletinBoardHost + 'b54bf489_3234d498d846_20');
+      await client.initialize(undefined, {
+        privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
+        publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
+      });
+
+
+      client.generateProofOfElectionCodes(['1']);
+
+      await client.registerVoter().catch((e) => {
+        console.error(e);
+        expect.fail('AVClient#registerVoter failed');
+      })
+      const { contestConfigs } = client.getElectionConfig()
+      const ballotConfig = client.getVoterBallotConfig()
+      const ballotSelection = dummyBallotSelection(ballotConfig, contestConfigs)
+
+      const _trackingCode = await client.constructBallot(ballotSelection).catch((e) => {
+        console.error(e);
+        expect.fail('AVClient#constructBallotCryptograms failed');
+      });
+      // expect(trackingCode.length).to.eql(64)
+
+      const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
+      const receipt = await client.castBallot(affidavit);
+      expect(receipt.trackingCode.length).to.eql(7)
+
+      if(USE_MOCK)
+        expectedNetworkRequests.forEach((mock) => mock.done());
+    };
+
+    if(USE_MOCK) {
+      await performTest();
+    } else {
+      return await recordResponses(async function() {
+        await performTest();
+      });
+    }
+  }).timeout(10000);
+})
 
 
 function dummyBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap ): BallotSelection {

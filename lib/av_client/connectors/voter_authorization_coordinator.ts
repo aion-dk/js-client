@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { IdentityConfirmationToken } from "./otp_provider";
 import { EmailDoesNotMatchVoterRecordError, NetworkError, UnsupportedServerReplyError, VoterRecordNotFoundError } from "../errors";
+import { ProofOfElectionCodes } from "../crypto/proof_of_election_codes";
 
 export default class VoterAuthorizationCoordinator {
   private backend: AxiosInstance;
@@ -55,11 +56,12 @@ export default class VoterAuthorizationCoordinator {
     })
   }
 
-  authorizeProof(publicKey: string, proof: string): Promise<AxiosResponse> {
+  authorizeProofOfElectionCodes(publicKey: string, proof: ProofOfElectionCodes): Promise<AxiosResponse> {
     return this.backend.post('authorize_proof', {
       electionContextUuid: this.electionContextUuid,
-      publicKey: publicKey,
-      proof: proof
+      voterPublicKey: proof.mainKeyPair.publicKey, // This public key is used by the VA to find the voter to authorize.
+      sessionPublicKey: publicKey, // This public key is used for the auth token
+      proof: proof.proof,
     })
   }
 
