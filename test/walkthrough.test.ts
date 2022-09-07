@@ -157,7 +157,7 @@ describe('entire voter flow using PoEC authorization', () => {
     }
   });
 
-  it.only('returns a receipt', async () => {
+  it('returns a receipt', async () => {
     const performTest = async () => {
       const client = new AVClient(bulletinBoardHost + 'b54bf489_3234d498d846_20');
       await client.initialize(undefined, {
