@@ -84,7 +84,6 @@ describe('entire voter flow using OTP authorization', () => {
         console.error(e);
         expect.fail('AVClient#constructBallotCryptograms failed');
       });
-      // expect(trackingCode.length).to.eql(64)
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       const receipt = await client.castBallot(affidavit);
@@ -180,7 +179,6 @@ describe('entire voter flow using PoEC authorization', () => {
         console.error(e);
         expect.fail('AVClient#constructBallotCryptograms failed');
       });
-      // expect(trackingCode.length).to.eql(64)
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       const receipt = await client.castBallot(affidavit);

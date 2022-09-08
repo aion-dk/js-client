@@ -54,7 +54,6 @@ export const acvHost = {
   post_authorize_proof: (organisation_slug, election_slug) => nock(conferenceHost)
     .post(`/${organisation_slug}/${election_slug}/authorize_proof`)
     .replyWithFile(200, __dirname + '/replies/otp_flow/post_voting_b54bf489_authorize_proof.json')
-
 }
 
 export const otpHost = {
