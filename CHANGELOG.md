@@ -1,4 +1,7 @@
 # AV Client Library Changelog
+## 1.1.6
+- Replace proof-of-private-key with proof-of-election-codes
+
 ## 1.1.5
 - Move authorizationMode under voterAuthorizer and rename values:
   - proof-of-identity and proof-of-private-key

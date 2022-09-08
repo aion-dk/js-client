@@ -1,0 +1,32 @@
+{
+  "voterCommitment": {
+    "address": "c17e7052c7a03d26f60cbe2b7e6f2c89218f041f6997b7363846d2bd8da246c6",
+    "author": "voter-voter1",
+    "parentAddress": "b46ac871df62bafaaa168206351f13125c4b9fab95940f57ee1eb50d5da6075e",
+    "previousAddress": "b46ac871df62bafaaa168206351f13125c4b9fab95940f57ee1eb50d5da6075e",
+    "content": {
+      "commitment": "0257dd5f15cc762d05505b7059aaf1fef8906fd17da6da7a634eddecac41107ed8"
+    },
+    "registeredAt": "2022-09-07T10:33:58.234Z",
+    "signature": "f8e5015846a9ca9746fad9558024d44ad85ea5d5dc994656d4d4a2d3b2b38608,befe98c896599e2c34657ea550eef07cb24b8e13609b754b275c5a770b9d1156",
+    "type": "VoterEncryptionCommitmentItem"
+  },
+  "boardCommitment": {
+    "address": "5ad13e017aed983ee275d1be1e53b5a92a36d676034a0570abdc4f7d247e3031",
+    "author": "Digital Ballot Box",
+    "parentAddress": "c17e7052c7a03d26f60cbe2b7e6f2c89218f041f6997b7363846d2bd8da246c6",
+    "previousAddress": "c17e7052c7a03d26f60cbe2b7e6f2c89218f041f6997b7363846d2bd8da246c6",
+    "content": {
+      "commitment": "03aba50419328423ea27434a71c5877bb928607ebc5e7b161095a2e11b90485a82"
+    },
+    "registeredAt": "2022-09-07T10:33:58.362Z",
+    "signature": "2eba8eda5ac77db6e2d0797ba5497dc833b414e6e89e88fd635d47b106cbc7f0,027f85dfc17795c61500bf7e753d0465f8f29b2cdd1267f5db33f88ea0c76790",
+    "type": "BoardEncryptionCommitmentItem"
+  },
+  "envelopes": {
+    "20": [
+      "02cde9f5187eb610fddfcd20f745a8a1f831810d67744ffbc1b01f7ae534ea8eb9,0255b4f9f7595ea66188eb0c7271cb1eaf30dca7d2b13d83c71643ddf97a3d21be"
+    ]
+  },
+  "receipt": "7d15d68985283253847adf52f97239c5d904e12e0ff0930010a4e88ea22ff442,506a1c08952787dc11b9aad642b14414989d3aa7c0d5d3194e7361e7354e2f57"
+}

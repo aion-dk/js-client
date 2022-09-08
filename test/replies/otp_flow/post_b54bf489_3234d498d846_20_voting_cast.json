@@ -1,0 +1,13 @@
+{
+  "castRequest": {
+    "address": "d98b752d71039dc3df90ab138768ba669a08fc9d7e0c2d8b2eeabfc3ab07c338",
+    "author": "voter-voter1",
+    "parentAddress": "5600090a77bb4f28592ebdc81684cf6cb55c53dbc10496447b70848e3eaac854",
+    "previousAddress": "5600090a77bb4f28592ebdc81684cf6cb55c53dbc10496447b70848e3eaac854",
+    "content": {},
+    "registeredAt": "2022-09-07T10:33:58.924Z",
+    "signature": "97b6e799db3b080c2d1ff8c8c8a2e21b0bed0b1f99efb895ea07d07d6a737f54,c03d61089244f654a88c1f041f7da9301a373ec4fbc342c8923fdfbcc1287c15",
+    "type": "CastRequestItem"
+  },
+  "receipt": "46e84599096bc60b29b5daff1cf6c023a1d390d853ca58f3d7c85fda741ac86b,b06fbdaa3a518d1b97cb20528e0c438926651eed2e382920617cd3c7bbbd6e88"
+}

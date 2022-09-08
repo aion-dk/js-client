@@ -12,31 +12,32 @@ function getEnvVar(name: string): string {
 }
 
 export const bulletinBoardHost = getEnvVar('DBB_URL')
+export const conferenceHost = getEnvVar('CONFERENCE_HOST_URL')
 export const voterAuthorizerHost = getEnvVar('VOTER_AUTHORIZER_URL')
 export const OTPProviderHost = getEnvVar('OTP_PROVIDER_URL')
 export const mailcatcherHost = getEnvVar('MAILCATCHER_URL')
 export const OTPProviderElectionContextId = 'cca2b217-cedd-4d58-a103-d101ba472eb8';
 
 export const bbHost = {
-  get_election_config: () => nock(bulletinBoardHost)
-      .get('/us/configuration')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/get_us_configuration.json'),
+  get_election_config: (board_slug = "us") => nock(bulletinBoardHost)
+      .get(`/${board_slug}/configuration`)
+      .replyWithFile(200, `${__dirname}/replies/otp_flow/get_${board_slug}_configuration.json`),
 
-  post_registrations: () => nock(bulletinBoardHost)
-      .post('/us/voting/registrations')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_voting_registrations.json'),
+  post_registrations: (board_slug = "us") => nock(bulletinBoardHost)
+      .post(`/${board_slug}/voting/registrations`)
+      .replyWithFile(200, `${__dirname}/replies/otp_flow/post_${board_slug}_voting_registrations.json`),
 
-  post_commitments: () => nock(bulletinBoardHost)
-      .post('/us/voting/commitments')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_voting_commitments.json'),
+  post_commitments: (board_slug = "us") => nock(bulletinBoardHost)
+      .post(`/${board_slug}/voting/commitments`)
+      .replyWithFile(200, `${__dirname}/replies/otp_flow/post_${board_slug}_voting_commitments.json`),
 
-  post_votes: () => nock(bulletinBoardHost)
-      .post('/us/voting/votes')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_voting_votes.json'),
+  post_votes: (board_slug = "us") => nock(bulletinBoardHost)
+      .post(`/${board_slug}/voting/votes`)
+      .replyWithFile(200, `${__dirname}/replies/otp_flow/post_${board_slug}_voting_votes.json`),
 
-  post_cast: () => nock(bulletinBoardHost)
-      .post('/us/voting/cast')
-      .replyWithFile(200, __dirname + '/replies/otp_flow/post_us_voting_cast.json')
+  post_cast: (board_slug = "us") => nock(bulletinBoardHost)
+      .post(`/${board_slug}/voting/cast`)
+      .replyWithFile(200, `${__dirname}/replies/otp_flow/post_${board_slug}_voting_cast.json`)
 };
 
 export const vaHost = {
@@ -47,6 +48,12 @@ export const vaHost = {
   post_request_authorization: () => nock(voterAuthorizerHost)
       .post('/request_authorization')
       .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
+}
+
+export const acvHost = {
+  post_authorize_proof: (organisation_slug, election_slug) => nock(conferenceHost)
+    .post(`/${organisation_slug}/${election_slug}/authorize_proof`)
+    .replyWithFile(200, __dirname + '/replies/otp_flow/post_voting_b54bf489_authorize_proof.json')
 }
 
 export const otpHost = {
