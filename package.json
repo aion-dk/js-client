@@ -19,6 +19,9 @@
     "lint": "eslint lib/ test/",
     "webpack": "webpack --config webpack.config.js"
   },
+  "files": [
+    "dist/lib/**/*"
+  ],
   "engines": {
     "node": ">=14"
   },
