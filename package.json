@@ -20,7 +20,7 @@
     "webpack": "webpack --config webpack.config.js"
   },
   "files": [
-    "lib/**/*"
+    "dist/lib/**/*"
   ],
   "engines": {
     "node": ">=14"
