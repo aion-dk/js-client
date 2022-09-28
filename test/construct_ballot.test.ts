@@ -46,7 +46,7 @@ describe('AVClient#constructBallot', () => {
       await client.registerVoter()
 
       const ballotSelection: BallotSelection = {
-        reference: 'ballot-1',
+        reference: 'precinct_4_bedrock',
         contestSelections: [
           {
             reference: 'contest ref 1',
@@ -101,7 +101,7 @@ describe('AVClient#constructBallot', () => {
         await client.registerVoter()
   
         const ballotSelection: BallotSelection = {
-          reference: 'ballot-1',
+          reference: 'precinct_4_bedrock',
           contestSelections: [
             {
               reference: 'contest ref 1',
@@ -129,7 +129,7 @@ describe('AVClient#constructBallot', () => {
         await client.registerVoter()
   
         const ballotSelection: BallotSelection = {
-          reference: 'ballot-1',
+          reference: 'precinct_4_bedrock',
           contestSelections: [
             {
               reference: 'contest ref 1',
