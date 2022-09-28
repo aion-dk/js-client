@@ -1,4 +1,7 @@
 # AV Client Library Changelog
+## 1.1.8
+- Added weight to the voter session expectation. DBB has also been expanded to provide weights for the session.
+
 ## 1.1.6
 - Replace proof-of-private-key with proof-of-election-codes
 
