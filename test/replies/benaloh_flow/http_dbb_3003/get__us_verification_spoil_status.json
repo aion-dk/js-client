@@ -1,12 +1,12 @@
 {
   "item": {
-    "address": "98d61431ea989426b7754af8552c33fc81b04535fdd5e8be900e97a7ef9447db",
-    "author": "voter-cc4100c38735d44c70e9e68078360ce25883d366",
-    "parentAddress": "8c0638e9a6dabc6dbcbdc9bb79854526c3654b5d02d86fbd14b0bda79531134d",
-    "previousAddress": "8c0638e9a6dabc6dbcbdc9bb79854526c3654b5d02d86fbd14b0bda79531134d",
+    "address": "40f90b541e72f54a955374113208fb40cb884dda7953f47d2c2714d816afea19",
+    "author": "voter-e40ec185fcc2e8a83e25bc9e82ee93262c01599e",
+    "parentAddress": "3bca82a183e32cd7413e94f6d6688716ea9c69878aa79f55aa0f8f6e60b41ace",
+    "previousAddress": "3bca82a183e32cd7413e94f6d6688716ea9c69878aa79f55aa0f8f6e60b41ace",
     "content": {},
-    "registeredAt": "2022-06-07T10:34:04.202Z",
-    "signature": "fc2c177d1da1d8aeb436951d373eab5be8af0b71a5a737fd43e4aa5aa7d249c7,a7f237bd9e49bc25904f324f1e2853190b8f86cd883487da6d648c285ed2256e",
+    "registeredAt": "2022-09-28T07:52:10.016Z",
+    "signature": "d36db7dbd28644917b97b7910a800aabe8ff69a928c95b3a183e7473f80ca2e6,84b4dc64ccf94af9d2fa46fa379dfdad4edf5ad8b76b2610cbd1296b565be9ae",
     "type": "SpoilRequestItem"
   }
 }
