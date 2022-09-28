@@ -1,24 +1,24 @@
 {
   "spoilRequest": {
-    "address": "c84433a0843de2d690580dcba562255b5e0b512f293ff9b932155117a04ec7df",
+    "address": "40f90b541e72f54a955374113208fb40cb884dda7953f47d2c2714d816afea19",
     "author": "voter-e40ec185fcc2e8a83e25bc9e82ee93262c01599e",
-    "parentAddress": "293b83fdbde82e4cddd427675c297af9fba6e453242cc849494c20f17db9c6da",
-    "previousAddress": "293b83fdbde82e4cddd427675c297af9fba6e453242cc849494c20f17db9c6da",
+    "parentAddress": "3bca82a183e32cd7413e94f6d6688716ea9c69878aa79f55aa0f8f6e60b41ace",
+    "previousAddress": "3bca82a183e32cd7413e94f6d6688716ea9c69878aa79f55aa0f8f6e60b41ace",
     "content": {},
-    "registeredAt": "2022-09-28T07:47:01.012Z",
-    "signature": "45a8d1bee5435fbb5b2a67b8e8bfa73de2f338c129b77697a35f0afdb9b1fcf8,aef165ea1e19e1ad340507401c8553ef3ece9722bc7e4c90ba504636196fb79d",
+    "registeredAt": "2022-09-28T07:52:10.016Z",
+    "signature": "d36db7dbd28644917b97b7910a800aabe8ff69a928c95b3a183e7473f80ca2e6,84b4dc64ccf94af9d2fa46fa379dfdad4edf5ad8b76b2610cbd1296b565be9ae",
     "type": "SpoilRequestItem"
   },
-  "receipt": "d7bd3862cd9264dc8fd29c72dd9a9fc03d5b33e6ee39623848605a35d0eb95bf,6872925cc810e7124408103765dbcd254a8e264c0efeeeba3f929af36aadbcf6",
+  "receipt": "051e6e3a5d0317c86165d68505dc867606ff9a7ad2f5a63cd6ab49b08ad4eb8e,9dccb6d5f4f67081efd5fb2053ae49fe024f1700a8e5da39dce921680f986f42",
   "boardCommitmentOpening": {
     "randomizers": {
       "contest ref 1": [
-        "da95efa860d2953ce93d3d3f6d7d9a961fce04f72269da3a2c6f1d24b15e1cf4"
+        "5dda0de6db91f11299faf6ae5c87c65c9a7a014346e95722ebf95c2c3cbe8065"
       ],
       "contest ref 2": [
-        "722d02ecc9bbcb717c5b5a909b1945e0225a602d5d47fedff8051762b5659ea9"
+        "de333f62f587626d704cd728f57a310ba87d6eb2b1ed61fcf78b21ca36008e52"
       ]
     },
-    "commitmentRandomness": "c5651376ce2314ce7a252cfc58051750eabd614b906bb1119dac6ba0f150fc1c"
+    "commitmentRandomness": "9303ee5ec19706d6525f4d10631a76e0bfbeb8d9bb3cb2e8ad5fd9fd7f2a6f67"
   }
 }

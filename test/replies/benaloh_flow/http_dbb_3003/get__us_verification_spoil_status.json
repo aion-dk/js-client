@@ -1,12 +1,12 @@
 {
   "item": {
-    "address": "c84433a0843de2d690580dcba562255b5e0b512f293ff9b932155117a04ec7df",
+    "address": "40f90b541e72f54a955374113208fb40cb884dda7953f47d2c2714d816afea19",
     "author": "voter-e40ec185fcc2e8a83e25bc9e82ee93262c01599e",
-    "parentAddress": "293b83fdbde82e4cddd427675c297af9fba6e453242cc849494c20f17db9c6da",
-    "previousAddress": "293b83fdbde82e4cddd427675c297af9fba6e453242cc849494c20f17db9c6da",
+    "parentAddress": "3bca82a183e32cd7413e94f6d6688716ea9c69878aa79f55aa0f8f6e60b41ace",
+    "previousAddress": "3bca82a183e32cd7413e94f6d6688716ea9c69878aa79f55aa0f8f6e60b41ace",
     "content": {},
-    "registeredAt": "2022-09-28T07:47:01.012Z",
-    "signature": "45a8d1bee5435fbb5b2a67b8e8bfa73de2f338c129b77697a35f0afdb9b1fcf8,aef165ea1e19e1ad340507401c8553ef3ece9722bc7e4c90ba504636196fb79d",
+    "registeredAt": "2022-09-28T07:52:10.016Z",
+    "signature": "d36db7dbd28644917b97b7910a800aabe8ff69a928c95b3a183e7473f80ca2e6,84b4dc64ccf94af9d2fa46fa379dfdad4edf5ad8b76b2610cbd1296b565be9ae",
     "type": "SpoilRequestItem"
   }
 }
