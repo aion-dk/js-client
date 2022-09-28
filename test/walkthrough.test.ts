@@ -139,12 +139,12 @@ describe('entire voter flow using PoEC authorization', () => {
 
     if(USE_MOCK) {
       expectedNetworkRequests = [
-        bbHost.get_election_config('b54bf489_3234d498d846_20'),
-        acvHost.post_authorize_proof('voting', 'b54bf489'),
-        bbHost.post_registrations('b54bf489_3234d498d846_20'),
-        bbHost.post_commitments('b54bf489_3234d498d846_20'),
-        bbHost.post_votes('b54bf489_3234d498d846_20'),
-        bbHost.post_cast('b54bf489_3234d498d846_20'),
+        bbHost.get_election_config('2904b00f_5abcbf894df3_58'),
+        acvHost.post_authorize_proof('voting', '2904b00f'),
+        bbHost.post_registrations('2904b00f_5abcbf894df3_58'),
+        bbHost.post_commitments('2904b00f_5abcbf894df3_58'),
+        bbHost.post_votes('2904b00f_5abcbf894df3_58'),
+        bbHost.post_cast('2904b00f_5abcbf894df3_58'),
       ];
     }
   });
@@ -156,14 +156,16 @@ describe('entire voter flow using PoEC authorization', () => {
     }
   });
 
-  it('returns a receipt', async () => {
+  it.only('returns a receipt', async () => {
     const performTest = async () => {
-      const client = new AVClient(bulletinBoardHost + 'b54bf489_3234d498d846_20');
+      const client = new AVClient(bulletinBoardHost + '2904b00f_5abcbf894df3_58');
       await client.initialize(undefined, {
-        privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
-        publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
+        privateKey: 'a259f4b44e30abc0cd53379381bdc86f44723911a5bc03bf4ff21d1b49b53efd',
+        publicKey: '0290d410a7d25411bdd3d82ace5f707d02c054b60e7dc8883c1f07be4265704dd6'
       });
 
+
+      "/voting/2904b00f/authorize_proof"
 
       client.generateProofOfElectionCodes(['1']);
 
