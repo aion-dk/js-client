@@ -238,6 +238,7 @@ export class AVClient implements IAVClient {
         authToken: authToken,
         identifier: decoded['identifier'],
         publicKey: decoded['public_key'],
+        weight: decoded['weight'] || 1,
         voterGroup: decoded['voter_group_key']
       }
     }
