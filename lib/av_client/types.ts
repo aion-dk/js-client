@@ -271,6 +271,8 @@ export interface ElectionConfig {
   // appended data:
   affidavit: AffidavitConfig;
 
+  castRequestItemAttachmentEncryptionKey: string;
+
   services: {
     'voterAuthorizer': VAService,
     'otpProvider': Service
