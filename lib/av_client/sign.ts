@@ -53,7 +53,11 @@ const verifyContent = (actual: Record<string, unknown>, expectations: Record<str
   const expectedContent = uniformer.formString(expectations);
   const actualContent = uniformer.formString(actual);
 
+  console.log(expectations)
+  console.log(actual)
   if(expectedContent != actualContent) {
+    console.log(expectedContent)
+    console.log(actualContent)
     throw new Error('Item payload failed sanity check. Received item did not match expected');
   }
 };

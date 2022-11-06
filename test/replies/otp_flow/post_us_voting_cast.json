@@ -1,10 +1,12 @@
 {
   "castRequest": {
-    "address": "981bc744bfbbd5c04fb2384e751b09e4580994a076cf7b8465bb8dd30b409c05",
+    "address": "669b6a7557ce2409aff34b0fdb859952e7803d3f4ff609fe2b9ec932b32d26e0",
     "author": "voter-e40ec185fcc2e8a83e25bc9e82ee93262c01599e",
     "parentAddress": "0093512e06c19010cdc41366c1d4b6c9934446161604293d7ceee7338e8bc6e6",
     "previousAddress": "0093512e06c19010cdc41366c1d4b6c9934446161604293d7ceee7338e8bc6e6",
-    "content": {},
+    "content": {
+      "attachment": "LELINw8MpVKQ87EJI1HcbLvLlPLtM9bca0jhb7ffoL4S6RyU1+60pcc0Nxxhqa9k+J6o/A=="
+    },
     "registeredAt": "2022-09-28T07:51:15.306Z",
     "signature": "61885774389d29ed68ff62cbd073c96895decfde15ed77cae32e4ea7d8237b11,588cbd9257bb66bb991b8367e30b9c4bf6a93f2bfdb1582ea41b611d8dff7cc5",
     "type": "CastRequestItem"

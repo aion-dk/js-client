@@ -132,7 +132,8 @@
     "latestConfigAddress": "4222f8d5e6f5f915cf40734d5ca8f24d32d4b2bb7a63013f7edbc67e5c5d0771",
     "status": "open",
     "sessionTimeout": 30,
-    "bcTimeout": 10
+    "bcTimeout": 10,
+    "castRequestItemAttachmentEncryptionKey": "02df80789b2713ae89c33cb877ce2c2e09b81e33c22d6cfdebc9b352598005661c"
   },
   "receipt": "44d417eae17effe4fb2a7573a839acfe95f430498a01cd8e44978d2542364907,726716ae59eb16d9f74af7a0e62022faa2b0d6731f2b5022782f3ce67dd6e880"
 }
