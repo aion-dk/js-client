@@ -397,6 +397,7 @@ export class AVClient implements IAVClient {
       if (affidavit && this.electionConfig) {
         try {
           const encryptedAffidavit = JSON.parse(dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit).toString())
+          console.log(encryptedAffidavit)
           castRequestItem.content['attachment'] = encryptedAffidavit.ciphertext
           castRequestItem['attachment'] = `data:text/plain;base64,${encryptedAffidavit.ciphertext}`
         } catch (err) {
@@ -409,7 +410,8 @@ export class AVClient implements IAVClient {
       const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
       const { castRequest, receipt } = response.data;
 
-      console.log(receipt)
+      console.log(castRequestItem)
+      console.log(castRequest)
 
       validatePayload(castRequest, castRequestItem);
       validateReceipt([castRequest], receipt, this.getDbbPublicKey());
