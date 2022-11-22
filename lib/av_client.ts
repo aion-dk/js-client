@@ -50,6 +50,7 @@ import { submitBallotCryptograms } from './av_client/actions/submit_ballot_crypt
 import {AxiosResponse} from "axios";
 import { ProofOfElectionCodes } from "./av_client/crypto/proof_of_election_codes";
 import { dhEncrypt } from "./av_client/crypto/aes";
+import {btoa} from "buffer";
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -396,10 +397,10 @@ export class AVClient implements IAVClient {
 
       if (affidavit && this.electionConfig) {
         try {
-          const encryptedAffidavit = dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit)
+          const encryptedAffidavit = dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit).toString()
           console.log(encryptedAffidavit)
-          castRequestItem.content['attachment'] = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(encryptedAffidavit.toString()))
-          castRequestItem['attachment'] = `data:text/plain;base64,${encryptedAffidavit.ciphertext}`
+          castRequestItem.content['attachment'] = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(encryptedAffidavit))
+          castRequestItem['attachment'] = `data:text/plain;base64,${btoa(encryptedAffidavit)}`
         } catch (err) {
           console.error(err)
         }
