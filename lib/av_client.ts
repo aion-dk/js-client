@@ -396,9 +396,9 @@ export class AVClient implements IAVClient {
 
       if (affidavit && this.electionConfig) {
         try {
-          const encryptedAffidavit = JSON.parse(dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit).toString())
+          const encryptedAffidavit = dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit)
           console.log(encryptedAffidavit)
-          castRequestItem.content['attachment'] = encryptedAffidavit.ciphertext
+          castRequestItem.content['attachment'] = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(encryptedAffidavit.toString()))
           castRequestItem['attachment'] = `data:text/plain;base64,${encryptedAffidavit.ciphertext}`
         } catch (err) {
           console.error(err)
