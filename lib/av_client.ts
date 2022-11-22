@@ -395,12 +395,12 @@ export class AVClient implements IAVClient {
           content: {}
       };
 
+      let encryptedAffidavit;
+
       if (affidavit && this.electionConfig) {
         try {
-          const encryptedAffidavit = dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit).toString()
-          console.log(encryptedAffidavit)
+          encryptedAffidavit = dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit).toString()
           castRequestItem.content['attachment'] = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(encryptedAffidavit))
-          castRequestItem['attachment'] = `data:text/plain;base64,${btoa(encryptedAffidavit)}`
         } catch (err) {
           console.error(err)
         }
@@ -408,11 +408,12 @@ export class AVClient implements IAVClient {
 
       const signedPayload = signPayload(castRequestItem, this.privateKey());
 
+      if (encryptedAffidavit) {
+        signedPayload['attachment'] = `data:text/plain;base64,${btoa(encryptedAffidavit)}`
+      }
+
       const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
       const { castRequest, receipt } = response.data;
-
-      console.log(castRequestItem)
-      console.log(castRequest)
 
       validatePayload(castRequest, castRequestItem);
       validateReceipt([castRequest], receipt, this.getDbbPublicKey());
