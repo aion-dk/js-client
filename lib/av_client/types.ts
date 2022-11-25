@@ -327,3 +327,64 @@ export type ReadableOptionSelection = {
   title: string
   text?: string
 }
+
+
+/** New stuff */
+
+export interface OptionContent {
+  reference: string;
+  code: number;
+  children?: Option[];
+  title: LocalString;
+  subtitle: LocalString;
+  description: LocalString;
+  writeIn?: {
+    maxSize: number
+    encoding: 'utf8'
+  }
+}
+
+
+export type NewBallotConfig = {
+
+}
+
+export type ContestContent = {
+  reference: String;
+  options: OptionContent[]
+}
+
+export type VotingRoundConfig = {
+
+}
+
+export type GenesisConfig = {
+
+}
+
+export interface NewContestConfig {
+  content: ContestContent
+}
+
+export interface ThresholdConfig {
+  content: ThresholdConfigContent
+}
+
+export type ThresholdConfigContent = {
+  encryptionKey: string
+}
+
+export interface VoterAuthorizer
+
+
+
+export interface LatestConfigItems {
+  thresholdConfig: ThresholdConfig;
+  voterAuthorizerConfig: string;
+  ballotConfigs: NewBallotConfig[];
+  contestConfigs: NewContestConfig[];
+  votingRoundConfigs: VotingRoundConfig[];
+  electionConfig: ElectionConfig;
+  genesisConfig: GenesisConfig;
+  latestConfigItem: BaseBoardItem;
+}

@@ -9,11 +9,11 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import { BallotConfig, BallotSelection, ContestConfig, ContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 const { useRecordedResponse, recordable } = prepareRecording('benaloh_flow')
 
-describe('entire benaloh flow', () => {
+describe.only('entire benaloh flow', () => {
   let sandbox;
   let expectedNetworkRequests : nock.Scope[] = [];
 
