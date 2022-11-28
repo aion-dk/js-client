@@ -49,7 +49,7 @@ import { encryptCommitmentOpening, validateCommmitmentOpening } from './av_clien
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
 import {AxiosResponse} from "axios";
 import { ProofOfElectionCodes } from "./av_client/crypto/proof_of_election_codes";
-import { dhEncrypt } from "./av_client/crypto/aes";
+import {dhDecrypt, dhEncrypt} from "./av_client/crypto/aes";
 import {btoa} from "buffer";
 
 /** @internal */
@@ -399,7 +399,8 @@ export class AVClient implements IAVClient {
 
       if (affidavit && this.electionConfig) {
         try {
-          encryptedAffidavit = dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit).toString()
+          encryptedAffidavit = dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit)
+
           castRequestItem.content['attachment'] = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(encryptedAffidavit))
         } catch (err) {
           console.error(err)
@@ -414,6 +415,9 @@ export class AVClient implements IAVClient {
 
       const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
       const { castRequest, receipt } = response.data;
+
+      console.log(castRequestItem)
+      console.log(castRequest)
 
       validatePayload(castRequest, castRequestItem);
       validateReceipt([castRequest], receipt, this.getDbbPublicKey());

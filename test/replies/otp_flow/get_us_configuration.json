@@ -133,7 +133,7 @@
     "status": "open",
     "sessionTimeout": 30,
     "bcTimeout": 10,
-    "castRequestItemAttachmentEncryptionKey": "02df80789b2713ae89c33cb877ce2c2e09b81e33c22d6cfdebc9b352598005661c"
+    "castRequestItemAttachmentEncryptionKey": "0248ccc9f10b1825efe88a701384e913d39c40b4660cf18b73717938fd3eb25a21"
   },
   "receipt": "44d417eae17effe4fb2a7573a839acfe95f430498a01cd8e44978d2542364907,726716ae59eb16d9f74af7a0e62022faa2b0d6731f2b5022782f3ce67dd6e880"
 }

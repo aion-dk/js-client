@@ -1,15 +1,15 @@
 {
   "castRequest": {
-    "address": "669b6a7557ce2409aff34b0fdb859952e7803d3f4ff609fe2b9ec932b32d26e0",
-    "author": "voter-e40ec185fcc2e8a83e25bc9e82ee93262c01599e",
-    "parentAddress": "0093512e06c19010cdc41366c1d4b6c9934446161604293d7ceee7338e8bc6e6",
-    "previousAddress": "0093512e06c19010cdc41366c1d4b6c9934446161604293d7ceee7338e8bc6e6",
+    "address": "4304082cc2d971685cfa0f053e908ba2df7ba0e01a5f4be2b42a5b3da4c932ac",
+    "author": "voter-524baf2bec173d6783237ca8bdb4dfe5f2c937ce",
     "content": {
-      "attachment": "LELINw8MpVKQ87EJI1HcbLvLlPLtM9bca0jhb7ffoL4S6RyU1+60pcc0Nxxhqa9k+J6o/A=="
+      "attachment": "ca1fa0ad5210926ce8c565fb18a7c92bc6b01c4dd9025458f01b76f5da8d2053"
     },
-    "registeredAt": "2022-09-28T07:51:15.306Z",
-    "signature": "61885774389d29ed68ff62cbd073c96895decfde15ed77cae32e4ea7d8237b11,588cbd9257bb66bb991b8367e30b9c4bf6a93f2bfdb1582ea41b611d8dff7cc5",
+    "parentAddress": "c2f7de0bf2580997e3709fa7fb6315307f0eae9d38d368ed25e4fad6fd297882",
+    "previousAddress": "c2f7de0bf2580997e3709fa7fb6315307f0eae9d38d368ed25e4fad6fd297882",
+    "registeredAt": "2022-11-28T11:18:39.041Z",
+    "signature": "df56fb6d471aa8ec267c698405bb6d5985aed714d2a83f9e710181b124b4cd8e,66bad92a2082def46429dffffb1ba9d9acc838b0e712ff8bedf419c0e86af5b8",
     "type": "CastRequestItem"
   },
-  "receipt": "5a03c439a9451a539a6e5f89e90d2bf045db5d1d5a24877bfed2ea120a2b1334,d9a0423a17eefaace71ba25d2c4c2dfd9fa12084b6d9a9834bf4e4b7ac4d94cd"
+  "receipt": "72a346e244df15988f67bad701546aadb67022d27ded95fa32de6b1c2e1c1611,032145ac2b830058d7e03a38742b1bcd7558fcd85170fc78bde48180b70094c5"
 }
