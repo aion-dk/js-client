@@ -1,5 +1,6 @@
 export interface IAVClient {
-  initialize(electionConfig: ElectionConfig): Promise<void>
+  initialize(electionConfig: LatestConfigItems): Promise<void>
+  // initialize(electionConfig: ElectionConfig): Promise<void>
   initialize(): Promise<void>
   requestAccessCode(opaqueVoterId: string, email: string): Promise<void>
   validateAccessCode(code: string): Promise<void>
@@ -208,31 +209,31 @@ export interface ItemExpectation {
 export type Signature = string;
 export type HashValue = string;
 
-export type BallotConfigMap = {
-  [voterGroupId: string]: BallotConfig
-};
+// export type BallotConfigMap = {
+//   [voterGroupId: string]: BallotConfig
+// };
 
-export type BallotConfig = {
-  reference: string
-  voterGroup: string
-  contestReferences: string[]
-}
+// export type BallotConfig = {
+//   reference: string
+//   voterGroup: string
+//   contestReferences: string[]
+// }
 
-export type ContestConfigMap = {
-  [contestReference: string]: ContestConfig
-}
+// export type ContestConfigMap = {
+//   [contestReference: string]: ContestConfig
+// }
 
-export type ContestConfig = {
-  reference: string
-  options: Option[]
-  markingType: MarkingType
-  resultType: {
-    name: string
-  }
-  title: LocalString
-  subtitle: LocalString
-  description: LocalString
-}
+// export type ContestConfig = {
+//   reference: string
+//   options: Option[]
+//   markingType: MarkingType
+//   resultType: {
+//     name: string
+//   }
+//   title: LocalString
+//   subtitle: LocalString
+//   description: LocalString
+// }
 
 export type MarkingType = {
   minMarks: number
@@ -253,47 +254,47 @@ export type BallotStatus = {
   }
 }
 
-export interface ElectionConfig {
-  app_url: string;
-  encryptionKey: string;
-  signingPublicKey: string;
-  election: Election;
-  ballots: Ballot[];
-  availableLocales: string[];
-  currentLocale: string;
+// export interface ElectionConfig {
+//   app_url: string;
+//   encryptionKey: string;
+//   signingPublicKey: string;
+//   election: Election;
+//   ballots: Ballot[];
+//   availableLocales: string[];
+//   currentLocale: string;
 
-  dbbPublicKey: string
+//   dbbPublicKey: string
 
-  contestConfigs: ContestConfigMap
-  ballotConfigs: BallotConfigMap;
-  latestConfigAddress: string;
+//   contestConfigs: ContestConfigMap
+//   ballotConfigs: BallotConfigMap;
+//   latestConfigAddress: string;
 
-  // appended data:
-  affidavit: AffidavitConfig;
+//   // appended data:
+//   affidavit: AffidavitConfig;
 
-  services: {
-    'voterAuthorizer': VAService,
-    'otpProvider': Service
-  };
-}
+//   services: {
+//     'voterAuthorizer': VAService,
+//     'otpProvider': Service
+//   };
+// }
 
-interface Service {
-  url: string;
-  electionContextUuid: string;
-  publicKey: string;
-}
+// interface Service {
+//   url: string;
+//   electionContextUuid: string;
+//   publicKey: string;
+// }
 
-interface VAService {
-  url: string;
-  electionContextUuid: string;
-  authorizationMode: string,
-  publicKey: string;
-}
+// interface VAService {
+//   url: string;
+//   electionContextUuid: string;
+//   authorizationMode: string,
+//   publicKey: string;
+// }
 
-interface AffidavitConfig {
-  curve: string;
-  encryptionKey: string;
-}
+// interface AffidavitConfig {
+//   curve: string;
+//   encryptionKey: string;
+// }
 
 export type BallotSelection = {
   reference: string
@@ -331,6 +332,62 @@ export type ReadableOptionSelection = {
 
 /** New stuff */
 
+// Threshold Config Item
+export interface ThresholdConfig {
+  content: ThresholdConfigContent
+}
+
+export type ThresholdConfigContent = {
+  encryptionKey: string
+}
+
+// Voter Authorizer Item
+export interface VoterAuthorizer {
+  content: VoterAuthorizerContent
+} 
+
+export interface VoterAuthorizerContent {
+  identityProvider: VoterAuthorizerContentItem
+  voterAuthorizer: VoterAuthorizerContentItem
+}
+
+export interface VoterAuthorizerContentItem {
+  contextUuid: string
+  publicKey: string
+  url: string
+  authorizationMode?: string
+}
+
+// Ballot Config Item
+export type NewBallotConfigMap = {
+  [voterGroupId: string]: NewBallotConfig
+}
+
+export type NewBallotConfig = {
+  content: NewBallotContent
+}
+
+export interface NewBallotContent {
+  reference: string
+  voterGroup: string
+  contestReferences: string[]
+}
+
+// Contest Config Item
+export type NewContestConfigMap = {
+  [contestReference: string]: NewContestConfig
+}
+
+export type NewContestConfig = {
+  content: NewContestContent
+}
+
+export interface NewContestContent {
+  reference: string
+  title: LocalString
+  options: OptionContent[]
+}
+
 export interface OptionContent {
   reference: string;
   code: number;
@@ -344,47 +401,54 @@ export interface OptionContent {
   }
 }
 
-
-export type NewBallotConfig = {
-
-}
-
-export type ContestContent = {
-  reference: String;
-  options: OptionContent[]
-}
-
+// Voting Round Config Item
 export type VotingRoundConfig = {
 
 }
 
-export type GenesisConfig = {
-
+// Election Config Item
+export type NewElectionConfig = {
+  content: ElectionConfigContent
 }
 
-export interface NewContestConfig {
-  content: ContestContent
+export interface ElectionConfigContent{
+  title: LocalString
+  uuid: string
+  status: string
+  locales: string[]
+  sessionTimeout: number
+  castRequestItemAttachmentEncryptionKey: string
+  requireCastRequestAttachment: boolean
+  bcTimeout: number
+  schedule: ScheduledElection
 }
 
-export interface ThresholdConfig {
-  content: ThresholdConfigContent
+export interface ScheduledElection {
+  from: string
+  to: string
 }
 
-export type ThresholdConfigContent = {
-  encryptionKey: string
+// Genesis Config Item
+export type NewGenesisConfig = {
+  content: GenesisConfigContent
 }
 
-export interface VoterAuthorizer
-
-
+export interface GenesisConfigContent {
+  ballotAcceptance: string
+  eaCurveName: string
+  eaPublicKey: string
+  electionSlug: string
+  publicKey: string
+  resultExtraction: string
+}
 
 export interface LatestConfigItems {
   thresholdConfig: ThresholdConfig;
-  voterAuthorizerConfig: string;
-  ballotConfigs: NewBallotConfig[];
-  contestConfigs: NewContestConfig[];
+  voterAuthorizerConfig: VoterAuthorizer;
+  ballotConfigs: NewBallotConfigMap;
+  contestConfigs: NewContestConfigMap;
   votingRoundConfigs: VotingRoundConfig[];
-  electionConfig: ElectionConfig;
-  genesisConfig: GenesisConfig;
+  electionConfig: NewElectionConfig;
+  genesisConfig: NewGenesisConfig;
   latestConfigItem: BaseBoardItem;
 }
