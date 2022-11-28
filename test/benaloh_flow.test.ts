@@ -124,7 +124,7 @@ describe.only('entire benaloh flow', () => {
   })).timeout(10000);
 
   async function placeVote(client: AVClient) {
-    const voterId = 'B00000000001'
+    const voterId = Math.random().toString()
     const voterEmail = 'markitmarchtest@osetinstitute.org'
     await client.requestAccessCode(voterId, voterEmail).catch((e) => {
       console.error(e);

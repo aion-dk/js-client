@@ -1,5 +1,5 @@
 export interface IAVClient {
-  initialize(electionConfig: LatestConfigItems): Promise<void>
+  initialize(electionConfig: LatestConfig): Promise<void>
   // initialize(electionConfig: ElectionConfig): Promise<void>
   initialize(): Promise<void>
   requestAccessCode(opaqueVoterId: string, email: string): Promise<void>
@@ -291,10 +291,10 @@ export type BallotStatus = {
 //   publicKey: string;
 // }
 
-// interface AffidavitConfig {
-//   curve: string;
-//   encryptionKey: string;
-// }
+interface AffidavitConfig {
+  curve: string;
+  encryptionKey: string;
+}
 
 export type BallotSelection = {
   reference: string
@@ -440,6 +440,12 @@ export interface GenesisConfigContent {
   electionSlug: string
   publicKey: string
   resultExtraction: string
+}
+
+export interface LatestConfig {
+  items: LatestConfigItems
+  receipt: string
+  affidavit: AffidavitConfig
 }
 
 export interface LatestConfigItems {
