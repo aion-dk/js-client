@@ -49,21 +49,16 @@ export class AVVerifier {
   async initialize(electionConfig: MinimalElectionConfig): Promise<void>
   async initialize(): Promise<void>
 
-  public async initialize(): Promise<void> {
-    const { items } = await fetchElectionConfig(this.bulletinBoard)
-    const electionConfig = {
-      encryptionKey: items.thresholdConfig.content.encryptionKey,
-      contestConfigs: items.contestConfigs
+  public async initialize(electionConfig?: MinimalElectionConfig): Promise<void> {
+    if (electionConfig) {
+      this.electionConfig = electionConfig;
+    } else {
+      this.electionConfig = {
+        encryptionKey: (await fetchElectionConfig(this.bulletinBoard)).items?.thresholdConfig?.content?.encryptionKey,
+        contestConfigs: (await fetchElectionConfig(this.bulletinBoard)).items?.contestConfigs,
+      };
     }
-    this.electionConfig = electionConfig;
   }
-  // public async initialize(electionConfig?: MinimalElectionConfig): Promise<void> {
-  //   if (electionConfig) {
-  //      this.electionConfig = electionConfig;
-  //    } else {
-  //      this.electionConfig = await fetchElectionConfig(this.bulletinBoard);
-  //   }
-  //   }
 
   public async findBallot(trackingCode: string): Promise<string> {
     const shortAddress = shortCodeToHex(trackingCode)
