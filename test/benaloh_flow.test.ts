@@ -47,8 +47,8 @@ describe('entire benaloh flow', () => {
   });
 
   it('spoils a ballot', recordable(USE_MOCK, async () => {
-    const verifier = new AVVerifier(bulletinBoardHost + 'us');
-    const client = new AVClient(bulletinBoardHost + 'us');
+    const verifier = new AVVerifier(bulletinBoardHost + '6');
+    const client = new AVClient(bulletinBoardHost + '6');
 
     await verifier.initialize()
     await client.initialize(undefined, {

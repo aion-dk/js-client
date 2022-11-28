@@ -132,6 +132,7 @@ export interface VoterSessionItem extends BaseBoardItem {
     identifier: string
     voterGroup: string
     publicKey: string
+    votingRoundReference: string
   }
 
   type: "VoterSessionItem"
@@ -218,8 +219,17 @@ export type BallotConfig = {
   contestReferences: string[]
 }
 
+export type VotingRoundConfig = {
+  reference: string
+  contestReferences: string[]
+}
+
 export type ContestConfigMap = {
   [contestReference: string]: ContestConfig
+}
+
+export type VotingRoundConfigMap = {
+  [votingRoundReference: string]: VotingRoundConfig
 }
 
 export type ContestConfig = {
@@ -264,6 +274,7 @@ export interface ElectionConfig {
 
   dbbPublicKey: string
 
+  votingRoundConfigs: VotingRoundConfigMap
   contestConfigs: ContestConfigMap
   ballotConfigs: BallotConfigMap;
   latestConfigAddress: string;
