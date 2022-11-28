@@ -1,11 +1,12 @@
-import { ContestConfigMap, ContestSelection, ContestMap, CommitmentOpening } from "./types"
+import { NewContestConfigMap, ContestSelection, ContestMap, CommitmentOpening } from "./types"
+// import { ContestConfigMap, ContestSelection, ContestMap, CommitmentOpening } from "./types"
 import { ElGamalPointCryptogram, addBigNums } from "./aion_crypto"
 import { bignumFromHex, pointFromHex } from "./crypto/util"
 import { pointsToBytes } from "./encoding/point_encoding"
 import { byteArrayToContestSelection } from "./encoding/byte_encoding"
 
 export function decryptContestSelections(
-  contestConfigs: ContestConfigMap,
+  contestConfigs: NewContestConfigMap,
   encryptionKey: string,
   cryptograms: ContestMap<string[]>,
   boardCommitmentOpening: CommitmentOpening,
@@ -18,7 +19,7 @@ export function decryptContestSelections(
     const randomizers = combineRandomizers(contestReference, boardCommitmentOpening, voterCommitmentOpening)
 
     const points = decryptPoints(contestCryptograms, randomizers, encryptionKey)
-    const maxSize = contestConfig.markingType.encoding.maxSize
+    const maxSize = contestConfig.content.markingType.encoding.maxSize
     const encodedContestSelection = pointsToBytes(points, maxSize)
     return byteArrayToContestSelection(contestConfig, encodedContestSelection)
   })

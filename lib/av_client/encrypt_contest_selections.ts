@@ -1,11 +1,12 @@
-import { ContestConfigMap, ContestEnvelope, ContestConfig, ContestSelection } from "./types";
+import { NewContestConfigMap, ContestEnvelope, NewContestConfig, ContestSelection } from "./types";
+// import { ContestConfigMap, ContestEnvelope, ContestConfig, ContestSelection } from "./types";
 import { randomBN, ElGamalPointCryptogram } from "./aion_crypto";
 import { bignumToHex, pointFromHex } from "./crypto/util";
 import { bytesToPoints } from "./encoding/point_encoding";
 import { contestSelectionToByteArray } from "./encoding/byte_encoding";
 
 export function encryptContestSelections(
-  contestConfigs: ContestConfigMap,
+  contestConfigs: NewContestConfigMap,
   contestSelections: ContestSelection[],
   encryptionKey: string
 ): ContestEnvelope[] {
@@ -16,7 +17,7 @@ export function encryptContestSelections(
 }
 
 function encryptContestSelection(
-  contestConfig: ContestConfig, 
+  contestConfig: NewContestConfig, 
   contestSelection: ContestSelection, 
   encryptionKey: string
 ): ContestEnvelope {

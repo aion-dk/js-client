@@ -7,7 +7,7 @@ import { prepareRecording } from './mock_helpers'
 import { AVVerifier } from '../lib/av_verifier';
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
-import { BallotConfig, BallotSelection, ContestConfig, ContestConfigMap, ContestSelection } from '../lib/av_client/types';
+import { NewBallotConfig, BallotSelection, NewContestConfig, NewContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
 const USE_MOCK = false;
 
@@ -138,7 +138,7 @@ describe.only('entire benaloh flow', () => {
     await client.registerVoter().catch((e) => {
       console.error(e);
     })
-    const { contestConfigs } = client.getElectionConfig()
+    const { items: { contestConfigs } } = client.getElectionConfig()
     const ballotConfig = client.getVoterBallotConfig()
     const ballotSelection = dummyBallotSelection(ballotConfig, contestConfigs)
 
@@ -174,18 +174,18 @@ describe.only('entire benaloh flow', () => {
 });
 
 
-function dummyBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap ): BallotSelection {
+function dummyBallotSelection( ballotConfig: NewBallotConfig, contestConfigs: NewContestConfigMap ): BallotSelection {
   return {
-    reference: ballotConfig.reference,
-    contestSelections: ballotConfig.contestReferences.map(cr => dummyContestSelection(contestConfigs[cr]))
+    reference: ballotConfig.content.reference,
+    contestSelections: ballotConfig.content.contestReferences.map(cr => dummyContestSelection(contestConfigs[cr]))
   }
 }
 
-function dummyContestSelection( contestConfig: ContestConfig ): ContestSelection {
+function dummyContestSelection( contestConfig: NewContestConfig ): ContestSelection {
   return {
-    reference: contestConfig.reference,
+    reference: contestConfig.content.reference,
     optionSelections: [
-      { reference: contestConfig.options[0].reference }
+      { reference: contestConfig.content.options[0].reference }
     ]
   }
 }

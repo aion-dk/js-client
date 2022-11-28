@@ -4,7 +4,8 @@ import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/o
 import { extractContestSelections } from './util/nist_cvr_extractor';
 import { AVVerifier } from './av_verifier';
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
-import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, ElectionConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus } from './av_client/types';
+import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, NewBallotConfig, BallotStatus } from './av_client/types';
+// import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, ElectionConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import * as jwt from 'jose';
@@ -88,7 +89,7 @@ export class AVClient implements IAVClient {
   private dbbPublicKey: string | undefined;
 
   private bulletinBoard: BulletinBoard;
-  private electionConfig?: ElectionConfig;
+  private electionConfig?: LatestConfig;
   private keyPair: KeyPair;
 
   private clientEnvelopes: ContestEnvelope[];
@@ -118,10 +119,10 @@ export class AVClient implements IAVClient {
    * @returns Returns undefined if succeeded or throws an error
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  async initialize(electionConfig: ElectionConfig | undefined, keyPair: KeyPair): Promise<void>
-  async initialize(electionConfig: ElectionConfig): Promise<void>
+  async initialize(electionConfig: LatestConfig | undefined, keyPair: KeyPair): Promise<void>
+  async initialize(electionConfig: LatestConfig): Promise<void>
   async initialize(): Promise<void>
-  public async initialize(electionConfig?: ElectionConfig, keyPair?: KeyPair): Promise<void> {
+  public async initialize(electionConfig?: LatestConfig, keyPair?: KeyPair): Promise<void> {
     if (electionConfig) {
       validateElectionConfig(electionConfig);
       this.electionConfig = electionConfig;
@@ -150,8 +151,10 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
-    const coordinatorURL = this.getElectionConfig().services.voterAuthorizer.url;
-    const voterAuthorizerContextUuid = this.getElectionConfig().services.voterAuthorizer.electionContextUuid;
+    const coordinatorURL = this.getElectionConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
+    // const coordinatorURL = this.getElectionConfig().services.voterAuthorizer.url;
+    const voterAuthorizerContextUuid = this.getElectionConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
+    // const voterAuthorizerContextUuid = this.getElectionConfig().services.voterAuthorizer.electionContextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
 
     return coordinator.createSession(opaqueVoterId, email)
@@ -186,8 +189,10 @@ export class AVClient implements IAVClient {
     if(!this.email)
       throw new InvalidStateError('Cannot validate access code. Access code was not requested.');
 
-    const otpProviderUrl = this.getElectionConfig().services.otpProvider.url;
-    const otpProviderElectionContextUuid = this.getElectionConfig().services.otpProvider.electionContextUuid;
+    const otpProviderUrl = this.getElectionConfig().items.voterAuthorizerConfig.content.identityProvider.url;
+    // const otpProviderUrl = this.getElectionConfig().services.otpProvider.url;
+    const otpProviderElectionContextUuid = this.getElectionConfig().items.voterAuthorizerConfig.content.identityProvider.contextUuid;
+    // const otpProviderElectionContextUuid = this.getElectionConfig().services.otpProvider.electionContextUuid;
     const provider = new OTPProvider(otpProviderUrl, otpProviderElectionContextUuid)
 
     this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email);
@@ -202,11 +207,15 @@ export class AVClient implements IAVClient {
    * Authorization is done by 'proof-of-identity' or 'proof-of-election-codes'
    */
   public async createVoterRegistration(): Promise<void> {
-    const coordinatorURL = this.getElectionConfig().services.voterAuthorizer.url;
-    const voterAuthorizerContextUuid = this.getElectionConfig().services.voterAuthorizer.electionContextUuid;
+    const coordinatorURL = this.getElectionConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
+    // const coordinatorURL = this.getElectionConfig().services.voterAuthorizer.url;
+    const voterAuthorizerContextUuid = this.getElectionConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
+    // const voterAuthorizerContextUuid = this.getElectionConfig().services.voterAuthorizer.electionContextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
-    const latestConfigAddress = this.getElectionConfig().latestConfigAddress;
-    const authorizationMode = this.getElectionConfig().services.voterAuthorizer.authorizationMode
+    const latestConfigAddress = this.getElectionConfig().items.latestConfigItem.address;
+    // const latestConfigAddress = this.getElectionConfig().latestConfigAddress;
+    const authorizationMode = this.getElectionConfig().items.voterAuthorizerConfig.content.voterAuthorizer.authorizationMode;
+    // const authorizationMode = this.getElectionConfig().services.voterAuthorizer.authorizationMode;
 
     let authorizationResponse: AxiosResponse
 
@@ -316,7 +325,12 @@ export class AVClient implements IAVClient {
 
     const state = {
       voterSession: this.voterSession,
-      electionConfig: this.getElectionConfig(),
+      electionConfig: {
+        encryptionKey: this.getElectionConfig().items.thresholdConfig.content.encryptionKey,
+        ballotConfigs: this.getElectionConfig().items.ballotConfigs,
+        contestConfigs: this.getElectionConfig().items.contestConfigs,
+      },
+      // electionConfig: this.getElectionConfig(),
     };
 
     const {
@@ -331,7 +345,7 @@ export class AVClient implements IAVClient {
       commitmentRandomness: pedersenCommitment.randomizer,
       randomizers: envelopeRandomizers
     }
- 
+
     const {
       // voterCommitment,     // TODO: Required when spoiling
       boardCommitment,
@@ -401,7 +415,7 @@ export class AVClient implements IAVClient {
 
       validatePayload(castRequest, castRequestItem);
       validateReceipt([castRequest], receipt, this.getDbbPublicKey());
-       
+
       return generateReceipt(receipt, castRequest);
     }
 
@@ -475,7 +489,7 @@ export class AVClient implements IAVClient {
     return
   }
 
-  public getElectionConfig(): ElectionConfig {
+  public getElectionConfig(): LatestConfig {
     if(!this.electionConfig){
       throw new InvalidStateError('No configuration loaded. Did you call initialize()?')
     }
@@ -491,14 +505,15 @@ export class AVClient implements IAVClient {
     return this.voterSession
   }
 
-  public getVoterBallotConfig(): BallotConfig {
+  public getVoterBallotConfig(): NewBallotConfig {
     const voterSession = this.getVoterSession()
-    const { ballotConfigs } = this.getElectionConfig()
+    const { items: { ballotConfigs } } = this.getElectionConfig()
     return ballotConfigs[voterSession.content.voterGroup]
   }
 
   public getDbbPublicKey(): string {
-    const dbbPublicKeyFromConfig = this.getElectionConfig().dbbPublicKey;
+    const dbbPublicKeyFromConfig = this.getElectionConfig().items.genesisConfig.content.publicKey;
+    // const dbbPublicKeyFromConfig = this.getElectionConfig().dbbPublicKey;
 
     if(this.dbbPublicKey) {
       return this.dbbPublicKey;
@@ -548,9 +563,9 @@ export class AVClient implements IAVClient {
       throw new InvalidStateError('Cannot challenge ballot, no user session')
     }
 
-   let attempts = 0;
-   
-   const executePoll = async (resolve, reject) => {
+  let attempts = 0;
+
+  const executePoll = async (resolve, reject) => {
       const result = await this.bulletinBoard.getVerifierItem(this.spoilRequest.address).catch(error => {
         console.error(error.response.data.error_message)
       });
@@ -567,7 +582,7 @@ export class AVClient implements IAVClient {
       }
     };
   
-   return new Promise(executePoll);
+  return new Promise(executePoll);
   }
 
   /**
@@ -605,7 +620,7 @@ export type {
   BallotBoxReceipt,
   HashValue,
   Signature,
-  ElectionConfig
+  LatestConfig
 }
 
 export {

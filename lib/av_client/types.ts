@@ -76,7 +76,7 @@ export interface Election {
   //...
 }
 
- /**
+/**
  * Example of a receipt:
  * ```javascript
  * {
@@ -88,7 +88,7 @@ export interface Election {
  * }
  * ```
  */
- export type BallotBoxReceipt = {
+export type BallotBoxReceipt = {
   trackingCode: string
   receipt: {
     address: string
@@ -385,6 +385,7 @@ export type NewContestConfig = {
 export interface NewContestContent {
   reference: string
   title: LocalString
+  markingType: MarkingType
   options: OptionContent[]
 }
 
@@ -402,9 +403,7 @@ export interface OptionContent {
 }
 
 // Voting Round Config Item
-export type VotingRoundConfig = {
-
-}
+// export type VotingRoundConfig = {}
 
 // Election Config Item
 export type NewElectionConfig = {
@@ -442,6 +441,8 @@ export interface GenesisConfigContent {
   resultExtraction: string
 }
 
+
+// Latest Config
 export interface LatestConfig {
   items: LatestConfigItems
   receipt: string
@@ -453,7 +454,7 @@ export interface LatestConfigItems {
   voterAuthorizerConfig: VoterAuthorizer;
   ballotConfigs: NewBallotConfigMap;
   contestConfigs: NewContestConfigMap;
-  votingRoundConfigs: VotingRoundConfig[];
+  // votingRoundConfigs: VotingRoundConfig[];
   electionConfig: NewElectionConfig;
   genesisConfig: NewGenesisConfig;
   latestConfigItem: BaseBoardItem;

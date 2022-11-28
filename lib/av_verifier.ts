@@ -2,7 +2,8 @@ import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
-import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ContestSelection, ReadableContestSelection, ContestConfigMap } from './av_client/types';
+import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ContestSelection, ReadableContestSelection, NewContestConfigMap } from './av_client/types';
+// import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ContestSelection, ReadableContestSelection, ContestConfigMap } from './av_client/types';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 import { fetchElectionConfig } from './av_client/election_config';
 import { decryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
@@ -12,7 +13,7 @@ import { makeOptionFinder } from './av_client/option_finder';
 
 interface MinimalElectionConfig {
   encryptionKey: string
-  contestConfigs: ContestConfigMap
+  contestConfigs: NewContestConfigMap
 }
 
 export class AVVerifier {
@@ -47,13 +48,22 @@ export class AVVerifier {
    */
   async initialize(electionConfig: MinimalElectionConfig): Promise<void>
   async initialize(): Promise<void>
-  public async initialize(electionConfig?: MinimalElectionConfig): Promise<void> {
-    if (electionConfig) {
-      this.electionConfig = electionConfig;
-    } else {
-      this.electionConfig = await fetchElectionConfig(this.bulletinBoard);
+
+  public async initialize(): Promise<void> {
+    const { items } = await fetchElectionConfig(this.bulletinBoard)
+    const electionConfig = {
+      encryptionKey: items.thresholdConfig.content.encryptionKey,
+      contestConfigs: items.contestConfigs
     }
+    this.electionConfig = electionConfig;
   }
+  // public async initialize(electionConfig?: MinimalElectionConfig): Promise<void> {
+  //   if (electionConfig) {
+  //      this.electionConfig = electionConfig;
+  //    } else {
+  //      this.electionConfig = await fetchElectionConfig(this.bulletinBoard);
+  //   }
+  //   }
 
   public async findBallot(trackingCode: string): Promise<string> {
     const shortAddress = shortCodeToHex(trackingCode)
@@ -145,11 +155,13 @@ export class AVVerifier {
         throw new InvalidContestError("Contest is not present in the election")
       } 
 
-      const optionFinder = makeOptionFinder(contestConfig.options)
+      const optionFinder = makeOptionFinder(contestConfig.content.options)
+      // const optionFinder = makeOptionFinder(contestConfig.options)
 
       return {
         reference: cs.reference,
-        title: localizer(contestConfig.title),
+        title: localizer(contestConfig.content.title),
+        // title: localizer(contestConfig.title),
         optionSelections: cs.optionSelections.map(os => {
           const optionConfig = optionFinder(os.reference)
           return {
