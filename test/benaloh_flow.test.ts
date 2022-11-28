@@ -21,8 +21,8 @@ describe.only('entire benaloh flow', () => {
     sandbox = resetDeterminism();
     if(USE_MOCK) {
       expectedNetworkRequests = [
-        useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration/latest_config'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration/latest_config'),
         useRecordedResponse(voterAuthorizerHost, 'post', '/create_session'),
         useRecordedResponse(voterAuthorizerHost, 'post', '/request_authorization'),
         useRecordedResponse(OTPProviderHost, 'post', '/authorize'),
@@ -139,6 +139,7 @@ describe.only('entire benaloh flow', () => {
       console.error(e);
     })
     const { items: { contestConfigs } } = client.getElectionConfig()
+
     const ballotConfig = client.getVoterBallotConfig()
     const ballotSelection = dummyBallotSelection(ballotConfig, contestConfigs)
 

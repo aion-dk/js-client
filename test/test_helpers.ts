@@ -20,7 +20,7 @@ export const OTPProviderElectionContextId = 'cca2b217-cedd-4d58-a103-d101ba472eb
 
 export const bbHost = {
   get_election_config: (board_slug = "us") => nock(bulletinBoardHost)
-      .get(`/${board_slug}/configuration`)
+      .get(`/${board_slug}/configuration/latest_config`)
       .replyWithFile(200, `${__dirname}/replies/otp_flow/get_${board_slug}_configuration.json`),
 
   post_registrations: (board_slug = "us") => nock(bulletinBoardHost)

@@ -1,11 +1,11 @@
-import { ContestConfig, ContestSelection, OptionSelection, Option } from "../types"
+import { NewContestConfig, ContestSelection, OptionSelection, Option } from "../types"
 import { flattenOptions } from '../flatten_options'
 import { ByteArrayReader } from './byte_array_reader'
 import { ByteArrayWriter } from "./byte_array_writer"
 
 
-export function byteArrayToContestSelection( contestConfig: ContestConfig, byteArray: Uint8Array ): ContestSelection {
-  const { reference, markingType, options } = contestConfig
+export function byteArrayToContestSelection( contestConfig: NewContestConfig, byteArray: Uint8Array ): ContestSelection {
+  const { reference, markingType, options } = contestConfig.content
   const codeSize = markingType.encoding.codeSize
 
   const flatOptions = flattenOptions(options)
@@ -39,8 +39,8 @@ export function byteArrayToContestSelection( contestConfig: ContestConfig, byteA
 }
 
 
-export function contestSelectionToByteArray( contestConfig: ContestConfig, contestSelection: ContestSelection ): Uint8Array {
-  const { reference, markingType, options } = contestConfig
+export function contestSelectionToByteArray( contestConfig: NewContestConfig, contestSelection: ContestSelection ): Uint8Array {
+  const { reference, markingType, options } = contestConfig.content
   if( reference !== contestSelection.reference ){
     throw new Error("contest selection does not match contest")
   }

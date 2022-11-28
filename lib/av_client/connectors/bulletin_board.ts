@@ -21,7 +21,7 @@ export class BulletinBoard {
   }
 
   getElectionConfig(): Promise<AxiosResponse> {
-    return this.backend.get('configuration');
+    return this.backend.get('configuration/latest_config');
   }
 
   // Voting

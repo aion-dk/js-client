@@ -5,8 +5,8 @@ import { InvalidConfigError } from "./errors";
 export async function fetchElectionConfig(bulletinBoard: BulletinBoard): Promise<LatestConfig> {
   return bulletinBoard.getElectionConfig()
     .then(
-      (response: { data: { electionConfig: LatestConfig } }) => {
-        const configData = response.data.electionConfig;
+      (response: { data: LatestConfig }) => {
+        const configData = response.data;
 
         // const privKey = 'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9'
         const pubKey = '03e9858b6e48eb93d8f27aa76b60806298c4c7dd94077ad6c3ff97c44937888647'
