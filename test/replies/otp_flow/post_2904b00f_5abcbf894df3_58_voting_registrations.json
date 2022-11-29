@@ -1,19 +1,19 @@
 {
+  "receipt": "18ab0a3e41a77247b42aa6a4bfb064974fa3105cc29d81e81ad694ddbc5197ad,647dd496ae60ee11a86357f80080a38d203d5745eac87534d6b8c1819fd199dd",
   "voterSession": {
-    "address": "d0dc6df8b1362b0ac488da74da0fe78749777aaa181066eb3dcf0561e13cab34",
+    "address": "8205ab1f858e8251c28828c33fe33443bbc86d1b7115a46f4d0adac60015ad8d",
     "author": "Digital Ballot Box",
-    "parentAddress": "a44fe55d12f09385dd8428a38fc7064d48db7bbe05c65562ede293e465f0111f",
-    "previousAddress": "c2982e30add8a244ce2b0ae7ca54c0aa86fe7df768c5c69209c3804f7eb0ad1f",
     "content": {
-      "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoidm90ZXIxIiwicHVibGljX2tleSI6IjAyOTBkNDEwYTdkMjU0MTFiZGQzZDgyYWNlNWY3MDdkMDJjMDU0YjYwZTdkYzg4ODNjMWYwN2JlNDI2NTcwNGRkNiIsInZvdGVyX2dyb3VwX2tleSI6IjU4Iiwid2VpZ2h0IjoxLCJmaW5nZXJwcmludCI6IjkxMDI3NTM2NDdhNWZmMTRhMDIyNWM4MmFiMjY4ZTMxNGI2ZmM5MzRhY2M0YzViZjFlZDlkOTk5NWUxZjQ4ZTAiLCJpYXQiOjE2NjQzNTY0MzAsImV4cCI6MTY2NDM1ODIzMH0.jW8kH0c68P-qqyH-V3VFUrzcrKK9Cih6UFtwyryNwR4WOSJsaKimpEzGfTMq8a0KNY2fVxE8hQIpwLuKSrFyAQ",
-      "identifier": "voter1",
-      "voterGroup": "58",
-      "weight": 1,
-      "publicKey": "0290d410a7d25411bdd3d82ace5f707d02c054b60e7dc8883c1f07be4265704dd6"
+      "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiMmY3MjJhYWE0ODNhMWZkNjQzYmE1OWExZGIzNTMwNTVlYTQ0Yjc2NCIsInB1YmxpY19rZXkiOiIwM2I4N2Q3ZmU3OTNhNjIxZGYyN2Y0NGMyMGY0NjBmZjcxMWQ1NTU0NWM1ODcyOWYyMGIzZmI2ZTg3MWM1M2M0OWMiLCJ2b3Rlcl9ncm91cF9rZXkiOiJwcmVjaW5jdF80X2JlZHJvY2siLCJzZWdtZW50MSI6InByZWNpbmN0XzRfYmVkcm9jayIsImVjX3Rva2VuX2ZpbmdlcnByaW50IjoiOTJmN2QzYmU4ZTkzZmMwMmZiNjg5NGQwZWI3MTRhOTFhNDc2ZjEyMyIsImF1ZCI6ImF2eDpiYzFiMWVkMC05NDNlLTQ2NDctYmZjMS0wNjMzYmEwOGMwNWUiLCJpYXQiOjE2Njk3MzA3MTEsImV4cCI6MTY2OTczMjUxMX0.tVVnAHyszzQBX98e4Zf91_6S3vq5MZBQTnvKcSbpoDA4K719uE8Oji-9ZPA6KlwvVrFnFaY-dgidR9s7iENIEg",
+      "identifier": "2f722aaa483a1fd643ba59a1db353055ea44b764",
+      "publicKey": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c",
+      "voterGroup": "precinct_4_bedrock",
+      "weight": 1
     },
-    "registeredAt": "2022-09-28T09:13:50.333Z",
-    "signature": "2a58829e25d7b930bed6e53707b61e3aeb92fb044fa2531885827f8ae3b82c82,12d28b6d55f5c644b138e8d893d1d71e0f5a384823d123f014bfd5018e50862e",
+    "parentAddress": "e2245d66419f2aab0385651e193027b1031098696a58ec7da399a45495459c27",
+    "previousAddress": "c531d8e514fde04b6356afa71df91f759e693038d1ccc65b77404a227e038fed",
+    "registeredAt": "2022-11-29T14:05:11.336Z",
+    "signature": "a98588568c7c377f248decea31158cc039b017df9372800cf307412075ec855c,7860bcb0b27e4b5bf2e53d629b0ead089f58368fdfaad8f75ab94822602292e8",
     "type": "VoterSessionItem"
-  },
-  "receipt": "5949b59c5078f39cdc9a0e661ee7d7b1ea2ad14474215d400e2806b801211389,5d3f610c05d7074fa3f7c9889f575c44b0d0a99b82ade21109f9ba20a38941f7"
+  }
 }

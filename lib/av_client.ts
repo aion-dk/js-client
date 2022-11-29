@@ -327,6 +327,10 @@ export class AVClient implements IAVClient {
       contestEnvelopes,
     } = constructContestEnvelopes(state, ballotSelection);
 
+    console.log('%%%%%')
+    console.log(contestEnvelopes)
+    console.log('%%%%%')
+
     this.clientEnvelopes = contestEnvelopes;
 
     this.voterCommitmentOpening = {
@@ -345,7 +349,10 @@ export class AVClient implements IAVClient {
       this.privateKey(),
       this.getDbbPublicKey()
     );
-
+    console.log('$$$$$$$')
+    console.log(serverEnvelopes)
+    console.log(boardCommitment)
+    console.log('$$$$$$$')
     this.boardCommitment = boardCommitment;
     this.serverEnvelopes = serverEnvelopes;
 
@@ -399,7 +406,10 @@ export class AVClient implements IAVClient {
 
       if (affidavit && this.electionConfig) {
         try {
-          encryptedAffidavit = dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit)
+          encryptedAffidavit = dhEncrypt(
+              '024086b0a88ea3bbb6e1319715acc40b48294f79a8ecbb02326e638d2488e687f9',
+              affidavit
+          )
 
           castRequestItem.content['attachment'] = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(encryptedAffidavit))
         } catch (err) {
@@ -415,9 +425,6 @@ export class AVClient implements IAVClient {
 
       const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
       const { castRequest, receipt } = response.data;
-
-      console.log(castRequestItem)
-      console.log(castRequest)
 
       validatePayload(castRequest, castRequestItem);
       validateReceipt([castRequest], receipt, this.getDbbPublicKey());

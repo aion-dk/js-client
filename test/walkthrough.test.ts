@@ -54,7 +54,7 @@ describe('entire voter flow using OTP authorization', () => {
       });
 
       const voterId = 'B00000000001'
-      const voterEmail = 'markitmarchtest@osetinstitute.org'
+      const voterEmail = 'madc@assemblyvoting.com'
       await client.requestAccessCode(voterId, voterEmail).catch((e) => {
         console.error(e);
         expect.fail('AVClient#requestAccessCode failed.');
@@ -62,7 +62,7 @@ describe('entire voter flow using OTP authorization', () => {
 
       let oneTimePassword: string;
       if (USE_MOCK) {
-        oneTimePassword = '12345';
+        oneTimePassword = '89656';
       } else {
         oneTimePassword = await extractOTPFromEmail();
       }
@@ -160,8 +160,8 @@ describe('entire voter flow using PoEC authorization', () => {
     const performTest = async () => {
       const client = new AVClient(bulletinBoardHost + '2904b00f_5abcbf894df3_58');
       await client.initialize(undefined, {
-        privateKey: 'a259f4b44e30abc0cd53379381bdc86f44723911a5bc03bf4ff21d1b49b53efd',
-        publicKey: '0290d410a7d25411bdd3d82ace5f707d02c054b60e7dc8883c1f07be4265704dd6'
+        privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
+        publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
       });
 
 
