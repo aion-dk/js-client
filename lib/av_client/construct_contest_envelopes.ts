@@ -2,7 +2,7 @@ import { validateBallotSelection } from './validate_selections'
 import { InvalidStateError } from './errors'
 import { generatePedersenCommitment } from './crypto/pedersen_commitment'
 import { encryptContestSelections } from './encrypt_contest_selections'
-import { NewBallotConfigMap, BallotSelection, NewContestConfigMap, ContestEnvelope, ContestMap } from './types'
+import { BallotSelection, ContestEnvelope, ContestMap, ClientState } from './types'
 // import { BallotConfigMap, BallotSelection, ContestConfigMap, ContestEnvelope, ContestMap } from './types'
 
 export function constructContestEnvelopes( state: ClientState, ballotSelection: BallotSelection ): ConstructResult { 
@@ -21,21 +21,21 @@ export function constructContestEnvelopes( state: ClientState, ballotSelection: 
   }
 }
 
-// We define the client state to only require a subset of the electionConfig and voterSession
-// This enables us to do less setup in testing. 
-// If any of the objects passed does not contain the required properties, then the build step will fail.
-interface ClientState {
-  electionConfig: {
-    encryptionKey: string
-    ballotConfigs: NewBallotConfigMap
-    contestConfigs: NewContestConfigMap
-  }
-  voterSession: { 
-    content: { 
-      voterGroup: string 
-    } 
-  }
-}
+// // We define the client state to only require a subset of the electionConfig and voterSession
+// // This enables us to do less setup in testing. 
+// // If any of the objects passed does not contain the required properties, then the build step will fail.
+// interface ClientState {
+//   electionConfig: {
+//     encryptionKey: string
+//     ballotConfigs: NewBallotConfigMap
+//     contestConfigs: NewContestConfigMap
+//   }
+//   voterSession: { 
+//     content: { 
+//       voterGroup: string 
+//     } 
+//   }
+// }
 
 type ConstructResult = {
   pedersenCommitment: {
@@ -53,7 +53,8 @@ function contestEnvelopesRandomizers( contestEnvelopes: ContestEnvelope[] ){
 
 function extractConfig( state: ClientState ){
   const { voterGroup } = state.voterSession.content
-  const { contestConfigs, ballotConfigs, encryptionKey } = state.electionConfig
+  const { contestConfigs, ballotConfigs } = state.latestConfig.items
+  const { encryptionKey } = state.latestConfig.items.thresholdConfig.content
 
   const ballotConfig = ballotConfigs[voterGroup]
 

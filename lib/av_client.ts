@@ -4,7 +4,7 @@ import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/o
 import { extractContestSelections } from './util/nist_cvr_extractor';
 import { AVVerifier } from './av_verifier';
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
-import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, NewBallotConfig, BallotStatus } from './av_client/types';
+import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, NewBallotConfig, BallotStatus, AffidavitConfig } from './av_client/types';
 // import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, ElectionConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
@@ -325,12 +325,18 @@ export class AVClient implements IAVClient {
 
     const state = {
       voterSession: this.voterSession,
-      electionConfig: {
-        encryptionKey: this.getElectionConfig().items.thresholdConfig.content.encryptionKey,
-        ballotConfigs: this.getElectionConfig().items.ballotConfigs,
-        contestConfigs: this.getElectionConfig().items.contestConfigs,
+      latestConfig: {
+        items: {
+          thresholdConfig: this.getElectionConfig().items.thresholdConfig,
+          voterAuthorizerConfig: this.getElectionConfig().items.voterAuthorizerConfig,
+          ballotConfigs: this.getElectionConfig().items.ballotConfigs,
+          contestConfigs: this.getElectionConfig().items.contestConfigs,
+          // votingRoundConfigs: this.getElectionConfig().items.votingRoundConfigs,
+          electionConfig: this.getElectionConfig().items.electionConfig,
+          genesisConfig: this.getElectionConfig().items.genesisConfig,
+          latestConfigItem: this.getElectionConfig().items.latestConfigItem,
+        }
       },
-      // electionConfig: this.getElectionConfig(),
     };
 
     const {
@@ -524,7 +530,7 @@ export class AVClient implements IAVClient {
     }
   }
 
-  private affidavitConfig(): AffidavitConfig {
+  private affidavitConfig(): AffidavitConfig | undefined {
     return this.getElectionConfig().affidavit
   }
 
@@ -606,11 +612,6 @@ export class AVClient implements IAVClient {
 
 type BigNum = string;
 type ECPoint = string;
-
-type AffidavitConfig = {
-  curve: string;
-  encryptionKey: string;
-}
 
 export type {
   IAVClient,

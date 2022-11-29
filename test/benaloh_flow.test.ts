@@ -13,7 +13,7 @@ const USE_MOCK = false;
 
 const { useRecordedResponse, recordable } = prepareRecording('benaloh_flow')
 
-describe.only('entire benaloh flow', () => {
+describe('entire benaloh flow', () => {
   let sandbox;
   let expectedNetworkRequests : nock.Scope[] = [];
 

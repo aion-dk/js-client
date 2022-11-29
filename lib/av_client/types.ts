@@ -291,7 +291,7 @@ export type BallotStatus = {
 //   publicKey: string;
 // }
 
-interface AffidavitConfig {
+export interface AffidavitConfig {
   curve: string;
   encryptionKey: string;
 }
@@ -385,8 +385,15 @@ export type NewContestConfig = {
 export interface NewContestContent {
   reference: string
   title: LocalString
+  subtitle: LocalString
+  description: LocalString
   markingType: MarkingType
+  resultType: ResultType
   options: OptionContent[]
+}
+
+export interface ResultType {
+  name: string
 }
 
 export interface OptionContent {
@@ -413,18 +420,16 @@ export type NewElectionConfig = {
 export interface ElectionConfigContent{
   title: LocalString
   uuid: string
-  status: string
-  locales: string[]
-  sessionTimeout: number
-  castRequestItemAttachmentEncryptionKey: string
-  requireCastRequestAttachment: boolean
-  bcTimeout: number
-  schedule: ScheduledElection
-}
-
-export interface ScheduledElection {
-  from: string
-  to: string
+  status?: string
+  locales?: string[]
+  sessionTimeout?: number
+  castRequestItemAttachmentEncryptionKey?: string
+  requireCastRequestAttachment?: boolean
+  bcTimeout?: number
+  schedule?: {
+    from: string
+    to: string
+  }
 }
 
 // Genesis Config Item
@@ -445,8 +450,8 @@ export interface GenesisConfigContent {
 // Latest Config
 export interface LatestConfig {
   items: LatestConfigItems
-  receipt: string
-  affidavit: AffidavitConfig
+  receipt?: string
+  affidavit?: AffidavitConfig
 }
 
 export interface LatestConfigItems {
@@ -458,4 +463,16 @@ export interface LatestConfigItems {
   electionConfig: NewElectionConfig;
   genesisConfig: NewGenesisConfig;
   latestConfigItem: BaseBoardItem;
+}
+
+// We define the client state to only require a subset of the electionConfig and voterSession
+// This enables us to do less setup in testing. 
+// If any of the objects passed does not contain the required properties, then the build step will fail.
+export interface ClientState {
+  latestConfig: LatestConfig
+  voterSession: { 
+    content: { 
+      voterGroup: string 
+    } 
+  }
 }
