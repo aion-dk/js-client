@@ -14,7 +14,7 @@ import {
 import { recordResponses } from './test_helpers'
 import { NewBallotConfig, BallotSelection, NewContestConfig, NewContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
-const USE_MOCK = false;
+const USE_MOCK = true;
 
 describe('entire voter flow using OTP authorization', () => {
   let sandbox;
