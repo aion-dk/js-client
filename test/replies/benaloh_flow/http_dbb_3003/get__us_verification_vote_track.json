@@ -1,55 +1,55 @@
 {
   "voterCommitment": {
-    "address": "45e2027fc34b1f6609b7a48d01f7e2b0dff38813caed3161b1bc1d72cae4ec3f",
+    "address": "72513d9f6de58050135c6952402e3bf044285a07aa1771643be06225c6ee0e36",
     "author": "voter-247a71688927e357eda2be03d1235262ff5e939a",
-    "parentAddress": "11fc8ca584bcf2d97ce5e228d24ef91bcbd89dea26f233aca0d9633fe1a8047d",
-    "previousAddress": "11fc8ca584bcf2d97ce5e228d24ef91bcbd89dea26f233aca0d9633fe1a8047d",
+    "parentAddress": "b34f79b2c8d7f1f8272df2612535f268d680571f67f5bba6fce098a72dd4b364",
+    "previousAddress": "b34f79b2c8d7f1f8272df2612535f268d680571f67f5bba6fce098a72dd4b364",
     "content": {
       "commitment": "0332f1125dd7f4315649b9341829fd4ad5ae6f3dc563b0b1615a918cf9fa54a1ec"
     },
-    "registeredAt": "2022-11-29T13:36:11.421Z",
-    "signature": "64f5f3649e542bc450f1e56a12d7a0c9e5fa56023db1a48184537cdc7a169151,cdd9aaf70355f472e90bf81b063d6056ab7a69db5190c20baddaa54591a64cf8",
+    "registeredAt": "2022-11-29T14:20:53.416Z",
+    "signature": "9c209c932189d14cee2ed436561a8207c3000f608b27e340645fb6f2a105d74a,a5afb5b9f7ff5ffde4aa7a9633335f27410eb9251aa6819b415fc341b4930058",
     "type": "VoterEncryptionCommitmentItem"
   },
   "serverCommitment": {
-    "address": "690b2cfe254494fdd1d1a9bbc764310a0a2a53bf6b4c0903ead6dde4baf359d7",
+    "address": "dd411522fe857511dfe643e261c4080219cfb79f24fcdf96d145a922ef49bdb0",
     "author": "Digital Ballot Box",
-    "parentAddress": "45e2027fc34b1f6609b7a48d01f7e2b0dff38813caed3161b1bc1d72cae4ec3f",
-    "previousAddress": "45e2027fc34b1f6609b7a48d01f7e2b0dff38813caed3161b1bc1d72cae4ec3f",
+    "parentAddress": "72513d9f6de58050135c6952402e3bf044285a07aa1771643be06225c6ee0e36",
+    "previousAddress": "72513d9f6de58050135c6952402e3bf044285a07aa1771643be06225c6ee0e36",
     "content": {
-      "commitment": "03ce39fd0e2e725d225832967db888861184d78b34291cfdc84d729a15e892cb24"
+      "commitment": "03385b4f42e1aa3db70f5b0a40bffb91355db884651d978cb191ba1927b8a91ce5"
     },
-    "registeredAt": "2022-11-29T13:36:11.452Z",
-    "signature": "170c42ec54f0f930aef675ae5cb5268400d73139c4707b796db682ebea190df5,74866abaf149f6f023681401b5dc0501a58943a6426d058ec8d90fca2502c1f0",
+    "registeredAt": "2022-11-29T14:20:53.446Z",
+    "signature": "2c9496b95fe89aa4bd371c7f0a1f7c4c2806a5f10dc357d30c6438d134e028f4,e8137f73539cd2c6811af3ab901255ac23abf53d95f8952ee6b76d832e691b6f",
     "type": "BoardEncryptionCommitmentItem"
   },
   "ballotCryptograms": {
-    "address": "634659645361ba3aa426741264e3596abaa6d256aa396a12d3352e65a7d92720",
+    "address": "af133bd60d16b3ff4f7e9440549f15775253e90a5e742c294fb5b19063b21fc4",
     "author": "voter-247a71688927e357eda2be03d1235262ff5e939a",
-    "parentAddress": "690b2cfe254494fdd1d1a9bbc764310a0a2a53bf6b4c0903ead6dde4baf359d7",
-    "previousAddress": "690b2cfe254494fdd1d1a9bbc764310a0a2a53bf6b4c0903ead6dde4baf359d7",
+    "parentAddress": "dd411522fe857511dfe643e261c4080219cfb79f24fcdf96d145a922ef49bdb0",
+    "previousAddress": "dd411522fe857511dfe643e261c4080219cfb79f24fcdf96d145a922ef49bdb0",
     "content": {
       "cryptograms": {
         "contest ref 1": [
-          "035d9dd1b45140bd3c2e65d590acdc0cd3eb95d2851c5c6761072a096e0e717730,02adadb14e9a3002eff53a697087023dacb54c1b6a7cdd15ce3fc4b90ee1a1e0df"
+          "036bff22d732bb219a2b0b26ea4f3b9e1514a9e03ca4729b73d8cb3f2a018c7785,030f99c32d7a4290aa949fa42414cd263d6689652717948f7e48bdc97ed3eca99e"
         ],
         "contest ref 2": [
-          "02c1abba8fb0bbc4314cfee139ca04aaa6db5e60c9aeefd71836a90de4583d446d,0351a67443c98edf19eb09d60a52845ef3a29efe5771cdf4d33c7e00d6090fa6b9"
+          "039cb749b9b71fe1aa8a379fdda1a6b857f9691eaa2101eae48dcbc3de818f4cc7,023b0f8813022a91f190de73db25f92ead6d115b04438f71367dfb67bbdfb5e87a"
         ]
       }
     },
-    "registeredAt": "2022-11-29T13:36:11.644Z",
-    "signature": "0e9d37f991ccf0aa83d5876af3180c30c26cef642f9647169f661ddb72914a80,8da96300572b51b8b763e22f2b911423eb75f144b6db3ce88fdae70b34257753",
+    "registeredAt": "2022-11-29T14:20:53.615Z",
+    "signature": "30bd3645be82f4b161ba16fe9cdbed23432845f3c0032f9288a6a4ea491f8e09,bc76e5719636100e9bc688c310c94a500bce419e128d5dce253fb875399c20c2",
     "type": "BallotCryptogramsItem"
   },
   "verificationTrackStart": {
     "author": "0213da368e39ab4875a54b37737294cc83671afae65ae3b81e78e3262d19ad9429",
-    "address": "3b26fc9a7863a40e644ccf499dc273492a573efd17a176b9d4e42e4e736e4b3d",
-    "shortAddress": "3b26fc9a78",
-    "parentAddress": "634659645361ba3aa426741264e3596abaa6d256aa396a12d3352e65a7d92720",
+    "address": "44c47391b06ad5d9c589dfd382c1925ac9953b8ce26f2564f0e0a24b142d813e",
+    "shortAddress": "44c47391b0",
+    "parentAddress": "af133bd60d16b3ff4f7e9440549f15775253e90a5e742c294fb5b19063b21fc4",
     "type": "VerificationStartItem",
     "content": {},
-    "signature": "1a9f2a651c4b43d344b67d89cabc0032e1f7c8a4900a4556d518e3f26227c7a6,a2898404ee985b425875f22ea513b3c646f9e094a8fa309a68d6e2e103ba0c15",
-    "registeredAt": "2022-11-29T13:36:11.666Z"
+    "signature": "d9d357500d0e83824112a9cc4334336c8101d7eeebdb502d44bd477b348d5fb1,1d0594930b8d104d1e7d1804ab9b109981499a5c1c4625b05bffec025cbeaed7",
+    "registeredAt": "2022-11-29T14:20:53.637Z"
   }
 }
