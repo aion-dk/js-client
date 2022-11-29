@@ -43,7 +43,7 @@ describe('AVClient#constructBallot', () => {
   //   it('encrypts correctly', async () => {
   //     await client.requestAccessCode('voter123', 'voter@foo.bar');
   //     await client.validateAccessCode('1234');
-  //     await client.registerVoter()
+  //     await client.registerVoter();
 
   //     const ballotSelection: BallotSelection = {
   //       reference: 'precinct_4_bedrock',

@@ -17,6 +17,8 @@ describe('findBallot', () => {
       useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration/latest_config')
     ]
 
+    console.log(expectedNetworkRequests)
+
     verifier = new AVVerifier(bulletinBoardHost + 'us');
     await verifier.initialize()
   });

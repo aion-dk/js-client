@@ -16,7 +16,7 @@ import { NewBallotConfig, BallotSelection, NewContestConfig, NewContestConfigMap
 
 const USE_MOCK = false;
 
-describe.skip('entire voter flow using OTP authorization', () => {
+describe('entire voter flow using OTP authorization', () => {
   let sandbox;
   let expectedNetworkRequests : nock.Scope[] = [];
 
@@ -87,11 +87,11 @@ describe.skip('entire voter flow using OTP authorization', () => {
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       const receipt = await client.castBallot(affidavit);
-      // expect(receipt.trackingCode.length).to.eql(7)
+      expect(receipt.trackingCode.length).to.eql(7);
 
-      if(USE_MOCK)
-        expectedNetworkRequests.forEach((mock) => mock.done());
-      };
+      if(USE_MOCK) {
+        expectedNetworkRequests.forEach((mock) => mock.done())
+      }
 
       if(USE_MOCK) {
         await performTest();
@@ -100,6 +100,7 @@ describe.skip('entire voter flow using OTP authorization', () => {
           await performTest();
         });
       }
+    }
   }).timeout(10000);
 
   async function extractOTPFromEmail() {
@@ -127,7 +128,7 @@ describe.skip('entire voter flow using OTP authorization', () => {
   }
 });
 
-describe.skip('entire voter flow using PoEC authorization', () => {
+describe('entire voter flow using PoEC authorization', () => {
   let sandbox;
   let expectedNetworkRequests : nock.Scope[] = [];
 
@@ -161,8 +162,7 @@ describe.skip('entire voter flow using PoEC authorization', () => {
         publicKey: '0290d410a7d25411bdd3d82ace5f707d02c054b60e7dc8883c1f07be4265704dd6'
       });
 
-
-      "/voting/2904b00f/authorize_proof"
+      // "/voting/2904b00f/authorize_proof"
 
       client.generateProofOfElectionCodes(['1']);
 
@@ -183,16 +183,17 @@ describe.skip('entire voter flow using PoEC authorization', () => {
       const receipt = await client.castBallot(affidavit);
       expect(receipt.trackingCode.length).to.eql(7)
 
-      if(USE_MOCK)
+      if(USE_MOCK) {
         expectedNetworkRequests.forEach((mock) => mock.done());
-    };
+      }
 
-    if(USE_MOCK) {
-      await performTest();
-    } else {
-      return await recordResponses(async function() {
+      if(USE_MOCK) {
         await performTest();
-      });
+      } else {
+        return await recordResponses(async function() {
+          await performTest();
+        });
+      }
     }
   }).timeout(10000);
 })

@@ -1,24 +1,24 @@
 {
   "spoilRequest": {
-    "address": "40f90b541e72f54a955374113208fb40cb884dda7953f47d2c2714d816afea19",
-    "author": "voter-e40ec185fcc2e8a83e25bc9e82ee93262c01599e",
-    "parentAddress": "3bca82a183e32cd7413e94f6d6688716ea9c69878aa79f55aa0f8f6e60b41ace",
-    "previousAddress": "3bca82a183e32cd7413e94f6d6688716ea9c69878aa79f55aa0f8f6e60b41ace",
+    "address": "ab4c0fbb80bd4f3f54ba4a6b8cb61ffbf4a221bf5aa4b3a0f5d20384da0f1670",
+    "author": "voter-247a71688927e357eda2be03d1235262ff5e939a",
+    "parentAddress": "634659645361ba3aa426741264e3596abaa6d256aa396a12d3352e65a7d92720",
+    "previousAddress": "634659645361ba3aa426741264e3596abaa6d256aa396a12d3352e65a7d92720",
     "content": {},
-    "registeredAt": "2022-09-28T07:52:10.016Z",
-    "signature": "d36db7dbd28644917b97b7910a800aabe8ff69a928c95b3a183e7473f80ca2e6,84b4dc64ccf94af9d2fa46fa379dfdad4edf5ad8b76b2610cbd1296b565be9ae",
+    "registeredAt": "2022-11-29T13:36:11.786Z",
+    "signature": "429e03b33f94a04aa8b74081ae9709cb27e120762ac981e164c1f1ad91c74bbd,d18a7e3c2bf8b087256d282ec17b63a9da5e223c122ef9a43bba72b592d31691",
     "type": "SpoilRequestItem"
   },
-  "receipt": "051e6e3a5d0317c86165d68505dc867606ff9a7ad2f5a63cd6ab49b08ad4eb8e,9dccb6d5f4f67081efd5fb2053ae49fe024f1700a8e5da39dce921680f986f42",
+  "receipt": "e3b10afc2e965207cad6fc8a98728c117b64bcf86cc0fcc8d505ce5130005b11,568a123a14d18c5353b39671f14d256826ac1d25d395d6c22cb2430c70c59d62",
   "boardCommitmentOpening": {
     "randomizers": {
       "contest ref 1": [
-        "5dda0de6db91f11299faf6ae5c87c65c9a7a014346e95722ebf95c2c3cbe8065"
+        "202d82946b10d9dba18262821ad200209571f316b028d61ff9cd46c76c111b15"
       ],
       "contest ref 2": [
-        "de333f62f587626d704cd728f57a310ba87d6eb2b1ed61fcf78b21ca36008e52"
+        "101919621b0e2640334af65d99703ba828917eab47cdb62ea7cf6dfa598ad7b8"
       ]
     },
-    "commitmentRandomness": "9303ee5ec19706d6525f4d10631a76e0bfbeb8d9bb3cb2e8ad5fd9fd7f2a6f67"
+    "commitmentRandomness": "b4c7b4021648c754a8ba4ff5fcf678e69b8dd9d8881a1edef2d528f5b6dd23d4"
   }
 }

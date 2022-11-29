@@ -1,12 +1,12 @@
 {
   "item": {
-    "address": "40f90b541e72f54a955374113208fb40cb884dda7953f47d2c2714d816afea19",
-    "author": "voter-e40ec185fcc2e8a83e25bc9e82ee93262c01599e",
-    "parentAddress": "3bca82a183e32cd7413e94f6d6688716ea9c69878aa79f55aa0f8f6e60b41ace",
-    "previousAddress": "3bca82a183e32cd7413e94f6d6688716ea9c69878aa79f55aa0f8f6e60b41ace",
+    "address": "ab4c0fbb80bd4f3f54ba4a6b8cb61ffbf4a221bf5aa4b3a0f5d20384da0f1670",
+    "author": "voter-247a71688927e357eda2be03d1235262ff5e939a",
+    "parentAddress": "634659645361ba3aa426741264e3596abaa6d256aa396a12d3352e65a7d92720",
+    "previousAddress": "634659645361ba3aa426741264e3596abaa6d256aa396a12d3352e65a7d92720",
     "content": {},
-    "registeredAt": "2022-09-28T07:52:10.016Z",
-    "signature": "d36db7dbd28644917b97b7910a800aabe8ff69a928c95b3a183e7473f80ca2e6,84b4dc64ccf94af9d2fa46fa379dfdad4edf5ad8b76b2610cbd1296b565be9ae",
+    "registeredAt": "2022-11-29T13:36:11.786Z",
+    "signature": "429e03b33f94a04aa8b74081ae9709cb27e120762ac981e164c1f1ad91c74bbd,d18a7e3c2bf8b087256d282ec17b63a9da5e223c122ef9a43bba72b592d31691",
     "type": "SpoilRequestItem"
   }
 }
