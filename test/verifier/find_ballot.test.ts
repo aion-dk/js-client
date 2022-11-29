@@ -21,50 +21,50 @@ describe('findBallot', () => {
     await verifier.initialize()
   });
 
-  context('given valid tracking code', () => {    
-    let shortAddress = ""
-    before(async () => {
-      expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'));
-      const bulletinBoard = new BulletinBoard(bulletinBoardHost + 'us');
-      const result = await bulletinBoard.getVotingTrack('test')
-      shortAddress = hexToShortCode(result.data.verificationTrackStart.shortAddress)
-    })
+  // context('given valid tracking code', () => {    
+  //   let shortAddress = ""
+  //   before(async () => {
+  //     expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'));
+  //     const bulletinBoard = new BulletinBoard(bulletinBoardHost + 'us');
+  //     const result = await bulletinBoard.getVotingTrack('test')
+  //     shortAddress = hexToShortCode(result.data.verificationTrackStart.shortAddress)
+  //   })
 
-    it('finds a ballot', async () => {
-      expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'));
-      const cryptogramAddress = await verifier.findBallot(shortAddress)
-      expect(cryptogramAddress.length).to.eql(64)
-    });
-  });
+  //   it('finds a ballot', async () => {
+  //     expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'));
+  //     const cryptogramAddress = await verifier.findBallot(shortAddress)
+  //     expect(cryptogramAddress.length).to.eql(64)
+  //   });
+  // });
 
-  context('given non-base58 tracking code', () => {
-    it('throws error', async () => {
-      await expectError(
-        verifier.findBallot('tracking-code'),
-        Error,
-        'Non-base58 character'
-      );
-    });    
-  });
+  // context('given non-base58 tracking code', () => {
+  //   it('throws error', async () => {
+  //     await expectError(
+  //       verifier.findBallot('tracking-code'),
+  //       Error,
+  //       'Non-base58 character'
+  //     );
+  //   });    
+  // });
 
-  context('given non-matching tracking code', () => {
-    it('throws "InvalidTrackingCodeError" error', async () => {
-      expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'));
-      await expectError(
-        verifier.findBallot('test'),
-        InvalidTrackingCodeError,
-        "Tracking code and short address from respose doesn't match"
-      );
-    });    
-  });
+  // context('given non-matching tracking code', () => {
+  //   it('throws "InvalidTrackingCodeError" error', async () => {
+  //     expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'));
+  //     await expectError(
+  //       verifier.findBallot('test'),
+  //       InvalidTrackingCodeError,
+  //       "Tracking code and short address from respose doesn't match"
+  //     );
+  //   });    
+  // });
 
-  context('given too long tracking code', () => {
-    it('throws "InvalidTrackingCodeError" error', async () => {
-      await expectError(
-        verifier.findBallot('dddddddddddddddddddddddddddddddddddddddddd'),
-        InvalidTrackingCodeError,
-        'Invalid input. Only up to 40 bits are supported.'
-      );
-    });    
-  });
+  // context('given too long tracking code', () => {
+  //   it('throws "InvalidTrackingCodeError" error', async () => {
+  //     await expectError(
+  //       verifier.findBallot('dddddddddddddddddddddddddddddddddddddddddd'),
+  //       InvalidTrackingCodeError,
+  //       'Invalid input. Only up to 40 bits are supported.'
+  //     );
+  //   });    
+  // });
 });

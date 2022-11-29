@@ -1,44 +1,46 @@
 import { expect } from 'chai';
 import { decryptContestSelections } from '../lib/av_client/decrypt_contest_selections'
 import { ElGamalPointCryptogram } from '../lib/av_client/aion_crypto'
-import { CommitmentOpening, ContestConfig, ContestConfigMap, ContestEnvelope, ContestMap } from '../lib/av_client/types';
+import { CommitmentOpening, NewContestConfig, NewContestConfigMap, ContestEnvelope, ContestMap } from '../lib/av_client/types';
 
 const encryptionKey = '021edaa87d7626dbd2faa99c4dc080f443c150ab70b24da411b13aa56249b5242e'
 
-const bigContest: ContestConfig = {
-  reference: 'big-contest',
-  markingType: {
-    minMarks: 1,
-    maxMarks: 1,
-    blankSubmission: "disabled",
-    encoding: {
-      codeSize: 1,
-      maxSize: 41,
-      cryptogramCount: 2
-    }
-  },
-  resultType: {
-    name: 'does not matter right now'
-  },
-  title: { en: 'Contest 1' },
-  subtitle: { en: 'Contest 1' },
-  description: { en: 'Contest 1' },
-  options: [
-    {
-      reference: 'option-1',
-      code: 1,
-      title: { en: 'Option 1' },
-      subtitle: { en: 'Option 1' },
-      description: { en: 'Option 1' },
-      writeIn: {
-        maxSize: 40,
-        encoding: 'utf8'
+const bigContest: NewContestConfig = {
+  content: {
+    reference: 'big-contest',
+    markingType: {
+      minMarks: 1,
+      maxMarks: 1,
+      blankSubmission: "disabled",
+      encoding: {
+        codeSize: 1,
+        maxSize: 41,
+        cryptogramCount: 2
       }
-    }
-  ]
+    },
+    resultType: {
+      name: 'does not matter right now'
+    },
+    title: { en: 'Contest 1' },
+    subtitle: { en: 'Contest 1' },
+    description: { en: 'Contest 1' },
+    options: [
+      {
+        reference: 'option-1',
+        code: 1,
+        title: { en: 'Option 1' },
+        subtitle: { en: 'Option 1' },
+        description: { en: 'Option 1' },
+        writeIn: {
+          maxSize: 40,
+          encoding: 'utf8'
+        }
+      }
+    ]
+  }
 }
-const contestConfigs: ContestConfigMap = {
-  [bigContest.reference]: bigContest
+const contestConfigs: NewContestConfigMap = {
+  [bigContest.content.reference]: bigContest
 }
 
 // Generated with the help of encryptContestSelections

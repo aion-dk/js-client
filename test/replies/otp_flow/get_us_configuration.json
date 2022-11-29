@@ -1,138 +1,247 @@
 {
-  "electionConfig": {
-    "dbbPublicKey": "035b71d909318bc8c7f9e3ffc8e39942b721e18ecfa972de644afd178ae006b68e",
-    "encryptionKey": "02df80789b2713ae89c33cb877ce2c2e09b81e33c22d6cfdebc9b352598005661c",
+  "items": {
     "thresholdConfig": {
-      "encryptionKey": "02df80789b2713ae89c33cb877ce2c2e09b81e33c22d6cfdebc9b352598005661c",
-      "threshold": 1,
-      "trustees": [
-        {
-          "publicKey": "02df80789b2713ae89c33cb877ce2c2e09b81e33c22d6cfdebc9b352598005661c",
-          "id": 4,
-          "polynomialCoefficients": []
-        }
-      ]
-    },
-    "curveName": "secp256k1",
-    "services": {
-      "voterAuthorizer": {
-        "electionContextUuid": "189d0f1d-5d2a-4a66-aaae-187b6f1afc73",
-        "publicKey": "02579060d0612d762f21736a30e6f38ba0352377d6d8cce09f95d535c22336381b",
-        "url": "http://voter-authorizer:3002/",
-        "authorizationMode": "proof-of-identity"
+      "address": "468668b52f9e8a2b61b61c6fb5cafd981fa25eb463beef1727af9d68355efb21",
+      "author": "Election Admin App",
+      "parentAddress": "7773806a3b5bb9e3054c7c68ad506a0175fab6e5d9f58f5def2635891d043dfd",
+      "previousAddress": "7773806a3b5bb9e3054c7c68ad506a0175fab6e5d9f58f5def2635891d043dfd",
+      "content": {
+        "encryptionKey": "02722db1f299f1ca2da9965ad8b513141f999b57577f975211c6a70ba34ec67489",
+        "threshold": 1,
+        "trustees": [
+          {
+            "publicKey": "02722db1f299f1ca2da9965ad8b513141f999b57577f975211c6a70ba34ec67489",
+            "id": 3,
+            "polynomialCoefficients": []
+          }
+        ]
       },
-      "otpProvider": {
-        "electionContextUuid": "468d1fbb-a53e-42f8-9d43-37be9e72ea7f",
-        "publicKey": "02c31776fd23004646a5e6554c7fc3087f1f1f23bcfab791e01256655cfc8b78a5",
-        "url": "http://otp-provider:3001/"
-      }
+      "registeredAt": "2022-11-28T09:25:46.580Z",
+      "signature": "117044699e0eee48bda910f06e4af2a64b8a1993ec5c43b1b864fbb0fef6e1ce,8b001fe51c209d751998c8f65cf24783f44a7d8b8159981e61893264f2d82cd0",
+      "type": "ThresholdConfigItem"
+    },
+    "voterAuthorizerConfig": {
+      "address": "7773806a3b5bb9e3054c7c68ad506a0175fab6e5d9f58f5def2635891d043dfd",
+      "author": "Election Admin App",
+      "parentAddress": "c7f4af23db19b00693a2952f512dc91f80f9c917d996f916af5cd5f8baf6766c",
+      "previousAddress": "c7f4af23db19b00693a2952f512dc91f80f9c917d996f916af5cd5f8baf6766c",
+      "content": {
+        "identityProvider": {
+          "contextUuid": "ddf97735-cab9-45a0-ae49-3a1a864578ab",
+          "publicKey": "02c1b4caac8b7d59bc960b3bba9c7691c66bc91292cb875065b1363a3a5936f319",
+          "url": "http://otp:3001"
+        },
+        "voterAuthorizer": {
+          "contextUuid": "0cb97ca5-db34-4bbb-9b50-f4ec5ab7fd74",
+          "publicKey": "02289a03d5f51fc958c5c6d8137384f73c2af9fee4b49f7e40f0aaff503dbe3e18",
+          "url": "http://voter-authorizer:3002/",
+          "authorizationMode": "proof-of-identity"
+        }
+      },
+      "registeredAt": "2022-11-28T09:25:46.433Z",
+      "signature": "a39d8840f2df030c64a4a6a1f57be2027917025f3b4bb30f490026f6e53d5973,ca09cab42a5f281856ffa408e409f230bacfd17735ca08fff88e2026e12b7cd1",
+      "type": "VoterAuthorizationConfigItem"
     },
     "ballotConfigs": {
       "precinct_4_bedrock": {
-        "reference": "precinct_4_bedrock",
-        "voterGroup": "precinct_4_bedrock",
-        "contestReferences": [
-          "contest ref 1",
-          "contest ref 2"
-        ]
+        "address": "0c00241d1c110b29f9664ac5628162829a7896589ef5bd32753a442d362274ae",
+        "author": "Election Admin App",
+        "parentAddress": "8efaa2a50fb48475afbe35fc3f58a821555220c2610bd6f0280596ca0229e14e",
+        "previousAddress": "8efaa2a50fb48475afbe35fc3f58a821555220c2610bd6f0280596ca0229e14e",
+        "content": {
+          "reference": "precinct_4_bedrock",
+          "voterGroup": "precinct_4_bedrock",
+          "contestReferences": [
+            "contest ref 1",
+            "contest ref 2"
+          ]
+        },
+        "registeredAt": "2022-11-28T09:25:46.302Z",
+        "signature": "d85fef8dc425b865fb95cba222bdcb0ace9e222da845d0b4659dabd5769a232b,5348b1029fbbe2b0a42bcd5201e50631c494a0c9e3d5d78dde315ebe1be7df75",
+        "type": "BallotConfigItem"
       },
       "precinct_3_spaceport": {
-        "reference": "precinct_3_spaceport",
-        "voterGroup": "precinct_3_spaceport",
-        "contestReferences": [
-          "contest ref 1",
-          "contest ref 2"
-        ]
+        "address": "c7f4af23db19b00693a2952f512dc91f80f9c917d996f916af5cd5f8baf6766c",
+        "author": "Election Admin App",
+        "parentAddress": "0c00241d1c110b29f9664ac5628162829a7896589ef5bd32753a442d362274ae",
+        "previousAddress": "0c00241d1c110b29f9664ac5628162829a7896589ef5bd32753a442d362274ae",
+        "content": {
+          "reference": "precinct_3_spaceport",
+          "voterGroup": "precinct_3_spaceport",
+          "contestReferences": [
+            "contest ref 1",
+            "contest ref 2"
+          ]
+        },
+        "registeredAt": "2022-11-28T09:25:46.355Z",
+        "signature": "f7f8dffd23772c1a0bfb6142973d4b2b90d9d0cd617b5abfb2632bcf06dd1df8,aa41aa8dda8202d3a306a74733057e6af5aaa5809be450377521f120b602f8e1",
+        "type": "BallotConfigItem"
       }
     },
     "contestConfigs": {
-      "contest ref 2": {
-        "reference": "contest ref 2",
-        "markingType": {
-          "blankSubmission": "disabled",
-          "minMarks": 1,
-          "maxMarks": 1,
-          "encoding": {
-            "codeSize": 1,
-            "maxSize": 1,
-            "cryptogramCount": 1
-          }
-        },
-        "options": [
-          {
-            "reference": "option ref 3",
-            "code": 1,
-            "title": {
-              "en": "Option 3"
-            }
-          },
-          {
-            "reference": "option ref 4",
-            "code": 2,
-            "title": {
-              "en": "Option 4"
-            }
-          },
-          {
-            "reference": "option ref 5",
-            "code": 3,
-            "title": {
-              "en": "Option 5"
-            }
-          }
-        ],
-        "title": {
-          "en": "Second ballot"
-        },
-        "resultType": {
-          "name": "resultType name not matter right now"
-        }
-      },
       "contest ref 1": {
-        "reference": "contest ref 1",
-        "markingType": {
-          "blankSubmission": "disabled",
-          "minMarks": 1,
-          "maxMarks": 1,
-          "encoding": {
-            "codeSize": 1,
-            "maxSize": 1,
-            "cryptogramCount": 1
-          }
-        },
-        "options": [
-          {
-            "reference": "option ref 1",
-            "code": 1,
-            "title": {
-              "en": "Option 1"
+        "address": "6746bba108898e64236cc450ebafe17beef9b9ce3d9bc7b15cf5fcef71e4b41c",
+        "author": "Election Admin App",
+        "parentAddress": "6e2c6d40d8b176ee6156dd291161f07f8e379c63b50a64500b707a26d5ee8836",
+        "previousAddress": "6e2c6d40d8b176ee6156dd291161f07f8e379c63b50a64500b707a26d5ee8836",
+        "content": {
+          "reference": "contest ref 1",
+          "title": {
+            "en": "First ballot"
+          },
+          "markingType": {
+            "blankSubmission": "disabled",
+            "minMarks": 1,
+            "maxMarks": 1,
+            "encoding": {
+              "codeSize": 1,
+              "maxSize": 1,
+              "cryptogramCount": 1
             }
           },
-          {
-            "reference": "option ref 2",
-            "code": 2,
-            "title": {
-              "en": "Option 2"
+          "resultType": {
+            "name": "resultType name not matter right now"
+          },
+          "options": [
+            {
+              "reference": "option ref 1",
+              "code": 1,
+              "title": {
+                "en": "Option 1"
+              }
+            },
+            {
+              "reference": "option ref 2",
+              "code": 2,
+              "title": {
+                "en": "Option 2"
+              }
             }
-          }
-        ],
-        "title": {
-          "en": "First ballot"
+          ]
         },
-        "resultType": {
-          "name": "resultType name not matter right now"
-        }
+        "registeredAt": "2022-11-28T09:25:46.063Z",
+        "signature": "3db79c5974770adff37afdf5a09f7598f07b27c4c67f14b960c077ddcb00d624,0d363e9ccfe246d695a596f06ca2ea22090ab26e5e50d2a7c2eb365429569b07",
+        "type": "ContestConfigItem"
+      },
+      "contest ref 2": {
+        "address": "8efaa2a50fb48475afbe35fc3f58a821555220c2610bd6f0280596ca0229e14e",
+        "author": "Election Admin App",
+        "parentAddress": "6746bba108898e64236cc450ebafe17beef9b9ce3d9bc7b15cf5fcef71e4b41c",
+        "previousAddress": "6746bba108898e64236cc450ebafe17beef9b9ce3d9bc7b15cf5fcef71e4b41c",
+        "content": {
+          "reference": "contest ref 2",
+          "title": {
+            "en": "Second ballot"
+          },
+          "markingType": {
+            "blankSubmission": "disabled",
+            "minMarks": 1,
+            "maxMarks": 1,
+            "encoding": {
+              "codeSize": 1,
+              "maxSize": 1,
+              "cryptogramCount": 1
+            }
+          },
+          "resultType": {
+            "name": "resultType name not matter right now"
+          },
+          "options": [
+            {
+              "reference": "option ref 3",
+              "code": 1,
+              "title": {
+                "en": "Option 3"
+              }
+            },
+            {
+              "reference": "option ref 4",
+              "code": 2,
+              "title": {
+                "en": "Option 4"
+              }
+            },
+            {
+              "reference": "option ref 5",
+              "code": 3,
+              "title": {
+                "en": "Option 5"
+              }
+            }
+          ]
+        },
+        "registeredAt": "2022-11-28T09:25:46.173Z",
+        "signature": "e0fa03f8f82da4a376d9bee5e6a8a95845c8e14d19ff5551f4e4f341d7260ac9,c92a5e57d3eb123aaa38f4a981d912868b9498f121233604119e813e81273ddb",
+        "type": "ContestConfigItem"
       }
     },
-    "genesisConfig": {
-      "publicKey": "035b71d909318bc8c7f9e3ffc8e39942b721e18ecfa972de644afd178ae006b68e",
-      "authorizationMode": null,
-      "curveName": "secp256k1"
+    "electionConfig": {
+      "address": "6e2c6d40d8b176ee6156dd291161f07f8e379c63b50a64500b707a26d5ee8836",
+      "author": "Election Admin App",
+      "parentAddress": "392f1698faffd33316a9ac51b38c2f36cbd62eb2a4db221d9e37c453215ceedd",
+      "previousAddress": "392f1698faffd33316a9ac51b38c2f36cbd62eb2a4db221d9e37c453215ceedd",
+      "content": {
+        "title": {
+          "en": "Some US Election"
+        },
+        "uuid": "bc1b1ed0-943e-4647-bfc1-0633ba08c05e",
+        "status": "scheduled",
+        "locales": [
+          "en"
+        ],
+        "sessionTimeout": 30,
+        "castRequestItemAttachmentEncryptionKey": "03ed7d1bf85a1ea42b8e110bff0ca6815211a2afdd98e983a52e4db16505358cf8",
+        "requireCastRequestAttachment": true,
+        "bcTimeout": 10,
+        "schedule": {
+          "from": "2022-11-28T09:26:34.041Z",
+          "to": "2022-12-28T09:25:34.041Z"
+        }
+      },
+      "registeredAt": "2022-11-28T09:25:45.628Z",
+      "signature": "59ca4be5fba0212f6333e2d68027b87884b7a09ab93275d5fd635ea6df15fefa,f4933c4b0c7cd4344addacc1ea3e3454b67732f0f43b02449d49bcf9187318eb",
+      "type": "ElectionConfigItem"
     },
-    "latestConfigAddress": "4222f8d5e6f5f915cf40734d5ca8f24d32d4b2bb7a63013f7edbc67e5c5d0771",
-    "status": "open",
-    "sessionTimeout": 30,
-    "bcTimeout": 10
+    "genesisConfig": {
+      "address": "392f1698faffd33316a9ac51b38c2f36cbd62eb2a4db221d9e37c453215ceedd",
+      "author": "Digital Ballot Box",
+      "parentAddress": "0000000000000000000000000000000000000000000000000000000000000000",
+      "previousAddress": "0000000000000000000000000000000000000000000000000000000000000000",
+      "content": {
+        "ballotAcceptance": "inferred",
+        "eaCurveName": "secp256k1",
+        "eaPublicKey": "03d247cd0170769326a0dcd321653bf5986618fcdda418da0eb45184f8f350ed61",
+        "electionSlug": "us",
+        "publicKey": "0213da368e39ab4875a54b37737294cc83671afae65ae3b81e78e3262d19ad9429",
+        "resultExtraction": "throughout-election"
+      },
+      "registeredAt": "2022-11-28T09:25:35.140Z",
+      "signature": "7a47c275534c3b9d3f270eadb74a1be8a3ce04b34a5ae69de3303538c1b65a4b,e66bfe8cb030b6f286283db841cfb275e098b5e02ac350dd0c336a7ac6b989db",
+      "type": "GenesisItem"
+    },
+    "extractionIntent": null,
+    "extractionData": null,
+    "extractionConfirmation": null,
+    "latestConfigItem": {
+      "address": "468668b52f9e8a2b61b61c6fb5cafd981fa25eb463beef1727af9d68355efb21",
+      "author": "Election Admin App",
+      "parentAddress": "7773806a3b5bb9e3054c7c68ad506a0175fab6e5d9f58f5def2635891d043dfd",
+      "previousAddress": "7773806a3b5bb9e3054c7c68ad506a0175fab6e5d9f58f5def2635891d043dfd",
+      "content": {
+        "encryptionKey": "02722db1f299f1ca2da9965ad8b513141f999b57577f975211c6a70ba34ec67489",
+        "threshold": 1,
+        "trustees": [
+          {
+            "publicKey": "02722db1f299f1ca2da9965ad8b513141f999b57577f975211c6a70ba34ec67489",
+            "id": 3,
+            "polynomialCoefficients": []
+          }
+        ]
+      },
+      "registeredAt": "2022-11-28T09:25:46.580Z",
+      "signature": "117044699e0eee48bda910f06e4af2a64b8a1993ec5c43b1b864fbb0fef6e1ce,8b001fe51c209d751998c8f65cf24783f44a7d8b8159981e61893264f2d82cd0",
+      "type": "ThresholdConfigItem"
+    }
   },
-  "receipt": "44d417eae17effe4fb2a7573a839acfe95f430498a01cd8e44978d2542364907,726716ae59eb16d9f74af7a0e62022faa2b0d6731f2b5022782f3ce67dd6e880"
+  "receipt": "1db8abdb6036bfad5c8b2e66880eb9646e4b6006f1fe179193343ae6c57d7986,ce637676e0339877ba415315c8afbd3a43807fc44164532031338822552ee7a5"
 }

@@ -2,98 +2,102 @@ import { AVVerifier } from '../../lib/av_verifier';
 import { expect } from 'chai';
 import { bulletinBoardHost } from '../test_helpers'
 import { InvalidContestError, InvalidOptionError } from '../../lib/av_client/errors';
-import { ContestConfigMap } from '../../lib/av_client/types';
+import { NewContestConfigMap } from '../../lib/av_client/types';
 
-const contestConfigs: ContestConfigMap = {
+const contestConfigs: NewContestConfigMap = {
   "contest ref 1": {
-    "reference": "contest ref 1",
-    "markingType": {
-      "minMarks": 1,
-      "maxMarks": 1,
-      "blankSubmission": "disabled",
-      "encoding": {
-        "codeSize": 1,
-        "maxSize": 1,
-        "cryptogramCount": 1
-      }
-    },
-    "options": [
-      {
-        "reference": "option ref 1",
-        "code": 1,
-        "title": {
-          "en": "Option 1"
-        },
-        "subtitle": {},
-        "description": {},
+    content: {
+      "reference": "contest ref 1",
+      "markingType": {
+        "minMarks": 1,
+        "maxMarks": 1,
+        "blankSubmission": "disabled",
+        "encoding": {
+          "codeSize": 1,
+          "maxSize": 1,
+          "cryptogramCount": 1
+        }
       },
-      {
-        "reference": "option ref 2",
-        "code": 2,
-        "title": {
-          "en": "Option 2"
+      "options": [
+        {
+          "reference": "option ref 1",
+          "code": 1,
+          "title": {
+            "en": "Option 1"
+          },
+          "subtitle": {},
+          "description": {},
         },
-        "subtitle": {},
-        "description": {},
+        {
+          "reference": "option ref 2",
+          "code": 2,
+          "title": {
+            "en": "Option 2"
+          },
+          "subtitle": {},
+          "description": {},
+        }
+      ],
+      "title": {
+        "en": "First ballot"
+      },
+      "subtitle": {},
+      "description": {},
+      "resultType": {
+        "name": "resultType name not matter right now"
       }
-    ],
-    "title": {
-      "en": "First ballot"
-    },
-    "subtitle": {},
-    "description": {},
-    "resultType": {
-      "name": "resultType name not matter right now"
     }
   },
   "contest ref 2": {
-    "reference": "contest ref 2",
-    "markingType": {
-      "minMarks": 1,
-      "maxMarks": 1,
-      "blankSubmission": "disabled",
-      "encoding": {
-        "codeSize": 1,
-        "maxSize": 1,
-        "cryptogramCount": 1
-      }
-    },
-    "options": [
-      {
-        "reference": "option ref 3",
-        "code": 1,
-        "title": {
-          "en": "Option 3"
-        },
-        "subtitle": {},
-        "description": {},
+    content: {
+      "reference": "contest ref 2",
+      "markingType": {
+        "minMarks": 1,
+        "maxMarks": 1,
+        "blankSubmission": "disabled",
+        "encoding": {
+          "codeSize": 1,
+          "maxSize": 1,
+          "cryptogramCount": 1
+        }
       },
-      {
-        "reference": "option ref 4",
-        "code": 2,
-        "title": {
-          "en": "Option 4"
+      "options": [
+        {
+          "reference": "option ref 3",
+          "code": 1,
+          "title": {
+            "en": "Option 3"
+          },
+          "subtitle": {},
+          "description": {},
         },
-        "subtitle": {},
-        "description": {},
+        {
+          "reference": "option ref 4",
+          "code": 2,
+          "title": {
+            "en": "Option 4"
+          },
+          "subtitle": {},
+          "description": {},
+        },
+        {
+          "reference": "option ref 5",
+          "code": 3,
+          "title": {
+            "en": "Option 5"
+          },
+          "subtitle": {},
+          "description": {},
+        }
+      ],
+      "title": {
+        "en": "Second ballot"
       },
-      {
-        "reference": "option ref 5",
-        "code": 3,
-        "title": {
-          "en": "Option 5"
-        },
-        "subtitle": {},
-        "description": {},
+      "subtitle": {},
+      "description": {},
+      "resultType": {
+        "name": "resultType name not matter right now"
       }
-    ],
-    "title": {
-      "en": "Second ballot"
-    },
-    "subtitle": {},
-    "description": {},
-    "resultType": {
-      "name": "resultType name not matter right now"
     }
   }
 }
