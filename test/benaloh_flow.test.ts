@@ -32,7 +32,7 @@ describe('entire benaloh flow', () => {
         useRecordedResponse(bulletinBoardHost, 'post', '/us/voting/spoil'),
         useRecordedResponse(bulletinBoardHost, 'post', '/us/verification/verifiers'),
         useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/verifiers/40f90b541e72f54a955374113208fb40cb884dda7953f47d2c2714d816afea19'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/verifiers/d3dce7a6c217d6022f30e5c6927fdbd50dec98dad353bf640c635d4041a1d935'),
         useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/spoil_status'),
         useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/commitment_openings'),
       ];
