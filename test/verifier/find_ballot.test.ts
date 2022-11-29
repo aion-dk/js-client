@@ -14,7 +14,7 @@ describe('findBallot', () => {
 
   beforeEach(async () => {
     expectedNetworkRequests = [
-      useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration')
+      useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration/latest_config')
     ]
 
     verifier = new AVVerifier(bulletinBoardHost + 'us');
