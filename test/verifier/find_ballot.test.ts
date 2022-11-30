@@ -21,7 +21,7 @@ describe('findBallot', () => {
     await verifier.initialize()
   });
 
-  context.skip('given valid tracking code', () => {    
+  context('given valid tracking code', () => {    
     let shortAddress = ""
     before(async () => {
       expectedNetworkRequests.push(useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'));

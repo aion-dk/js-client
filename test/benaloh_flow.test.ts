@@ -22,7 +22,6 @@ describe('entire benaloh flow', () => {
     if(USE_MOCK) {
       expectedNetworkRequests = [
         useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration/latest_config'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration/latest_config'),
         useRecordedResponse(voterAuthorizerHost, 'post', '/create_session'),
         useRecordedResponse(voterAuthorizerHost, 'post', '/request_authorization'),
         useRecordedResponse(OTPProviderHost, 'post', '/authorize'),
@@ -124,7 +123,7 @@ describe('entire benaloh flow', () => {
   })).timeout(10000);
 
   async function placeVote(client: AVClient) {
-    const voterId = 'B00000000001'
+    const voterId = USE_MOCK ? Math.random().toString() : 'B00000000001';
     const voterEmail = 'markitmarchtest@osetinstitute.org'
     await client.requestAccessCode(voterId, voterEmail).catch((e) => {
       console.error(e);
