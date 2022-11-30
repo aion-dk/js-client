@@ -3,26 +3,12 @@ import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUES
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
 import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ContestSelection, ReadableContestSelection, LatestConfig } from './av_client/types';
-// import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ContestSelection, ReadableContestSelection, ContestConfigMap } from './av_client/types';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
-import { fetchElectionConfig } from './av_client/election_config';
+import { fetchLatestConfig } from './av_client/election_config';
 import { decryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
 import { InvalidContestError, InvalidTrackingCodeError } from './av_client/errors';
 import { decryptContestSelections } from './av_client/decrypt_contest_selections';
 import { makeOptionFinder } from './av_client/option_finder';
-
-// interface MinimalLatestConfig {
-//   items: {
-//     thresholdConfig: {
-//       content: {
-//         encryptionKey: string
-//       }
-//     }
-//     contestConfigs: NewContestConfigMap
-//   }
-//   encryptionKey: string
-// }
-
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
   private verifierPrivateKey: string | undefined
@@ -60,7 +46,7 @@ export class AVVerifier {
     if (latestConfig) {
       this.latestConfig = latestConfig;
     } else {
-      this.latestConfig = await fetchElectionConfig(this.bulletinBoard)
+      this.latestConfig = await fetchLatestConfig(this.bulletinBoard)
     }
   }
 
@@ -155,12 +141,10 @@ export class AVVerifier {
       } 
 
       const optionFinder = makeOptionFinder(contestConfig.content.options)
-      // const optionFinder = makeOptionFinder(contestConfig.options)
 
       return {
         reference: cs.reference,
         title: localizer(contestConfig.content.title),
-        // title: localizer(contestConfig.title),
         optionSelections: cs.optionSelections.map(os => {
           const optionConfig = optionFinder(os.reference)
           return {

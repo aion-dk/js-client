@@ -3,7 +3,6 @@ import { InvalidStateError } from './errors'
 import { generatePedersenCommitment } from './crypto/pedersen_commitment'
 import { encryptContestSelections } from './encrypt_contest_selections'
 import { BallotSelection, ContestEnvelope, ContestMap, ClientState } from './types'
-// import { BallotConfigMap, BallotSelection, ContestConfigMap, ContestEnvelope, ContestMap } from './types'
 
 export function constructContestEnvelopes( state: ClientState, ballotSelection: BallotSelection ): ConstructResult { 
   const { contestConfigs, ballotConfig, encryptionKey } = extractConfig(state)
@@ -20,22 +19,6 @@ export function constructContestEnvelopes( state: ClientState, ballotSelection: 
     contestEnvelopes,
   }
 }
-
-// // We define the client state to only require a subset of the electionConfig and voterSession
-// // This enables us to do less setup in testing. 
-// // If any of the objects passed does not contain the required properties, then the build step will fail.
-// interface ClientState {
-//   electionConfig: {
-//     encryptionKey: string
-//     ballotConfigs: NewBallotConfigMap
-//     contestConfigs: NewContestConfigMap
-//   }
-//   voterSession: { 
-//     content: { 
-//       voterGroup: string 
-//     } 
-//   }
-// }
 
 type ConstructResult = {
   pedersenCommitment: {

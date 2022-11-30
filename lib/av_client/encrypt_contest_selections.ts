@@ -1,5 +1,4 @@
 import { NewContestConfigMap, ContestEnvelope, NewContestConfig, ContestSelection } from "./types";
-// import { ContestConfigMap, ContestEnvelope, ContestConfig, ContestSelection } from "./types";
 import { randomBN, ElGamalPointCryptogram } from "./aion_crypto";
 import { bignumToHex, pointFromHex } from "./crypto/util";
 import { bytesToPoints } from "./encoding/point_encoding";

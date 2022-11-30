@@ -1,3 +1,4 @@
+/*eslint-disable @typescript-eslint/no-explicit-any*/
 import * as sjcl from '../sjcl';
 import * as crypto from "../aion_crypto";
 

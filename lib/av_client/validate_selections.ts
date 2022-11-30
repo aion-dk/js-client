@@ -1,10 +1,8 @@
 import { NewBallotConfig, BallotSelection, ContestSelection, OptionSelection, NewContestConfig, NewContestConfigMap, Option } from './types';
-// import { BallotConfig, BallotSelection, ContestSelection, OptionSelection, ContestConfig, ContestConfigMap, Option } from './types';
 import { flattenOptions } from './flatten_options'
 import { CorruptSelectionError as CorruptSelectionError } from './errors';
 
 export function validateBallotSelection( ballotConfig: NewBallotConfig, contestConfigs: NewContestConfigMap, ballotSelection: BallotSelection ){
-// export function validateBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap, ballotSelection: BallotSelection ){
   if( ballotConfig.content.reference !== ballotSelection.reference ){
     throw new CorruptSelectionError('Ballot selection does not match ballot config')
   }
