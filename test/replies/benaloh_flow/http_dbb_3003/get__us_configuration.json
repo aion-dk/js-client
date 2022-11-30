@@ -24,7 +24,7 @@
       "otpProvider": {
         "electionContextUuid": "468d1fbb-a53e-42f8-9d43-37be9e72ea7f",
         "publicKey": "02c31776fd23004646a5e6554c7fc3087f1f1f23bcfab791e01256655cfc8b78a5",
-        "url": "http://otp-provider:3001/"
+        "url": "http://otp:3001/"
       }
     },
     "ballotConfigs": {
