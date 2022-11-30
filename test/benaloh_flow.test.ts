@@ -9,7 +9,7 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import { NewBallotConfig, BallotSelection, NewContestConfig, NewContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
-const USE_MOCK = false;
+const USE_MOCK = true;
 
 const { useRecordedResponse, recordable } = prepareRecording('benaloh_flow')
 

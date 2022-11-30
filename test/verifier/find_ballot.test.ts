@@ -8,7 +8,7 @@ import { InvalidTrackingCodeError } from '../../lib/av_client/errors';
 import { BulletinBoard } from '../../lib/av_client/connectors/bulletin_board';
 import { hexToShortCode } from '../../lib/av_client/short_codes';
 
-describe.skip('findBallot', () => {
+describe('findBallot', () => {
   let verifier: AVVerifier;
   let expectedNetworkRequests : nock.Scope[] = [];
 

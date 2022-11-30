@@ -14,7 +14,7 @@ import {
 import { AccessCodeExpired } from '../lib/av_client/errors';
 
 
-describe.skip('AVClient#validateAccessCode', () => {
+describe('AVClient#validateAccessCode', () => {
   let client: AVClient;
   let sandbox;
   const expectedNetworkRequests : nock.Scope[] = [];
