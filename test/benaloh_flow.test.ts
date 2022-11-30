@@ -9,7 +9,7 @@ import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import { NewBallotConfig, BallotSelection, NewContestConfig, NewContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 const { useRecordedResponse, recordable } = prepareRecording('benaloh_flow')
 
@@ -124,7 +124,7 @@ describe('entire benaloh flow', () => {
   })).timeout(10000);
 
   async function placeVote(client: AVClient) {
-    const voterId = Math.random().toString()
+    const voterId = 'B00000000001'
     const voterEmail = 'markitmarchtest@osetinstitute.org'
     await client.requestAccessCode(voterId, voterEmail).catch((e) => {
       console.error(e);

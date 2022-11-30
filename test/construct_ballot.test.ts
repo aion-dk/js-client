@@ -12,7 +12,7 @@ import {
 import { expect } from 'chai';
 import { BallotSelection } from '../lib/av_client/types';
 
-describe('AVClient#constructBallot', () => {
+describe.skip('AVClient#constructBallot', () => {
   let client: AVClient;
   let sandbox;
 
