@@ -4,7 +4,7 @@ import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/o
 import { extractContestSelections } from './util/nist_cvr_extractor';
 import { AVVerifier } from './av_verifier';
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
-import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, NewBallotConfig, BallotStatus } from './av_client/types';
+import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import * as jwt from 'jose';
@@ -491,7 +491,7 @@ export class AVClient implements IAVClient {
     return this.voterSession
   }
 
-  public getVoterBallotConfig(): NewBallotConfig {
+  public getVoterBallotConfig(): BallotConfig {
     const voterSession = this.getVoterSession()
     const { items: { ballotConfigs } } = this.getLatestConfig()
     return ballotConfigs[voterSession.content.voterGroup]

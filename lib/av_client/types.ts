@@ -1,6 +1,5 @@
 export interface IAVClient {
-  initialize(electionConfig: LatestConfig): Promise<void>
-  // initialize(electionConfig: ElectionConfig): Promise<void>
+  initialize(latestConfig: LatestConfig): Promise<void>
   initialize(): Promise<void>
   requestAccessCode(opaqueVoterId: string, email: string): Promise<void>
   validateAccessCode(code: string): Promise<void>
@@ -209,32 +208,6 @@ export interface ItemExpectation {
 export type Signature = string;
 export type HashValue = string;
 
-// export type BallotConfigMap = {
-//   [voterGroupId: string]: BallotConfig
-// };
-
-// export type BallotConfig = {
-//   reference: string
-//   voterGroup: string
-//   contestReferences: string[]
-// }
-
-// export type ContestConfigMap = {
-//   [contestReference: string]: ContestConfig
-// }
-
-// export type ContestConfig = {
-//   reference: string
-//   options: Option[]
-//   markingType: MarkingType
-//   resultType: {
-//     name: string
-//   }
-//   title: LocalString
-//   subtitle: LocalString
-//   description: LocalString
-// }
-
 export type MarkingType = {
   minMarks: number
   maxMarks: number
@@ -253,43 +226,6 @@ export type BallotStatus = {
     registered_at: string
   }
 }
-
-// export interface ElectionConfig {
-//   app_url: string;
-//   encryptionKey: string;
-//   signingPublicKey: string;
-//   election: Election;
-//   ballots: Ballot[];
-//   availableLocales: string[];
-//   currentLocale: string;
-
-//   dbbPublicKey: string
-
-//   contestConfigs: ContestConfigMap
-//   ballotConfigs: BallotConfigMap;
-//   latestConfigAddress: string;
-
-//   // appended data:
-//   affidavit: AffidavitConfig;
-
-//   services: {
-//     'voterAuthorizer': VAService,
-//     'otpProvider': Service
-//   };
-// }
-
-// interface Service {
-//   url: string;
-//   electionContextUuid: string;
-//   publicKey: string;
-// }
-
-// interface VAService {
-//   url: string;
-//   electionContextUuid: string;
-//   authorizationMode: string,
-//   publicKey: string;
-// }
 
 export interface AffidavitConfig {
   curve: string;
@@ -329,8 +265,26 @@ export type ReadableOptionSelection = {
   text?: string
 }
 
-
 /** New stuff */
+
+// Latest Config
+export interface LatestConfig {
+  items: LatestConfigItems
+  receipt?: string
+  affidavit?: AffidavitConfig
+}
+
+export interface LatestConfigItems {
+  thresholdConfig: ThresholdConfig;
+  voterAuthorizerConfig: VoterAuthorizer;
+  ballotConfigs: BallotConfigMap;
+  contestConfigs: ContestConfigMap;
+  // votingRoundConfigs: VotingRoundConfig[];
+  electionConfig: ElectionConfig;
+  genesisConfig: GenesisConfig;
+  latestConfigItem: BaseBoardItem;
+}
+
 
 // Threshold Config Item
 export interface ThresholdConfig {
@@ -359,30 +313,30 @@ export interface VoterAuthorizerContentItem {
 }
 
 // Ballot Config Item
-export type NewBallotConfigMap = {
-  [voterGroupId: string]: NewBallotConfig
+export type BallotConfigMap = {
+  [voterGroupId: string]: BallotConfig
 }
 
-export type NewBallotConfig = {
-  content: NewBallotContent
+export type BallotConfig = {
+  content: BallotContent
 }
 
-export interface NewBallotContent {
+export interface BallotContent {
   reference: string
   voterGroup: string
   contestReferences: string[]
 }
 
 // Contest Config Item
-export type NewContestConfigMap = {
-  [contestReference: string]: NewContestConfig
+export type ContestConfigMap = {
+  [contestReference: string]: ContestConfig
 }
 
-export type NewContestConfig = {
-  content: NewContestContent
+export type ContestConfig = {
+  content: ContestContent
 }
 
-export interface NewContestContent {
+export interface ContestContent {
   reference: string
   title: LocalString
   subtitle: LocalString
@@ -413,7 +367,7 @@ export interface OptionContent {
 // export type VotingRoundConfig = {}
 
 // Election Config Item
-export type NewElectionConfig = {
+export type ElectionConfig = {
   content: ElectionConfigContent
 }
 
@@ -433,7 +387,7 @@ export interface ElectionConfigContent{
 }
 
 // Genesis Config Item
-export type NewGenesisConfig = {
+export type GenesisConfig = {
   content: GenesisConfigContent
 }
 
@@ -444,25 +398,6 @@ export interface GenesisConfigContent {
   electionSlug: string
   publicKey: string
   resultExtraction: string
-}
-
-
-// Latest Config
-export interface LatestConfig {
-  items: LatestConfigItems
-  receipt?: string
-  affidavit?: AffidavitConfig
-}
-
-export interface LatestConfigItems {
-  thresholdConfig: ThresholdConfig;
-  voterAuthorizerConfig: VoterAuthorizer;
-  ballotConfigs: NewBallotConfigMap;
-  contestConfigs: NewContestConfigMap;
-  // votingRoundConfigs: VotingRoundConfig[];
-  electionConfig: NewElectionConfig;
-  genesisConfig: NewGenesisConfig;
-  latestConfigItem: BaseBoardItem;
 }
 
 // We define the client state to only require a subset of the electionConfig and voterSession

@@ -1,11 +1,11 @@
-import { NewContestConfigMap, ContestSelection, ContestMap, CommitmentOpening } from "./types"
+import { ContestConfigMap, ContestSelection, ContestMap, CommitmentOpening } from "./types"
 import { ElGamalPointCryptogram, addBigNums } from "./aion_crypto"
 import { bignumFromHex, pointFromHex } from "./crypto/util"
 import { pointsToBytes } from "./encoding/point_encoding"
 import { byteArrayToContestSelection } from "./encoding/byte_encoding"
 
 export function decryptContestSelections(
-  contestConfigs: NewContestConfigMap,
+  contestConfigs: ContestConfigMap,
   encryptionKey: string,
   cryptograms: ContestMap<string[]>,
   boardCommitmentOpening: CommitmentOpening,

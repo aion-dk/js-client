@@ -1,8 +1,8 @@
-import { NewBallotConfig, BallotSelection, ContestSelection, OptionSelection, NewContestConfig, NewContestConfigMap, Option } from './types';
+import { BallotConfig, BallotSelection, ContestSelection, OptionSelection, ContestConfig, ContestConfigMap, Option } from './types';
 import { flattenOptions } from './flatten_options'
 import { CorruptSelectionError as CorruptSelectionError } from './errors';
 
-export function validateBallotSelection( ballotConfig: NewBallotConfig, contestConfigs: NewContestConfigMap, ballotSelection: BallotSelection ){
+export function validateBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap, ballotSelection: BallotSelection ){
   if( ballotConfig.content.reference !== ballotSelection.reference ){
     throw new CorruptSelectionError('Ballot selection does not match ballot config')
   }
@@ -15,7 +15,7 @@ export function validateBallotSelection( ballotConfig: NewBallotConfig, contestC
   })
 }
 
-export function validateContestSelection( contestConfig: NewContestConfig, contestSelection: ContestSelection ){
+export function validateContestSelection( contestConfig: ContestConfig, contestSelection: ContestSelection ){
   if( contestConfig.content.reference !== contestSelection.reference ){
     throw new CorruptSelectionError('Contest selection is not matching contest config')
   }
@@ -58,13 +58,13 @@ export function validateContestSelection( contestConfig: NewContestConfig, conte
   })
 }
 
-function getContestConfig( contestConfigs: NewContestConfigMap, contestSelection: ContestSelection ){
+function getContestConfig( contestConfigs: ContestConfigMap, contestSelection: ContestSelection ){
   const contestConfig = contestConfigs[contestSelection.reference]
   if( contestConfig ) return contestConfig
   throw new CorruptSelectionError('Contest config not found')
 }
 
-function validateContestsMatching( ballotConfig: NewBallotConfig, ballotSelection: BallotSelection ){
+function validateContestsMatching( ballotConfig: BallotConfig, ballotSelection: BallotSelection ){
   const selectedContests = ballotSelection.contestSelections.map(cs => cs.reference)
   if( !containsSameStrings(ballotConfig.content.contestReferences, selectedContests) ){
     throw new CorruptSelectionError('Contest selections do not match the contests allowed by the ballot')
