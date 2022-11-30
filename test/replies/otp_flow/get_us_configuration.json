@@ -1,1 +1,142 @@
-{"electionConfig":{"electionTitle":{"en":"Some US Election"},"dbbPublicKey":"02fda0b51bca745984893a0e363848b883604efeae37a4e97e99e3ee0b14de8300","encryptionKey":"0252601f1c4c99b449264558b4723513c02eea0945a7c146079055d6ff07bfded9","thresholdConfig":{"encryptionKey":"0252601f1c4c99b449264558b4723513c02eea0945a7c146079055d6ff07bfded9","threshold":1,"trustees":[{"publicKey":"0252601f1c4c99b449264558b4723513c02eea0945a7c146079055d6ff07bfded9","id":1,"polynomialCoefficients":[]}]},"curveName":"secp256k1","services":{"voterAuthorizer":{"electionContextUuid":"5c28c166-62e0-4543-991c-6211f4fbb371","publicKey":"03f7f018df16789118b8136b5d80e598ad4324512ed341d8cf15edd1d2c4c864e0","url":"http://voter-authorizer:3002/","authorizationMode":"proof-of-identity"},"otpProvider":{"electionContextUuid":"8be29aff-598c-495a-bc4a-ec287b84c5db","publicKey":"0293a6551f04038e82ec6a7d0573e437f1478cd891fd8fc170a1fdf718d52b255c","url":"http://otp:3001/"}},"ballotConfigs":{"precinct_4_bedrock":{"reference":"precinct_4_bedrock","voterGroup":"precinct_4_bedrock","contestReferences":["contest ref 1","contest ref 2"]},"precinct_3_spaceport":{"reference":"precinct_3_spaceport","voterGroup":"precinct_3_spaceport","contestReferences":["contest ref 1","contest ref 2"]}},"contestConfigs":{"contest ref 2":{"reference":"contest ref 2","markingType":{"blankSubmission":"disabled","minMarks":1,"maxMarks":1,"encoding":{"codeSize":1,"maxSize":1,"cryptogramCount":1}},"options":[{"reference":"option ref 3","code":1,"title":{"en":"Option 3"}},{"reference":"option ref 4","code":2,"title":{"en":"Option 4"}},{"reference":"option ref 5","code":3,"title":{"en":"Option 5"}}],"title":{"en":"Second ballot"},"resultType":{"name":"resultType name not matter right now"}},"contest ref 1":{"reference":"contest ref 1","markingType":{"blankSubmission":"disabled","minMarks":1,"maxMarks":1,"encoding":{"codeSize":1,"maxSize":1,"cryptogramCount":1}},"options":[{"reference":"option ref 1","code":1,"title":{"en":"Option 1"}},{"reference":"option ref 2","code":2,"title":{"en":"Option 2"}}],"title":{"en":"First ballot"},"resultType":{"name":"resultType name not matter right now"}}},"genesisConfig":{"publicKey":"02fda0b51bca745984893a0e363848b883604efeae37a4e97e99e3ee0b14de8300","authorizationMode":null,"curveName":"secp256k1"},"latestConfigAddress":"e2245d66419f2aab0385651e193027b1031098696a58ec7da399a45495459c27","status":"scheduled","sessionTimeout":30,"bcTimeout":10},"receipt":"d293ab8e46b024018c79ebdd21fedf8d271718290fe909823d843783d0463557,e75f07259b347a582393de86b18af2434076bbc5b0269eaaba300c0a1ad8750b"}
+{
+  "electionConfig": {
+    "electionTitle": {
+      "en": "Some US Election"
+    },
+    "dbbPublicKey": "03e00c01f8f7601f3ab41e32b11072a1e06d4fb743a382b2de1515f3c11d9ac103",
+    "encryptionKey": "039b810cdd75129ad08422c588b07c2e3458ff6081a93295aecb5708907daa5b3e",
+    "thresholdConfig": {
+      "encryptionKey": "039b810cdd75129ad08422c588b07c2e3458ff6081a93295aecb5708907daa5b3e",
+      "threshold": 1,
+      "trustees": [
+        {
+          "publicKey": "039b810cdd75129ad08422c588b07c2e3458ff6081a93295aecb5708907daa5b3e",
+          "id": 1,
+          "polynomialCoefficients": []
+        }
+      ]
+    },
+    "curveName": "secp256k1",
+    "services": {
+      "voterAuthorizer": {
+        "electionContextUuid": "aece3bc0-aeb8-48c5-9d6e-76d1def60207",
+        "publicKey": "0310365b9f30e9b393e606efdd85f98af8e398dedb8909ef19c14117c7759ccf29",
+        "url": "http://voter-authorizer:3002/",
+        "authorizationMode": "proof-of-identity"
+      },
+      "otpProvider": {
+        "electionContextUuid": "7f5a5d64-882c-4562-826b-6f9091615c5b",
+        "publicKey": "02a5c0f01ec0fbb692647484685a1f2b8482c0a62ad93d1d1a972e4f2546ba17c4",
+        "url": "http://otp:3001/"
+      }
+    },
+    "ballotConfigs": {
+      "precinct_3_spaceport": {
+        "reference": "precinct_3_spaceport",
+        "voterGroup": "precinct_3_spaceport",
+        "contestReferences": [
+          "contest ref 1",
+          "contest ref 2"
+        ]
+      },
+      "precinct_4_bedrock": {
+        "reference": "precinct_4_bedrock",
+        "voterGroup": "precinct_4_bedrock",
+        "contestReferences": [
+          "contest ref 1",
+          "contest ref 2"
+        ]
+      }
+    },
+    "contestConfigs": {
+      "contest ref 1": {
+        "reference": "contest ref 1",
+        "markingType": {
+          "blankSubmission": "disabled",
+          "minMarks": 1,
+          "maxMarks": 1,
+          "encoding": {
+            "codeSize": 1,
+            "maxSize": 1,
+            "cryptogramCount": 1
+          }
+        },
+        "options": [
+          {
+            "reference": "option ref 1",
+            "code": 1,
+            "title": {
+              "en": "Option 1"
+            }
+          },
+          {
+            "reference": "option ref 2",
+            "code": 2,
+            "title": {
+              "en": "Option 2"
+            }
+          }
+        ],
+        "title": {
+          "en": "First ballot"
+        },
+        "resultType": {
+          "name": "resultType name not matter right now"
+        }
+      },
+      "contest ref 2": {
+        "reference": "contest ref 2",
+        "markingType": {
+          "blankSubmission": "disabled",
+          "minMarks": 1,
+          "maxMarks": 1,
+          "encoding": {
+            "codeSize": 1,
+            "maxSize": 1,
+            "cryptogramCount": 1
+          }
+        },
+        "options": [
+          {
+            "reference": "option ref 3",
+            "code": 1,
+            "title": {
+              "en": "Option 3"
+            }
+          },
+          {
+            "reference": "option ref 4",
+            "code": 2,
+            "title": {
+              "en": "Option 4"
+            }
+          },
+          {
+            "reference": "option ref 5",
+            "code": 3,
+            "title": {
+              "en": "Option 5"
+            }
+          }
+        ],
+        "title": {
+          "en": "Second ballot"
+        },
+        "resultType": {
+          "name": "resultType name not matter right now"
+        }
+      }
+    },
+    "genesisConfig": {
+      "publicKey": "03e00c01f8f7601f3ab41e32b11072a1e06d4fb743a382b2de1515f3c11d9ac103",
+      "authorizationMode": null,
+      "curveName": "secp256k1"
+    },
+    "latestConfigAddress": "80cc3dd61a7be05f9f71210e2faf56481f52ba05152a9057ead41450a8fabebb",
+    "status": "scheduled",
+    "sessionTimeout": 30,
+    "bcTimeout": 10,
+    "castRequestItemAttachmentEncryptionKey": "0362fb2a49a54f457e328a35c0dc89be8324435f1c2bdb3ca4438f459040753e5a"
+  },
+  "receipt": "7c17de09762943b2aa99bbfa9c519a7d69ea5cd7375989382584f929fb919d76,7d96b828d21d12ca85f6091eab22b0f0eb2123fabf857b9f623e827a3c5d48dd"
+}

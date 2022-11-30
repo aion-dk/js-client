@@ -37,7 +37,6 @@ export async function submitBallotCryptograms(
   const receipt = response.data.receipt;
 
   validatePayload(ballotCryptogramsItemCopy, ballotCryptogramsItem)
-  // console.log('??????!!!!')
   validateReceipt([ballotCryptogramsItemCopy, verificationItem], receipt, dbbPublicKey)
 
   return [

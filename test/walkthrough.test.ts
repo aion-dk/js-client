@@ -130,7 +130,7 @@ describe('entire voter flow using OTP authorization', () => {
   }
 });
 
-describe('entire voter flow using PoEC authorization', () => {
+xdescribe('entire voter flow using PoEC authorization', () => {
   let sandbox;
   let expectedNetworkRequests : nock.Scope[] = [];
 
