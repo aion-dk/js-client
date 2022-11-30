@@ -396,7 +396,7 @@ export class AVClient implements IAVClient {
 
       let encryptedAffidavit;
 
-      if (affidavit && this.electionConfig) {
+      if (affidavit && this.electionConfig && this.electionConfig.castRequestItemAttachmentEncryptionKey) {
         try {
           encryptedAffidavit = dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit).toString()
 
