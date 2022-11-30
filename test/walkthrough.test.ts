@@ -130,6 +130,7 @@ describe('entire voter flow using OTP authorization', () => {
   }
 });
 
+// TODO: Regenerate replies when js-client will be switched to /:election_slug/configuration/latest_config endpoint
 xdescribe('entire voter flow using PoEC authorization', () => {
   let sandbox;
   let expectedNetworkRequests : nock.Scope[] = [];

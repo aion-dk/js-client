@@ -49,8 +49,8 @@ import { encryptCommitmentOpening, validateCommmitmentOpening } from './av_clien
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
 import {AxiosResponse} from "axios";
 import { ProofOfElectionCodes } from "./av_client/crypto/proof_of_election_codes";
-import {dhDecrypt, dhEncrypt} from "./av_client/crypto/aes";
-import {btoa} from "buffer";
+import { dhEncrypt } from "./av_client/crypto/aes";
+import { btoa } from "buffer";
 
 /** @internal */
 export const sjcl = sjclLib;
