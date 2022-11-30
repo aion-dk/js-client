@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import { decryptContestSelections } from '../lib/av_client/decrypt_contest_selections'
 import { ElGamalPointCryptogram } from '../lib/av_client/aion_crypto'
-import { CommitmentOpening, NewContestConfig, NewContestConfigMap, ContestEnvelope, ContestMap } from '../lib/av_client/types';
+import { CommitmentOpening, ContestConfig, ContestConfigMap, ContestEnvelope, ContestMap } from '../lib/av_client/types';
 
 const encryptionKey = '021edaa87d7626dbd2faa99c4dc080f443c150ab70b24da411b13aa56249b5242e'
 
-const bigContest: NewContestConfig = {
+const bigContest: ContestConfig = {
   content: {
     reference: 'big-contest',
     markingType: {
@@ -39,7 +39,7 @@ const bigContest: NewContestConfig = {
     ]
   }
 }
-const contestConfigs: NewContestConfigMap = {
+const contestConfigs: ContestConfigMap = {
   [bigContest.content.reference]: bigContest
 }
 

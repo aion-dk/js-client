@@ -1,9 +1,9 @@
 import { validateBallotSelection, validateContestSelection } from '../lib/av_client/validate_selections'
 import { expect } from 'chai'
-import { NewContestConfig, BallotSelection, NewBallotConfig, NewContestConfigMap } from '../lib/av_client/types'
+import { ContestConfig, BallotSelection, BallotConfig, ContestConfigMap } from '../lib/av_client/types'
 import { CorruptSelectionError } from '../lib/av_client/errors'
 
-const contestOne: NewContestConfig = {
+const contestOne: ContestConfig = {
   content: {
     reference: 'contest-1',
     markingType: {
@@ -41,7 +41,7 @@ const contestOne: NewContestConfig = {
   }
 }
 
-const contestTwo: NewContestConfig = {
+const contestTwo: ContestConfig = {
   content: {
     reference: 'contest-2',
     markingType: {
@@ -179,7 +179,7 @@ describe('validateContestSelection', () => {
 })
 
 describe('validateBallotSelection', () => {
-  const ballotConfig: NewBallotConfig = {
+  const ballotConfig: BallotConfig = {
     content: {
       reference: 'ballot-1',
       voterGroup: '4',
@@ -190,7 +190,7 @@ describe('validateBallotSelection', () => {
     }
   }
 
-  const contestConfigs: NewContestConfigMap = {
+  const contestConfigs: ContestConfigMap = {
     [contestOne.content.reference]: contestOne,
     [contestTwo.content.reference]: contestTwo
   }

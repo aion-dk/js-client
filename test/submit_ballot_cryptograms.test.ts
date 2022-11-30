@@ -1,3 +1,4 @@
+/*eslint-disable @typescript-eslint/no-explicit-any*/
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import nock = require('nock');

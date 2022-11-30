@@ -1,8 +1,8 @@
 import { contestSelectionToByteArray, byteArrayToContestSelection } from '../../lib/av_client/encoding/byte_encoding'
 import { expect } from 'chai'
-import { NewContestConfig, ContestSelection } from '../../lib/av_client/types'
+import { ContestConfig, ContestSelection } from '../../lib/av_client/types'
 
-const contestConfig: NewContestConfig = {
+const contestConfig: ContestConfig = {
     content: {
       reference: 'contest ref 1',
       title: { en: 'Contest title' },

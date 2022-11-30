@@ -1,24 +1,24 @@
 {
   "spoilRequest": {
-    "address": "d3dce7a6c217d6022f30e5c6927fdbd50dec98dad353bf640c635d4041a1d935",
-    "author": "voter-247a71688927e357eda2be03d1235262ff5e939a",
-    "parentAddress": "9095c8b819b4f9c5af756acfae3e1f70e8f8d995058c289883c2418a6c30b6f7",
-    "previousAddress": "9095c8b819b4f9c5af756acfae3e1f70e8f8d995058c289883c2418a6c30b6f7",
+    "address": "d92b51740b28ae6e204728d24e8e06f4e3b0f8aab5cc160ab61c2a6cafcbba50",
+    "author": "voter-2989624b79930b550569196612f25ed804a40c65",
+    "parentAddress": "b247414c93e685fc4d26d6eb2b385012fe2d38a4323fe8c26a7615f969519f23",
+    "previousAddress": "b247414c93e685fc4d26d6eb2b385012fe2d38a4323fe8c26a7615f969519f23",
     "content": {},
-    "registeredAt": "2022-11-29T14:32:03.017Z",
-    "signature": "23ba7777339d326c70527b3cbc26ce3905215253f6fd9952fe8289e9314e6307,563dcc745a9864b5c506c39b86f59b34044106555b49d2da0d2130cfd562493e",
+    "registeredAt": "2022-11-30T12:52:42.358Z",
+    "signature": "081e776edc3a2fc4871417a90d2410755cd3c38bab377dc23fa71de74aefb1f2,4743b7a472e93b26f1c108b80cc94b36ee2ac6333c08e56b8faed1c3f1064c5e",
     "type": "SpoilRequestItem"
   },
-  "receipt": "6de777e7817a78a722b210aeb0012de9fc1ee7b8465b1f5e0862f803da8c807d,f1448611fb14d57a782d9ace5fbeeeee6fc5bbc1c1e2ce454a905556e24bb5f1",
+  "receipt": "a142ead2b351743e2ba84fa86f40d37c4d437114ddac8cc6ae2ee7372410b882,aa8ef1e4f15a7609255433a5cbd1ea8b24fb632e2802e94f3afc447bbcddf61b",
   "boardCommitmentOpening": {
     "randomizers": {
       "contest ref 1": [
-        "732a2dcbb58a44b889cd397638f0f038e576de5de7e4e54646120b34a6f9e064"
+        "41609b24c94966677afe42079d9f619cc354fca33c425c6ce53b05e1ef43e30b"
       ],
       "contest ref 2": [
-        "96a4b51452b469dbd565c2a340eec276ff1a34e904acfcd8529182f942e31df9"
+        "19808ceb3f5ab604d7e97cd6255f5271603e7becdf28c09ac59ac7588d65eea2"
       ]
     },
-    "commitmentRandomness": "6064677f33480918bdfe61269750da918073969ef2906fc3755072329c37fc51"
+    "commitmentRandomness": "f045557458c4a65dd47983e8ec4cf8a5d1a9392184a1eb476e5695fd5751ef7b"
   }
 }

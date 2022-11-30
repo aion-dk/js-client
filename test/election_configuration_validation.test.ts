@@ -1,3 +1,4 @@
+/*eslint-disable @typescript-eslint/no-explicit-any*/
 import { AVClient, LatestConfig } from '../lib/av_client';
 import {
   expectError,

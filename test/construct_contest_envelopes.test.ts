@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { constructContestEnvelopes } from '../lib/av_client/construct_contest_envelopes';
-import { NewContestConfig, NewBallotConfig, ClientState } from '../lib/av_client/types';
+import { ContestConfig, BallotConfig, ClientState } from '../lib/av_client/types';
 
-const contestOne: NewContestConfig = {
+const contestOne: ContestConfig = {
   content: {
     reference: 'contest-1',
     markingType: {
@@ -33,21 +33,13 @@ const contestOne: NewContestConfig = {
   }
 }
 
-const ballotOne: NewBallotConfig = {
+const ballotOne: BallotConfig = {
   content: {
     reference: 'ballot-1',
     voterGroup: '1',
     contestReferences: ['contest-1']
   }
 }
-
-// const contestConfigs: NewContestConfigMap = {
-//   [contestOne.content.reference]: contestOne
-// }
-
-// const ballotConfigs: NewBallotConfigMap = {
-//   [ballotOne.content.voterGroup]: ballotOne
-// }
 
 const clientState: ClientState = {
   latestConfig: {

@@ -7,7 +7,7 @@ import { prepareRecording } from './mock_helpers'
 import { AVVerifier } from '../lib/av_verifier';
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
-import { NewBallotConfig, BallotSelection, NewContestConfig, NewContestConfigMap, ContestSelection } from '../lib/av_client/types';
+import { BallotConfig, BallotSelection, ContestConfig, ContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
 const USE_MOCK = false;
 
@@ -32,7 +32,7 @@ describe('entire benaloh flow', () => {
         useRecordedResponse(bulletinBoardHost, 'post', '/us/voting/spoil'),
         useRecordedResponse(bulletinBoardHost, 'post', '/us/verification/verifiers'),
         useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/verifiers/d3dce7a6c217d6022f30e5c6927fdbd50dec98dad353bf640c635d4041a1d935'),
+        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/verifiers/d92b51740b28ae6e204728d24e8e06f4e3b0f8aab5cc160ab61c2a6cafcbba50'),
         useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/spoil_status'),
         useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/commitment_openings'),
       ];
@@ -138,7 +138,7 @@ describe('entire benaloh flow', () => {
     await client.registerVoter().catch((e) => {
       console.error(e);
     })
-    const { items: { contestConfigs } } = client.getElectionConfig()
+    const { items: { contestConfigs } } = client.getLatestConfig()
 
     const ballotConfig = client.getVoterBallotConfig()
     const ballotSelection = dummyBallotSelection(ballotConfig, contestConfigs)
@@ -175,14 +175,14 @@ describe('entire benaloh flow', () => {
 });
 
 
-function dummyBallotSelection( ballotConfig: NewBallotConfig, contestConfigs: NewContestConfigMap ): BallotSelection {
+function dummyBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap ): BallotSelection {
   return {
     reference: ballotConfig.content.reference,
     contestSelections: ballotConfig.content.contestReferences.map(cr => dummyContestSelection(contestConfigs[cr]))
   }
 }
 
-function dummyContestSelection( contestConfig: NewContestConfig ): ContestSelection {
+function dummyContestSelection( contestConfig: ContestConfig ): ContestSelection {
   return {
     reference: contestConfig.content.reference,
     optionSelections: [

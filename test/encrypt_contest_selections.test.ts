@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { encryptContestSelections } from '../lib/av_client/encrypt_contest_selections'
-import { NewContestConfig, NewContestConfigMap } from '../lib/av_client/types';
+import { ContestConfig, ContestConfigMap } from '../lib/av_client/types';
 
 const encryptionKey = '021edaa87d7626dbd2faa99c4dc080f443c150ab70b24da411b13aa56249b5242e'
 
-const contestOne: NewContestConfig = {
+const contestOne: ContestConfig = {
   content: {
     reference: 'contest-1',
     markingType: {
@@ -35,7 +35,7 @@ const contestOne: NewContestConfig = {
   }
 }
 
-const contestConfigs: NewContestConfigMap = {
+const contestConfigs: ContestConfigMap = {
   [contestOne.content.reference]: contestOne
 }
 
@@ -65,7 +65,7 @@ describe('encryptContestSelections', () => {
   })
 
   context('when given a contest selection for a contest that uses 2 cryptograms', () => {
-    const bigContest: NewContestConfig = {
+    const bigContest: ContestConfig = {
       content: {
         reference: 'big-contest',
         markingType: {
@@ -99,7 +99,7 @@ describe('encryptContestSelections', () => {
         ]
       }
     }
-    const contestConfigs: NewContestConfigMap = {
+    const contestConfigs: ContestConfigMap = {
       [bigContest.content.reference]: bigContest
     }
 

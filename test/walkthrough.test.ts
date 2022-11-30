@@ -12,7 +12,7 @@ import {
   acvHost,
 } from './test_helpers';
 import { recordResponses } from './test_helpers'
-import { NewBallotConfig, BallotSelection, NewContestConfig, NewContestConfigMap, ContestSelection } from '../lib/av_client/types';
+import { BallotConfig, BallotSelection, ContestConfig, ContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
 const USE_MOCK = true;
 
@@ -76,7 +76,7 @@ describe('entire voter flow using OTP authorization', () => {
         console.error(e);
         expect.fail('AVClient#registerVoter failed');
       })
-      const { items: { contestConfigs } } = client.getElectionConfig()
+      const { items: { contestConfigs } } = client.getLatestConfig()
       const ballotConfig = client.getVoterBallotConfig()
       const ballotSelection = dummyBallotSelection(ballotConfig, contestConfigs)
 
@@ -170,7 +170,7 @@ describe('entire voter flow using PoEC authorization', () => {
         console.error(e);
         expect.fail('AVClient#registerVoter failed');
       })
-      const { items: { contestConfigs } } = client.getElectionConfig()
+      const { items: { contestConfigs } } = client.getLatestConfig()
       const ballotConfig = client.getVoterBallotConfig()
       const ballotSelection = dummyBallotSelection(ballotConfig, contestConfigs)
 
@@ -198,14 +198,14 @@ describe('entire voter flow using PoEC authorization', () => {
   }).timeout(10000);
 })
 
-function dummyBallotSelection( ballotConfig: NewBallotConfig, contestConfigs: NewContestConfigMap ): BallotSelection {
+function dummyBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap ): BallotSelection {
   return {
     reference: ballotConfig.content.reference,
     contestSelections: ballotConfig.content.contestReferences.map(cr => dummyContestSelection(contestConfigs[cr]))
   }
 }
 
-function dummyContestSelection( contestConfig: NewContestConfig ): ContestSelection {
+function dummyContestSelection( contestConfig: ContestConfig ): ContestSelection {
   return {
     reference: contestConfig.content.reference,
     optionSelections: [
