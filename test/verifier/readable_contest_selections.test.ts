@@ -1,16 +1,17 @@
 import { AVVerifier } from '../../lib/av_verifier';
 import { expect } from 'chai';
-import { bulletinBoardHost, readJSON } from '../test_helpers'
+import { bulletinBoardHost } from '../test_helpers'
 import { InvalidContestError, InvalidOptionError } from '../../lib/av_client/errors';
-
-const latestConfig = readJSON('./replies/otp_flow/get_us_configuration.json');
+import { LatestConfig } from '../../lib/av_client/types';
+import latestConfig from '../fixtures/latestConfig';
 
 describe('getReadbleContestSelections', () => {
   let verifier: AVVerifier;
+  const config: LatestConfig = latestConfig;
 
   beforeEach(async () => {
     verifier = new AVVerifier(bulletinBoardHost + 'us');
-    await verifier.initialize(latestConfig)
+    await verifier.initialize(config)
   });
 
   context('given valid ballot', () => {
@@ -21,7 +22,7 @@ describe('getReadbleContestSelections', () => {
       },
       {
         reference: 'contest ref 2',
-        optionSelections: [{ reference: 'option ref 3' }]
+        optionSelections: [{ reference: 'option ref 2' }]
       },
     ]
 
@@ -43,8 +44,8 @@ describe('getReadbleContestSelections', () => {
           title: 'Second ballot',
           optionSelections: [
             { 
-              reference: 'option ref 3',
-              title: 'Option 3'
+              reference: 'option ref 2',
+              title: 'Option 2'
             }
           ]
         },
