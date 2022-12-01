@@ -118,9 +118,9 @@ export class AVClient implements IAVClient {
    * @returns Returns undefined if succeeded or throws an error
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  async initialize(latestConfig: LatestConfig | undefined, keyPair: KeyPair): Promise<void>
-  async initialize(latestConfig: LatestConfig): Promise<void>
-  async initialize(): Promise<void>
+  // async initialize(latestConfig: LatestConfig | undefined, keyPair: KeyPair): Promise<void>
+  // async initialize(latestConfig: LatestConfig): Promise<void>
+  // async initialize(): Promise<void>
   public async initialize(latestConfig?: LatestConfig, keyPair?: KeyPair): Promise<void> {
     if (latestConfig) {
       validateLatestConfig(latestConfig);
