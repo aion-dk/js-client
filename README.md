@@ -31,22 +31,19 @@ To run tests:
 yarn run test
 ````
 
+To run benaloh flow and walkthrough test:
+
+Delete the `.skip` on line 9 (test/benaloh_flow.test.ts) and on lines 11 and 90 (test/walkthrough.test.ts) and make sure you have all the services in the devbox running.
+
+```
+yarn run test
+````
+
 To run the tests in watch mode:
 
 ```
 yarn run tdd
 ```
-
-To record the responses
-
-In the `js-client` go to `walkthrough.test.ts` and disable mocks by changing `const USE_MOCK = true;` -> `false`.
-
-Uncomment `// return await recordResponses(async function() {` in `returns a receipt` test. Remember the closing brackets at the end of the test.
-
-The recorded responses should be saved the `test/replies/otp_flow`-folder.
-
-The folder can be copy pasted to the `ionic-app`-repo by replacing the folder `tests/e2e/fixtures/otp_flow`
-
 
 To generate HTML documentation for external usage:
 
