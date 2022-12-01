@@ -46,41 +46,10 @@ describe('election configuration validation', () => {
             title: {
               en: "First ballot"
             },
-            markingType: {
-              blankSubmission: "disabled",
-              minMarks: 1,
-              maxMarks: 1,
-              encoding: {
-                codeSize: 1,
-                maxSize: 1,
-                cryptogramCount: 1
-              }
+            subtitle: {
+              en: "First ballot"
             },
-            resultType: {
-              name: "resultType name not matter right now"
-            },
-            options: [
-              {
-                reference: "option ref 1",
-                code: 1,
-                title: {
-                  en: "Option 1"
-                },
-              },
-              {
-                reference: "option ref 2",
-                code: 2,
-                title: {
-                  en: "Option 2"
-                }
-              }
-            ]
-          }
-        },
-        ["contest ref 2"]: {
-          content: {
-            reference: "contest ref 2",
-            title: {
+            description: {
               en: "First ballot"
             },
             markingType: {
@@ -102,14 +71,81 @@ describe('election configuration validation', () => {
                 code: 1,
                 title: {
                   en: "Option 1"
-                }
+                },
+                subtitle: {
+                  en: "Option 1"
+                },
+                description: {
+                  en: "Option 1"
+                },
               },
               {
                 reference: "option ref 2",
                 code: 2,
                 title: {
                   en: "Option 2"
-                }
+                },
+                subtitle: {
+                  en: "Option 2"
+                },
+                description: {
+                  en: "Option 2"
+                },
+              }
+            ]
+          }
+        },
+        ["contest ref 2"]: {
+          content: {
+            reference: "contest ref 2",
+            title: {
+              en: "First ballot"
+            },
+            subtitle: {
+              en: "First ballot"
+            },
+            description: {
+              en: "First ballot"
+            },
+            markingType: {
+              blankSubmission: "disabled",
+              minMarks: 1,
+              maxMarks: 1,
+              encoding: {
+                codeSize: 1,
+                maxSize: 1,
+                cryptogramCount: 1
+              }
+            },
+            resultType: {
+              name: "resultType name not matter right now"
+            },
+            options: [
+              {
+                reference: "option ref 1",
+                code: 1,
+                title: {
+                  en: "Option 1"
+                },
+                subtitle: {
+                  en: "Option 1"
+                },
+                description: {
+                  en: "Option 1"
+                },
+              },
+              {
+                reference: "option ref 2",
+                code: 2,
+                title: {
+                  en: "Option 2"
+                },
+                subtitle: {
+                  en: "Option 2"
+                },
+                description: {
+                  en: "Option 2"
+                },
               }
             ]
           }
