@@ -271,6 +271,9 @@ export interface ElectionConfig {
   // appended data:
   affidavit: AffidavitConfig;
 
+  // NOTE: It's fake until js-client will start using config/latest_config endpoint
+  castRequestItemAttachmentEncryptionKey: string;
+
   services: {
     'voterAuthorizer': VAService,
     'otpProvider': Service
