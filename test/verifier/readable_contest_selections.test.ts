@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { bulletinBoardHost } from '../test_helpers'
 import { InvalidContestError, InvalidOptionError } from '../../lib/av_client/errors';
 
-describe.only('getReadbleContestSelections', () => {
+describe('getReadbleContestSelections', () => {
   let verifier: AVVerifier;
 
   beforeEach(async () => {
