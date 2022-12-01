@@ -1,5 +1,6 @@
 /*eslint-disable @typescript-eslint/no-explicit-any*/
-import { AVClient, LatestConfig } from '../lib/av_client';
+import { AVClient } from '../lib/av_client';
+import { LatestConfig } from '../lib/av_client/types';
 import { expectError } from './test_helpers';
 import { InvalidConfigError } from '../lib/av_client/errors';
 import latestConfig from './fixtures/latestConfig'

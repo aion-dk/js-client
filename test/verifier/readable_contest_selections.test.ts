@@ -2,8 +2,8 @@ import { AVVerifier } from '../../lib/av_verifier';
 import { expect } from 'chai';
 import { bulletinBoardHost } from '../test_helpers'
 import { InvalidContestError, InvalidOptionError } from '../../lib/av_client/errors';
-import { LatestConfig } from '../../lib/av_client';
-import latestConfig from '../fixtures/latestConfig'
+import { LatestConfig } from '../../lib/av_client/types';
+import latestConfig from '../fixtures/latestConfig';
 
 describe('getReadbleContestSelections', () => {
   let verifier: AVVerifier;
