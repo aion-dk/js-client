@@ -49,6 +49,8 @@ import { encryptCommitmentOpening, validateCommmitmentOpening } from './av_clien
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
 import {AxiosResponse} from "axios";
 import { ProofOfElectionCodes } from "./av_client/crypto/proof_of_election_codes";
+import { dhEncrypt } from "./av_client/crypto/aes";
+import { btoa } from "buffer";
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -340,7 +342,6 @@ export class AVClient implements IAVClient {
       this.privateKey(),
       this.getDbbPublicKey()
     );
-
     this.boardCommitment = boardCommitment;
     this.serverEnvelopes = serverEnvelopes;
 
@@ -379,7 +380,7 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-    public async castBallot(_affidavit?: Affidavit): Promise<BallotBoxReceipt> {
+    public async castBallot(affidavit?: Affidavit): Promise<BallotBoxReceipt> {
       if(!(this.voterSession)) {
         throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
       }
@@ -390,11 +391,26 @@ export class AVClient implements IAVClient {
           content: {}
       };
 
+      let encryptedAffidavit;
+
+      if (affidavit && this.electionConfig && this.electionConfig.castRequestItemAttachmentEncryptionKey) {
+        try {
+          encryptedAffidavit = dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit).toString()
+
+          castRequestItem.content['attachment'] = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(encryptedAffidavit))
+        } catch (err) {
+          console.error(err)
+        }
+      }
+
       const signedPayload = signPayload(castRequestItem, this.privateKey());
+
+      if (encryptedAffidavit) {
+        signedPayload['attachment'] = `data:text/plain;base64,${btoa(encryptedAffidavit)}`
+      }
 
       const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
       const { castRequest, receipt } = response.data;
-      
 
       validatePayload(castRequest, castRequestItem);
       validateReceipt([castRequest], receipt, this.getDbbPublicKey());
