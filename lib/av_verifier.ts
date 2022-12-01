@@ -39,9 +39,6 @@ export class AVVerifier {
    * @returns Returns undefined if succeeded or throws an error
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  // async initialize(latestConfig: LatestConfig): Promise<void>
-  // async initialize(): Promise<void>
-
   public async initialize(latestConfig?: LatestConfig): Promise<void> {
     if (latestConfig) {
       this.latestConfig = latestConfig;
