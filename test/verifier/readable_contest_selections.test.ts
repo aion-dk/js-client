@@ -1,16 +1,14 @@
 import { AVVerifier } from '../../lib/av_verifier';
 import { expect } from 'chai';
-import { bulletinBoardHost, readJSON } from '../test_helpers'
+import { bulletinBoardHost } from '../test_helpers'
 import { InvalidContestError, InvalidOptionError } from '../../lib/av_client/errors';
 
-const latestConfig = readJSON('./replies/otp_flow/get_us_configuration.json');
-
-describe('getReadbleContestSelections', () => {
+describe.only('getReadbleContestSelections', () => {
   let verifier: AVVerifier;
 
   beforeEach(async () => {
     verifier = new AVVerifier(bulletinBoardHost + 'us');
-    await verifier.initialize(latestConfig)
+    await verifier.initialize()
   });
 
   context('given valid ballot', () => {

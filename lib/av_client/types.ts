@@ -339,8 +339,8 @@ export type ContestConfig = {
 export interface ContestContent {
   reference: string
   title: LocalString
-  subtitle: LocalString
-  description: LocalString
+  subtitle?: LocalString
+  description?: LocalString
   markingType: MarkingType
   resultType: ResultType
   options: OptionContent[]
@@ -355,8 +355,8 @@ export interface OptionContent {
   code: number;
   children?: Option[];
   title: LocalString;
-  subtitle: LocalString;
-  description: LocalString;
+  subtitle?: LocalString;
+  description?: LocalString;
   writeIn?: {
     maxSize: number
     encoding: 'utf8'
