@@ -1,0 +1,19 @@
+{
+  "voterSession": {
+    "address": "06cc5a5a2faafac26cf68d3088a853b52e980eb138d161b223f403b5f1d36868",
+    "author": "Digital Ballot Box",
+    "parentAddress": "4222f8d5e6f5f915cf40734d5ca8f24d32d4b2bb7a63013f7edbc67e5c5d0771",
+    "previousAddress": "2317fcfe1abe5f1564ff5e3e599a96228039aa867bd851298fe74856d39dd400",
+    "content": {
+      "authToken": "eyJhbGciOiJFUzI1NiJ9.eyJpZGVudGlmaWVyIjoiZTQwZWMxODVmY2MyZThhODNlMjViYzllODJlZTkzMjYyYzAxNTk5ZSIsInB1YmxpY19rZXkiOiIwM2I4N2Q3ZmU3OTNhNjIxZGYyN2Y0NGMyMGY0NjBmZjcxMWQ1NTU0NWM1ODcyOWYyMGIzZmI2ZTg3MWM1M2M0OWMiLCJ2b3Rlcl9ncm91cF9rZXkiOiJwcmVjaW5jdF80X2JlZHJvY2siLCJzZWdtZW50MSI6InByZWNpbmN0XzRfYmVkcm9jayIsImVjX3Rva2VuX2ZpbmdlcnByaW50IjoiNTU4NzBlNGVjMDVlNDA0NzIxMzQyZWVkYTEzOWM4YjE1NTUwNGU3ZSIsImF1ZCI6ImF2eDpiYzFiMWVkMC05NDNlLTQ2NDctYmZjMS0wNjMzYmEwOGMwNWUiLCJpYXQiOjE2NjQzNTE0NzQsImV4cCI6MTY2NDM1MzI3NH0.HsAkaLkUWe_n7ZRRuNAbBPn1bq8BLQLJLEZTwBAyDnUrmHXPuvH6ibKif3Tc_nr3KncSgGamxnpL_ZmUMlfrKw",
+      "identifier": "e40ec185fcc2e8a83e25bc9e82ee93262c01599e",
+      "voterGroup": "precinct_4_bedrock",
+      "weight": 1,
+      "publicKey": "03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c"
+    },
+    "registeredAt": "2022-09-28T07:51:14.654Z",
+    "signature": "4b011631a60dce92c750e12033f7fb05470737cc5621d242ec7cc86e63e5b7fd,18f81cd4cb036a3f1bb09748832bb749449ff888986700e916166513220ff982",
+    "type": "VoterSessionItem"
+  },
+  "receipt": "2a3d7431079eca1163c817dfc56ee5ee3aa0232cfa3f944343d487b3392ea64a,ede21da18a11af6d92b8ea50add777d5e9f42aa65f5f85bed266781249227dbb"
+}

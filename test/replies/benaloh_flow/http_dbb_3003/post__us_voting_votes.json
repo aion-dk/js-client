@@ -1,0 +1,32 @@
+{
+  "vote": {
+    "address": "b247414c93e685fc4d26d6eb2b385012fe2d38a4323fe8c26a7615f969519f23",
+    "author": "voter-2989624b79930b550569196612f25ed804a40c65",
+    "parentAddress": "7e19373e016a3a920ffd52d54a4fe44aa0c995520e447e1d373baf1558cc8299",
+    "previousAddress": "7e19373e016a3a920ffd52d54a4fe44aa0c995520e447e1d373baf1558cc8299",
+    "content": {
+      "cryptograms": {
+        "contest ref 1": [
+          "03468c204d10dbaf81d2b807e7230097251a1e87854e23d7b3551e08de4992e387,0224a184948c8639d98dc9c856ed0cbeab410dfacfe44c9262e903768e0871f8b8"
+        ],
+        "contest ref 2": [
+          "03f756344f1337343ddeead2c341eb25358a2c7e8ae3a054374527e7fa0865b818,02455f932d495f771f1321ff4737a48d09ada61a01784a06900465d4c151db2f9d"
+        ]
+      }
+    },
+    "registeredAt": "2022-11-30T12:52:42.225Z",
+    "signature": "cd4c3f05963262e2289e29e7774f6d9f758e90eedd8fa9659773130b493891c6,53c4a29708394590b8905113238284febdf5d0963a08a19b03921d8aa580b2e2",
+    "type": "BallotCryptogramsItem"
+  },
+  "verification": {
+    "author": "037b9c074d3756dc2b8f0eda4aa9d36d661e79d0e2b50da38b5d56a0154b630838",
+    "address": "650a6c951d744a5b038da2c5482d0370582406e25f819d0caefee02eefca13a8",
+    "shortAddress": "650a6c951d",
+    "parentAddress": "b247414c93e685fc4d26d6eb2b385012fe2d38a4323fe8c26a7615f969519f23",
+    "type": "VerificationStartItem",
+    "content": {},
+    "signature": "34fe80602c9925a439bbe8da60bd4b0d57edee7ed4fe751c3e71ba8b73bcf04d,c1befd06ad5dbd1d6bbdb6904f92f3fdc6e5d8346dd5d0e0a4144849dbcde2a2",
+    "registeredAt": "2022-11-30T12:52:42.248Z"
+  },
+  "receipt": "a30226184cb2e11a43d34a3e43bc64fc9fac74d66a684bd546d421b20fc22e2a,f654dc5324a6a4985294b664b734c876ff74942b330520c1a06ed2d704edb779"
+}

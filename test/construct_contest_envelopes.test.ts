@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { constructContestEnvelopes } from '../lib/av_client/construct_contest_envelopes';
 import { ContestConfig, BallotConfig, ClientState } from '../lib/av_client/types';
-import latestConfig from './fixtures/latestConfig';
 
 const contestOne: ContestConfig = {
   content: {
@@ -45,17 +44,55 @@ const ballotOne: BallotConfig = {
 const clientState: ClientState = {
   latestConfig: {
     items: {
-      thresholdConfig: latestConfig.items.thresholdConfig,
+      thresholdConfig: {
+        content: {
+          encryptionKey: ""
+        }
+      },
       ballotConfigs: {
         [ballotOne.content.voterGroup]: ballotOne
       },
       contestConfigs: {
         [contestOne.content.reference]: contestOne
       },
-      voterAuthorizerConfig: latestConfig.items.voterAuthorizerConfig,
-      electionConfig: latestConfig.items.electionConfig,
-      genesisConfig: latestConfig.items.genesisConfig,
-      latestConfigItem: latestConfig.items.latestConfigItem,
+      voterAuthorizerConfig: {
+        content: {
+          identityProvider: {
+            contextUuid: "", 
+            publicKey: "", 
+            url: ""
+          },
+          voterAuthorizer: {
+            contextUuid: "", 
+            publicKey: "", 
+            url: ""
+          }
+        }
+      },
+      electionConfig: {
+        content: {
+          title: {"":""},
+          uuid: ""
+        }
+      },
+      genesisConfig: {
+        content: {
+          ballotAcceptance: "",
+          eaCurveName: "",
+          eaPublicKey: "",
+          electionSlug: "",
+          publicKey: "",
+          resultExtraction: "",
+        }
+      },
+      latestConfigItem: {
+        address: "",
+        author: "",
+        parentAddress: "",
+        previousAddress: "",
+        registeredAt: "",
+        signature: "",
+      }
     }
   },
   voterSession: {

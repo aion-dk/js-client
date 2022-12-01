@@ -1,6 +1,8 @@
 /*eslint-disable @typescript-eslint/no-explicit-any*/
 import { expect } from 'chai';
+import nock = require('nock');
 import sinon = require('sinon');
+import * as fs from 'fs';
 import * as sjcl from '../lib/av_client/sjcl';
 import 'dotenv/config'
 
@@ -16,6 +18,50 @@ export const voterAuthorizerHost = getEnvVar('VOTER_AUTHORIZER_URL')
 export const OTPProviderHost = getEnvVar('OTP_PROVIDER_URL')
 export const mailcatcherHost = getEnvVar('MAILCATCHER_URL')
 export const OTPProviderElectionContextId = 'cca2b217-cedd-4d58-a103-d101ba472eb8';
+
+export const bbHost = {
+  get_election_config: (board_slug = "us") => nock(bulletinBoardHost)
+      .get(`/${board_slug}/configuration/latest_config`)
+      .replyWithFile(200, `${__dirname}/replies/otp_flow/get_${board_slug}_configuration.json`),
+
+  post_registrations: (board_slug = "us") => nock(bulletinBoardHost)
+      .post(`/${board_slug}/voting/registrations`)
+      .replyWithFile(200, `${__dirname}/replies/otp_flow/post_${board_slug}_voting_registrations.json`),
+
+  post_commitments: (board_slug = "us") => nock(bulletinBoardHost)
+      .post(`/${board_slug}/voting/commitments`)
+      .replyWithFile(200, `${__dirname}/replies/otp_flow/post_${board_slug}_voting_commitments.json`),
+
+  post_votes: (board_slug = "us") => nock(bulletinBoardHost)
+      .post(`/${board_slug}/voting/votes`)
+      .replyWithFile(200, `${__dirname}/replies/otp_flow/post_${board_slug}_voting_votes.json`),
+
+  post_cast: (board_slug = "us") => nock(bulletinBoardHost)
+      .post(`/${board_slug}/voting/cast`)
+      .replyWithFile(200, `${__dirname}/replies/otp_flow/post_${board_slug}_voting_cast.json`)
+};
+
+export const vaHost = {
+  post_create_session: () => nock(voterAuthorizerHost)
+      .post('/create_session')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_create_session.json'),
+
+  post_request_authorization: () => nock(voterAuthorizerHost)
+      .post('/request_authorization')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_request_authorization.json')
+}
+
+export const acvHost = {
+  post_authorize_proof: (organisation_slug, election_slug) => nock(conferenceHost)
+    .post(`/${organisation_slug}/${election_slug}/authorize_proof`)
+    .replyWithFile(200, __dirname + `/replies/otp_flow/post_${organisation_slug}_${election_slug}_authorize_proof.json`)
+}
+
+export const otpHost = {
+  post_authorize: () => nock(OTPProviderHost)
+      .post('/authorize')
+      .replyWithFile(200, __dirname + '/replies/otp_flow/post_authorize.json')
+};
 
 export function resetDeterminism() {
   const sandbox = sinon.createSandbox();
@@ -46,6 +92,12 @@ export function deterministicRandomWords(nwords, _paranoia) {
   return output
 }
 
+export function readJSON(path) {
+  const data = fs.readFileSync(require.resolve(path), 'utf-8');
+  const json = JSON.parse(data);
+  return json;
+}
+
 export function resetDeterministicOffset() {
   global.deterministicOffset = 0;
 }
@@ -53,6 +105,16 @@ export function resetDeterministicOffset() {
 // Make Math.random deterministic when running tests
 export function deterministicMathRandom() {
   return 0.42
+}
+
+export async function recordResponses(callback) {
+  setupRecording();
+
+  await callback.call()
+
+  stopRecording();
+  saveFiles();
+  cleanup();
 }
 
 type SynchronousFunction = () => void
@@ -70,4 +132,58 @@ export async function expectError(promise: (Promise<unknown>|SynchronousFunction
       () => promise()
     ).to.throw(errorType, message);
   }
+}
+
+function setupRecording() {
+  nock.restore(); // Clear nock
+  nock.recorder.clear(); // Clear recorder
+  nock.recorder.rec({
+    dont_print: true, // No stdout output
+    output_objects: true // Returns objects instead of a string about recording
+  });
+}
+
+function stopRecording() {
+  nock.restore()
+  nock.activate()
+}
+
+function saveFiles() {
+  const indentationSpaces = 2;
+  nock.recorder.play().forEach(function(record) {
+    // Exclude getting OTP code from email requests
+    if (record.scope == mailcatcherHost.replace(/\/$/, '')) {
+      return;
+    }
+    const filePath = filenameFromRequest(record.method, record.path);
+    const json = JSON.stringify(record.response, null, indentationSpaces);
+    try {
+      fs.writeFileSync(filePath, json);
+      console.debug(`Response written to ${filePath}`);
+    } catch(error) {
+      console.error(error);
+    }
+  });
+}
+
+function filenameFromRequest(httpMethod, url) {
+  const extension = 'json';
+  const targetDir = __dirname + '/replies/otp_flow/';
+
+  const urlPathForFilename = url
+    .replace(/^\//g, '') // Remove leading slash
+    .replace(/=/g, "-") // Convert all '=' to '-', for example, 'foo?bar=1' becomes 'foo?bar-1'
+    .replace(/[^\w-]+/g, "_") // Leave alphanumeric characters and dashes as is, convert everything else to underscores
+    .toLowerCase() // Preventing filename case sensitivity issues before they become a pain
+
+  const httpMethodForFilename = httpMethod.toLowerCase(); // Preventing filename case sensitivity issues
+  const filename = `${httpMethodForFilename}_${urlPathForFilename}.${extension}`
+  const absolutePath = targetDir + filename;
+
+  return absolutePath;
+}
+
+function cleanup() {
+  nock.recorder.clear();
+  console.debug("Finished recording responses");
 }

@@ -1,26 +1,52 @@
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import axios from 'axios';
+import nock = require('nock');
 import {
   resetDeterminism,
+  vaHost,
+  bbHost,
+  otpHost,
   bulletinBoardHost,
   mailcatcherHost,
+  acvHost,
 } from './test_helpers';
+import { recordResponses } from './test_helpers'
 import { BallotConfig, BallotSelection, ContestConfig, ContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
-describe.skip('entire voter flow using OTP authorization', () => {
+const USE_MOCK = true;
+
+describe('entire voter flow using OTP authorization', () => {
   let sandbox;
+  let expectedNetworkRequests : nock.Scope[] = [];
 
   beforeEach(() => {
-    sandbox = resetDeterminism()
+    sandbox = resetDeterminism();
+
+    if(USE_MOCK) {
+      expectedNetworkRequests = [
+        bbHost.get_election_config(),
+        vaHost.post_create_session(),
+        vaHost.post_request_authorization(),
+        otpHost.post_authorize(),
+        bbHost.post_registrations(),
+        bbHost.post_commitments(),
+        bbHost.post_votes(),
+        bbHost.post_cast(),
+      ];
+    }
   });
 
   afterEach(() => {
     sandbox.restore()
+    if (USE_MOCK) {
+      nock.cleanAll();
+    }
   });
 
   it('returns a receipt', async () => {
-    const _performTest = async () => {
+    // For recording, remember to reset AVX database and update oneTimePassword fixture value
+    const performTest = async () => {
       const client = new AVClient(bulletinBoardHost + 'us');
       await client.initialize(undefined, {
         privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
@@ -34,7 +60,12 @@ describe.skip('entire voter flow using OTP authorization', () => {
         expect.fail('AVClient#requestAccessCode failed.');
       });
 
-      const oneTimePassword: string = await extractOTPFromEmail();
+      let oneTimePassword: string;
+      if (USE_MOCK) {
+        oneTimePassword = '12345';
+      } else {
+        oneTimePassword = await extractOTPFromEmail();
+      }
 
       const _confirmationToken = await client.validateAccessCode(oneTimePassword).catch((e) => {
         console.error(e);
@@ -58,7 +89,17 @@ describe.skip('entire voter flow using OTP authorization', () => {
       const receipt = await client.castBallot(affidavit);
       expect(receipt.trackingCode.length).to.eql(7);
 
-      await _performTest();
+      if(USE_MOCK) {
+        expectedNetworkRequests.forEach((mock) => mock.done())
+      }
+
+      if(USE_MOCK) {
+        await performTest();
+      } else {
+        return await recordResponses(async function() {
+          await performTest();
+        });
+      }
     }
   }).timeout(10000);
 
@@ -87,24 +128,41 @@ describe.skip('entire voter flow using OTP authorization', () => {
   }
 });
 
-describe.skip('entire voter flow using PoEC authorization', () => {
+describe('entire voter flow using PoEC authorization', () => {
   let sandbox;
+  let expectedNetworkRequests : nock.Scope[] = [];
 
   beforeEach(() => {
     sandbox = resetDeterminism();
+
+    if(USE_MOCK) {
+      expectedNetworkRequests = [
+        bbHost.get_election_config('2904b00f_5abcbf894df3_58'),
+        acvHost.post_authorize_proof('voting', '2904b00f'),
+        bbHost.post_registrations('2904b00f_5abcbf894df3_58'),
+        bbHost.post_commitments('2904b00f_5abcbf894df3_58'),
+        bbHost.post_votes('2904b00f_5abcbf894df3_58'),
+        bbHost.post_cast('2904b00f_5abcbf894df3_58'),
+      ];
+    }
   });
 
   afterEach(() => {
     sandbox.restore()
+    if (USE_MOCK) {
+      nock.cleanAll();
+    }
   });
 
   it('returns a receipt', async () => {
-    const _performTest = async () => {
+    const performTest = async () => {
       const client = new AVClient(bulletinBoardHost + '2904b00f_5abcbf894df3_58');
       await client.initialize(undefined, {
         privateKey: 'a259f4b44e30abc0cd53379381bdc86f44723911a5bc03bf4ff21d1b49b53efd',
         publicKey: '0290d410a7d25411bdd3d82ace5f707d02c054b60e7dc8883c1f07be4265704dd6'
       });
+
+      // "/voting/2904b00f/authorize_proof"
 
       client.generateProofOfElectionCodes(['1']);
 
@@ -125,7 +183,17 @@ describe.skip('entire voter flow using PoEC authorization', () => {
       const receipt = await client.castBallot(affidavit);
       expect(receipt.trackingCode.length).to.eql(7)
 
-      await _performTest();
+      if(USE_MOCK) {
+        expectedNetworkRequests.forEach((mock) => mock.done());
+      }
+
+      if(USE_MOCK) {
+        await performTest();
+      } else {
+        return await recordResponses(async function() {
+          await performTest();
+        });
+      }
     }
   }).timeout(10000);
 })
