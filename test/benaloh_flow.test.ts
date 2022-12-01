@@ -1,51 +1,23 @@
 import axios from 'axios';
-import nock = require('nock');
 import { resetDeterminism } from './test_helpers';
-import { bulletinBoardHost, voterAuthorizerHost, OTPProviderHost, mailcatcherHost } from './test_helpers'
-import { prepareRecording } from './mock_helpers'
-
+import { bulletinBoardHost, mailcatcherHost } from './test_helpers'
 import { AVVerifier } from '../lib/av_verifier';
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
 import { BallotConfig, BallotSelection, ContestConfig, ContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
-const USE_MOCK = false;
-
-const { useRecordedResponse, recordable } = prepareRecording('benaloh_flow')
-
-describe('entire benaloh flow', () => {
+describe.skip('entire benaloh flow', () => {
   let sandbox;
-  let expectedNetworkRequests : nock.Scope[] = [];
 
   beforeEach(() => {
     sandbox = resetDeterminism();
-    if(USE_MOCK) {
-      expectedNetworkRequests = [
-        useRecordedResponse(bulletinBoardHost, 'get', '/us/configuration/latest_config'),
-        useRecordedResponse(voterAuthorizerHost, 'post', '/create_session'),
-        useRecordedResponse(voterAuthorizerHost, 'post', '/request_authorization'),
-        useRecordedResponse(OTPProviderHost, 'post', '/authorize'),
-        useRecordedResponse(bulletinBoardHost, 'post', '/us/voting/registrations'),
-        useRecordedResponse(bulletinBoardHost, 'post', '/us/voting/commitments'),
-        useRecordedResponse(bulletinBoardHost, 'post', '/us/voting/votes'),
-        useRecordedResponse(bulletinBoardHost, 'post', '/us/voting/spoil'),
-        useRecordedResponse(bulletinBoardHost, 'post', '/us/verification/verifiers'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/vote_track'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/verifiers/d92b51740b28ae6e204728d24e8e06f4e3b0f8aab5cc160ab61c2a6cafcbba50'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/spoil_status'),
-        useRecordedResponse(bulletinBoardHost, 'get', '/us/verification/commitment_openings'),
-      ];
-    }
   });
 
   afterEach(() => {
     sandbox.restore()
-    if (USE_MOCK) {
-      nock.cleanAll();
-    }
   });
 
-  it('spoils a ballot', recordable(USE_MOCK, async () => {
+  it('spoils a ballot', async () => {
     const verifier = new AVVerifier(bulletinBoardHost + 'us');
     const client = new AVClient(bulletinBoardHost + 'us');
 
@@ -118,18 +90,16 @@ describe('entire benaloh flow', () => {
       }
     ]);
 
-    if( USE_MOCK ) expectedNetworkRequests.forEach((mock) => mock.done());
-
-  })).timeout(10000);
+  }).timeout(10000);
 
   async function placeVote(client: AVClient) {
-    const voterId = USE_MOCK ? Math.random().toString() : 'B00000000001';
+    const voterId = 'B00000000001';
     const voterEmail = 'markitmarchtest@osetinstitute.org'
     await client.requestAccessCode(voterId, voterEmail).catch((e) => {
       console.error(e);
     });
 
-    const oneTimePassword = USE_MOCK ? '12345' : await extractOTPFromEmail()
+    const oneTimePassword = await extractOTPFromEmail()
     await client.validateAccessCode(oneTimePassword).catch((e) => {
       console.error(e);
     });
