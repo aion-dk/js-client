@@ -393,9 +393,9 @@ export class AVClient implements IAVClient {
 
       let encryptedAffidavit;
 
-      if (affidavit && this.electionConfig && this.electionConfig.castRequestItemAttachmentEncryptionKey) {
+      if (affidavit && this.latestConfig && this.latestConfig.castRequestItemAttachmentEncryptionKey) {
         try {
-          encryptedAffidavit = dhEncrypt(this.electionConfig.castRequestItemAttachmentEncryptionKey, affidavit).toString()
+          encryptedAffidavit = dhEncrypt(this.latestConfig.castRequestItemAttachmentEncryptionKey, affidavit).toString()
 
           castRequestItem.content['attachment'] = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(encryptedAffidavit))
         } catch (err) {

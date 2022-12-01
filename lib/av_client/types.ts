@@ -272,6 +272,7 @@ export interface LatestConfig {
   items: LatestConfigItems
   receipt?: string
   affidavit?: AffidavitConfig
+  castRequestItemAttachmentEncryptionKey?: any // Fix this type
 }
 
 export interface LatestConfigItems {
