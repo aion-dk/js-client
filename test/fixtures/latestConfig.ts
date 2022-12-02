@@ -154,6 +154,9 @@ const latestConfig: LatestConfig = {
         uuid: "bc1b1ed0-943e-4647-bfc1-0633ba08c05e",
       }
     },
+    votingRoundConfigs: {
+      
+    },
     genesisConfig: {
       content: {
         ballotAcceptance: "inferred",
