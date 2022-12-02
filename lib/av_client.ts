@@ -553,26 +553,26 @@ export class AVClient implements IAVClient {
       throw new InvalidStateError('Cannot challenge ballot, no user session')
     }
 
-  let attempts = 0;
+    let attempts = 0;
 
-  const executePoll = async (resolve, reject) => {
-      const result = await this.bulletinBoard.getVerifierItem(this.spoilRequest.address).catch(error => {
-        console.error(error.response.data.error_message)
-      });
+    const executePoll = async (resolve, reject) => {
+        const result = await this.bulletinBoard.getVerifierItem(this.spoilRequest.address).catch(error => {
+          console.error(error.response.data.error_message)
+        });
 
-      attempts++;
-      if (result?.data?.verifier?.type === VERIFIER_ITEM) {
-        this.verifierItem = result.data.verifier
-        const pairingCode = hexToShortCode(result.data.verifier.shortAddress)
-        return resolve(pairingCode);
-      } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
-        return reject(new TimeoutError('Exceeded max attempts'));
-      } else  {
-        setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
-      }
-    };
-  
-  return new Promise(executePoll);
+        attempts++;
+        if (result?.data?.verifier?.type === VERIFIER_ITEM) {
+          this.verifierItem = result.data.verifier
+          const pairingCode = hexToShortCode(result.data.verifier.shortAddress)
+          return resolve(pairingCode);
+        } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
+          return reject(new TimeoutError('Exceeded max attempts'));
+        } else  {
+          setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
+        }
+      };
+    
+    return new Promise(executePoll);
   }
 
   /**
