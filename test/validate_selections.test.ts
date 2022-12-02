@@ -4,68 +4,72 @@ import { ContestConfig, BallotSelection, BallotConfig, ContestConfigMap } from '
 import { CorruptSelectionError } from '../lib/av_client/errors'
 
 const contestOne: ContestConfig = {
-  reference: 'contest-1',
-  markingType: {
-    minMarks: 1,
-    maxMarks: 1,
-    blankSubmission: "disabled",
-    encoding: {
-      codeSize: 1,
-      maxSize: 1,
-      cryptogramCount: 1
-    }
-  },
-  resultType: {
-    name: 'does not matter right now'
-  },
-  title: { en: 'Contest 1' },
-  subtitle: { en: 'Contest 1' },
-  description: { en: 'Contest 1' },
-  options: [
-    {
-      reference: 'option-1',
-      code: 1,
-      title: { en: 'Option 1' },
-      subtitle: { en: 'Option 1' },
-      description: { en: 'Option 1' },
+  content: {
+    reference: 'contest-1',
+    markingType: {
+      minMarks: 1,
+      maxMarks: 1,
+      blankSubmission: "disabled",
+      encoding: {
+        codeSize: 1,
+        maxSize: 1,
+        cryptogramCount: 1
+      }
     },
-    {
-      reference: 'option-3',
-      code: 3,
-      title: { en: 'Option 3' },
-      subtitle: { en: 'Option 3' },
-      description: { en: 'Option 3' },
-    }
-  ]
+    resultType: {
+      name: 'does not matter right now'
+    },
+    title: { en: 'Contest 1' },
+    subtitle: { en: 'Contest 1' },
+    description: { en: 'Contest 1' },
+    options: [
+      {
+        reference: 'option-1',
+        code: 1,
+        title: { en: 'Option 1' },
+        subtitle: { en: 'Option 1' },
+        description: { en: 'Option 1' },
+      },
+      {
+        reference: 'option-3',
+        code: 3,
+        title: { en: 'Option 3' },
+        subtitle: { en: 'Option 3' },
+        description: { en: 'Option 3' },
+      }
+    ]
+  }
 }
 
 const contestTwo: ContestConfig = {
-  reference: 'contest-2',
-  markingType: {
-    minMarks: 1,
-    maxMarks: 2,
-    blankSubmission: "active_choice",
-    encoding: {
-      codeSize: 1,
-      maxSize: 2,
-      cryptogramCount: 1
-    }
-  },
-  resultType: {
-    name: 'does not matter right now'
-  },
-  title: { en: 'Contest 2' },
-  subtitle: { en: 'Contest 2' },
-  description: { en: 'Contest 2' },
-  options: [
-    {
-      reference: 'option-a',
-      code: 1,
-      title: { en: 'Option a' },
-      subtitle: { en: 'Option a' },
-      description: { en: 'Option a' },
-    }
-  ]
+  content: {
+    reference: 'contest-2',
+    markingType: {
+      minMarks: 1,
+      maxMarks: 2,
+      blankSubmission: "active_choice",
+      encoding: {
+        codeSize: 1,
+        maxSize: 2,
+        cryptogramCount: 1
+      }
+    },
+    resultType: {
+      name: 'does not matter right now'
+    },
+    title: { en: 'Contest 2' },
+    subtitle: { en: 'Contest 2' },
+    description: { en: 'Contest 2' },
+    options: [
+      {
+        reference: 'option-a',
+        code: 1,
+        title: { en: 'Option a' },
+        subtitle: { en: 'Option a' },
+        description: { en: 'Option a' },
+      }
+    ]
+  }
 }
 
 describe('validateContestSelection', () => {
@@ -76,6 +80,7 @@ describe('validateContestSelection', () => {
         { reference: 'option-1' }
       ]
     }
+
     it('does not throw error', () => {
       expect(() => {
         validateContestSelection( contestOne, contestSelection )
@@ -90,6 +95,7 @@ describe('validateContestSelection', () => {
         { reference: 'option-1' }
       ]
     }
+
     it('throws an error', () => {
       expect(() => {
         validateContestSelection( contestOne, contestSelection )
@@ -102,6 +108,7 @@ describe('validateContestSelection', () => {
       reference: 'contest-1',
       optionSelections: []
     }
+
     it('throws an error', () => {
       expect(() => {
         validateContestSelection( contestOne, contestSelection )
@@ -114,6 +121,7 @@ describe('validateContestSelection', () => {
       reference: 'contest-2',
       optionSelections: []
     }
+
     it('does not throw an error', () => {
       expect(() => {
         validateContestSelection( contestTwo, contestSelection )
@@ -127,6 +135,7 @@ describe('validateContestSelection', () => {
       optionSelections: [{ reference: 'option-1' },
         { reference: 'option-3' }]
     }
+
     it('throws an error', () => {
       expect(() => {
         validateContestSelection( contestOne, contestSelection )
@@ -141,6 +150,7 @@ describe('validateContestSelection', () => {
         { reference: 'option-2' }
       ]
     }
+
     it('throws an error', () => {
       expect(() => {
         validateContestSelection( contestOne, contestSelection )
@@ -158,6 +168,7 @@ describe('validateContestSelection', () => {
           { reference: 'option-a' }
         ]
       }
+
       it('throws an error', () => {
         expect(() => {
           validateContestSelection( contestTwo, contestSelection )
@@ -169,17 +180,19 @@ describe('validateContestSelection', () => {
 
 describe('validateBallotSelection', () => {
   const ballotConfig: BallotConfig = {
-    reference: 'ballot-1',
-    voterGroup: '4',
-    contestReferences: [
-      'contest-1',
-      'contest-2'
-    ]
+    content: {
+      reference: 'ballot-1',
+      voterGroup: '4',
+      contestReferences: [
+        'contest-1',
+        'contest-2'
+      ]
+    }
   }
-  
+
   const contestConfigs: ContestConfigMap = {
-    [contestOne.reference]: contestOne,
-    [contestTwo.reference]: contestTwo
+    [contestOne.content.reference]: contestOne,
+    [contestTwo.content.reference]: contestTwo
   }
   
 
@@ -208,6 +221,7 @@ describe('validateBallotSelection', () => {
       }).to.not.throw()
     })
   })
+
   context('when given a ballot selection with wrong reference', () => {
     const ballotSelection: BallotSelection = {
       reference: 'wrong-reference',
@@ -233,6 +247,7 @@ describe('validateBallotSelection', () => {
       }).to.throw(CorruptSelectionError, 'Ballot selection does not match ballot config')
     })
   })
+
   context('when given ballot selection with missing contests', () => {
     context('when given a valid ballot selection', () => {
       const ballotSelection: BallotSelection = {
@@ -246,7 +261,7 @@ describe('validateBallotSelection', () => {
           }
         ]
       }
-  
+
       it('throws errors', () => {
         expect(() => {
           validateBallotSelection( ballotConfig, contestConfigs, ballotSelection)
@@ -272,7 +287,7 @@ describe('validateBallotSelection', () => {
           }
         ]
       }
-  
+
       it('throws errors', () => {
         expect(() => {
           validateBallotSelection( ballotConfig, contestConfigs, ballotSelection)

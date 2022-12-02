@@ -18,7 +18,7 @@ export function decryptContestSelections(
     const randomizers = combineRandomizers(contestReference, boardCommitmentOpening, voterCommitmentOpening)
 
     const points = decryptPoints(contestCryptograms, randomizers, encryptionKey)
-    const maxSize = contestConfig.markingType.encoding.maxSize
+    const maxSize = contestConfig.content.markingType.encoding.maxSize
     const encodedContestSelection = pointsToBytes(points, maxSize)
     return byteArrayToContestSelection(contestConfig, encodedContestSelection)
   })

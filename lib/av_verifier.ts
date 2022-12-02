@@ -2,19 +2,13 @@ import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { signPayload } from './av_client/sign';
-import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ContestSelection, ReadableContestSelection, ContestConfigMap } from './av_client/types';
+import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ContestSelection, ReadableContestSelection, LatestConfig } from './av_client/types';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
-import { fetchElectionConfig } from './av_client/election_config';
+import { fetchLatestConfig } from './av_client/election_config';
 import { decryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
 import { InvalidContestError, InvalidTrackingCodeError } from './av_client/errors';
 import { decryptContestSelections } from './av_client/decrypt_contest_selections';
 import { makeOptionFinder } from './av_client/option_finder';
-
-interface MinimalElectionConfig {
-  encryptionKey: string
-  contestConfigs: ContestConfigMap
-}
-
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
   private verifierPrivateKey: string | undefined
@@ -25,7 +19,7 @@ export class AVVerifier {
   private ballotCryptograms: BallotCryptogramItem;
   private boardCommitmentOpening: VoterCommitmentOpeningItem
   private voterCommitmentOpening: BoardCommitmentOpeningItem
-  private electionConfig: MinimalElectionConfig
+  private latestConfig: LatestConfig
   private bulletinBoard: BulletinBoard;
 
   /**
@@ -45,13 +39,11 @@ export class AVVerifier {
    * @returns Returns undefined if succeeded or throws an error
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  async initialize(electionConfig: MinimalElectionConfig): Promise<void>
-  async initialize(): Promise<void>
-  public async initialize(electionConfig?: MinimalElectionConfig): Promise<void> {
-    if (electionConfig) {
-      this.electionConfig = electionConfig;
+  public async initialize(latestConfig?: LatestConfig): Promise<void> {
+    if (latestConfig) {
+      this.latestConfig = latestConfig;
     } else {
-      this.electionConfig = await fetchElectionConfig(this.bulletinBoard);
+      this.latestConfig = await fetchLatestConfig(this.bulletinBoard)
     }
   }
 
@@ -105,8 +97,8 @@ export class AVVerifier {
     validateCommmitmentOpening(voterCommitmentOpening, this.voterCommitment, 'Voter commitment not valid')
 
     return decryptContestSelections(
-      this.electionConfig.contestConfigs,
-      this.electionConfig.encryptionKey,
+      this.latestConfig.items.contestConfigs,
+      this.latestConfig.items.thresholdConfig.content.encryptionKey,
       this.ballotCryptograms.content.cryptograms,
       boardCommitmentOpening,
       voterCommitmentOpening
@@ -140,16 +132,16 @@ export class AVVerifier {
     const localizer = makeLocalizer(locale)
 
     return contestSelections.map(cs => {
-      const contestConfig = this.electionConfig.contestConfigs[cs.reference]
+      const contestConfig = this.latestConfig.items.contestConfigs[cs.reference]
       if( !contestConfig ){
         throw new InvalidContestError("Contest is not present in the election")
       } 
 
-      const optionFinder = makeOptionFinder(contestConfig.options)
+      const optionFinder = makeOptionFinder(contestConfig.content.options)
 
       return {
         reference: cs.reference,
-        title: localizer(contestConfig.title),
+        title: localizer(contestConfig.content.title),
         optionSelections: cs.optionSelections.map(os => {
           const optionConfig = optionFinder(os.reference)
           return {

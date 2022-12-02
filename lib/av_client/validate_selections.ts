@@ -3,7 +3,7 @@ import { flattenOptions } from './flatten_options'
 import { CorruptSelectionError as CorruptSelectionError } from './errors';
 
 export function validateBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap, ballotSelection: BallotSelection ){
-  if( ballotConfig.reference !== ballotSelection.reference ){
+  if( ballotConfig.content.reference !== ballotSelection.reference ){
     throw new CorruptSelectionError('Ballot selection does not match ballot config')
   }
 
@@ -16,11 +16,11 @@ export function validateBallotSelection( ballotConfig: BallotConfig, contestConf
 }
 
 export function validateContestSelection( contestConfig: ContestConfig, contestSelection: ContestSelection ){
-  if( contestConfig.reference !== contestSelection.reference ){
+  if( contestConfig.content.reference !== contestSelection.reference ){
     throw new CorruptSelectionError('Contest selection is not matching contest config')
   }
 
-  const { markingType, options } = contestConfig
+  const { markingType, options } = contestConfig.content
 
   const isBlank = contestSelection.optionSelections.length === 0
 
@@ -66,7 +66,7 @@ function getContestConfig( contestConfigs: ContestConfigMap, contestSelection: C
 
 function validateContestsMatching( ballotConfig: BallotConfig, ballotSelection: BallotSelection ){
   const selectedContests = ballotSelection.contestSelections.map(cs => cs.reference)
-  if( !containsSameStrings(ballotConfig.contestReferences, selectedContests) ){
+  if( !containsSameStrings(ballotConfig.content.contestReferences, selectedContests) ){
     throw new CorruptSelectionError('Contest selections do not match the contests allowed by the ballot')
   }
 }

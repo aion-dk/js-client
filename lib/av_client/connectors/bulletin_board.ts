@@ -20,8 +20,8 @@ export class BulletinBoard {
     this.voterSessionUuid = voterSessionUuid
   }
 
-  getElectionConfig(): Promise<AxiosResponse> {
-    return this.backend.get('configuration');
+  getLatestConfig(): Promise<AxiosResponse> {
+    return this.backend.get('configuration/latest_config');
   }
 
   // Voting
