@@ -3,7 +3,7 @@ import { validatePayload, validateReceipt } from '../lib/av_client/sign';
 import { ItemExpectation, BoardItem } from '../lib/av_client/types';
 import { expect } from 'chai';
 
-describe.only('Validation checks', () => {
+describe('Validation checks', () => {
   context('validatePayload', () => {
     it("Payload is correct", () => {
       const expectedItem: ItemExpectation = {
