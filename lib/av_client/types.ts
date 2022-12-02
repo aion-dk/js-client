@@ -265,7 +265,6 @@ export type ReadableOptionSelection = {
   text?: string
 }
 
-/** New stuff */
 
 // Latest Config
 export interface LatestConfig {
