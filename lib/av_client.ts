@@ -4,7 +4,7 @@ import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/o
 import { extractContestSelections } from './util/nist_cvr_extractor';
 import { AVVerifier } from './av_verifier';
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
-import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus } from './av_client/types';
+import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import * as jwt from 'jose';
@@ -86,6 +86,7 @@ export const sjcl = sjclLib;
 export class AVClient implements IAVClient {
   private authorizationSessionId: string;
   private email: string;
+  private votingRoundReference: string;
   private identityConfirmationToken: IdentityConfirmationToken;
   private dbbPublicKey: string | undefined;
 
@@ -200,12 +201,13 @@ export class AVClient implements IAVClient {
    * Registers a voter based on the authorization mode of the Voter Authorizer
    * Authorization is done by 'proof-of-identity' or 'proof-of-election-codes'
    */
-  public async createVoterRegistration(): Promise<void> {
+  public async createVoterRegistration(votingRoundReference = "voting-round-1"): Promise<void> {
     const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
     const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
     const latestConfigAddress = this.getLatestConfig().items.latestConfigItem.address;
     const authorizationMode = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.authorizationMode;
+    this.votingRoundReference = votingRoundReference
 
     let authorizationResponse: AxiosResponse
 
@@ -238,7 +240,8 @@ export class AVClient implements IAVClient {
         identifier: decoded['identifier'],
         publicKey: decoded['public_key'],
         weight: decoded['weight'] || 1,
-        voterGroup: decoded['voter_group_key']
+        voterGroup: decoded['voter_group_key'],
+        votingRoundReference: decoded['voting_round_reference']
       }
     }
 
@@ -299,7 +302,7 @@ export class AVClient implements IAVClient {
    * Should be followed by either {@link AVClient.spoilBallot | spoilBallot}
    * or {@link AVClient.castBallot | castBallot}.
    *
-   * @param   cvr Object containing the selections for each contest.
+   * @param   ballotSelection BallotSelection containing the selections for each contest.
    * @returns Returns the ballot tracking code. Example:
    * ```javascript
    * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
@@ -510,6 +513,18 @@ export class AVClient implements IAVClient {
     return ballotConfigs[voterSession.content.voterGroup]
   }
 
+  public getVoterContestConfigs(): ContestConfig[] {
+    const voterSession = this.getVoterSession()
+    const { items: { ballotConfigs, votingRoundConfigs, contestConfigs }} = this.getLatestConfig()
+    
+    const myBallotConfig = ballotConfigs[voterSession.content.voterGroup]
+    const myVotingRoundConfig = votingRoundConfigs[voterSession.content.votingRoundReference]
+    const contestsICanVoteOn = myBallotConfig.content.contestReferences.filter(value => myVotingRoundConfig.contestReferences.includes(value));
+    return contestsICanVoteOn.map(contestReference => {
+      return contestConfigs[contestReference]
+    })
+  }
+
   public getDbbPublicKey(): string {
     const dbbPublicKeyFromConfig = this.getLatestConfig().items.genesisConfig.content.publicKey;
 
@@ -535,7 +550,8 @@ export class AVClient implements IAVClient {
     return await coordinator.requestPublicKeyAuthorization(
         this.authorizationSessionId,
         this.identityConfirmationToken,
-        this.keyPair.publicKey
+        this.keyPair.publicKey,
+        this.votingRoundReference
     );
   }
 

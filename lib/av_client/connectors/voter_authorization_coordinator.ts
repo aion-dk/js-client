@@ -47,12 +47,13 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
-  requestPublicKeyAuthorization(sessionId: string, identityConfirmationToken: IdentityConfirmationToken, publicKey: string): Promise<AxiosResponse> {
+  requestPublicKeyAuthorization(sessionId: string, identityConfirmationToken: IdentityConfirmationToken, publicKey: string, votingRoundReference: string): Promise<AxiosResponse> {
     return this.backend.post('request_authorization', {
       electionContextUuid: this.electionContextUuid,
       sessionId: sessionId,
       emailConfirmationToken: identityConfirmationToken,
-      publicKey: publicKey
+      publicKey: publicKey,
+      votingRoundReference: votingRoundReference
     })
   }
 

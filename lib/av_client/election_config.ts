@@ -8,6 +8,14 @@ export async function fetchLatestConfig(bulletinBoard: BulletinBoard): Promise<L
       (response: { data: LatestConfig }) => {
         const configData = response.data;
 
+        // TODO: Remove later
+        configData.items.votingRoundConfigs = {
+          "voting-round-1": {
+            reference: "voting-round-1",
+            contestReferences: Object.keys(configData.items.contestConfigs)
+          }
+        } 
+
         // const privKey = 'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9'
         const pubKey = '03e9858b6e48eb93d8f27aa76b60806298c4c7dd94077ad6c3ff97c44937888647'
         configData.affidavit = {
