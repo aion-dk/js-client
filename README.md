@@ -33,7 +33,7 @@ yarn run test
 
 To run benaloh flow and walkthrough test:
 
-Delete the `.skip` on line 9 (test/benaloh_flow.test.ts) and on lines 11 and 90 (test/walkthrough.test.ts) and make sure you have all the services in the devbox running.
+Delete the `.skip` instruction on line 9, in the test/benaloh_flow.test.ts, and on lines 11 and 90, in test/walkthrough.test.ts, and make sure you have Devbox’s services running and seeded.
 
 ```
 yarn run test
