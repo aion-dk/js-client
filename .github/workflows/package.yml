@@ -1,7 +1,7 @@
 name: Package
 on:
   release:
-    types: [created]
+    types: [created, published]
 jobs:
   publish-package:
     runs-on: ubuntu-20.04
