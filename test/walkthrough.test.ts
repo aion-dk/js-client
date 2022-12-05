@@ -20,7 +20,6 @@ describe.skip('entire voter flow using OTP authorization', () => {
   });
 
   it('returns a receipt', async () => {
-    const _performTest = async () => {
       const client = new AVClient(bulletinBoardHost + 'us');
       await client.initialize(undefined, {
         privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
@@ -28,7 +27,7 @@ describe.skip('entire voter flow using OTP authorization', () => {
       });
 
       const voterId = Math.random().toString()
-      const voterEmail = 'markitmarchtest@osetinstitute.org'
+      const voterEmail = 'dev@assemblyvoting.com'
       await client.requestAccessCode(voterId, voterEmail).catch((e) => {
         console.error(e);
         expect.fail('AVClient#requestAccessCode failed.');
@@ -58,8 +57,6 @@ describe.skip('entire voter flow using OTP authorization', () => {
       const receipt = await client.castBallot(affidavit);
       expect(receipt.trackingCode.length).to.eql(7);
 
-      await _performTest();
-    }
   }).timeout(10000);
 
   async function extractOTPFromEmail() {
@@ -99,7 +96,6 @@ describe.skip('entire voter flow using PoEC authorization', () => {
   });
 
   it('returns a receipt', async () => {
-    const _performTest = async () => {
       const client = new AVClient(bulletinBoardHost + '2904b00f_5abcbf894df3_58');
       await client.initialize(undefined, {
         privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
@@ -125,8 +121,6 @@ describe.skip('entire voter flow using PoEC authorization', () => {
       const receipt = await client.castBallot(affidavit);
       expect(receipt.trackingCode.length).to.eql(7)
 
-      await _performTest();
-    }
   }).timeout(10000);
 })
 
