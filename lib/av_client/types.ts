@@ -132,6 +132,7 @@ export interface VoterSessionItem extends BaseBoardItem {
     identifier: string
     voterGroup: string
     publicKey: string
+    votingRoundReference: string
   }
 
   type: "VoterSessionItem"
@@ -279,7 +280,7 @@ export interface LatestConfigItems {
   voterAuthorizerConfig: VoterAuthorizer;
   ballotConfigs: BallotConfigMap;
   contestConfigs: ContestConfigMap;
-  // votingRoundConfigs: VotingRoundConfig[];
+  votingRoundConfigs: VotingRoundConfigMap;
   electionConfig: ElectionConfig;
   genesisConfig: GenesisConfig;
   latestConfigItem: BaseBoardItem;
@@ -364,7 +365,14 @@ export interface OptionContent {
 }
 
 // Voting Round Config Item
-// export type VotingRoundConfig = {}
+export type VotingRoundConfigMap = {
+  [votingRoundReference: string]: VotingRoundConfig
+}
+
+export type VotingRoundConfig = {
+  reference: string
+  contestReferences: string[]
+}
 
 // Election Config Item
 export type ElectionConfig = {

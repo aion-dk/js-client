@@ -56,6 +56,7 @@ const clientState: ClientState = {
       electionConfig: latestConfig.items.electionConfig,
       genesisConfig: latestConfig.items.genesisConfig,
       latestConfigItem: latestConfig.items.latestConfigItem,
+      votingRoundConfigs: latestConfig.items.votingRoundConfigs
     }
   },
   voterSession: {

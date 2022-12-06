@@ -63,7 +63,8 @@ describe('Validation checks', () => {
         authToken: "",
         identifier: "",
         voterGroup: "",
-        publicKey: publicKey
+        publicKey: publicKey,
+        votingRoundReference: ""
       },
       registeredAt: "",
       signature: "71b8d5d9565d7a174cc2938b1a591281538bbbd913032ff87f7d92071e01f335,70cef6d1f4d1ef06f5a1a207c70dcd936a2c6fb508361e61cf4c77aa1175319d",
