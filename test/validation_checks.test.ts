@@ -50,7 +50,7 @@ describe('Validation checks', () => {
         voterGroup: "group1",
         publicKey: "12345",
         votingRoundReference: "round1",
-        segments: { "age": "10-20"}
+        segments: { "age": "10-20" }
       },
       type: "VoterSessionItem",
     }
