@@ -381,6 +381,10 @@ export interface VotingRoundContent {
   reference: string
   status: "open" | "scheduled" | "closed"
   resultPublicationDelay: number
+  schedule?: {
+    from: string
+    to: string
+  }
   contestReferences: string[]
 }
 
