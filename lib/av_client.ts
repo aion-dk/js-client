@@ -519,7 +519,7 @@ export class AVClient implements IAVClient {
     
     const myBallotConfig = ballotConfigs[voterSession.content.voterGroup]
     const myVotingRoundConfig = votingRoundConfigs[voterSession.content.votingRoundReference]
-    const contestsICanVoteOn = myBallotConfig.content.contestReferences.filter(value => myVotingRoundConfig.contestReferences.includes(value));
+    const contestsICanVoteOn = myBallotConfig.content.contestReferences.filter(value => myVotingRoundConfig.content.contestReferences.includes(value));
     return contestsICanVoteOn.map(contestReference => {
       return contestConfigs[contestReference]
     })

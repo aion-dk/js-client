@@ -133,10 +133,15 @@ export interface VoterSessionItem extends BaseBoardItem {
     voterGroup: string
     publicKey: string
     votingRoundReference: string
+    segments?: Segments
   }
 
   type: "VoterSessionItem"
   // Segments...
+}
+
+interface Segments {
+  [key: string]: string
 }
 
 export interface BoardCommitmentItem extends BaseBoardItem {
@@ -369,7 +374,13 @@ export type VotingRoundConfigMap = {
 }
 
 export type VotingRoundConfig = {
+  content: VotingRoundContent
+}
+
+export interface VotingRoundContent {
   reference: string
+  status: "open" | "scheduled" | "closed"
+  resultPublicationDelay: number
   contestReferences: string[]
 }
 
