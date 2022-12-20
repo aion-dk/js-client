@@ -24,9 +24,7 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
   }
   if(expectations.content !== undefined) {
     const requiredContentAttributes = Object.keys(expectations.content)
-
     const itemContent = Object.fromEntries(Object.entries(item.content).filter(([key]) => requiredContentAttributes.includes(key)));
-
     verifyContent(itemContent, expectations.content);
   }
 
