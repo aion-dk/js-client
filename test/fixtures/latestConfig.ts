@@ -155,7 +155,14 @@ const latestConfig: LatestConfig = {
       }
     },
     votingRoundConfigs: {
-      
+      "voting-round-1": {
+        content: {
+          status: "open",
+          reference: "voting-round-1",
+          resultPublicationDelay: 0,
+          contestReferences: ["contest ref 1"]
+        },
+      }
     },
     genesisConfig: {
       content: {

@@ -374,7 +374,13 @@ export type VotingRoundConfigMap = {
 }
 
 export type VotingRoundConfig = {
+  content: VotingRoundContent
+}
+
+export interface VotingRoundContent {
   reference: string
+  status: "open" | "scheduled" | "disabled"
+  resultPublicationDelay: number
   contestReferences: string[]
 }
 
