@@ -23,8 +23,14 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
     throw new Error(`BoardItem did not match expected parent address ${expectations.parentAddress}`);
   }
 
+  
+
   if(expectations.content !== undefined) {
-    verifyContent(item.content, expectations.content);
+    const requiredContentAttributes = Object.keys(expectations.content)
+
+    const itemContent = Object.fromEntries(Object.entries(item.content).filter(([key]) => requiredContentAttributes.includes(key)));
+    
+    verifyContent(itemContent, expectations.content);
   }
 
   verifyAddress(item);

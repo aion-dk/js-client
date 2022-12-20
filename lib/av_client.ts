@@ -232,6 +232,8 @@ export class AVClient implements IAVClient {
     if(decoded === null)
       throw new InvalidTokenError('Auth token could not be decoded');
 
+
+    
     const voterSessionItemExpectation = {
       type: VOTER_SESSION_ITEM,
       parentAddress: latestConfigAddress,
@@ -241,9 +243,11 @@ export class AVClient implements IAVClient {
         publicKey: decoded['public_key'],
         weight: decoded['weight'] || 1,
         voterGroup: decoded['voter_group_key'],
-        votingRoundReference: decoded['voting_round_reference']
+        votingRoundReference: decoded['voting_round_reference'],
       }
     }
+
+    const requiredContentAttributes = Object.keys(voterSessionItemExpectation.content)
 
     const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, latestConfigAddress);
     const voterSessionItem = voterSessionItemResponse.data.voterSession;
