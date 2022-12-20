@@ -25,8 +25,42 @@ describe('Validation checks', () => {
       type: "BoardEncryptionCommitmentItem",
     }
 
+    const expectedSessionItem: ItemExpectation = {
+      parentAddress: "12345",
+      content: {
+        authToken: "123",
+        identifier: "identifier",
+        voterGroup: "group1",
+        publicKey: "12345",
+        votingRoundReference: "round1",
+      },
+      type: "VoterSessionItem",
+    }
+
+    const receivedSessionItem: BoardItem = {
+      address: "33e486117e7255861e15a31781d494700d68ed35e41e6ebcb0926ce5b3c828fb",
+      author: "",
+      parentAddress: "12345",
+      previousAddress: "11111",
+      registeredAt: "",
+      signature: "",
+      content: {
+        authToken: "123",
+        identifier: "identifier",
+        voterGroup: "group1",
+        publicKey: "12345",
+        votingRoundReference: "round1",
+        segments: { "age": "10-20"}
+      },
+      type: "VoterSessionItem",
+    }
+
+    it("Session payload is correct", () => {
+      expect(() => validatePayload(receivedSessionItem, expectedSessionItem)).not.to.throw();
+    });
+
     it("Payload is correct", () => {
-      expect(() => validatePayload(receivedItem, expectedItem)).not.throw;
+      expect(() => validatePayload(receivedItem, expectedItem)).not.to.throw();
     });
 
     it("Type doesn't match", () => {
