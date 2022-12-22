@@ -18,8 +18,8 @@ describe.skip('entire benaloh flow', () => {
   });
 
   it('spoils a ballot', async () => {
-    const verifier = new AVVerifier(bulletinBoardHost + 'us');
-    const client = new AVClient(bulletinBoardHost + 'us');
+    const verifier = new AVVerifier(bulletinBoardHost + 'usa');
+    const client = new AVClient(bulletinBoardHost + 'usa');
 
     await verifier.initialize()
     await client.initialize(undefined, {
@@ -57,11 +57,8 @@ describe.skip('entire benaloh flow', () => {
 
     expect(contestSelections).to.eql([
       {
-        reference: 'contest ref 1',
-        optionSelections: [{reference: 'option ref 1'}]
-      },{
-        reference: 'contest ref 2',
-        optionSelections: [{reference: 'option ref 3'}]
+        reference: 'recqPa7AeyufIfd6k',
+        optionSelections: [{reference: 'recysACFx8cgwomBE'}]
       }
     ]);
 
@@ -69,24 +66,9 @@ describe.skip('entire benaloh flow', () => {
 
     expect(readableContestSelections).to.deep.equal([
       {
-        "reference": "contest ref 1",
-        "title": "First ballot",
-        "optionSelections": [
-          {
-            "reference": "option ref 1",
-            "title": "Option 1"
-          }
-        ]
-      },
-      {
-        "reference": "contest ref 2",
-        "title": "Second ballot",
-        "optionSelections": [
-          {
-            "reference": "option ref 3",
-            "title": "Option 3"
-          }
-        ]
+        reference: 'recqPa7AeyufIfd6k',
+        title: 'Air Traffic Control Tax Increase',
+        optionSelections: [ { reference: 'recysACFx8cgwomBE', title: 'Yes' } ]
       }
     ]);
 

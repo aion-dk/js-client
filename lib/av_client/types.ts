@@ -39,28 +39,28 @@ export type KeyPair = {
  */
 export type Affidavit = string
 
-export interface Ballot {
-  id: number;
-  vote_encoding_type: number;
-  title: LocalString;
-  description: LocalString;
-  options: Option[];
-  write_in: boolean;
-  //...
-}
+// export interface Ballot {
+//   id: number;
+//   vote_encoding_type: number;
+//   title: LocalString;
+//   description: LocalString;
+//   options: Option[];
+//   write_in: boolean;
+//   //...
+// }
 
-export interface Option {
-  reference: string;
-  code: number;
-  children?: Option[];
-  title: LocalString;
-  subtitle: LocalString;
-  description: LocalString;
-  writeIn?: {
-    maxSize: number
-    encoding: 'utf8'
-  }
-}
+// export interface Option {
+//   reference: string;
+//   code: number;
+//   children?: Option[];
+//   title: LocalString;
+//   subtitle?: LocalString;
+//   description?: LocalString;
+//   writeIn?: {
+//     maxSize: number
+//     encoding: 'utf8'
+//   }
+// }
 
 export interface LocalString {
   [locale: string]: string;
@@ -280,29 +280,47 @@ export interface LatestConfig {
 }
 
 export interface LatestConfigItems {
-  thresholdConfig: ThresholdConfig;
-  voterAuthorizerConfig: VoterAuthorizer;
-  ballotConfigs: BallotConfigMap;
-  contestConfigs: ContestConfigMap;
-  votingRoundConfigs: VotingRoundConfigMap;
-  electionConfig: ElectionConfig;
-  genesisConfig: GenesisConfig;
-  latestConfigItem: BaseBoardItem;
+  thresholdConfig: ThresholdConfig
+  voterAuthorizerConfig: VoterAuthorizer
+  ballotConfigs: BallotConfigMap
+  contestConfigs: ContestConfigMap
+  votingRoundConfigs: VotingRoundConfigMap
+  electionConfig: ElectionConfig
+  genesisConfig: GenesisConfig
+  latestConfigItem: BaseBoardItem
+  // segmentsConfig: SegmentsConfig
+  // extractionIntents: ExtractionIntents
+  // extractionData: ExtractionData
+  // extractionConfirmations: ExtractionConfirmations
 }
 
+interface PolynomialCoefficient {
+  degree: number
+  coefficient: string
+}
+
+interface Trustee {
+  publicKey: string
+  id: number
+  polynomialCoefficients: PolynomialCoefficient[]
+}
 
 // Threshold Config Item
-export interface ThresholdConfig {
+export interface ThresholdConfig extends BaseBoardItem {
   content: ThresholdConfigContent
+  type: 'ThresholdConfigItem'
 }
 
-export type ThresholdConfigContent = {
+export interface ThresholdConfigContent {
   encryptionKey: string
+  threshold: number
+  trustees: Trustee[]
 }
 
 // Voter Authorizer Item
-export interface VoterAuthorizer {
+export interface VoterAuthorizer extends BaseBoardItem {
   content: VoterAuthorizerContent
+  type: 'VoterAuthorizationConfigItem'
 } 
 
 export interface VoterAuthorizerContent {
@@ -318,12 +336,13 @@ export interface VoterAuthorizerContentItem {
 }
 
 // Ballot Config Item
-export type BallotConfigMap = {
+export interface BallotConfigMap {
   [voterGroupId: string]: BallotConfig
 }
 
-export type BallotConfig = {
+export interface BallotConfig extends BaseBoardItem {
   content: BallotContent
+  type: 'BallotConfigItem'
 }
 
 export interface BallotContent {
@@ -333,12 +352,13 @@ export interface BallotContent {
 }
 
 // Contest Config Item
-export type ContestConfigMap = {
+export interface ContestConfigMap {
   [contestReference: string]: ContestConfig
 }
 
-export type ContestConfig = {
+export interface ContestConfig extends BaseBoardItem {
   content: ContestContent
+  type: 'ContestConfigItem'
 }
 
 export interface ContestContent {
@@ -358,7 +378,7 @@ export interface ResultType {
 export interface OptionContent {
   reference: string;
   code: number;
-  children?: Option[];
+  children?: OptionContent[];
   title: LocalString;
   subtitle: LocalString;
   description: LocalString;
@@ -369,12 +389,13 @@ export interface OptionContent {
 }
 
 // Voting Round Config Item
-export type VotingRoundConfigMap = {
+export interface VotingRoundConfigMap {
   [votingRoundReference: string]: VotingRoundConfig
 }
 
-export type VotingRoundConfig = {
+export interface VotingRoundConfig extends BaseBoardItem {
   content: VotingRoundContent
+  type: 'VotingRoundConfigItem'
 }
 
 export interface VotingRoundContent {
@@ -389,11 +410,12 @@ export interface VotingRoundContent {
 }
 
 // Election Config Item
-export type ElectionConfig = {
+export interface ElectionConfig extends BaseBoardItem {
   content: ElectionConfigContent
+  type: 'ElectionConfigItem'
 }
 
-export interface ElectionConfigContent{
+export interface ElectionConfigContent {
   title: LocalString
   uuid: string
   status?: string
@@ -409,8 +431,11 @@ export interface ElectionConfigContent{
 }
 
 // Genesis Config Item
-export type GenesisConfig = {
+export interface GenesisConfig extends BaseBoardItem {
+  parentAddress: '0000000000000000000000000000000000000000000000000000000000000000'
+  previousAddress: '0000000000000000000000000000000000000000000000000000000000000000'
   content: GenesisConfigContent
+  type: 'GenesisItem'
 }
 
 export interface GenesisConfigContent {
