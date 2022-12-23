@@ -265,7 +265,7 @@ export interface LatestConfigItems {
   electionConfig: ElectionConfig
   genesisConfig: GenesisConfig
   latestConfigItem: LatestConfigurationConfig
-  segmentsConfig: SegmentsConfig | null
+  segmentsConfig: SegmentsConfigMap | null
   extractionIntents?: ExtractionIntents
   extractionData?: ExtractionData
   extractionConfirmations?: ExtractionConfirmations
@@ -279,6 +279,7 @@ export interface LatestConfigurationConfig extends BaseBoardItem {
     | 'VotingRoundConfigItem'
     | 'ElectionConfigItem'
     | 'GenesisItem'
+    | 'SegmentsConfigItem'
   content: VoterAuthorizerContent
     | ThresholdConfigContent
     | BallotContent
@@ -286,6 +287,7 @@ export interface LatestConfigurationConfig extends BaseBoardItem {
     | VotingRoundContent
     | ElectionConfigContent
     | GenesisConfigContent
+    | SegmentsConfigContent
 }
 
 // Threshold Config Item
@@ -451,7 +453,15 @@ export interface GenesisConfigContent {
 }
 
 // Segments Config Item
-export interface SegmentsConfig {
+export interface SegmentsConfigMap {
+  [segments: string]: SegmentsConfig
+}
+
+export interface SegmentsConfig extends BaseBoardItem {
+  content: SegmentsConfigContent
+  type: 'SegmentsConfigItem'
+}
+export interface SegmentsConfigContent {
   segments: string[]
 }
 
