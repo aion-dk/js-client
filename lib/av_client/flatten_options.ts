@@ -1,6 +1,6 @@
-import { Option } from './types';
+import { OptionContent } from './types';
 
-function flattenOption(option: Option){
+function flattenOption(option: OptionContent){
   const clone = { ...option }
   delete clone.children
 
@@ -8,7 +8,7 @@ function flattenOption(option: Option){
   return [clone].concat(flattenOptions(children))
 }
 
-export function flattenOptions(options: Option[]): Option[] {
-  const reducer = (list: Option[], option: Option) => list.concat(flattenOption(option))
+export function flattenOptions(options: OptionContent[]): OptionContent[] {
+  const reducer = (list: OptionContent[], option: OptionContent) => list.concat(flattenOption(option))
   return options.reduce(reducer, [])
 }

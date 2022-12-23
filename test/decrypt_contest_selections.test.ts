@@ -6,6 +6,13 @@ import { CommitmentOpening, ContestConfig, ContestConfigMap, ContestEnvelope, Co
 const encryptionKey = '021edaa87d7626dbd2faa99c4dc080f443c150ab70b24da411b13aa56249b5242e'
 
 const bigContest: ContestConfig = {
+  address: '',
+  author: '',
+  parentAddress: '',
+  previousAddress: '',
+  registeredAt: '',
+  signature: '',
+  type: 'ContestConfigItem',
   content: {
     reference: 'big-contest',
     markingType: {

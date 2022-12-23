@@ -3,6 +3,13 @@ import { expect } from 'chai'
 import { ContestConfig, ContestSelection } from '../../lib/av_client/types'
 
 const contestConfig: ContestConfig = {
+    address: '',
+    author: '',
+    parentAddress: '',
+    previousAddress: '',
+    registeredAt: '',
+    signature: '',
+    type: 'ContestConfigItem',
     content: {
       reference: 'contest ref 1',
       title: { en: 'Contest title' },

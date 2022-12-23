@@ -5,6 +5,13 @@ import { ContestConfig, ContestConfigMap } from '../lib/av_client/types';
 const encryptionKey = '021edaa87d7626dbd2faa99c4dc080f443c150ab70b24da411b13aa56249b5242e'
 
 const contestOne: ContestConfig = {
+  address: '',
+  author: '',
+  parentAddress: '',
+  previousAddress: '',
+  registeredAt: '',
+  signature: '',
+  type: 'ContestConfigItem',
   content: {
     reference: 'contest-1',
     markingType: {
@@ -66,6 +73,13 @@ describe('encryptContestSelections', () => {
 
   context('when given a contest selection for a contest that uses 2 cryptograms', () => {
     const bigContest: ContestConfig = {
+      address: '',
+      author: '',
+      parentAddress: '',
+      previousAddress: '',
+      registeredAt: '',
+      signature: '',
+      type: 'ContestConfigItem',
       content: {
         reference: 'big-contest',
         markingType: {

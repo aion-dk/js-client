@@ -39,29 +39,6 @@ export type KeyPair = {
  */
 export type Affidavit = string
 
-// export interface Ballot {
-//   id: number;
-//   vote_encoding_type: number;
-//   title: LocalString;
-//   description: LocalString;
-//   options: Option[];
-//   write_in: boolean;
-//   //...
-// }
-
-// export interface Option {
-//   reference: string;
-//   code: number;
-//   children?: Option[];
-//   title: LocalString;
-//   subtitle?: LocalString;
-//   description?: LocalString;
-//   writeIn?: {
-//     maxSize: number
-//     encoding: 'utf8'
-//   }
-// }
-
 export interface LocalString {
   [locale: string]: string;
 }
@@ -122,7 +99,7 @@ interface BaseBoardItem {
   signature: string
 }
 
-export interface BaseVerificationItem extends BaseBoardItem{
+export interface BaseVerificationItem extends BaseBoardItem {
   shortAddress: string
 }
 
@@ -214,12 +191,13 @@ export interface ItemExpectation {
 export type Signature = string;
 export type HashValue = string;
 
-export type MarkingType = {
+export interface MarkingType {
   minMarks: number
   maxMarks: number
+  voteVariation?: string
   blankSubmission: "disabled" | "active_choice" | "implicit"
   encoding: {
-    codeSize: 1 | 2
+    codeSize: number
     maxSize: number
     cryptogramCount: number
   }
@@ -271,7 +249,6 @@ export type ReadableOptionSelection = {
   text?: string
 }
 
-
 // Latest Config
 export interface LatestConfig {
   items: LatestConfigItems
@@ -287,22 +264,28 @@ export interface LatestConfigItems {
   votingRoundConfigs: VotingRoundConfigMap
   electionConfig: ElectionConfig
   genesisConfig: GenesisConfig
-  latestConfigItem: BaseBoardItem
-  // segmentsConfig: SegmentsConfig
-  // extractionIntents: ExtractionIntents
-  // extractionData: ExtractionData
-  // extractionConfirmations: ExtractionConfirmations
+  latestConfigItem: LatestConfigurationConfig
+  segmentsConfig: SegmentsConfig | null
+  extractionIntents?: ExtractionIntents
+  extractionData?: ExtractionData
+  extractionConfirmations?: ExtractionConfirmations
 }
 
-interface PolynomialCoefficient {
-  degree: number
-  coefficient: string
-}
-
-interface Trustee {
-  publicKey: string
-  id: number
-  polynomialCoefficients: PolynomialCoefficient[]
+export interface LatestConfigurationConfig extends BaseBoardItem {
+  type: 'ThresholdConfigItem'
+    | 'VoterAuthorizationConfigItem'
+    | 'BallotConfigItem'
+    | 'ContestConfigItem'
+    | 'VotingRoundConfigItem'
+    | 'ElectionConfigItem'
+    | 'GenesisItem'
+  content: VoterAuthorizerContent
+    | ThresholdConfigContent
+    | BallotContent
+    | ContestContent
+    | VotingRoundContent
+    | ElectionConfigContent
+    | GenesisConfigContent
 }
 
 // Threshold Config Item
@@ -315,6 +298,17 @@ export interface ThresholdConfigContent {
   encryptionKey: string
   threshold: number
   trustees: Trustee[]
+}
+
+export interface Trustee {
+  publicKey: string
+  id: number
+  polynomialCoefficients: PolynomialCoefficient[]
+}
+
+export interface PolynomialCoefficient {
+  degree: number
+  coefficient: string
 }
 
 // Voter Authorizer Item
@@ -332,7 +326,7 @@ export interface VoterAuthorizerContentItem {
   contextUuid: string
   publicKey: string
   url: string
-  authorizationMode?: string
+  authorizationMode?: 'proof-of-identity' | 'proof-of-election-codes'
 }
 
 // Ballot Config Item
@@ -349,6 +343,7 @@ export interface BallotContent {
   reference: string
   voterGroup: string
   contestReferences: string[]
+  attachment?: string
 }
 
 // Contest Config Item
@@ -364,8 +359,8 @@ export interface ContestConfig extends BaseBoardItem {
 export interface ContestContent {
   reference: string
   title: LocalString
-  subtitle: LocalString
-  description: LocalString
+  subtitle?: LocalString
+  description?: LocalString
   markingType: MarkingType
   resultType: ResultType
   options: OptionContent[]
@@ -380,8 +375,8 @@ export interface OptionContent {
   code: number;
   children?: OptionContent[];
   title: LocalString;
-  subtitle: LocalString;
-  description: LocalString;
+  subtitle?: LocalString;
+  description?: LocalString;
   writeIn?: {
     maxSize: number
     encoding: 'utf8'
@@ -401,7 +396,7 @@ export interface VotingRoundConfig extends BaseBoardItem {
 export interface VotingRoundContent {
   reference: string
   status: "open" | "scheduled" | "closed"
-  resultPublicationDelay: number
+  resultPublicationDelay?: number
   schedule?: {
     from: string
     to: string
@@ -416,13 +411,21 @@ export interface ElectionConfig extends BaseBoardItem {
 }
 
 export interface ElectionConfigContent {
+  address?: string
   title: LocalString
+  subtitle?: LocalString
+  description?: LocalString
   uuid: string
-  status?: string
-  locales?: string[]
+  status: string
+  locales: string[]
   sessionTimeout?: number
+  numDaysToCureAffidavits?: number
   castRequestItemAttachmentEncryptionKey?: string
   requireCastRequestAttachment?: boolean
+  uocavaOpeningDate?: string 
+  nonUocavaOpeningDate?: string
+  extractionThreshold?: number
+  rejectionReasons?: string[]
   bcTimeout?: number
   schedule?: {
     from: string
@@ -439,12 +442,41 @@ export interface GenesisConfig extends BaseBoardItem {
 }
 
 export interface GenesisConfigContent {
-  ballotAcceptance: string
-  eaCurveName: string
+  ballotAcceptance: 'inferred' | 'manual'
+  eaCurveName: 'secp256r1' | 'secp384r1'| 'secp521r1' | 'secp256k1'
   eaPublicKey: string
   electionSlug: string
   publicKey: string
-  resultExtraction: string
+  resultExtraction: 'post-election' | 'throughout-election'
+}
+
+// Segments Config Item
+export interface SegmentsConfig {
+  segments: string[]
+}
+
+// Extraction Items
+export interface ExtractionData {
+  votingRoundReference?: string
+}
+
+export interface ExtractionIntentsMap {
+  [extractionIntent: string]: ExtractionIntents
+}
+
+export interface ExtractionIntents {
+  extractionIntent?: any
+  receipt?: string
+  meta?: {
+    pollingUrl: string | undefined
+  },
+}
+
+export interface ExtractionConfirmations {
+  parentAddress?: string
+  signature?: string
+  content?: string
+  attachment?: string
 }
 
 // We define the client state to only require a subset of the electionConfig and voterSession

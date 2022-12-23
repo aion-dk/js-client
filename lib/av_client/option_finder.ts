@@ -1,12 +1,12 @@
 import { flattenOptions } from './flatten_options';
 import { InvalidOptionError } from './errors';
-import { Option } from './types'
+import { OptionContent } from './types'
 
-export function makeOptionFinder( options: Option[] ){
+export function makeOptionFinder( options: OptionContent[] ){
   const flatOptions = flattenOptions(options)
   const optionMap = extractOptionMap(flatOptions)
   
-  return ( reference: string ): Option => {
+  return ( reference: string ): OptionContent => {
     const option = optionMap[reference]
     if( option ) return option
 
@@ -14,6 +14,6 @@ export function makeOptionFinder( options: Option[] ){
   }
 }
 
-function extractOptionMap(flatOptions: Option[]){
+function extractOptionMap(flatOptions: OptionContent[]){
   return Object.fromEntries(flatOptions.map(option => [option.reference, option]))
 }
