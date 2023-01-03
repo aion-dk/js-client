@@ -39,29 +39,6 @@ export type KeyPair = {
  */
 export type Affidavit = string
 
-export interface Ballot {
-  id: number;
-  vote_encoding_type: number;
-  title: LocalString;
-  description: LocalString;
-  options: Option[];
-  write_in: boolean;
-  //...
-}
-
-export interface Option {
-  reference: string;
-  code: number;
-  children?: Option[];
-  title: LocalString;
-  subtitle: LocalString;
-  description: LocalString;
-  writeIn?: {
-    maxSize: number
-    encoding: 'utf8'
-  }
-}
-
 export interface LocalString {
   [locale: string]: string;
 }
@@ -122,7 +99,7 @@ interface BaseBoardItem {
   signature: string
 }
 
-export interface BaseVerificationItem extends BaseBoardItem{
+export interface BaseVerificationItem extends BaseBoardItem {
   shortAddress: string
 }
 
@@ -214,12 +191,13 @@ export interface ItemExpectation {
 export type Signature = string;
 export type HashValue = string;
 
-export type MarkingType = {
+export interface MarkingType {
   minMarks: number
   maxMarks: number
+  voteVariation?: string
   blankSubmission: "disabled" | "active_choice" | "implicit"
   encoding: {
-    codeSize: 1 | 2
+    codeSize: number
     maxSize: number
     cryptogramCount: number
   }
@@ -271,7 +249,6 @@ export type ReadableOptionSelection = {
   text?: string
 }
 
-
 // Latest Config
 export interface LatestConfig {
   items: LatestConfigItems
@@ -280,29 +257,66 @@ export interface LatestConfig {
 }
 
 export interface LatestConfigItems {
-  thresholdConfig: ThresholdConfig;
-  voterAuthorizerConfig: VoterAuthorizer;
-  ballotConfigs: BallotConfigMap;
-  contestConfigs: ContestConfigMap;
-  votingRoundConfigs: VotingRoundConfigMap;
-  electionConfig: ElectionConfig;
-  genesisConfig: GenesisConfig;
-  latestConfigItem: BaseBoardItem;
+  thresholdConfig: ThresholdConfig
+  voterAuthorizerConfig: VoterAuthorizer
+  ballotConfigs: BallotConfigMap
+  contestConfigs: ContestConfigMap
+  votingRoundConfigs: VotingRoundConfigMap
+  electionConfig: ElectionConfig
+  genesisConfig: GenesisConfig
+  latestConfigItem: LatestConfigurationConfig
+  segmentsConfig: SegmentsConfigMap | null
+  extractionIntents?: ExtractionIntents
+  extractionData?: ExtractionData
+  extractionConfirmations?: ExtractionConfirmations
 }
 
+export interface LatestConfigurationConfig extends BaseBoardItem {
+  type: 'ThresholdConfigItem'
+    | 'VoterAuthorizationConfigItem'
+    | 'BallotConfigItem'
+    | 'ContestConfigItem'
+    | 'VotingRoundConfigItem'
+    | 'ElectionConfigItem'
+    | 'GenesisItem'
+    | 'SegmentsConfigItem'
+  content: VoterAuthorizerContent
+    | ThresholdConfigContent
+    | BallotContent
+    | ContestContent
+    | VotingRoundContent
+    | ElectionConfigContent
+    | GenesisConfigContent
+    | SegmentsConfigContent
+}
 
 // Threshold Config Item
-export interface ThresholdConfig {
+export interface ThresholdConfig extends BaseBoardItem {
   content: ThresholdConfigContent
+  type: 'ThresholdConfigItem'
 }
 
-export type ThresholdConfigContent = {
+export interface ThresholdConfigContent {
   encryptionKey: string
+  threshold: number
+  trustees: Trustee[]
+}
+
+export interface Trustee {
+  publicKey: string
+  id: number
+  polynomialCoefficients: PolynomialCoefficient[]
+}
+
+export interface PolynomialCoefficient {
+  degree: number
+  coefficient: string
 }
 
 // Voter Authorizer Item
-export interface VoterAuthorizer {
+export interface VoterAuthorizer extends BaseBoardItem {
   content: VoterAuthorizerContent
+  type: 'VoterAuthorizationConfigItem'
 } 
 
 export interface VoterAuthorizerContent {
@@ -314,38 +328,41 @@ export interface VoterAuthorizerContentItem {
   contextUuid: string
   publicKey: string
   url: string
-  authorizationMode?: string
+  authorizationMode?: 'proof-of-identity' | 'proof-of-election-codes'
 }
 
 // Ballot Config Item
-export type BallotConfigMap = {
+export interface BallotConfigMap {
   [voterGroupId: string]: BallotConfig
 }
 
-export type BallotConfig = {
+export interface BallotConfig extends BaseBoardItem {
   content: BallotContent
+  type: 'BallotConfigItem'
 }
 
 export interface BallotContent {
   reference: string
   voterGroup: string
   contestReferences: string[]
+  attachment?: string
 }
 
 // Contest Config Item
-export type ContestConfigMap = {
+export interface ContestConfigMap {
   [contestReference: string]: ContestConfig
 }
 
-export type ContestConfig = {
+export interface ContestConfig extends BaseBoardItem {
   content: ContestContent
+  type: 'ContestConfigItem'
 }
 
 export interface ContestContent {
   reference: string
   title: LocalString
-  subtitle: LocalString
-  description: LocalString
+  subtitle?: LocalString
+  description?: LocalString
   markingType: MarkingType
   resultType: ResultType
   options: OptionContent[]
@@ -358,10 +375,10 @@ export interface ResultType {
 export interface OptionContent {
   reference: string;
   code: number;
-  children?: Option[];
+  children?: OptionContent[];
   title: LocalString;
-  subtitle: LocalString;
-  description: LocalString;
+  subtitle?: LocalString;
+  description?: LocalString;
   writeIn?: {
     maxSize: number
     encoding: 'utf8'
@@ -369,18 +386,19 @@ export interface OptionContent {
 }
 
 // Voting Round Config Item
-export type VotingRoundConfigMap = {
+export interface VotingRoundConfigMap {
   [votingRoundReference: string]: VotingRoundConfig
 }
 
-export type VotingRoundConfig = {
+export interface VotingRoundConfig extends BaseBoardItem {
   content: VotingRoundContent
+  type: 'VotingRoundConfigItem'
 }
 
 export interface VotingRoundContent {
   reference: string
   status: "open" | "scheduled" | "closed"
-  resultPublicationDelay: number
+  resultPublicationDelay?: number
   schedule?: {
     from: string
     to: string
@@ -389,18 +407,27 @@ export interface VotingRoundContent {
 }
 
 // Election Config Item
-export type ElectionConfig = {
+export interface ElectionConfig extends BaseBoardItem {
   content: ElectionConfigContent
+  type: 'ElectionConfigItem'
 }
 
-export interface ElectionConfigContent{
+export interface ElectionConfigContent {
+  address?: string
   title: LocalString
+  subtitle?: LocalString
+  description?: LocalString
   uuid: string
-  status?: string
-  locales?: string[]
+  status: string
+  locales: string[]
   sessionTimeout?: number
+  numDaysToCureAffidavits?: number
   castRequestItemAttachmentEncryptionKey?: string
   requireCastRequestAttachment?: boolean
+  uocavaOpeningDate?: string 
+  nonUocavaOpeningDate?: string
+  extractionThreshold?: number
+  rejectionReasons?: string[]
   bcTimeout?: number
   schedule?: {
     from: string
@@ -409,17 +436,57 @@ export interface ElectionConfigContent{
 }
 
 // Genesis Config Item
-export type GenesisConfig = {
+export interface GenesisConfig extends BaseBoardItem {
+  parentAddress: '0000000000000000000000000000000000000000000000000000000000000000'
+  previousAddress: '0000000000000000000000000000000000000000000000000000000000000000'
   content: GenesisConfigContent
+  type: 'GenesisItem'
 }
 
 export interface GenesisConfigContent {
-  ballotAcceptance: string
-  eaCurveName: string
+  ballotAcceptance: 'inferred' | 'manual'
+  eaCurveName: 'secp256r1' | 'secp384r1'| 'secp521r1' | 'secp256k1'
   eaPublicKey: string
   electionSlug: string
   publicKey: string
-  resultExtraction: string
+  resultExtraction: 'post-election' | 'throughout-election'
+}
+
+// Segments Config Item
+export interface SegmentsConfigMap {
+  [segments: string]: SegmentsConfig
+}
+
+export interface SegmentsConfig extends BaseBoardItem {
+  content: SegmentsConfigContent
+  type: 'SegmentsConfigItem'
+}
+export interface SegmentsConfigContent {
+  segments: string[]
+}
+
+// Extraction Items
+export interface ExtractionData {
+  votingRoundReference?: string
+}
+
+export interface ExtractionIntentsMap {
+  [extractionIntent: string]: ExtractionIntents
+}
+
+export interface ExtractionIntents {
+  extractionIntent?: any
+  receipt?: string
+  meta?: {
+    pollingUrl: string | undefined
+  },
+}
+
+export interface ExtractionConfirmations {
+  parentAddress?: string
+  signature?: string
+  content?: string
+  attachment?: string
 }
 
 // We define the client state to only require a subset of the electionConfig and voterSession

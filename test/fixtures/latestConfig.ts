@@ -3,11 +3,27 @@ import { LatestConfig } from '../../lib/av_client';
 const latestConfig: LatestConfig = {
   items: {
     thresholdConfig: {
+      address: '',
+      author: '',
+      parentAddress: '',
+      previousAddress: '',
+      registeredAt: '',
+      signature: '',
+      type: 'ThresholdConfigItem',
       content: {
-        encryptionKey: "03d8c46ae42cd7f95009ddf444eebc5b18e2cad34aad94129ffc54b5606b5638f4"
+        encryptionKey: "03d8c46ae42cd7f95009ddf444eebc5b18e2cad34aad94129ffc54b5606b5638f4",
+        threshold: 1,
+        trustees: []
       }
     },
     voterAuthorizerConfig: {
+      address: '',
+      author: '',
+      parentAddress: '',
+      previousAddress: '',
+      registeredAt: '',
+      signature: '',
+      type: 'VoterAuthorizationConfigItem',
       content: {
         identityProvider: {
           contextUuid: "adb99ef7-7992-4bc9-a54b-239d64d97f91",
@@ -24,6 +40,13 @@ const latestConfig: LatestConfig = {
     },
     ballotConfigs: {
       precinct_4_bedrock: {
+        address: '',
+        author: '',
+        parentAddress: '',
+        previousAddress: '',
+        registeredAt: '',
+        signature: '',
+        type: 'BallotConfigItem',
         content: {
           reference: "precinct_4_bedrock",
           voterGroup: "precinct_4_bedrock",
@@ -36,6 +59,13 @@ const latestConfig: LatestConfig = {
     },
     contestConfigs: {
       "contest ref 1": {
+        address: '',
+        author: '',
+        parentAddress: '',
+        previousAddress: '',
+        registeredAt: '',
+        signature: '',
+        type: 'ContestConfigItem',
         content: {
           reference: "contest ref 1",
           title: {
@@ -91,6 +121,13 @@ const latestConfig: LatestConfig = {
         }
       },
       "contest ref 2": {
+        address: '',
+        author: '',
+        parentAddress: '',
+        previousAddress: '',
+        registeredAt: '',
+        signature: '',
+        type: 'ContestConfigItem',
         content: {
           reference: "contest ref 2",
           title: {
@@ -147,15 +184,33 @@ const latestConfig: LatestConfig = {
       },
     },
     electionConfig: {
+      address: '',
+      author: '',
+      parentAddress: '',
+      previousAddress: '',
+      registeredAt: '',
+      signature: '',
+      type: 'ElectionConfigItem',
       content: {
         title: {
           en: "Some US Election"
         },
         uuid: "bc1b1ed0-943e-4647-bfc1-0633ba08c05e",
+        status: "scheduled",
+        locales: [
+          "en"
+        ],
       }
     },
     votingRoundConfigs: {
       "voting-round-1": {
+        address: '',
+        author: '',
+        parentAddress: '',
+        previousAddress: '',
+        registeredAt: '',
+        signature: '',
+        type: 'VotingRoundConfigItem',
         content: {
           status: "open",
           reference: "voting-round-1",
@@ -165,6 +220,13 @@ const latestConfig: LatestConfig = {
       }
     },
     genesisConfig: {
+      address: '',
+      author: '',
+      parentAddress: '0000000000000000000000000000000000000000000000000000000000000000',
+      previousAddress: '0000000000000000000000000000000000000000000000000000000000000000',
+      registeredAt: '',
+      signature: '',
+      type: 'GenesisItem',
       content: {
         ballotAcceptance: "inferred",
         eaCurveName: "secp256k1",
@@ -174,13 +236,29 @@ const latestConfig: LatestConfig = {
         resultExtraction: "throughout-election"
       }
     },
+    segmentsConfig: null,
+    extractionIntents: {},
+    extractionData: {},
+    extractionConfirmations: {},
     latestConfigItem: {
-      address: "0e4cc630c0fd8f6ca3f4a2f4329ab440969044a7dd470038f6c5ae17c5f6ed23",
+      address: "f777803fa83e8f79141becb3858cf23e28a1fd6e701b94eb6c20aa2fcd9f58c1",
       author: "Election Admin App",
-      parentAddress: "dfd82ccd645048358fe92cb48988ee4487fdd390fb657bf68733fae9bf308cfd",
-      previousAddress: "dfd82ccd645048358fe92cb48988ee4487fdd390fb657bf68733fae9bf308cfd",
-      registeredAt: "2022-11-30T13:57:38.451Z",
-      signature: "ccb3e5af13908cdbff5b41b0e5a349bddb573adc017fa4f0ba436c45c3b7f7f8,18f361cc6944ffae8ab0b9f34e8b1c49a5bb78fb0a09889e1ab405d183b11e9b",
+      parentAddress: "35629e3960fb05b7ddbb27ec161ef74581b2be4e1345477f0c9be2c38f2d17be",
+      previousAddress: "35629e3960fb05b7ddbb27ec161ef74581b2be4e1345477f0c9be2c38f2d17be",
+      content: {
+        encryptionKey: "0220f81d43002c88229ed8c80cfc7f84f9700ee13d80e1be1cd8a3677f84e99ae1",
+        threshold: 1,
+        trustees: [
+          {
+            publicKey: "0220f81d43002c88229ed8c80cfc7f84f9700ee13d80e1be1cd8a3677f84e99ae1",
+            id: 6,
+            polynomialCoefficients: []
+          }
+        ]
+      },
+      registeredAt: "2022-12-21T13:26:04.894Z",
+      signature: "b9941eac0965bcac23b935206a934fec07aeac1f12d785868b9cfe49c54bca8d,25250822e9b315b9db3c71cd81092c1ee2175e1d591a95bf1a391bdc84821722",
+      type: "ThresholdConfigItem"
     }
   },
 };

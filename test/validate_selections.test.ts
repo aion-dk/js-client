@@ -4,6 +4,13 @@ import { ContestConfig, BallotSelection, BallotConfig, ContestConfigMap } from '
 import { CorruptSelectionError } from '../lib/av_client/errors'
 
 const contestOne: ContestConfig = {
+  address: '',
+  author: '',
+  parentAddress: '',
+  previousAddress: '',
+  registeredAt: '',
+  signature: '',
+  type: 'ContestConfigItem',
   content: {
     reference: 'contest-1',
     markingType: {
@@ -42,6 +49,13 @@ const contestOne: ContestConfig = {
 }
 
 const contestTwo: ContestConfig = {
+  address: '',
+  author: '',
+  parentAddress: '',
+  previousAddress: '',
+  registeredAt: '',
+  signature: '',
+  type: 'ContestConfigItem',
   content: {
     reference: 'contest-2',
     markingType: {
@@ -180,6 +194,13 @@ describe('validateContestSelection', () => {
 
 describe('validateBallotSelection', () => {
   const ballotConfig: BallotConfig = {
+    address: '',
+    author: '',
+    parentAddress: '',
+    previousAddress: '',
+    registeredAt: '',
+    signature: '',
+    type: 'BallotConfigItem',
     content: {
       reference: 'ballot-1',
       voterGroup: '4',

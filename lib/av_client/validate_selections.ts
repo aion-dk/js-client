@@ -1,4 +1,4 @@
-import { BallotConfig, BallotSelection, ContestSelection, OptionSelection, ContestConfig, ContestConfigMap, Option } from './types';
+import { BallotConfig, BallotSelection, ContestSelection, OptionSelection, ContestConfig, ContestConfigMap, OptionContent } from './types';
 import { flattenOptions } from './flatten_options'
 import { CorruptSelectionError as CorruptSelectionError } from './errors';
 
@@ -71,7 +71,7 @@ function validateContestsMatching( ballotConfig: BallotConfig, ballotSelection: 
   }
 }
 
-function makeGetOption(options: Option[]){
+function makeGetOption(options: OptionContent[]){
   const flatOptions = flattenOptions(options)
   const referenceMap = Object.fromEntries(flatOptions.map(o => [o.reference, o]))
 

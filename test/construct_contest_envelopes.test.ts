@@ -4,6 +4,13 @@ import { ContestConfig, BallotConfig, ClientState } from '../lib/av_client/types
 import latestConfig from './fixtures/latestConfig';
 
 const contestOne: ContestConfig = {
+  address: '',
+  author: '',
+  parentAddress: '',
+  previousAddress: '',
+  registeredAt: '',
+  signature: '',
+  type: 'ContestConfigItem',
   content: {
     reference: 'contest-1',
     markingType: {
@@ -35,6 +42,13 @@ const contestOne: ContestConfig = {
 }
 
 const ballotOne: BallotConfig = {
+  address: '',
+  author: '',
+  parentAddress: '',
+  previousAddress: '',
+  registeredAt: '',
+  signature: '',
+  type: 'BallotConfigItem',
   content: {
     reference: 'ballot-1',
     voterGroup: '1',
@@ -56,7 +70,8 @@ const clientState: ClientState = {
       electionConfig: latestConfig.items.electionConfig,
       genesisConfig: latestConfig.items.genesisConfig,
       latestConfigItem: latestConfig.items.latestConfigItem,
-      votingRoundConfigs: latestConfig.items.votingRoundConfigs
+      votingRoundConfigs: latestConfig.items.votingRoundConfigs,
+      segmentsConfig: null
     }
   },
   voterSession: {
