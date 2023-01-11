@@ -220,7 +220,7 @@ export class AVClient implements IAVClient {
       if(this.proofOfElectionCodes == null)
         throw new InvalidStateError('Cannot register voter without proof of election codes. User has not generated an election codes proof.')
 
-      authorizationResponse = await coordinator.authorizeProofOfElectionCodes(this.keyPair.publicKey, this.proofOfElectionCodes)
+      authorizationResponse = await coordinator.authorizeProofOfElectionCodes(this.keyPair.publicKey, this.proofOfElectionCodes, this.votingRoundReference)
     } else {
       throw new InvalidConfigError('Unknown authorization mode of voter authorizer')
     }
