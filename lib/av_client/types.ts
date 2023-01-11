@@ -494,6 +494,7 @@ export interface ExtractionConfirmations {
 // If any of the objects passed does not contain the required properties, then the build step will fail.
 export interface ClientState {
   latestConfig: LatestConfig
+  votingRoundReference: string
   voterSession: { 
     content: { 
       voterGroup: string 
