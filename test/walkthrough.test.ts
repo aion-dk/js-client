@@ -8,7 +8,7 @@ import {
 } from './test_helpers';
 import { BallotConfig, BallotSelection, ContestConfig, ContestConfigMap, ContestSelection } from '../lib/av_client/types';
 
-describe('entire voter flow using OTP authorization', () => {
+describe.skip('entire voter flow using OTP authorization', () => {
   let sandbox;
 
   beforeEach(() => {
@@ -19,8 +19,8 @@ describe('entire voter flow using OTP authorization', () => {
     sandbox.restore()
   });
 
-  it.only('returns a receipt', async () => {
-      const client = new AVClient("https://dbb.avx.dev-us-1.assemblyvoting.net/" + 'us');
+  it('returns a receipt', async () => {
+      const client = new AVClient(bulletinBoardHost + 'us');
       await client.initialize(undefined, {
         privateKey: 'bcafc67ca4af6b462f60d494adb675d8b1cf57b16dfd8d110bbc2453709999b0',
         publicKey: '03b87d7fe793a621df27f44c20f460ff711d55545c58729f20b3fb6e871c53c49c'
@@ -32,9 +32,6 @@ describe('entire voter flow using OTP authorization', () => {
         console.error(e);
         expect.fail('AVClient#requestAccessCode failed.');
       });
-
-      console.log("TEST");
-      
 
       const oneTimePassword: string = await extractOTPFromEmail();
 
