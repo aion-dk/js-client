@@ -350,7 +350,7 @@ describe("validateBallotSelection", () => {
       });
 
       context(
-        "when given ballot selection with missing contests according to ballot",
+        "when given ballot selection with missing contests according to ballot config",
         () => {
           const votingRoundConfig: VotingRoundConfig = {
             address: "",
