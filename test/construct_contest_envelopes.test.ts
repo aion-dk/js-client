@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { constructContestEnvelopes } from '../lib/av_client/construct_contest_envelopes';
-import { ContestConfig, BallotConfig, ClientState } from '../lib/av_client/types';
+import { ContestConfig, BallotConfig, ClientState, VotingRoundConfig } from '../lib/av_client/types';
 import latestConfig from './fixtures/latestConfig';
 
 const contestOne: ContestConfig = {
@@ -56,6 +56,24 @@ const ballotOne: BallotConfig = {
   }
 }
 
+const votingRoundConfig: VotingRoundConfig = {
+  address: "",
+  author: "",
+  parentAddress: "",
+  previousAddress: "",
+  content: {
+  status: "open",
+  reference: "voting-round-1",
+  contestReferences: [
+    'contest-1',
+    'contest-2'
+  ]
+  },
+  registeredAt: "2023-01-11T09:27:11.397Z",
+  signature: "120e0bf80ad403fdd07b9accf19aa5f4fbc5746424e552b22cf9c93f1c06f815,0de6cc49f0bb8d4680cc1039e2ce983bd9ee002b3cea196e12efb43eababf5c8",
+  type: "VotingRoundConfigItem"
+}
+
 const clientState: ClientState = {
   latestConfig: {
     items: {
@@ -66,11 +84,13 @@ const clientState: ClientState = {
       contestConfigs: {
         [contestOne.content.reference]: contestOne
       },
+      votingRoundConfigs: {
+        [votingRoundConfig.content.reference]: votingRoundConfig
+      },
       voterAuthorizerConfig: latestConfig.items.voterAuthorizerConfig,
       electionConfig: latestConfig.items.electionConfig,
       genesisConfig: latestConfig.items.genesisConfig,
       latestConfigItem: latestConfig.items.latestConfigItem,
-      votingRoundConfigs: latestConfig.items.votingRoundConfigs,
       segmentsConfig: null
     }
   },
@@ -78,7 +98,8 @@ const clientState: ClientState = {
     content: { 
       voterGroup: '1',
     }
-  }
+  },
+  votingRoundReference: "voting-round-1"
 }
 
 const ballotSelection = {

@@ -5,9 +5,9 @@ import { encryptContestSelections } from './encrypt_contest_selections'
 import { BallotSelection, ContestEnvelope, ContestMap, ClientState } from './types'
 
 export function constructContestEnvelopes( state: ClientState, ballotSelection: BallotSelection ): ConstructResult { 
-  const { contestConfigs, ballotConfig, encryptionKey } = extractConfig(state)
+  const { contestConfigs, ballotConfig, encryptionKey, votingRoundConfig } = extractConfig(state)
 
-  validateBallotSelection(ballotConfig, contestConfigs, ballotSelection)
+  validateBallotSelection(ballotConfig, contestConfigs, ballotSelection, votingRoundConfig)
 
   const contestEnvelopes = encryptContestSelections(contestConfigs, ballotSelection.contestSelections, encryptionKey)
   const envelopeRandomizers = contestEnvelopesRandomizers(contestEnvelopes)
@@ -36,10 +36,11 @@ function contestEnvelopesRandomizers( contestEnvelopes: ContestEnvelope[] ){
 
 function extractConfig( state: ClientState ){
   const { voterGroup } = state.voterSession.content
-  const { contestConfigs, ballotConfigs } = state.latestConfig.items
+  const { contestConfigs, ballotConfigs, votingRoundConfigs } = state.latestConfig.items
   const { encryptionKey } = state.latestConfig.items.thresholdConfig.content
 
   const ballotConfig = ballotConfigs[voterGroup]
+  const votingRoundConfig = votingRoundConfigs[state.votingRoundReference]
 
   if( !ballotConfig ){
     throw new InvalidStateError('Cannot construct ballot cryptograms. Ballot config not found for voter')
@@ -48,6 +49,7 @@ function extractConfig( state: ClientState ){
   return {
     ballotConfig,
     contestConfigs,
-    encryptionKey
+    encryptionKey,
+    votingRoundConfig
   }
 }

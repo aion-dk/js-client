@@ -319,6 +319,7 @@ export class AVClient implements IAVClient {
     const state = {
       voterSession: this.voterSession,
       latestConfig: this.getLatestConfig(),
+      votingRoundReference: this.votingRoundReference
     };
 
     const {
