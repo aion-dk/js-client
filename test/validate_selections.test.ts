@@ -325,30 +325,28 @@ describe("validateBallotSelection", () => {
         type: "VotingRoundConfigItem",
       };
 
-      context("when given a valid ballot selection", () => {
-        const ballotSelection: BallotSelection = {
-          reference: "ballot-1",
-          contestSelections: [
-            {
-              reference: "contest-1",
-              optionSelections: [{ reference: "option-1" }],
-            },
-          ],
-        };
+      const ballotSelection: BallotSelection = {
+        reference: "ballot-1",
+        contestSelections: [
+          {
+            reference: "contest-1",
+            optionSelections: [{ reference: "option-1" }],
+          },
+        ],
+      };
 
-        it("throws errors", () => {
-          expect(() => {
-            validateBallotSelection(
-              ballotConfig,
-              contestConfigs,
-              ballotSelection,
-              votingRoundConfig
-            );
-          }).to.throw(
-            CorruptSelectionError,
-            "Contest selections do not match the contests allowed by the ballot or voting round"
+      it("throws errors", () => {
+        expect(() => {
+          validateBallotSelection(
+            ballotConfig,
+            contestConfigs,
+            ballotSelection,
+            votingRoundConfig
           );
-        });
+        }).to.throw(
+          CorruptSelectionError,
+          "Contest selections do not match the contests allowed by the ballot or voting round"
+        );
       });
 
       context(
@@ -369,27 +367,25 @@ describe("validateBallotSelection", () => {
             type: "VotingRoundConfigItem",
           };
 
-          context("when given a valid ballot selection", () => {
-            const ballotSelection: BallotSelection = {
-              reference: "ballot-1",
-              contestSelections: [
-                {
-                  reference: "contest-1",
-                  optionSelections: [{ reference: "option-1" }],
-                },
-              ],
-            };
+          const ballotSelection: BallotSelection = {
+            reference: "ballot-1",
+            contestSelections: [
+              {
+                reference: "contest-1",
+                optionSelections: [{ reference: "option-1" }],
+              },
+            ],
+          };
 
-            it("throws errors", () => {
-              expect(() => {
-                validateBallotSelection(
-                  ballotConfig,
-                  contestConfigs,
-                  ballotSelection,
-                  votingRoundConfig
-                );
-              }).to.not.throw();
-            });
+          it("accepts the selection", () => {
+            expect(() => {
+              validateBallotSelection(
+                ballotConfig,
+                contestConfigs,
+                ballotSelection,
+                votingRoundConfig
+              );
+            }).to.not.throw();
           });
 
           context(
