@@ -396,7 +396,6 @@ export class AVClient implements IAVClient {
       };
 
       let encryptedAffidavit;
-      console.log(affidavit && this?.latestConfig?.items?.electionConfig?.content);
       
       if (affidavit && this?.latestConfig?.items?.electionConfig?.content?.castRequestItemAttachmentEncryptionKey) {
         try {
@@ -409,8 +408,6 @@ export class AVClient implements IAVClient {
       }
 
       const signedPayload = signPayload(castRequestItem, this.privateKey());
-      console.log("You");
-      
       if (encryptedAffidavit) {
         signedPayload['attachment'] = `data:text/plain;base64,${Buffer.from(encryptedAffidavit).toString('base64')}`
       }
