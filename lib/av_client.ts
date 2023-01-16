@@ -385,6 +385,8 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
     public async castBallot(affidavit?: Affidavit): Promise<BallotBoxReceipt> {
+      // Affidavit must be base64 encoded
+
       if(!(this.voterSession)) {
         throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
       }
