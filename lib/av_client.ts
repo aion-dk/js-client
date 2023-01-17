@@ -8,6 +8,7 @@ import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, 
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import * as jwt from 'jose';
+import { Buffer } from 'buffer'
 
 import {
   fetchLatestConfig,
@@ -50,7 +51,6 @@ import { submitBallotCryptograms } from './av_client/actions/submit_ballot_crypt
 import {AxiosResponse} from "axios";
 import { ProofOfElectionCodes } from "./av_client/crypto/proof_of_election_codes";
 import { dhEncrypt } from "./av_client/crypto/aes";
-import { btoa } from "buffer";
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -385,6 +385,8 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
     public async castBallot(affidavit?: Affidavit): Promise<BallotBoxReceipt> {
+      // Affidavit must be base64 encoded
+
       if(!(this.voterSession)) {
         throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
       }
@@ -396,7 +398,7 @@ export class AVClient implements IAVClient {
       };
 
       let encryptedAffidavit;
-
+      
       if (affidavit && this?.latestConfig?.items?.electionConfig?.content?.castRequestItemAttachmentEncryptionKey) {
         try {
           encryptedAffidavit = dhEncrypt(this.latestConfig.items.electionConfig.content.castRequestItemAttachmentEncryptionKey, affidavit).toString()
@@ -408,9 +410,8 @@ export class AVClient implements IAVClient {
       }
 
       const signedPayload = signPayload(castRequestItem, this.privateKey());
-
       if (encryptedAffidavit) {
-        signedPayload['attachment'] = `data:text/plain;base64,${btoa(encryptedAffidavit)}`
+        signedPayload['attachment'] = `data:text/plain;base64,${Buffer.from(encryptedAffidavit).toString('base64')}`
       }
 
       const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
