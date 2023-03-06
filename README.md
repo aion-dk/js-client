@@ -52,6 +52,8 @@ yarn run docs
 ```
 
 ## Publishing
+Publishing it done automatically by the pipeline. Check the pipeline to see if the publish was successful.
+Remember to update the `package.json` version.
 
 ```bash
 $ bin/publish
