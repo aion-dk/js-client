@@ -362,6 +362,7 @@ export interface ContestContent {
   reference: string
   title: LocalString
   subtitle?: LocalString
+  question?: LocalString
   description?: LocalString
   markingType: MarkingType
   resultType: ResultType
