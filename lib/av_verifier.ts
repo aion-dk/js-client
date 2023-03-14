@@ -107,7 +107,7 @@ export class AVVerifier {
 
   public async pollForSpoilRequest(): Promise<string> {
     let attempts = 0;
-    
+
     const executePoll = async (resolve, reject) => {
       const result = await this.bulletinBoard.getSpoilRequestItem(this.cryptogramAddress).catch(error => {
         console.error(error.response.data.error_message)
@@ -124,7 +124,7 @@ export class AVVerifier {
         setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
       }
     };
-  
+
     return new Promise(executePoll);
   }
 
@@ -135,7 +135,7 @@ export class AVVerifier {
       const contestConfig = this.latestConfig.items.contestConfigs[cs.reference]
       if( !contestConfig ){
         throw new InvalidContestError("Contest is not present in the election")
-      } 
+      }
 
       const optionFinder = makeOptionFinder(contestConfig.content.options)
 
@@ -146,7 +146,8 @@ export class AVVerifier {
           const optionConfig = optionFinder(os.reference)
           return {
             reference: os.reference,
-            title: localizer(optionConfig.title)
+            title: localizer(optionConfig.title),
+            text: os.text,
           }
         })
       }
@@ -165,7 +166,7 @@ export class AVVerifier {
       if (result?.data?.voterCommitmentOpening && result?.data?.boardCommitmentOpening) {
         this.boardCommitmentOpening = result.data.boardCommitmentOpening
         this.voterCommitmentOpening = result.data.voterCommitmentOpening
-      
+
         return resolve(result.data);
       } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
         return reject(new Error('Exceeded max attempts'));
@@ -173,7 +174,7 @@ export class AVVerifier {
         setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
       }
     };
-  
+
     return new Promise(executePoll);
   }
 }
@@ -184,7 +185,7 @@ function makeLocalizer( locale: string ){
     if( availableFields.length === 0 ){
       throw new Error('No localized data available')
     }
-  
+
     return field[locale] || field[availableFields[0]]
   }
 }
