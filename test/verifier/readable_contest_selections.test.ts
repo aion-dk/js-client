@@ -22,29 +22,37 @@ describe('getReadbleContestSelections', () => {
       },
       {
         reference: 'contest ref 2',
-        optionSelections: [{ reference: 'option ref 2' }]
+        optionSelections: [
+          {
+            reference: 'option ref 2',
+            text: 'John Doe'
+          }
+        ]
       },
     ]
 
     it('returns a readable ballot', async () => {
-      const readableContestSelections = verifier.getReadableContestSelections(contestSelections, "en")
+      const readableContestSelections = verifier
+        .getReadableContestSelections(contestSelections, "en")
       expect(readableContestSelections).to.eql([
         {
           reference: 'contest ref 1',
           title: 'First ballot',
           optionSelections: [
-            { 
+            {
               reference: 'option ref 1',
+              text: undefined,
               title: 'Option 1'
             }
-        ]
+          ]
         },
         {
           reference: 'contest ref 2',
           title: 'Second ballot',
           optionSelections: [
-            { 
+            {
               reference: 'option ref 2',
+              text: 'John Doe',
               title: 'Option 2'
             }
           ]
@@ -53,7 +61,7 @@ describe('getReadbleContestSelections', () => {
     });
   });
 
-  context('given a contest thats not present  in the election config', () => {
+  context('given a contest thats not present in the election config', () => {
     const contestSelections = [
       {
         reference: 'not present',
@@ -64,7 +72,7 @@ describe('getReadbleContestSelections', () => {
         optionSelections: [{ reference: 'option ref 3' }]
       },
     ]
-    
+
     it('throws an "InvalidContestError"', async () => {
       expect(() => {
         verifier.getReadableContestSelections(contestSelections, "en")
@@ -83,7 +91,7 @@ describe('getReadbleContestSelections', () => {
         optionSelections: [{ reference: 'option ref 3' }]
       },
     ]
-    
+
     it('throws an "InvalidOptionError"', async () => {
       expect(() => {
         verifier.getReadableContestSelections(contestSelections, "en")
