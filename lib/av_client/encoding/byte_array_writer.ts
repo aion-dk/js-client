@@ -1,4 +1,3 @@
-
 export class ByteArrayWriter {
   private pointer: number
   private byteArray: Uint8Array

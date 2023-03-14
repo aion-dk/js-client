@@ -3,51 +3,60 @@ import { expect } from 'chai'
 import { ContestConfig, ContestSelection } from '../../lib/av_client/types'
 
 const contestConfig: ContestConfig = {
-  reference: 'contest ref 1',
-  title: { en: 'Contest title' },
-  subtitle: { en: '' },
-  description: { en: '' },
-  markingType: {
-    minMarks: 1,
-    maxMarks: 3,
-    blankSubmission: "disabled",
-    encoding: {
-      codeSize: 1,
-      maxSize: 20,
-      cryptogramCount: 1
-    }
-  },
-  resultType: {
-    name: 'does not matter for this test'
-  },
-  options: [
-    {
-      reference: 'ref1',
-      code: 1,
-      title: { en: 'Option 1' },
-      subtitle: { en: '' },
-      description: { en: '' }
-    },
-    {
-      reference: 'ref2',
-      code: 2,
-      title: { en: 'Option 2' },
-      subtitle: { en: '' },
-      description: { en: '' }
-    },
-    {
-      reference: 'ref3',
-      code: 3,
-      title: { en: 'Option 3 write in' },
+    address: '',
+    author: '',
+    parentAddress: '',
+    previousAddress: '',
+    registeredAt: '',
+    signature: '',
+    type: 'ContestConfigItem',
+    content: {
+      reference: 'contest ref 1',
+      title: { en: 'Contest title' },
       subtitle: { en: '' },
       description: { en: '' },
-      writeIn: {
-        maxSize: 10,
-        encoding: 'utf8'
-      }
+      markingType: {
+        minMarks: 1,
+        maxMarks: 3,
+        blankSubmission: "disabled",
+        encoding: {
+          codeSize: 1,
+          maxSize: 20,
+          cryptogramCount: 1
+        }
+      },
+      resultType: {
+        name: 'does not matter for this test'
+      },
+      options: [
+        {
+          reference: 'ref1',
+          code: 1,
+          title: { en: 'Option 1' },
+          subtitle: { en: '' },
+          description: { en: '' }
+        },
+        {
+          reference: 'ref2',
+          code: 2,
+          title: { en: 'Option 2' },
+          subtitle: { en: '' },
+          description: { en: '' }
+        },
+        {
+          reference: 'ref3',
+          code: 3,
+          title: { en: 'Option 3 write in' },
+          subtitle: { en: '' },
+          description: { en: '' },
+          writeIn: {
+            maxSize: 10,
+            encoding: 'utf8'
+          }
+        }
+      ]
     }
-  ]
-}
+  }
 
 
 describe('contestSelectionToByteArray', () => {

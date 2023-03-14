@@ -1,11 +1,11 @@
-import { ContestConfig, ContestSelection, OptionSelection, Option } from "../types"
+import { ContestConfig, ContestSelection, OptionSelection, OptionContent } from "../types"
 import { flattenOptions } from '../flatten_options'
 import { ByteArrayReader } from './byte_array_reader'
 import { ByteArrayWriter } from "./byte_array_writer"
 
 
 export function byteArrayToContestSelection( contestConfig: ContestConfig, byteArray: Uint8Array ): ContestSelection {
-  const { reference, markingType, options } = contestConfig
+  const { reference, markingType, options } = contestConfig.content
   const codeSize = markingType.encoding.codeSize
 
   const flatOptions = flattenOptions(options)
@@ -40,7 +40,7 @@ export function byteArrayToContestSelection( contestConfig: ContestConfig, byteA
 
 
 export function contestSelectionToByteArray( contestConfig: ContestConfig, contestSelection: ContestSelection ): Uint8Array {
-  const { reference, markingType, options } = contestConfig
+  const { reference, markingType, options } = contestConfig.content
   if( reference !== contestSelection.reference ){
     throw new Error("contest selection does not match contest")
   }
@@ -70,15 +70,15 @@ export function contestSelectionToByteArray( contestConfig: ContestConfig, conte
 }
 
 
-function extractWriteInMap(flatOptions: Option[]){
+function extractWriteInMap(flatOptions: OptionContent[]){
   const writeInOptions = flatOptions.filter(option => option.writeIn)
   return Object.fromEntries(writeInOptions.map(option => [option.reference, option.writeIn]))
 }
 
-function extractCodeMap(flatOptions: Option[]){
+function extractCodeMap(flatOptions: OptionContent[]){
   return Object.fromEntries(flatOptions.map(option => [option.reference, option.code]))
 }
 
-function extractReferenceMap(flatOptions: Option[]){
+function extractReferenceMap(flatOptions: OptionContent[]){
   return Object.fromEntries(flatOptions.map(option => [option.code, option.reference]))
 }

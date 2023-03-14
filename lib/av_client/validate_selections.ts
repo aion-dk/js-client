@@ -1,13 +1,13 @@
-import { BallotConfig, BallotSelection, ContestSelection, OptionSelection, ContestConfig, ContestConfigMap, Option } from './types';
+import { BallotConfig, BallotSelection, ContestSelection, OptionSelection, ContestConfig, ContestConfigMap, OptionContent, VotingRoundConfig } from './types';
 import { flattenOptions } from './flatten_options'
 import { CorruptSelectionError as CorruptSelectionError } from './errors';
 
-export function validateBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap, ballotSelection: BallotSelection ){
-  if( ballotConfig.reference !== ballotSelection.reference ){
+export function validateBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap, ballotSelection: BallotSelection, votingRoundConfig: VotingRoundConfig ){
+  if( ballotConfig.content.reference !== ballotSelection.reference ){
     throw new CorruptSelectionError('Ballot selection does not match ballot config')
   }
 
-  validateContestsMatching(ballotConfig, ballotSelection)
+  validateContestsMatching(ballotConfig, ballotSelection, votingRoundConfig)
 
   ballotSelection.contestSelections.forEach(contestSelection => {
     const contestConfig = getContestConfig(contestConfigs, contestSelection)
@@ -16,11 +16,11 @@ export function validateBallotSelection( ballotConfig: BallotConfig, contestConf
 }
 
 export function validateContestSelection( contestConfig: ContestConfig, contestSelection: ContestSelection ){
-  if( contestConfig.reference !== contestSelection.reference ){
+  if( contestConfig.content.reference !== contestSelection.reference ){
     throw new CorruptSelectionError('Contest selection is not matching contest config')
   }
 
-  const { markingType, options } = contestConfig
+  const { markingType, options } = contestConfig.content
 
   const isBlank = contestSelection.optionSelections.length === 0
 
@@ -64,14 +64,16 @@ function getContestConfig( contestConfigs: ContestConfigMap, contestSelection: C
   throw new CorruptSelectionError('Contest config not found')
 }
 
-function validateContestsMatching( ballotConfig: BallotConfig, ballotSelection: BallotSelection ){
+function validateContestsMatching( ballotConfig: BallotConfig, ballotSelection: BallotSelection, votingRoundConfig: VotingRoundConfig ){
+  const availableContests = votingRoundConfig.content.contestReferences.filter(value => ballotConfig.content.contestReferences.includes(value));
   const selectedContests = ballotSelection.contestSelections.map(cs => cs.reference)
-  if( !containsSameStrings(ballotConfig.contestReferences, selectedContests) ){
-    throw new CorruptSelectionError('Contest selections do not match the contests allowed by the ballot')
+  
+  if( !containsSameStrings(availableContests, selectedContests) ){
+    throw new CorruptSelectionError('Contest selections do not match the contests allowed by the ballot or voting round')
   }
 }
 
-function makeGetOption(options: Option[]){
+function makeGetOption(options: OptionContent[]){
   const flatOptions = flattenOptions(options)
   const referenceMap = Object.fromEntries(flatOptions.map(o => [o.reference, o]))
 

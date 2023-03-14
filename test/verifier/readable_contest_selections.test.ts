@@ -2,113 +2,16 @@ import { AVVerifier } from '../../lib/av_verifier';
 import { expect } from 'chai';
 import { bulletinBoardHost } from '../test_helpers'
 import { InvalidContestError, InvalidOptionError } from '../../lib/av_client/errors';
-import { ContestConfigMap } from '../../lib/av_client/types';
-
-const contestConfigs: ContestConfigMap = {
-  "contest ref 1": {
-    "reference": "contest ref 1",
-    "markingType": {
-      "minMarks": 1,
-      "maxMarks": 1,
-      "blankSubmission": "disabled",
-      "encoding": {
-        "codeSize": 1,
-        "maxSize": 1,
-        "cryptogramCount": 1
-      }
-    },
-    "options": [
-      {
-        "reference": "option ref 1",
-        "code": 1,
-        "title": {
-          "en": "Option 1"
-        },
-        "subtitle": {},
-        "description": {},
-      },
-      {
-        "reference": "option ref 2",
-        "code": 2,
-        "title": {
-          "en": "Option 2"
-        },
-        "subtitle": {},
-        "description": {},
-      }
-    ],
-    "title": {
-      "en": "First ballot"
-    },
-    "subtitle": {},
-    "description": {},
-    "resultType": {
-      "name": "resultType name not matter right now"
-    }
-  },
-  "contest ref 2": {
-    "reference": "contest ref 2",
-    "markingType": {
-      "minMarks": 1,
-      "maxMarks": 1,
-      "blankSubmission": "disabled",
-      "encoding": {
-        "codeSize": 1,
-        "maxSize": 1,
-        "cryptogramCount": 1
-      }
-    },
-    "options": [
-      {
-        "reference": "option ref 3",
-        "code": 1,
-        "title": {
-          "en": "Option 3"
-        },
-        "subtitle": {},
-        "description": {},
-      },
-      {
-        "reference": "option ref 4",
-        "code": 2,
-        "title": {
-          "en": "Option 4"
-        },
-        "subtitle": {},
-        "description": {},
-      },
-      {
-        "reference": "option ref 5",
-        "code": 3,
-        "title": {
-          "en": "Option 5"
-        },
-        "subtitle": {},
-        "description": {},
-      }
-    ],
-    "title": {
-      "en": "Second ballot"
-    },
-    "subtitle": {},
-    "description": {},
-    "resultType": {
-      "name": "resultType name not matter right now"
-    }
-  }
-}
-
-const minimalElectionConfig = {
-  "encryptionKey": "03bbb6c547fa7f8e144f1940159306de7fcde0161925be9e58dbf0d6b17a9e07a8",
-  "contestConfigs": contestConfigs
-}
+import { LatestConfig } from '../../lib/av_client/types';
+import latestConfig from '../fixtures/latestConfig';
 
 describe('getReadbleContestSelections', () => {
   let verifier: AVVerifier;
+  const config: LatestConfig = latestConfig;
 
   beforeEach(async () => {
     verifier = new AVVerifier(bulletinBoardHost + 'us');
-    await verifier.initialize(minimalElectionConfig)
+    await verifier.initialize(config)
   });
 
   context('given valid ballot', () => {
@@ -119,7 +22,7 @@ describe('getReadbleContestSelections', () => {
       },
       {
         reference: 'contest ref 2',
-        optionSelections: [{ reference: 'option ref 3' }]
+        optionSelections: [{ reference: 'option ref 2' }]
       },
     ]
 
@@ -141,8 +44,8 @@ describe('getReadbleContestSelections', () => {
           title: 'Second ballot',
           optionSelections: [
             { 
-              reference: 'option ref 3',
-              title: 'Option 3'
+              reference: 'option ref 2',
+              title: 'Option 2'
             }
           ]
         },

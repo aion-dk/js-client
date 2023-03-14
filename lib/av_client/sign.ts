@@ -15,16 +15,17 @@ export const signPayload = (obj: Record<string, unknown>, privateKey: string) =>
 }
 
 export const validatePayload = (item: BoardItem, expectations: ItemExpectation, signaturePublicKey?: string) => {
-  if(expectations.content !== undefined) {
-    verifyContent(item.content, expectations.content);
-  }
-
   if(expectations.type != item.type) {
     throw new Error(`BoardItem did not match expected type '${expectations.type}'`);
   }
 
   if(expectations.parentAddress != item.parentAddress) {
     throw new Error(`BoardItem did not match expected parent address ${expectations.parentAddress}`);
+  }
+  if(expectations.content !== undefined) {
+    const requiredContentAttributes = Object.keys(expectations.content)
+    const itemContent = Object.fromEntries(Object.entries(item.content).filter(([key]) => requiredContentAttributes.includes(key)));
+    verifyContent(itemContent, expectations.content);
   }
 
   verifyAddress(item);
