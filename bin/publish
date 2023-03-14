@@ -1,8 +1,0 @@
-#!/bin/bash
-
-set -e
-
-yarn run tsc
-yarn run build
-
-yarn publish
