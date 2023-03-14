@@ -33,17 +33,17 @@ describe('getReadbleContestSelections', () => {
           reference: 'contest ref 1',
           title: 'First ballot',
           optionSelections: [
-            { 
+            {
               reference: 'option ref 1',
               title: 'Option 1'
             }
-        ]
+          ]
         },
         {
           reference: 'contest ref 2',
           title: 'Second ballot',
           optionSelections: [
-            { 
+            {
               reference: 'option ref 2',
               title: 'Option 2'
             }
@@ -64,7 +64,7 @@ describe('getReadbleContestSelections', () => {
         optionSelections: [{ reference: 'option ref 3' }]
       },
     ]
-    
+
     it('throws an "InvalidContestError"', async () => {
       expect(() => {
         verifier.getReadableContestSelections(contestSelections, "en")
@@ -83,7 +83,7 @@ describe('getReadbleContestSelections', () => {
         optionSelections: [{ reference: 'option ref 3' }]
       },
     ]
-    
+
     it('throws an "InvalidOptionError"', async () => {
       expect(() => {
         verifier.getReadableContestSelections(contestSelections, "en")
