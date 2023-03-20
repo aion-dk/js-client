@@ -405,8 +405,8 @@ export interface VotingRoundContent {
     to: string
   }
   contestReferences: string[]
-  demo: boolean
-  identifiable: boolean
+  demo?: boolean
+  identifiable?: boolean
 }
 
 // Election Config Item
