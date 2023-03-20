@@ -146,7 +146,7 @@ export interface BoardCommitmentOpeningItem extends BaseVerificationItem {
 export interface VoterCommitmentItem extends BaseBoardItem {
   content: {
     commitment: string
-  } 
+  }
 
   type: "VoterEncryptionCommitmentItem"
 }
@@ -154,7 +154,7 @@ export interface VoterCommitmentItem extends BaseBoardItem {
 export interface BallotCryptogramItem extends BaseBoardItem {
   content: {
     cryptograms: ContestMap<string[]>
-  } 
+  }
   type: "BallotCryptogramsItem"
 }
 
@@ -317,7 +317,7 @@ export interface PolynomialCoefficient {
 export interface VoterAuthorizer extends BaseBoardItem {
   content: VoterAuthorizerContent
   type: 'VoterAuthorizationConfigItem'
-} 
+}
 
 export interface VoterAuthorizerContent {
   identityProvider: VoterAuthorizerContentItem
@@ -405,6 +405,8 @@ export interface VotingRoundContent {
     to: string
   }
   contestReferences: string[]
+  demo: boolean
+  identifiable: boolean
 }
 
 // Election Config Item
@@ -425,7 +427,7 @@ export interface ElectionConfigContent {
   numDaysToCureAffidavits?: number
   castRequestItemAttachmentEncryptionKey?: string
   requireCastRequestAttachment?: boolean
-  uocavaOpeningDate?: string 
+  uocavaOpeningDate?: string
   nonUocavaOpeningDate?: string
   extractionThreshold?: number
   rejectionReasons?: string[]
@@ -491,14 +493,14 @@ export interface ExtractionConfirmations {
 }
 
 // We define the client state to only require a subset of the electionConfig and voterSession
-// This enables us to do less setup in testing. 
+// This enables us to do less setup in testing.
 // If any of the objects passed does not contain the required properties, then the build step will fail.
 export interface ClientState {
   latestConfig: LatestConfig
   votingRoundReference: string
-  voterSession: { 
-    content: { 
-      voterGroup: string 
-    } 
+  voterSession: {
+    content: {
+      voterGroup: string
+    }
   }
 }
