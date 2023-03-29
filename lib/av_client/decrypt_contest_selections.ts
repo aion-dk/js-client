@@ -1,4 +1,4 @@
-import { ContestConfigMap, ContestSelection, ContestMap, CommitmentOpening } from "./types"
+import {ContestConfigMap, ContestSelection, ContestMap, CommitmentOpening, ContestSubmission} from "./types"
 import { ElGamalPointCryptogram, addBigNums } from "./aion_crypto"
 import { bignumFromHex, pointFromHex } from "./crypto/util"
 import { pointsToBytes } from "./encoding/point_encoding"
@@ -7,27 +7,28 @@ import { byteArrayToContestSelection } from "./encoding/byte_encoding"
 export function decryptContestSelections(
   contestConfigs: ContestConfigMap,
   encryptionKey: string,
-  cryptograms: ContestMap<string[]>,
+  contests: ContestMap<ContestSubmission>,
   boardCommitmentOpening: CommitmentOpening,
   voterCommitmentOpening: CommitmentOpening
 ): ContestSelection[] {
 
-  return Object.keys(cryptograms).map(function(contestReference) {
+  return Object.keys(contests).map(function(contestReference) {
     const contestConfig = contestConfigs[contestReference]
-    const contestCryptograms = cryptograms[contestReference]
+    const contestCryptograms = contests[contestReference].cryptograms
+    const cryptogramsMultiplier = contests[contestReference].multiplier
     const randomizers = combineRandomizers(contestReference, boardCommitmentOpening, voterCommitmentOpening)
 
     const points = decryptPoints(contestCryptograms, randomizers, encryptionKey)
     const maxSize = contestConfig.content.markingType.encoding.maxSize
     const encodedContestSelection = pointsToBytes(points, maxSize)
-    return byteArrayToContestSelection(contestConfig, encodedContestSelection)
+    return byteArrayToContestSelection(contestConfig, encodedContestSelection, cryptogramsMultiplier)
   })
 }
 
-function combineRandomizers( 
-  contestReference: string, 
-  boardCommitmentOpening: CommitmentOpening, 
-  voterCommitmentOpening: CommitmentOpening 
+function combineRandomizers(
+  contestReference: string,
+  boardCommitmentOpening: CommitmentOpening,
+  voterCommitmentOpening: CommitmentOpening
 ){
   const br = boardCommitmentOpening.randomizers[contestReference]
   const vr = voterCommitmentOpening.randomizers[contestReference]

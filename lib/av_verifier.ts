@@ -51,7 +51,7 @@ export class AVVerifier {
     const shortAddress = shortCodeToHex(trackingCode)
     await this.bulletinBoard.getVotingTrack(shortAddress).then(response => {
       if (shortAddress !== response.data.verificationTrackStart.shortAddress) {
-        throw new InvalidTrackingCodeError("Tracking code and short address from respose doesn't match")
+        throw new InvalidTrackingCodeError("Tracking code and short address from response doesn't match")
       }
       if (['voterCommitment', 'serverCommitment', 'ballotCryptograms', 'verificationTrackStart']
         .every(p => Object.keys(response.data).includes(p))){
@@ -99,7 +99,7 @@ export class AVVerifier {
     return decryptContestSelections(
       this.latestConfig.items.contestConfigs,
       this.latestConfig.items.thresholdConfig.content.encryptionKey,
-      this.ballotCryptograms.content.cryptograms,
+      this.ballotCryptograms.content.contests,
       boardCommitmentOpening,
       voterCommitmentOpening
     )

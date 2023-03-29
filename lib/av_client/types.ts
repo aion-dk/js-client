@@ -29,6 +29,11 @@ export interface ContestMap<T> {
   [contestId: string]: T;
 }
 
+export interface ContestSubmission {
+  multiplier: number;
+  cryptograms: string[];
+}
+
 export type KeyPair = {
   privateKey: string;
   publicKey: string;
@@ -153,7 +158,7 @@ export interface VoterCommitmentItem extends BaseBoardItem {
 
 export interface BallotCryptogramItem extends BaseBoardItem {
   content: {
-    cryptograms: ContestMap<string[]>
+    contests: ContestMap<ContestSubmission>
   }
   type: "BallotCryptogramsItem"
 }
@@ -223,6 +228,7 @@ export type BallotSelection = {
 
 export type ContestSelection = {
   reference: string
+  multiplier?: number,
   optionSelections: OptionSelection[]
 }
 

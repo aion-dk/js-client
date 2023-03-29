@@ -4,7 +4,7 @@ import { ByteArrayReader } from './byte_array_reader'
 import { ByteArrayWriter } from "./byte_array_writer"
 
 
-export function byteArrayToContestSelection( contestConfig: ContestConfig, byteArray: Uint8Array ): ContestSelection {
+export function byteArrayToContestSelection( contestConfig: ContestConfig, byteArray: Uint8Array , multiplier: number): ContestSelection {
   const { reference, markingType, options } = contestConfig.content
   const codeSize = markingType.encoding.codeSize
 
@@ -18,7 +18,7 @@ export function byteArrayToContestSelection( contestConfig: ContestConfig, byteA
 
   while( reader.hasMore() ){
     const code = reader.readInteger(codeSize)
-    if( code === 0 ) throw new Error('ArgumentError: Unexpecked bytes found in byte array')
+    if( code === 0 ) throw new Error('ArgumentError: Unexpected bytes found in byte array')
 
     const reference = referenceMap[code]
     if( !reference ) throw new Error('ArgumentError: Unexpected option code encountered')
@@ -34,6 +34,7 @@ export function byteArrayToContestSelection( contestConfig: ContestConfig, byteA
 
   return {
     reference,
+    multiplier,
     optionSelections: optionSelections
   }
 }
@@ -63,7 +64,7 @@ export function contestSelectionToByteArray( contestConfig: ContestConfig, conte
     if( writeIn ){
       const text = optionSelection.text || ''
       writer.writeString(writeIn.maxSize, text)
-    } 
+    }
   })
 
   return writer.getByteArray()
