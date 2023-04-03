@@ -367,6 +367,8 @@ export interface ContestContent {
   markingType: MarkingType
   resultType: ResultType
   options: OptionContent[]
+  identifiable?: boolean
+  contestPositions?: ContestPositionMap
 }
 
 export interface ResultType {
