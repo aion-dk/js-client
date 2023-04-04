@@ -1,4 +1,4 @@
-import { contestSelectionToByteArray, byteArrayToContestSelection } from '../../lib/av_client/encoding/byte_encoding'
+import { contestSelectionToByteArray, byteArrayToSelectionPile } from '../../lib/av_client/encoding/byte_encoding'
 import { expect } from 'chai'
 import { ContestConfig, ContestSelection } from '../../lib/av_client/types'
 
@@ -86,7 +86,7 @@ describe('contestSelectionToByteArray', () => {
       reference: 'contest ref mismatch',
       optionSelections: []
     }
-    
+
     it('throws an error', () => {
       expect(() => {
         contestSelectionToByteArray(contestConfig, contestSelection)
@@ -107,7 +107,7 @@ describe('byteArrayToContestSelection', () => {
   }
 
   it('returns a ContestSelection when given a valid Uint8Array', () => {
-    const result = byteArrayToContestSelection(contestConfig, byteArray)
+    const result = byteArrayToSelectionPile(contestConfig, byteArray)
     expect(result).to.deep.equal(contestSelection)
   })
 
@@ -115,7 +115,7 @@ describe('byteArrayToContestSelection', () => {
     const byteArray = Uint8Array.of(2,3,104,101,108,108,111,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0)
 
     it('returns a ContestSelection when given a valid Uint8Array', () => {
-      const result = byteArrayToContestSelection(contestConfig, byteArray)
+      const result = byteArrayToSelectionPile(contestConfig, byteArray)
       expect(result).to.deep.equal(contestSelection)
     })
   })
@@ -126,7 +126,7 @@ describe('byteArrayToContestSelection', () => {
       const byteArray = Uint8Array.of(42)
       expect(() => {
 
-        byteArrayToContestSelection(contestConfig, byteArray)
+        byteArrayToSelectionPile(contestConfig, byteArray)
       }).to.throw('ArgumentError: Unexpected option code encountered')
     })
   })

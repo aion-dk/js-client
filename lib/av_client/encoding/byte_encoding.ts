@@ -4,8 +4,8 @@ import { ByteArrayReader } from './byte_array_reader'
 import { ByteArrayWriter } from "./byte_array_writer"
 
 
-export function byteArrayToContestSelection( contestConfig: ContestConfig, byteArray: Uint8Array , multiplier: number): ContestSelection {
-  const { reference, markingType, options } = contestConfig.content
+export function byteArrayToSelectionPile(contestConfig: ContestConfig, byteArray: Uint8Array , multiplier: number): SelectionPile {
+  const { markingType, options } = contestConfig.content
   const codeSize = markingType.encoding.codeSize
 
   const flatOptions = flattenOptions(options)
@@ -33,7 +33,6 @@ export function byteArrayToContestSelection( contestConfig: ContestConfig, byteA
   }
 
   return {
-    reference,
     multiplier,
     optionSelections: optionSelections
   }
