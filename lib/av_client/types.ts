@@ -390,6 +390,8 @@ export interface ContestContent {
   markingType: MarkingType
   resultType: ResultType
   options: OptionContent[]
+  identifiable?: boolean
+  contestPositions?: ContestPositionMap
 }
 
 export interface ResultType {
@@ -430,6 +432,7 @@ export interface VotingRoundContent {
   contestReferences: string[]
   demo?: boolean
   identifiable?: boolean
+  contestPositions?: ContestPositionMap;
 }
 
 // Election Config Item
@@ -481,6 +484,10 @@ export interface GenesisConfigContent {
 // Segments Config Item
 export interface SegmentsConfigMap {
   [segments: string]: SegmentsConfig
+}
+
+export interface ContestPositionMap {
+    [contestReference: string]: number;
 }
 
 export interface SegmentsConfig extends BaseBoardItem {

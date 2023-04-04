@@ -7,8 +7,8 @@ import { constructContestEnvelopes } from './av_client/construct_contest_envelop
 import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig } from './av_client/types';
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
-import * as jwt from 'jose';
 import { Buffer } from 'buffer'
+import jwtDecode, { JwtPayload } from "jwt-decode";
 
 import {
   fetchLatestConfig,
@@ -227,7 +227,7 @@ export class AVClient implements IAVClient {
 
     const { authToken } = authorizationResponse.data;
 
-    const decoded = jwt.decodeJwt(authToken); // TODO: Verify against dbb pubkey: this.getLatestConfig().services.voterAuthorizer.public_key);
+    const decoded = jwtDecode<JwtPayload>(authToken); // TODO: Verify against dbb pubkey: this.getLatestConfig().services.voterAuthorizer.public_key);
 
     if(decoded === null)
       throw new InvalidTokenError('Auth token could not be decoded');
