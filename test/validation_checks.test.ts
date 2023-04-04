@@ -113,8 +113,12 @@ describe('Validation checks', () => {
         parentAddress: "413f31e24314bfad618cd5f09f999384f188360e316cfb0b9f36218358fd092b",
         previousAddress: "413f31e24314bfad618cd5f09f999384f188360e316cfb0b9f36218358fd092b",
         content: {
-          cryptograms: {
-            recqPa7AeyufIfd6k: [""]
+
+          contests: {
+            recqPa7AeyufIfd6k: [{
+              multiplier: 1,
+              cryptograms: [""],
+            }]
           }
         },
         registeredAt: "",

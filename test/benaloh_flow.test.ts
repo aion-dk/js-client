@@ -154,8 +154,11 @@ function dummyBallotSelection( ballotConfig: BallotConfig, contestConfigs: Conte
 function dummyContestSelection( contestConfig: ContestConfig ): ContestSelection {
   return {
     reference: contestConfig.content.reference,
-    optionSelections: [
-      { reference: contestConfig.content.options[0].reference }
-    ]
+    piles: [{
+      multiplier: 1,
+      optionSelections: [
+        { reference: contestConfig.content.options[0].reference }
+      ]
+    }]
   }
 }

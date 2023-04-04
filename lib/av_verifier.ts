@@ -1,14 +1,29 @@
-import { BulletinBoard } from './av_client/connectors/bulletin_board';
-import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM } from './av_client/constants';
-import { randomKeyPair } from './av_client/generate_key_pair';
-import { signPayload } from './av_client/sign';
-import { VerifierItem, BoardCommitmentOpeningItem, VoterCommitmentOpeningItem, BallotCryptogramItem, ContestSelection, ReadableContestSelection, LatestConfig } from './av_client/types';
-import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
-import { fetchLatestConfig } from './av_client/election_config';
-import { decryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
-import { InvalidContestError, InvalidTrackingCodeError } from './av_client/errors';
-import { decryptContestSelections } from './av_client/decrypt_contest_selections';
-import { makeOptionFinder } from './av_client/option_finder';
+import {BulletinBoard} from './av_client/connectors/bulletin_board';
+import {
+  CAST_REQUEST_ITEM,
+  MAX_POLL_ATTEMPTS,
+  POLLING_INTERVAL_MS,
+  SPOIL_REQUEST_ITEM,
+  VERIFIER_ITEM
+} from './av_client/constants';
+import {randomKeyPair} from './av_client/generate_key_pair';
+import {signPayload} from './av_client/sign';
+import {
+  VerifierItem,
+  BoardCommitmentOpeningItem,
+  VoterCommitmentOpeningItem,
+  BallotCryptogramItem,
+  ContestSelection,
+  ReadableContestSelection,
+  LatestConfig
+} from './av_client/types';
+import {hexToShortCode, shortCodeToHex} from './av_client/short_codes';
+import {fetchLatestConfig} from './av_client/election_config';
+import {decryptCommitmentOpening, validateCommmitmentOpening} from './av_client/crypto/commitments';
+import {InvalidContestError, InvalidTrackingCodeError} from './av_client/errors';
+import {decryptContestSelections} from './av_client/decrypt_contest_selections';
+import {makeOptionFinder} from './av_client/option_finder';
+
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
   private verifierPrivateKey: string | undefined
@@ -54,11 +69,11 @@ export class AVVerifier {
         throw new InvalidTrackingCodeError("Tracking code and short address from response doesn't match")
       }
       if (['voterCommitment', 'serverCommitment', 'ballotCryptograms', 'verificationTrackStart']
-        .every(p => Object.keys(response.data).includes(p))){
-          this.cryptogramAddress = response.data.ballotCryptograms.address
-          this.voterCommitment = response.data.voterCommitment.content.commitment;
-          this.boardCommitment = response.data.serverCommitment.content.commitment;
-          this.ballotCryptograms = response.data.ballotCryptograms;
+        .every(p => Object.keys(response.data).includes(p))) {
+        this.cryptogramAddress = response.data.ballotCryptograms.address
+        this.voterCommitment = response.data.voterCommitment.content.commitment;
+        this.boardCommitment = response.data.serverCommitment.content.commitment;
+        this.ballotCryptograms = response.data.ballotCryptograms;
       }
     })
 
@@ -86,7 +101,7 @@ export class AVVerifier {
   }
 
   public decryptBallot(): ContestSelection[] {
-    if( !this.verifierPrivateKey ){
+    if (!this.verifierPrivateKey) {
       throw new Error('Verifier private key not present')
     }
 
@@ -116,11 +131,11 @@ export class AVVerifier {
 
       if (result?.data?.item?.type === SPOIL_REQUEST_ITEM) {
         return resolve(result.data.item.address);
-      } else if (result?.data?.item?.type === CAST_REQUEST_ITEM){
+      } else if (result?.data?.item?.type === CAST_REQUEST_ITEM) {
         return reject(new Error('Ballot has been cast and cannot be spoiled'))
-      }  else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
+      } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
         return reject(new Error('Exceeded max attempts'));
-      } else  {
+      } else {
         setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
       }
     };
@@ -128,33 +143,43 @@ export class AVVerifier {
     return new Promise(executePoll);
   }
 
-  public getReadableContestSelections( contestSelections: ContestSelection[], locale: string ): ReadableContestSelection[] {
+  public getReadableContestSelections(contestSelections: ContestSelection[], locale: string): ReadableContestSelection[] {
     const localizer = makeLocalizer(locale)
 
     return contestSelections.map(cs => {
       const contestConfig = this.latestConfig.items.contestConfigs[cs.reference]
-      if( !contestConfig ){
+      if (!contestConfig) {
         throw new InvalidContestError("Contest is not present in the election")
       }
 
       const optionFinder = makeOptionFinder(contestConfig.content.options)
 
-      return {
-        reference: cs.reference,
-        title: localizer(contestConfig.content.title),
-        optionSelections: cs.optionSelections.map(os => {
+      const readablePiles = cs.piles.map(pile => ({
+        multiplier: pile.multiplier,
+        optionSelections: pile.optionSelections.map(os => {
           const optionConfig = optionFinder(os.reference)
+
           return {
             reference: os.reference,
             title: localizer(optionConfig.title),
             text: os.text,
           }
         })
+      }))
+
+      return {
+        reference: cs.reference,
+        title: localizer(contestConfig.content.title),
+        piles: readablePiles
       }
     })
+
+
   }
 
-  public async pollForCommitmentOpening() {
+  public async
+
+  pollForCommitmentOpening() {
     let attempts = 0;
 
     const executePoll = async (resolve, reject) => {
@@ -170,7 +195,7 @@ export class AVVerifier {
         return resolve(result.data);
       } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
         return reject(new Error('Exceeded max attempts'));
-      } else  {
+      } else {
         setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
       }
     };
@@ -179,10 +204,10 @@ export class AVVerifier {
   }
 }
 
-function makeLocalizer( locale: string ){
-  return ( field: { [locale: string]: string } ) => {
+function makeLocalizer(locale: string) {
+  return (field: { [locale: string]: string }) => {
     const availableFields = Object.keys(field)
-    if( availableFields.length === 0 ){
+    if (availableFields.length === 0) {
       throw new Error('No localized data available')
     }
 

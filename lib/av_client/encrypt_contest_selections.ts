@@ -8,7 +8,7 @@ import {
 import { randomBN, ElGamalPointCryptogram } from "./aion_crypto";
 import { bignumToHex, pointFromHex } from "./crypto/util";
 import { bytesToPoints } from "./encoding/point_encoding";
-import { contestSelectionToByteArray } from "./encoding/byte_encoding";
+import { selectionPileToByteArray } from "./encoding/byte_encoding";
 import {SjclEllipticalPoint} from "./sjcl";
 
 export function encryptContestSelections(
@@ -48,7 +48,7 @@ function encryptSelectionPile(
   selectionPile: SelectionPile,
   encryptionKeyPoint: SjclEllipticalPoint
 ): EncryptedPile {
-  const encodedSelectionPile = contestSelectionToByteArray(contestConfig, selectionPile)
+  const encodedSelectionPile = selectionPileToByteArray(contestConfig, selectionPile)
   const pilePoints = bytesToPoints(encodedSelectionPile)
 
   const encryptedPile: EncryptedPile = {multiplier: selectionPile.multiplier, cryptograms: [], randomizers: []}

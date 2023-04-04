@@ -102,7 +102,7 @@ export type BoardItemType =
   "VoterSessionItem" |
   "VoterEncryptionCommitmentOpeningItem"
 
-interface BaseBoardItem {
+export interface BaseBoardItem {
   address: string
   author: string
   parentAddress: string
@@ -166,7 +166,7 @@ export interface VoterCommitmentItem extends BaseBoardItem {
 
 export interface BallotCryptogramItem extends BaseBoardItem {
   content: {
-    contests: ContestMap<EncryptedPile>
+    contests: ContestMap<SealedPile[]>
   }
   type: "BallotCryptogramsItem"
 }
@@ -187,7 +187,7 @@ export interface SpoilRequestItem extends BaseBoardItem {
 }
 
 export interface CommitmentOpening {
-  randomizers: ContestMap<string[]>
+  randomizers: ContestMap<string[][]>
   commitmentRandomness: string
 }
 
@@ -207,7 +207,7 @@ export type HashValue = string;
 export interface MarkingType {
   minMarks: number
   maxMarks: number
-  maxPiles: number
+  maxPiles?: number
   voteVariation?: string
   blankSubmission: "disabled" | "active_choice" | "implicit"
   encoding: {
@@ -258,6 +258,11 @@ export type ContestEnvelope = {
 export type ReadableContestSelection = {
   reference: string
   title: string
+  piles: ReadableSelectionPile[]
+}
+
+export type ReadableSelectionPile = {
+  multiplier: number,
   optionSelections: ReadableOptionSelection[]
 }
 

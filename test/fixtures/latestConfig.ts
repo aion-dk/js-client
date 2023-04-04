@@ -1,14 +1,10 @@
 import { LatestConfig } from '../../lib/av_client';
+import {baseItemAttributes} from "./itemHelper";
 
 const latestConfig: LatestConfig = {
   items: {
     thresholdConfig: {
-      address: '',
-      author: '',
-      parentAddress: '',
-      previousAddress: '',
-      registeredAt: '',
-      signature: '',
+      ...baseItemAttributes(),
       type: 'ThresholdConfigItem',
       content: {
         encryptionKey: "03d8c46ae42cd7f95009ddf444eebc5b18e2cad34aad94129ffc54b5606b5638f4",
@@ -17,12 +13,7 @@ const latestConfig: LatestConfig = {
       }
     },
     voterAuthorizerConfig: {
-      address: '',
-      author: '',
-      parentAddress: '',
-      previousAddress: '',
-      registeredAt: '',
-      signature: '',
+      ...baseItemAttributes(),
       type: 'VoterAuthorizationConfigItem',
       content: {
         identityProvider: {
@@ -40,12 +31,7 @@ const latestConfig: LatestConfig = {
     },
     ballotConfigs: {
       precinct_4_bedrock: {
-        address: '',
-        author: '',
-        parentAddress: '',
-        previousAddress: '',
-        registeredAt: '',
-        signature: '',
+        ...baseItemAttributes(),
         type: 'BallotConfigItem',
         content: {
           reference: "precinct_4_bedrock",
@@ -59,12 +45,7 @@ const latestConfig: LatestConfig = {
     },
     contestConfigs: {
       "contest ref 1": {
-        address: '',
-        author: '',
-        parentAddress: '',
-        previousAddress: '',
-        registeredAt: '',
-        signature: '',
+        ...baseItemAttributes(),
         type: 'ContestConfigItem',
         content: {
           reference: "contest ref 1",
@@ -121,12 +102,7 @@ const latestConfig: LatestConfig = {
         }
       },
       "contest ref 2": {
-        address: '',
-        author: '',
-        parentAddress: '',
-        previousAddress: '',
-        registeredAt: '',
-        signature: '',
+        ...baseItemAttributes(),
         type: 'ContestConfigItem',
         content: {
           reference: "contest ref 2",
@@ -184,12 +160,7 @@ const latestConfig: LatestConfig = {
       },
     },
     electionConfig: {
-      address: '',
-      author: '',
-      parentAddress: '',
-      previousAddress: '',
-      registeredAt: '',
-      signature: '',
+      ...baseItemAttributes(),
       type: 'ElectionConfigItem',
       content: {
         title: {
@@ -204,12 +175,7 @@ const latestConfig: LatestConfig = {
     },
     votingRoundConfigs: {
       "voting-round-1": {
-        address: '',
-        author: '',
-        parentAddress: '',
-        previousAddress: '',
-        registeredAt: '',
-        signature: '',
+        ...baseItemAttributes(),
         type: 'VotingRoundConfigItem',
         content: {
           status: "open",

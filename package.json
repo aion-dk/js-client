@@ -14,7 +14,7 @@
     "test": "mocha --require ts-node/register/transpile-only --require source-map-support/register --recursive --extension ts ./test/*.test.ts ./test/**/*.test.ts",
     "test:walkthrough": "mocha --require ts-node/register/transpile-only --require source-map-support/register --recursive --extension ts ./test/walkthrough.test.ts",
     "coverage": "tsc && nyc --reporter=json-summary --reporter=text yarn test",
-    "tdd": "mocha --require ts-node/register/transpile-only --require source-map-support/register --extension ts ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
+    "tdd": "mocha --require ts-node/register/transpile-only --require source-map-support/register --extension ts ./test/*.test.ts ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
     "docs": "typedoc --plugin none --out docs --includes test/",
     "build": "tsc && cp lib/av_client/*.js dist/lib/av_client",
     "lint": "eslint lib/ test/",

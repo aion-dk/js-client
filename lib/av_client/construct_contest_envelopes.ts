@@ -25,16 +25,16 @@ type ConstructResult = {
     commitment: string,
     randomizer: string
   }
-  envelopeRandomizers: ContestMap<string[]>,
+  envelopeRandomizers: ContestMap<string[][]>,
   contestEnvelopes: ContestEnvelope[],
 }
 
-function extractRandomizers( contestEnvelopes: ContestEnvelope[] ){
-  const flattened_randomizers = ce => ce.piles.reduce((randomizers, p): string[] => {
-    return [...randomizers, ...p.randomizers]
-  }, [])
+function extractRandomizers( contestEnvelopes: ContestEnvelope[]): ContestMap<string[][]> {
+  const randomizers = ce => ce.piles.map((p): string[] => {
+    return p.randomizers
+  })
 
-  const entries = contestEnvelopes.map(ce => [ce.reference, flattened_randomizers(ce)])
+  const entries = contestEnvelopes.map(ce => [ce.reference, randomizers(ce)])
   return Object.fromEntries(entries)
 }
 

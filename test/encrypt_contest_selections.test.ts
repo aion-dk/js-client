@@ -49,9 +49,13 @@ const contestConfigs: ContestConfigMap = {
 const contestSelections =  [
   {
     reference: 'contest-1',
-    optionSelections: [
-      { reference: 'option-1' }
-    ]
+    piles: [{
+      multiplier: 1,
+      optionSelections: [
+        { reference: 'option-1' }
+      ]
+    }]
+
   }
 ]
 
@@ -65,9 +69,9 @@ describe('encryptContestSelections', () => {
 
       const contestEnvelope = contestEnvelopes[0]
       expect(contestEnvelope.reference).to.eql('contest-1')
-      expect(contestEnvelope).to.have.all.keys('reference', 'cryptograms', 'randomizers')
-      expect(contestEnvelope.cryptograms.length).to.eql(1)
-      expect(contestEnvelope.randomizers.length).to.eql(1)
+      expect(contestEnvelope).to.have.all.keys('reference', 'piles')
+      expect(contestEnvelope.piles[0].cryptograms.length).to.eql(1)
+      expect(contestEnvelope.piles[0].randomizers.length).to.eql(1)
     })
   })
 
@@ -120,9 +124,13 @@ describe('encryptContestSelections', () => {
     const contestSelections =  [
       {
         reference: 'big-contest',
-        optionSelections: [
-          { reference: 'option-1', text: 'this is a write in text' }
-        ]
+        piles: [{
+          multiplier: 1,
+          optionSelections: [
+            { reference: 'option-1', text: 'this is a write in text' }
+          ]
+        }]
+
       }
     ]
 
@@ -132,8 +140,8 @@ describe('encryptContestSelections', () => {
 
       const contestEnvelope = contestEnvelopes[0]
       expect(contestEnvelope.reference).to.eql('big-contest')
-      expect(contestEnvelope.cryptograms.length).to.eql(2)
-      expect(contestEnvelope.randomizers.length).to.eql(2)
+      expect(contestEnvelope.piles[0].cryptograms.length).to.eql(2)
+      expect(contestEnvelope.piles[0].randomizers.length).to.eql(2)
     })
   })
 })

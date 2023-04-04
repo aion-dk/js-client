@@ -39,7 +39,7 @@ export function byteArrayToSelectionPile(contestConfig: ContestConfig, byteArray
 }
 
 
-export function contestSelectionToByteArray( contestConfig: ContestConfig, selectionPile: SelectionPile ): Uint8Array {
+export function selectionPileToByteArray(contestConfig: ContestConfig, selectionPile: SelectionPile ): Uint8Array {
   const { markingType, options } = contestConfig.content
 
   const flatOptions = flattenOptions(options)

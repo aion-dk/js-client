@@ -16,33 +16,42 @@ describe('Util#extractContestSelections', () => {
     expect(result).to.deep.equal([
       {
         "reference": "recIj8OmzqzzvnDbM",
-        "optionSelections": [
-          {
-            "reference": "recqq21kO6HWgpJZV",
-            "text": "a dfjyghjfshgksgh. z"
-          }
-        ]
+        "piles": [{
+          "multiplier": 1,
+          "optionSelections": [
+            {
+              "reference": "recqq21kO6HWgpJZV",
+              "text": "a dfjyghjfshgksgh. z"
+            }
+          ]
+        }]
       },
       {
         "reference": "recXNb4zPrvC1m6Fr",
-        "optionSelections": [
-          {
-            "reference": "rec9Eev970VhohqKi",
-            "text": "a dkfhg z"
-          },
-          {
-            "reference": "recFiGYjGCIyk5LBe",
-            "text": "a kdjfhglj dljfghlkjd flkhj l z"
-          }
-        ]
+        "piles": [{
+          "multiplier": 1,
+          "optionSelections": [
+            {
+              "reference": "rec9Eev970VhohqKi",
+              "text": "a dkfhg z"
+            },
+            {
+              "reference": "recFiGYjGCIyk5LBe",
+              "text": "a kdjfhglj dljfghlkjd flkhj l z"
+            }
+          ]
+        }]
       },
       {
         "reference": "recqPa7AeyufIfd6k",
-        "optionSelections": [
-          {
-            "reference": "recysACFx8cgwomBE"
-          }
-        ]
+        "piles": [{
+          "multiplier": 1,
+          "optionSelections": [
+            {
+              "reference": "recysACFx8cgwomBE"
+            }
+          ]
+        }]
       }
     ])
   })
