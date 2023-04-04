@@ -4,13 +4,13 @@ import { generatePedersenCommitment } from './crypto/pedersen_commitment'
 import { encryptContestSelections } from './encrypt_contest_selections'
 import { BallotSelection, ContestEnvelope, ContestMap, ClientState } from './types'
 
-export function constructContestEnvelopes( state: ClientState, ballotSelection: BallotSelection ): ConstructResult { 
-  const { contestConfigs, ballotConfig, encryptionKey, votingRoundConfig } = extractConfig(state)
+export function constructContestEnvelopes( state: ClientState, ballotSelection: BallotSelection ): ConstructResult {
+  const { contestConfigs, ballotConfig, encryptionKey, votingRoundConfig, weight } = extractConfig(state)
 
-  validateBallotSelection(ballotConfig, contestConfigs, ballotSelection, votingRoundConfig)
+  validateBallotSelection(ballotConfig, contestConfigs, ballotSelection, votingRoundConfig, weight)
 
   const contestEnvelopes = encryptContestSelections(contestConfigs, ballotSelection.contestSelections, encryptionKey)
-  const envelopeRandomizers = contestEnvelopesRandomizers(contestEnvelopes)
+  const envelopeRandomizers = extractRandomizers(contestEnvelopes)
   const pedersenCommitment = generatePedersenCommitment(envelopeRandomizers)
 
   return {
@@ -25,22 +25,27 @@ type ConstructResult = {
     commitment: string,
     randomizer: string
   }
-  envelopeRandomizers: ContestMap<string[]>
+  envelopeRandomizers: ContestMap<string[]>,
   contestEnvelopes: ContestEnvelope[],
 }
 
-function contestEnvelopesRandomizers( contestEnvelopes: ContestEnvelope[] ){
-  const entries = contestEnvelopes.map(ce => [ce.reference, ce.randomizers])
+function extractRandomizers( contestEnvelopes: ContestEnvelope[] ){
+  const flattened_randomizers = ce => ce.piles.reduce((randomizers, p): string[] => {
+    return [...randomizers, ...p.randomizers]
+  }, [])
+
+  const entries = contestEnvelopes.map(ce => [ce.reference, flattened_randomizers(ce)])
   return Object.fromEntries(entries)
 }
 
 function extractConfig( state: ClientState ){
-  const { voterGroup } = state.voterSession.content
+  let { voterGroup, weight } = state.voterSession.content
   const { contestConfigs, ballotConfigs, votingRoundConfigs } = state.latestConfig.items
   const { encryptionKey } = state.latestConfig.items.thresholdConfig.content
-
   const ballotConfig = ballotConfigs[voterGroup]
   const votingRoundConfig = votingRoundConfigs[state.votingRoundReference]
+
+  weight ||= 1
 
   if( !ballotConfig ){
     throw new InvalidStateError('Cannot construct ballot cryptograms. Ballot config not found for voter')
@@ -50,6 +55,7 @@ function extractConfig( state: ClientState ){
     ballotConfig,
     contestConfigs,
     encryptionKey,
-    votingRoundConfig
+    votingRoundConfig,
+    weight,
   }
 }

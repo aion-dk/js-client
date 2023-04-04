@@ -29,10 +29,17 @@ export interface ContestMap<T> {
   [contestId: string]: T;
 }
 
-export interface ContestSubmission {
+export interface EncryptedPile {
+  multiplier: number;
+  cryptograms: string[];
+  randomizers: string[];
+}
+
+export interface SealedPile {
   multiplier: number;
   cryptograms: string[];
 }
+
 
 export type KeyPair = {
   privateKey: string;
@@ -115,6 +122,7 @@ export interface VoterSessionItem extends BaseBoardItem {
     voterGroup: string
     publicKey: string
     votingRoundReference: string
+    weight?: number
     segments?: Segments
   }
 
@@ -158,7 +166,7 @@ export interface VoterCommitmentItem extends BaseBoardItem {
 
 export interface BallotCryptogramItem extends BaseBoardItem {
   content: {
-    contests: ContestMap<ContestSubmission>
+    contests: ContestMap<EncryptedPile>
   }
   type: "BallotCryptogramsItem"
 }
@@ -199,6 +207,7 @@ export type HashValue = string;
 export interface MarkingType {
   minMarks: number
   maxMarks: number
+  maxPiles: number
   voteVariation?: string
   blankSubmission: "disabled" | "active_choice" | "implicit"
   encoding: {
@@ -228,7 +237,11 @@ export type BallotSelection = {
 
 export type ContestSelection = {
   reference: string
-  multiplier?: number,
+  piles: SelectionPile[]
+}
+
+export type SelectionPile = {
+  multiplier: number,
   optionSelections: OptionSelection[]
 }
 
@@ -239,8 +252,7 @@ export type OptionSelection = {
 
 export type ContestEnvelope = {
   reference: string
-  cryptograms: string[]
-  randomizers: string[]
+  piles: EncryptedPile[]
 }
 
 export type ReadableContestSelection = {
@@ -504,9 +516,5 @@ export interface ExtractionConfirmations {
 export interface ClientState {
   latestConfig: LatestConfig
   votingRoundReference: string
-  voterSession: {
-    content: {
-      voterGroup: string
-    }
-  }
+  voterSession: VoterSessionItem
 }

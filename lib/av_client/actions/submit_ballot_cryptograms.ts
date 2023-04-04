@@ -8,19 +8,19 @@ import { finalizeCryptograms } from '../finalize_cryptograms'
 export async function submitBallotCryptograms(
   bulletinBoard: BulletinBoard,
   clientEnvelopes: ContestEnvelope[],
-  serverCryptograms: ContestMap<string[]>,
+  serverEnvelopes: ContestMap<string[][]>,
   boardCommitmentAddress: string,
   voterPrivateKey: string,
   dbbPublicKey: string
 ): Promise<[BallotCryptogramItem, VerificationStartItem]> {
 
-  const finalizedCryptograms = finalizeCryptograms(clientEnvelopes, serverCryptograms)
+  const finalizedCryptograms = finalizeCryptograms(clientEnvelopes, serverEnvelopes)
 
   const ballotCryptogramsItem = {
     parentAddress: boardCommitmentAddress,
     type: BALLOT_CRYPTOGRAMS_ITEM,
     content: {
-      cryptograms: finalizedCryptograms,
+      contests: finalizedCryptograms,
     }
   }
 
@@ -28,7 +28,7 @@ export async function submitBallotCryptograms(
 
   const itemWithProofs = {
     ...signedBallotCryptogramsItem,
-    proofs: sealContestEnvelopes(clientEnvelopes)
+    proofs: generateEnvelopeProofs(clientEnvelopes)
   }
 
   const response = (await bulletinBoard.submitVotes(itemWithProofs));
@@ -45,9 +45,13 @@ export async function submitBallotCryptograms(
   ]
 }
 
-function sealContestEnvelopes( contestEnvelopes: ContestEnvelope[] ): ContestMap<string[]> {
-  const entries = contestEnvelopes.map(ce =>
-    [ ce.reference, ce.randomizers.map(r => generateDiscreteLogarithmProof(r)) ]
+function generateEnvelopeProofs( contestEnvelopes: ContestEnvelope[] ): ContestMap<string[][]> {
+  const entries = contestEnvelopes.map(ce => {
+    const envelopeProofs = ce.piles.map((p, index) => {
+      return p.randomizers.map(r => generateDiscreteLogarithmProof(r))
+    })
+    return [ce.reference, envelopeProofs]
+  }
   )
   return Object.fromEntries(entries)
 }

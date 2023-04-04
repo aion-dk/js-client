@@ -1,4 +1,4 @@
-import { ContestConfig, ContestSelection, OptionSelection, OptionContent } from "../types"
+import {ContestConfig, ContestSelection, OptionSelection, OptionContent, SelectionPile} from "../types"
 import { flattenOptions } from '../flatten_options'
 import { ByteArrayReader } from './byte_array_reader'
 import { ByteArrayWriter } from "./byte_array_writer"
@@ -40,11 +40,8 @@ export function byteArrayToContestSelection( contestConfig: ContestConfig, byteA
 }
 
 
-export function contestSelectionToByteArray( contestConfig: ContestConfig, contestSelection: ContestSelection ): Uint8Array {
-  const { reference, markingType, options } = contestConfig.content
-  if( reference !== contestSelection.reference ){
-    throw new Error("contest selection does not match contest")
-  }
+export function contestSelectionToByteArray( contestConfig: ContestConfig, selectionPile: SelectionPile ): Uint8Array {
+  const { markingType, options } = contestConfig.content
 
   const flatOptions = flattenOptions(options)
   const codeMap = extractCodeMap(flatOptions)
@@ -52,7 +49,7 @@ export function contestSelectionToByteArray( contestConfig: ContestConfig, conte
 
   const writer = new ByteArrayWriter(markingType.encoding.maxSize)
 
-  contestSelection.optionSelections.forEach(optionSelection => {
+  selectionPile.optionSelections.forEach(optionSelection => {
     const writeIn = writeInMap[optionSelection.reference]
     const code = codeMap[optionSelection.reference]
 

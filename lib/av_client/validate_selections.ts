@@ -2,7 +2,7 @@ import { BallotConfig, BallotSelection, ContestSelection, OptionSelection, Conte
 import { flattenOptions } from './flatten_options'
 import { CorruptSelectionError as CorruptSelectionError } from './errors';
 
-export function validateBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap, ballotSelection: BallotSelection, votingRoundConfig: VotingRoundConfig ){
+export function validateBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap, ballotSelection: BallotSelection, votingRoundConfig: VotingRoundConfig, weight: number ){
   if( ballotConfig.content.reference !== ballotSelection.reference ){
     throw new CorruptSelectionError('Ballot selection does not match ballot config')
   }
@@ -11,18 +11,32 @@ export function validateBallotSelection( ballotConfig: BallotConfig, contestConf
 
   ballotSelection.contestSelections.forEach(contestSelection => {
     const contestConfig = getContestConfig(contestConfigs, contestSelection)
-    validateContestSelection(contestConfig, contestSelection)
+    validateContestSelection(contestConfig, contestSelection, weight)
   })
 }
 
-export function validateContestSelection( contestConfig: ContestConfig, contestSelection: ContestSelection ){
+export function validateContestSelection( contestConfig: ContestConfig, contestSelection: ContestSelection, weight: number ){
   if( contestConfig.content.reference !== contestSelection.reference ){
     throw new CorruptSelectionError('Contest selection is not matching contest config')
   }
 
   const { markingType, options } = contestConfig.content
 
-  const isBlank = contestSelection.optionSelections.length === 0
+  // Validate maxPiles allowed
+  if(markingType.maxPiles && markingType.maxPiles > contestSelection.piles.length) {
+    throw new CorruptSelectionError('Weight is distributed more than allowed.')
+  }
+
+  // Validate weight versus pile multipliers
+  if(weight < contestSelection.piles.reduce((sum, pile) => sum + pile.multiplier, 0)) {
+    throw new CorruptSelectionError('Selection sum is larger than voting weight.')
+  }
+
+  contestSelection.piles.forEach(pile => validateSelectionPile(pile, markingType, options))
+}
+
+function validateSelectionPile(pile, markingType, options) {
+  const isBlank = pile.optionSelections.length === 0
 
   // Validate blankSubmission
   if( isBlank && markingType.blankSubmission == 'disabled'){
@@ -30,19 +44,19 @@ export function validateContestSelection( contestConfig: ContestConfig, contestS
   }
 
   // Validate that mark count is within bounds
-  if( !isBlank && !withinBounds(markingType.minMarks, contestSelection.optionSelections.length, markingType.maxMarks) ){
+  if( !isBlank && !withinBounds(markingType.minMarks, pile.optionSelections.length, markingType.maxMarks) ){
     throw new CorruptSelectionError('Contest selection does not contain a valid amount of option selections')
   }
 
   // Validate duplicates - that any vote selection is not referencing the same option multiple times
-  const selectedOptions = contestSelection.optionSelections.map(os => os.reference)
+  const selectedOptions = pile.optionSelections.map(os => os.reference)
   if( hasDuplicates(selectedOptions) ){
     throw new CorruptSelectionError('Same option selected multiple times')
   }
 
   const getOption = makeGetOption(options)
 
-  contestSelection.optionSelections.forEach(optionSelection => {
+  pile.optionSelections.forEach(optionSelection => {
     const option = getOption(optionSelection)
 
     if( option.writeIn ){
@@ -67,7 +81,7 @@ function getContestConfig( contestConfigs: ContestConfigMap, contestSelection: C
 function validateContestsMatching( ballotConfig: BallotConfig, ballotSelection: BallotSelection, votingRoundConfig: VotingRoundConfig ){
   const availableContests = votingRoundConfig.content.contestReferences.filter(value => ballotConfig.content.contestReferences.includes(value));
   const selectedContests = ballotSelection.contestSelections.map(cs => cs.reference)
-  
+
   if( !containsSameStrings(availableContests, selectedContests) ){
     throw new CorruptSelectionError('Contest selections do not match the contests allowed by the ballot or voting round')
   }
@@ -99,7 +113,7 @@ function hasDuplicates(arr: string[]) {
 function containsSameStrings( array1: string[], array2: string[] ){
   const cloned1 = [...array1]
   const cloned2 = [...array2]
-  
+
   cloned1.sort()
   cloned2.sort()
 
