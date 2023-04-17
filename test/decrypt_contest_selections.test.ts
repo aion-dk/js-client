@@ -1,6 +1,5 @@
 import {expect} from 'chai';
 import {decryptContestSelections} from '../lib/av_client/decrypt_contest_selections'
-import {ElGamalPointCryptogram} from '../lib/av_client/aion_crypto'
 import {CommitmentOpening, ContestConfig, ContestConfigMap, ContestEnvelope, ContestMap} from '../lib/av_client/types';
 import {finalizeCryptograms} from "../lib/av_client/finalize_cryptograms";
 import {baseItemAttributes} from "./fixtures/itemHelper";

@@ -39,13 +39,11 @@ function extractRandomizers( contestEnvelopes: ContestEnvelope[]): ContestMap<st
 }
 
 function extractConfig( state: ClientState ){
-  let { voterGroup, weight } = state.voterSession.content
+  const { voterGroup, weight } = state.voterSession.content
   const { contestConfigs, ballotConfigs, votingRoundConfigs } = state.latestConfig.items
   const { encryptionKey } = state.latestConfig.items.thresholdConfig.content
   const ballotConfig = ballotConfigs[voterGroup]
   const votingRoundConfig = votingRoundConfigs[state.votingRoundReference]
-
-  weight ||= 1
 
   if( !ballotConfig ){
     throw new InvalidStateError('Cannot construct ballot cryptograms. Ballot config not found for voter')

@@ -1,4 +1,4 @@
-import {ContestConfig, ContestSelection, OptionSelection, OptionContent, SelectionPile} from "../types"
+import {ContestConfig, OptionSelection, OptionContent, SelectionPile} from "../types"
 import { flattenOptions } from '../flatten_options'
 import { ByteArrayReader } from './byte_array_reader'
 import { ByteArrayWriter } from "./byte_array_writer"

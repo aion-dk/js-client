@@ -1,4 +1,4 @@
-import {ContestEnvelope, ContestMap} from "../types";
+import {ContestMap} from "../types";
 import {Bignum} from "./bignum";
 import {Point} from "./point";
 import {

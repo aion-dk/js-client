@@ -47,7 +47,7 @@ export async function submitBallotCryptograms(
 
 function generateEnvelopeProofs( contestEnvelopes: ContestEnvelope[] ): ContestMap<string[][]> {
   const entries = contestEnvelopes.map(ce => {
-    const envelopeProofs = ce.piles.map((p, index) => {
+    const envelopeProofs = ce.piles.map((p) => {
       return p.randomizers.map(r => generateDiscreteLogarithmProof(r))
     })
     return [ce.reference, envelopeProofs]
