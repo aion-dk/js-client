@@ -1,15 +1,11 @@
-import { expect } from 'chai';
-import { constructContestEnvelopes } from '../lib/av_client/construct_contest_envelopes';
-import { ContestConfig, BallotConfig, ClientState, VotingRoundConfig } from '../lib/av_client/types';
+import {expect} from 'chai';
+import {constructContestEnvelopes} from '../lib/av_client/construct_contest_envelopes';
+import {ContestConfig, BallotConfig, ClientState, VotingRoundConfig, BallotSelection} from '../lib/av_client/types';
 import latestConfig from './fixtures/latestConfig';
+import {baseItemAttributes} from "./fixtures/itemHelper";
 
 const contestOne: ContestConfig = {
-  address: '',
-  author: '',
-  parentAddress: '',
-  previousAddress: '',
-  registeredAt: '',
-  signature: '',
+  ...baseItemAttributes(),
   type: 'ContestConfigItem',
   content: {
     reference: 'contest-1',
@@ -26,28 +22,23 @@ const contestOne: ContestConfig = {
     resultType: {
       name: 'does not matter right now'
     },
-    title: { en: 'Contest 1' },
-    subtitle: { en: 'Contest 1' },
-    description: { en: 'Contest 1' },
+    title: {en: 'Contest 1'},
+    subtitle: {en: 'Contest 1'},
+    description: {en: 'Contest 1'},
     options: [
       {
         reference: 'option-1',
         code: 1,
-        title: { en: 'Option 1' },
-        subtitle: { en: 'Option 1' },
-        description: { en: 'Option 1' },
+        title: {en: 'Option 1'},
+        subtitle: {en: 'Option 1'},
+        description: {en: 'Option 1'},
       }
     ]
   }
 }
 
 const ballotOne: BallotConfig = {
-  address: '',
-  author: '',
-  parentAddress: '',
-  previousAddress: '',
-  registeredAt: '',
-  signature: '',
+  ...baseItemAttributes(),
   type: 'BallotConfigItem',
   content: {
     reference: 'ballot-1',
@@ -62,12 +53,12 @@ const votingRoundConfig: VotingRoundConfig = {
   parentAddress: "",
   previousAddress: "",
   content: {
-  status: "open",
-  reference: "voting-round-1",
-  contestReferences: [
-    'contest-1',
-    'contest-2'
-  ]
+    status: "open",
+    reference: "voting-round-1",
+    contestReferences: [
+      'contest-1',
+      'contest-2'
+    ]
   },
   registeredAt: "2023-01-11T09:27:11.397Z",
   signature: "120e0bf80ad403fdd07b9accf19aa5f4fbc5746424e552b22cf9c93f1c06f815,0de6cc49f0bb8d4680cc1039e2ce983bd9ee002b3cea196e12efb43eababf5c8",
@@ -95,21 +86,32 @@ const clientState: ClientState = {
     }
   },
   voterSession: {
-    content: { 
-      voterGroup: '1',
-    }
+    ...baseItemAttributes(),
+    content: {
+      authToken: "string",
+      identifier: "string",
+      publicKey: "string",
+      votingRoundReference: "string",
+      weight: 1,
+      voterGroup: '1'
+    },
+    type: "VoterSessionItem"
   },
   votingRoundReference: "voting-round-1"
 }
 
-const ballotSelection = {
+const ballotSelection: BallotSelection = {
   reference: 'ballot-1',
   contestSelections: [
     {
       reference: 'contest-1',
-      optionSelections: [
-        { reference: 'option-1' }
-      ]
+      piles: [{
+        multiplier: 1,
+        optionSelections: [
+          {reference: 'option-1'}
+        ]
+      }]
+
     }
   ]
 }

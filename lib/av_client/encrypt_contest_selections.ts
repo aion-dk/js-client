@@ -1,8 +1,15 @@
-import { ContestConfigMap, ContestEnvelope, ContestConfig, ContestSelection } from "./types";
+import {
+  ContestConfigMap,
+  ContestEnvelope,
+  ContestConfig,
+  ContestSelection,
+  EncryptedPile, SelectionPile
+} from "./types";
 import { randomBN, ElGamalPointCryptogram } from "./aion_crypto";
 import { bignumToHex, pointFromHex } from "./crypto/util";
 import { bytesToPoints } from "./encoding/point_encoding";
-import { contestSelectionToByteArray } from "./encoding/byte_encoding";
+import { selectionPileToByteArray } from "./encoding/byte_encoding";
+import {SjclEllipticalPoint} from "./sjcl";
 
 export function encryptContestSelections(
   contestConfigs: ContestConfigMap,
@@ -16,29 +23,43 @@ export function encryptContestSelections(
 }
 
 function encryptContestSelection(
-  contestConfig: ContestConfig, 
-  contestSelection: ContestSelection, 
+  contestConfig: ContestConfig,
+  contestSelection: ContestSelection,
   encryptionKey: string
 ): ContestEnvelope {
-  const encodedContestSelection = contestSelectionToByteArray(contestConfig, contestSelection)
-  const contestPoints = bytesToPoints(encodedContestSelection)
-
-  // Encrypt the contestPoints
-  const encryptionKeyPoint = pointFromHex(encryptionKey).toEccPoint();
-
-  const contestEnvelope: ContestEnvelope = {
-    reference: contestSelection.reference,
-    cryptograms: [],
-    randomizers: []
+  if( contestConfig.content.reference !== contestSelection.reference ){
+    throw new Error("contest selection does not match contest")
   }
 
-  contestPoints.map(votePoint => {
+  const encryptionKeyPoint = pointFromHex(encryptionKey).toEccPoint();
+
+  const encryptedPiles: EncryptedPile[] = contestSelection.piles.map(sp => {
+    return encryptSelectionPile(contestConfig, sp, encryptionKeyPoint)
+  })
+
+  return {
+    reference: contestSelection.reference,
+    piles: encryptedPiles,
+  }
+}
+
+function encryptSelectionPile(
+  contestConfig: ContestConfig,
+  selectionPile: SelectionPile,
+  encryptionKeyPoint: SjclEllipticalPoint
+): EncryptedPile {
+  const encodedSelectionPile = selectionPileToByteArray(contestConfig, selectionPile)
+  const pilePoints = bytesToPoints(encodedSelectionPile)
+
+  const encryptedPile: EncryptedPile = {multiplier: selectionPile.multiplier, cryptograms: [], randomizers: []}
+
+  pilePoints.map(votePoint => {
     const randomizerBN = randomBN();
     const cryptogram = ElGamalPointCryptogram.encrypt(votePoint, encryptionKeyPoint, randomizerBN);
 
-    contestEnvelope.randomizers.push(bignumToHex(randomizerBN))
-    contestEnvelope.cryptograms.push(cryptogram.toString())
+    encryptedPile.randomizers.push(bignumToHex(randomizerBN))
+    encryptedPile.cryptograms.push(cryptogram.toString())
   })
 
-  return contestEnvelope
+  return encryptedPile
 }

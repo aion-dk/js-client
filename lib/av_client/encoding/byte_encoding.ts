@@ -1,11 +1,11 @@
-import { ContestConfig, ContestSelection, OptionSelection, OptionContent } from "../types"
+import {ContestConfig, OptionSelection, OptionContent, SelectionPile} from "../types"
 import { flattenOptions } from '../flatten_options'
 import { ByteArrayReader } from './byte_array_reader'
 import { ByteArrayWriter } from "./byte_array_writer"
 
 
-export function byteArrayToContestSelection( contestConfig: ContestConfig, byteArray: Uint8Array ): ContestSelection {
-  const { reference, markingType, options } = contestConfig.content
+export function byteArrayToSelectionPile(contestConfig: ContestConfig, byteArray: Uint8Array , multiplier: number): SelectionPile {
+  const { markingType, options } = contestConfig.content
   const codeSize = markingType.encoding.codeSize
 
   const flatOptions = flattenOptions(options)
@@ -18,7 +18,7 @@ export function byteArrayToContestSelection( contestConfig: ContestConfig, byteA
 
   while( reader.hasMore() ){
     const code = reader.readInteger(codeSize)
-    if( code === 0 ) throw new Error('ArgumentError: Unexpecked bytes found in byte array')
+    if( code === 0 ) throw new Error('ArgumentError: Unexpected bytes found in byte array')
 
     const reference = referenceMap[code]
     if( !reference ) throw new Error('ArgumentError: Unexpected option code encountered')
@@ -33,17 +33,14 @@ export function byteArrayToContestSelection( contestConfig: ContestConfig, byteA
   }
 
   return {
-    reference,
+    multiplier,
     optionSelections: optionSelections
   }
 }
 
 
-export function contestSelectionToByteArray( contestConfig: ContestConfig, contestSelection: ContestSelection ): Uint8Array {
-  const { reference, markingType, options } = contestConfig.content
-  if( reference !== contestSelection.reference ){
-    throw new Error("contest selection does not match contest")
-  }
+export function selectionPileToByteArray(contestConfig: ContestConfig, selectionPile: SelectionPile ): Uint8Array {
+  const { markingType, options } = contestConfig.content
 
   const flatOptions = flattenOptions(options)
   const codeMap = extractCodeMap(flatOptions)
@@ -51,7 +48,7 @@ export function contestSelectionToByteArray( contestConfig: ContestConfig, conte
 
   const writer = new ByteArrayWriter(markingType.encoding.maxSize)
 
-  contestSelection.optionSelections.forEach(optionSelection => {
+  selectionPile.optionSelections.forEach(optionSelection => {
     const writeIn = writeInMap[optionSelection.reference]
     const code = codeMap[optionSelection.reference]
 
@@ -63,7 +60,7 @@ export function contestSelectionToByteArray( contestConfig: ContestConfig, conte
     if( writeIn ){
       const text = optionSelection.text || ''
       writer.writeString(writeIn.maxSize, text)
-    } 
+    }
   })
 
   return writer.getByteArray()

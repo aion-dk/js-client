@@ -1,36 +1,46 @@
-import { ContestConfigMap, ContestSelection, ContestMap, CommitmentOpening } from "./types"
+import {ContestConfigMap, ContestSelection, ContestMap, CommitmentOpening, SealedPile} from "./types"
 import { ElGamalPointCryptogram, addBigNums } from "./aion_crypto"
 import { bignumFromHex, pointFromHex } from "./crypto/util"
 import { pointsToBytes } from "./encoding/point_encoding"
-import { byteArrayToContestSelection } from "./encoding/byte_encoding"
+import { byteArrayToSelectionPile } from "./encoding/byte_encoding"
 
 export function decryptContestSelections(
   contestConfigs: ContestConfigMap,
   encryptionKey: string,
-  cryptograms: ContestMap<string[]>,
+  contests: ContestMap<SealedPile[]>,
   boardCommitmentOpening: CommitmentOpening,
   voterCommitmentOpening: CommitmentOpening
 ): ContestSelection[] {
 
-  return Object.keys(cryptograms).map(function(contestReference) {
+  const contestSelections = Object.entries(contests).map(function([contestReference, piles]): ContestSelection {
     const contestConfig = contestConfigs[contestReference]
-    const contestCryptograms = cryptograms[contestReference]
-    const randomizers = combineRandomizers(contestReference, boardCommitmentOpening, voterCommitmentOpening)
+    const otherPiles = piles.map((sealedPile, index) => {
+      const pileCryptograms = sealedPile.cryptograms
+      const pileMultiplier = sealedPile.multiplier
+      const randomizers = combineRandomizers(contestReference, index, boardCommitmentOpening, voterCommitmentOpening)
 
-    const points = decryptPoints(contestCryptograms, randomizers, encryptionKey)
-    const maxSize = contestConfig.content.markingType.encoding.maxSize
-    const encodedContestSelection = pointsToBytes(points, maxSize)
-    return byteArrayToContestSelection(contestConfig, encodedContestSelection)
+      const points = decryptPoints(pileCryptograms, randomizers, encryptionKey)
+      const maxSize = contestConfig.content.markingType.encoding.maxSize
+      const encodedContestSelection = pointsToBytes(points, maxSize)
+      return byteArrayToSelectionPile(contestConfig, encodedContestSelection, pileMultiplier)
+    });
+    return {
+      reference: contestReference,
+      piles: otherPiles
+    }
   })
+
+  return contestSelections;
 }
 
-function combineRandomizers( 
-  contestReference: string, 
-  boardCommitmentOpening: CommitmentOpening, 
-  voterCommitmentOpening: CommitmentOpening 
-){
-  const br = boardCommitmentOpening.randomizers[contestReference]
-  const vr = voterCommitmentOpening.randomizers[contestReference]
+function combineRandomizers(
+  contestReference: string,
+  index: number,
+  boardCommitmentOpening: CommitmentOpening,
+  voterCommitmentOpening: CommitmentOpening
+): string[] {
+  const br = boardCommitmentOpening.randomizers[contestReference][index]
+  const vr = voterCommitmentOpening.randomizers[contestReference][index]
 
   return Object.keys(vr).map(i => addBigNums(vr[i], br[i]))
 }
