@@ -122,7 +122,7 @@ export interface VoterSessionItem extends BaseBoardItem {
     voterGroup: string
     publicKey: string
     votingRoundReference: string
-    weight?: number
+    weight: number
     segments?: Segments
   }
 

@@ -45,6 +45,7 @@ function extractConfig( state: ClientState ){
   const ballotConfig = ballotConfigs[voterGroup]
   const votingRoundConfig = votingRoundConfigs[state.votingRoundReference]
 
+
   if( !ballotConfig ){
     throw new InvalidStateError('Cannot construct ballot cryptograms. Ballot config not found for voter')
   }

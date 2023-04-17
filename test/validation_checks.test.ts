@@ -31,6 +31,7 @@ describe('Validation checks', () => {
         authToken: "123",
         identifier: "identifier",
         voterGroup: "group1",
+        weight: 1,
         publicKey: "12345",
         votingRoundReference: "round1",
       },
@@ -38,7 +39,7 @@ describe('Validation checks', () => {
     }
 
     const receivedSessionItem: BoardItem = {
-      address: "33e486117e7255861e15a31781d494700d68ed35e41e6ebcb0926ce5b3c828fb",
+      address: "ba7520c37f9a81a5eee305dda9183799acea93f05a832a0016ae4e6659411ca4",
       author: "",
       parentAddress: "12345",
       previousAddress: "11111",
@@ -49,6 +50,7 @@ describe('Validation checks', () => {
         identifier: "identifier",
         voterGroup: "group1",
         publicKey: "12345",
+        weight: 1,
         votingRoundReference: "round1",
         segments: { "age": "10-20" }
       },
@@ -97,6 +99,7 @@ describe('Validation checks', () => {
         authToken: "",
         identifier: "",
         voterGroup: "",
+        weight: 1,
         publicKey: publicKey,
         votingRoundReference: ""
       },
