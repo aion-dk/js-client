@@ -18,16 +18,20 @@ describe('getReadbleContestSelections', () => {
     const contestSelections = [
       {
         reference: 'contest ref 1',
-        optionSelections: [{ reference: 'option ref 1' }]
+        piles: [{
+          multiplier: 1,
+          optionSelections: [{ reference: "option ref 1" }],
+        }]
       },
       {
         reference: 'contest ref 2',
-        optionSelections: [
-          {
+        piles: [{
+          multiplier: 1,
+          optionSelections: [{
             reference: 'option ref 2',
             text: 'John Doe'
-          }
-        ]
+          }],
+        }]
       },
     ]
 
@@ -38,24 +42,30 @@ describe('getReadbleContestSelections', () => {
         {
           reference: 'contest ref 1',
           title: 'First ballot',
-          optionSelections: [
-            {
-              reference: 'option ref 1',
-              text: undefined,
-              title: 'Option 1'
-            }
-          ]
+          piles: [{
+            multiplier: 1,
+            optionSelections: [
+              {
+                reference: 'option ref 1',
+                text: undefined,
+                title: 'Option 1'
+              }
+            ]
+          }]
         },
         {
           reference: 'contest ref 2',
           title: 'Second ballot',
-          optionSelections: [
-            {
-              reference: 'option ref 2',
-              text: 'John Doe',
-              title: 'Option 2'
-            }
-          ]
+          piles: [{
+            multiplier: 1,
+            optionSelections: [
+              {
+                reference: 'option ref 2',
+                text: 'John Doe',
+                title: 'Option 2'
+              }
+            ]
+          }]
         },
       ])
     });
@@ -65,11 +75,17 @@ describe('getReadbleContestSelections', () => {
     const contestSelections = [
       {
         reference: 'not present',
-        optionSelections: [{ reference: 'option ref 1' }]
+        piles: [{
+          multiplier: 1,
+          optionSelections: [{ reference: "option ref 1" }],
+        }]
       },
       {
         reference: 'contest ref 2',
-        optionSelections: [{ reference: 'option ref 3' }]
+        piles: [{
+          multiplier: 1,
+          optionSelections: [{ reference: "option ref 3" }],
+        }]
       },
     ]
 
@@ -84,11 +100,17 @@ describe('getReadbleContestSelections', () => {
     const contestSelections = [
       {
         reference: 'contest ref 1',
-        optionSelections: [{ reference: 'not present' }]
+        piles: [{
+          multiplier: 1,
+          optionSelections: [{ reference: "not present" }],
+        }]
       },
       {
         reference: 'contest ref 2',
-        optionSelections: [{ reference: 'option ref 3' }]
+        piles: [{
+          multiplier: 1,
+          optionSelections: [{ reference: "option ref 3" }],
+        }]
       },
     ]
 

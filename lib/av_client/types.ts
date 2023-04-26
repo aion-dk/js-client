@@ -29,6 +29,18 @@ export interface ContestMap<T> {
   [contestId: string]: T;
 }
 
+export interface EncryptedPile {
+  multiplier: number;
+  cryptograms: string[];
+  randomizers: string[];
+}
+
+export interface SealedPile {
+  multiplier: number;
+  cryptograms: string[];
+}
+
+
 export type KeyPair = {
   privateKey: string;
   publicKey: string;
@@ -90,7 +102,7 @@ export type BoardItemType =
   "VoterSessionItem" |
   "VoterEncryptionCommitmentOpeningItem"
 
-interface BaseBoardItem {
+export interface BaseBoardItem {
   address: string
   author: string
   parentAddress: string
@@ -110,6 +122,7 @@ export interface VoterSessionItem extends BaseBoardItem {
     voterGroup: string
     publicKey: string
     votingRoundReference: string
+    weight: number
     segments?: Segments
   }
 
@@ -153,7 +166,7 @@ export interface VoterCommitmentItem extends BaseBoardItem {
 
 export interface BallotCryptogramItem extends BaseBoardItem {
   content: {
-    cryptograms: ContestMap<string[]>
+    contests: ContestMap<SealedPile[]>
   }
   type: "BallotCryptogramsItem"
 }
@@ -174,7 +187,7 @@ export interface SpoilRequestItem extends BaseBoardItem {
 }
 
 export interface CommitmentOpening {
-  randomizers: ContestMap<string[]>
+  randomizers: ContestMap<string[][]>
   commitmentRandomness: string
 }
 
@@ -194,6 +207,7 @@ export type HashValue = string;
 export interface MarkingType {
   minMarks: number
   maxMarks: number
+  maxPiles?: number
   voteVariation?: string
   blankSubmission: "disabled" | "active_choice" | "implicit"
   encoding: {
@@ -223,6 +237,11 @@ export type BallotSelection = {
 
 export type ContestSelection = {
   reference: string
+  piles: SelectionPile[]
+}
+
+export type SelectionPile = {
+  multiplier: number,
   optionSelections: OptionSelection[]
 }
 
@@ -233,13 +252,17 @@ export type OptionSelection = {
 
 export type ContestEnvelope = {
   reference: string
-  cryptograms: string[]
-  randomizers: string[]
+  piles: EncryptedPile[]
 }
 
 export type ReadableContestSelection = {
   reference: string
   title: string
+  piles: ReadableSelectionPile[]
+}
+
+export type ReadableSelectionPile = {
+  multiplier: number,
   optionSelections: ReadableOptionSelection[]
 }
 
@@ -505,9 +528,5 @@ export interface ExtractionConfirmations {
 export interface ClientState {
   latestConfig: LatestConfig
   votingRoundReference: string
-  voterSession: {
-    content: {
-      voterGroup: string
-    }
-  }
+  voterSession: VoterSessionItem
 }

@@ -95,7 +95,7 @@ export class AVClient implements IAVClient {
   private keyPair: KeyPair;
 
   private clientEnvelopes: ContestEnvelope[];
-  private serverEnvelopes: ContestMap<string[]>;
+  private serverEnvelopes: ContestMap<string[][]>;
   private voterSession: VoterSessionItem;
   private boardCommitment: BoardCommitmentItem;
   private verifierItem: VerifierItem
@@ -324,7 +324,7 @@ export class AVClient implements IAVClient {
 
     const {
       pedersenCommitment,
-      envelopeRandomizers, // TODO: Required when spoiling
+      envelopeRandomizers,
       contestEnvelopes,
     } = constructContestEnvelopes(state, ballotSelection);
 
@@ -335,8 +335,9 @@ export class AVClient implements IAVClient {
       randomizers: envelopeRandomizers
     }
 
+    const contestPilesMap = contestEnvelopes.map(ce => [ce.reference, ce.piles.length])
+
     const {
-      // voterCommitment,     // TODO: Required when spoiling
       boardCommitment,
       serverEnvelopes
     } = await submitVoterCommitment(
@@ -344,6 +345,7 @@ export class AVClient implements IAVClient {
       this.voterSession.address,
       pedersenCommitment.commitment,
       this.privateKey(),
+      Object.fromEntries(contestPilesMap),
       this.getDbbPublicKey()
     );
     this.boardCommitment = boardCommitment;
@@ -398,7 +400,7 @@ export class AVClient implements IAVClient {
       };
 
       let encryptedAffidavit;
-      
+
       if (affidavit && this?.latestConfig?.items?.electionConfig?.content?.castRequestItemAttachmentEncryptionKey) {
         try {
           encryptedAffidavit = dhEncrypt(this.latestConfig.items.electionConfig.content.castRequestItemAttachmentEncryptionKey, affidavit).toString()
@@ -518,7 +520,7 @@ export class AVClient implements IAVClient {
   public getVoterContestConfigs(): ContestConfig[] {
     const voterSession = this.getVoterSession()
     const { items: { ballotConfigs, votingRoundConfigs, contestConfigs }} = this.getLatestConfig()
-    
+
     const myBallotConfig = ballotConfigs[voterSession.content.voterGroup]
     const myVotingRoundConfig = votingRoundConfigs[voterSession.content.votingRoundReference]
     const contestsICanVoteOn = myBallotConfig.content.contestReferences.filter(value => myVotingRoundConfig.content.contestReferences.includes(value));
@@ -596,7 +598,7 @@ export class AVClient implements IAVClient {
   /**
    * Finds the ballot status corresponding to the given trackingcode.
    * Also returns the activities associated with the ballot
-   * 
+   *
    * @param trackingCode base58-encoded trackingcode
   */
   public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
@@ -607,7 +609,7 @@ export class AVClient implements IAVClient {
       activities: activities,
       status: status
     }
-    
+
     return ballotStatus
   }
 }
@@ -627,7 +629,7 @@ export type {
 
 export {
   extractContestSelections,
-  AVVerifier,   
+  AVVerifier,
   AvClientError,
   AccessCodeExpired,
   AccessCodeInvalid,

@@ -6,7 +6,7 @@ import { BoardCommitmentItem, ContestMap, VoterCommitmentItem } from "../types";
 type SubmitVoterCommitmentResponse = {
   voterCommitment: VoterCommitmentItem
   boardCommitment: BoardCommitmentItem
-  serverEnvelopes: ContestMap<string[]>
+  serverEnvelopes: ContestMap<string[][]>
 }
 
 const submitVoterCommitment = async (
@@ -14,12 +14,14 @@ const submitVoterCommitment = async (
   sessionAddress: string,
   commitment: string,
   voterSigningKey: string,
+  pilesPerContest: ContestMap<number>,
   dbbPublicKey: string): Promise<SubmitVoterCommitmentResponse> => {
 
   const voterCommitmentItem = {
     parentAddress: sessionAddress,
     type: VOTER_COMMITMENT_ITEM,
     content: {
+      pilesPerContest: pilesPerContest,
       commitment: commitment
     }
   };
@@ -44,7 +46,7 @@ const submitVoterCommitment = async (
 
   return {
     voterCommitment: voterCommitmentCopy,
-    boardCommitment, 
+    boardCommitment,
     serverEnvelopes
   }
 }

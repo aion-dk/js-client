@@ -99,12 +99,16 @@ describe("validateContestSelection", () => {
   context("when given a valid contest selection", () => {
     const contestSelection = {
       reference: "contest-1",
-      optionSelections: [{ reference: "option-1" }],
+      piles: [{
+        multiplier: 1,
+        optionSelections: [{ reference: "option-1" }],
+      }]
+
     };
 
     it("does not throw error", () => {
       expect(() => {
-        validateContestSelection(contestOne, contestSelection);
+        validateContestSelection(contestOne, contestSelection, 1);
       }).to.not.throw();
     });
   });
@@ -112,12 +116,15 @@ describe("validateContestSelection", () => {
   context("when given a contest selection with wrong reference", () => {
     const contestSelection = {
       reference: "wrong-contest-reference",
-      optionSelections: [{ reference: "option-1" }],
+      piles: [{
+        multiplier: 1,
+        optionSelections: [{ reference: "option-1" }],
+      }]
     };
 
     it("throws an error", () => {
       expect(() => {
-        validateContestSelection(contestOne, contestSelection);
+        validateContestSelection(contestOne, contestSelection, 1);
       }).to.throw(
         CorruptSelectionError,
         "Contest selection is not matching contest config"
@@ -130,12 +137,15 @@ describe("validateContestSelection", () => {
     () => {
       const contestSelection = {
         reference: "contest-1",
-        optionSelections: [],
+        piles: [{
+          multiplier: 1,
+          optionSelections: [],
+        }]
       };
 
       it("throws an error", () => {
         expect(() => {
-          validateContestSelection(contestOne, contestSelection);
+          validateContestSelection(contestOne, contestSelection, 1);
         }).to.throw(
           CorruptSelectionError,
           "Blank submissions are not allowed in this contest"
@@ -149,12 +159,15 @@ describe("validateContestSelection", () => {
     () => {
       const contestSelection = {
         reference: "contest-2",
-        optionSelections: [],
+        piles: [{
+          multiplier: 1,
+          optionSelections: [],
+        }]
       };
 
       it("does not throw an error", () => {
         expect(() => {
-          validateContestSelection(contestTwo, contestSelection);
+          validateContestSelection(contestTwo, contestSelection, 1);
         }).to.not.throw();
       });
     }
@@ -163,12 +176,15 @@ describe("validateContestSelection", () => {
   context("when given a contest selection with two selections", () => {
     const contestSelection = {
       reference: "contest-1",
-      optionSelections: [{ reference: "option-1" }, { reference: "option-3" }],
+      piles: [{
+        multiplier: 1,
+        optionSelections: [{ reference: "option-1" }, { reference: "option-3" }],
+      }]
     };
 
     it("throws an error", () => {
       expect(() => {
-        validateContestSelection(contestOne, contestSelection);
+        validateContestSelection(contestOne, contestSelection, 1);
       }).to.throw(
         CorruptSelectionError,
         "Contest selection does not contain a valid amount of option selections"
@@ -179,12 +195,15 @@ describe("validateContestSelection", () => {
   context("when given a contest selection with wrong options", () => {
     const contestSelection = {
       reference: "contest-1",
-      optionSelections: [{ reference: "option-2" }],
+      piles: [{
+        multiplier: 1,
+        optionSelections: [{ reference: "option-2" }],
+      }]
     };
 
     it("throws an error", () => {
       expect(() => {
-        validateContestSelection(contestOne, contestSelection);
+        validateContestSelection(contestOne, contestSelection, 1);
       }).to.throw(CorruptSelectionError, "Option config not found");
     });
   });
@@ -195,15 +214,19 @@ describe("validateContestSelection", () => {
       () => {
         const contestSelection = {
           reference: "contest-2",
-          optionSelections: [
-            { reference: "option-a" },
-            { reference: "option-a" },
-          ],
+          piles: [{
+            multiplier: 1,
+            optionSelections: [
+              { reference: "option-a" },
+              { reference: "option-a" },
+            ],
+          }]
+
         };
 
         it("throws an error", () => {
           expect(() => {
-            validateContestSelection(contestTwo, contestSelection);
+            validateContestSelection(contestTwo, contestSelection, 1);
           }).to.throw(
             CorruptSelectionError,
             "Same option selected multiple times"
@@ -256,11 +279,17 @@ describe("validateBallotSelection", () => {
       contestSelections: [
         {
           reference: "contest-1",
-          optionSelections: [{ reference: "option-1" }],
+          piles: [{
+            multiplier: 1,
+            optionSelections: [{ reference: "option-1" }],
+          }]
         },
         {
           reference: "contest-2",
-          optionSelections: [{ reference: "option-a" }],
+          piles: [{
+            multiplier: 1,
+            optionSelections: [{ reference: "option-a" }],
+          }]
         },
       ],
     };
@@ -271,7 +300,8 @@ describe("validateBallotSelection", () => {
           ballotConfig,
           contestConfigs,
           ballotSelection,
-          votingRoundConfig
+          votingRoundConfig,
+          1
         );
       }).to.not.throw();
     });
@@ -283,11 +313,17 @@ describe("validateBallotSelection", () => {
       contestSelections: [
         {
           reference: "contest-1",
-          optionSelections: [{ reference: "option-1" }],
+          piles: [{
+            multiplier: 1,
+            optionSelections: [{ reference: "option-1" }],
+          }]
         },
         {
           reference: "contest-2",
-          optionSelections: [{ reference: "option-a" }],
+          piles: [{
+            multiplier: 1,
+            optionSelections: [{ reference: "option-a" }],
+          }]
         },
       ],
     };
@@ -298,7 +334,8 @@ describe("validateBallotSelection", () => {
           ballotConfig,
           contestConfigs,
           ballotSelection,
-          votingRoundConfig
+          votingRoundConfig,
+          1
         );
       }).to.throw(
         CorruptSelectionError,
@@ -330,7 +367,10 @@ describe("validateBallotSelection", () => {
         contestSelections: [
           {
             reference: "contest-1",
-            optionSelections: [{ reference: "option-1" }],
+            piles: [{
+              multiplier: 1,
+              optionSelections: [{ reference: "option-1" }],
+            }]
           },
         ],
       };
@@ -341,7 +381,8 @@ describe("validateBallotSelection", () => {
             ballotConfig,
             contestConfigs,
             ballotSelection,
-            votingRoundConfig
+            votingRoundConfig,
+            1
           );
         }).to.throw(
           CorruptSelectionError,
@@ -372,7 +413,10 @@ describe("validateBallotSelection", () => {
             contestSelections: [
               {
                 reference: "contest-1",
-                optionSelections: [{ reference: "option-1" }],
+                piles: [{
+                  multiplier: 1,
+                  optionSelections: [{ reference: "option-1" }],
+                }]
               },
             ],
           };
@@ -383,7 +427,8 @@ describe("validateBallotSelection", () => {
                 ballotConfig,
                 contestConfigs,
                 ballotSelection,
-                votingRoundConfig
+                votingRoundConfig,
+                1
               );
             }).to.not.throw();
           });
@@ -396,11 +441,17 @@ describe("validateBallotSelection", () => {
                 contestSelections: [
                   {
                     reference: "contest-1",
-                    optionSelections: [{ reference: "option-1" }],
+                    piles: [{
+                      multiplier: 1,
+                      optionSelections: [{ reference: "option-1" }],
+                    }]
                   },
                   {
                     reference: "contest-1",
-                    optionSelections: [{ reference: "option-1" }],
+                    piles: [{
+                      multiplier: 1,
+                      optionSelections: [{ reference: "option-1" }],
+                    }]
                   },
                 ],
               };
@@ -411,7 +462,8 @@ describe("validateBallotSelection", () => {
                     ballotConfig,
                     contestConfigs,
                     ballotSelection,
-                    votingRoundConfig
+                    votingRoundConfig,
+                    1
                   );
                 }).to.throw(
                   CorruptSelectionError,
@@ -429,11 +481,17 @@ describe("validateBallotSelection", () => {
                 contestSelections: [
                   {
                     reference: "contest-1",
-                    optionSelections: [{ reference: "option-1" }],
+                    piles: [{
+                      multiplier: 1,
+                      optionSelections: [{ reference: "option-1" }],
+                    }]
                   },
                   {
                     reference: "contest-2",
-                    optionSelections: [{ reference: "option-1" }],
+                    piles: [{
+                      multiplier: 1,
+                      optionSelections: [{ reference: "option-1" }],
+                    }]
                   },
                 ],
               };
@@ -459,7 +517,8 @@ describe("validateBallotSelection", () => {
                     ballotConfig,
                     contestConfigs,
                     ballotSelection,
-                    votingRoundConfig
+                    votingRoundConfig,
+                    1
                   );
                 }).to.throw(
                   CorruptSelectionError,

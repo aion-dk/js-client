@@ -1,4 +1,4 @@
-import { ContestMap } from "../types";
+import {ContestMap} from "../types";
 import {Bignum} from "./bignum";
 import {Point} from "./point";
 import {
@@ -44,7 +44,7 @@ class PedersenCommitment {
   static generate(messages: ContestMap<Bignum[]>, commitmentRandomizer: Bignum): Point {
     const initialPoint = new Point(Curve.G).mult(commitmentRandomizer);
     const terms = Object.entries(messages).flatMap(([contestReference, messages]) => {
-      
+
       const terms = messages.map((message, index) => {
         const generator = PedersenCommitment.computeGenerator(contestReference, index);
         return generator.mult(message);
@@ -77,11 +77,11 @@ const stringMapToBignumMap = (stringMap: ContestMap<string[]>): ContestMap<Bignu
  * @param options Optional options object. Allows caller to specify randomizer
  * @returns Commitment point and randomizer, both as hex.
  */
-const generatePedersenCommitment = (randomizers: ContestMap<string[]>, options?: { randomizer: string }) => {
+const generatePedersenCommitment = (randomizers: ContestMap<string[][]>, options?: { randomizer: string }) => {
   const randomizer = options && options.randomizer ?
     new Bignum(options.randomizer) : generateRandomBignum();
 
-  const messages = stringMapToBignumMap(randomizers);
+  const messages = stringMapToBignumMap(flattenRandomizers(randomizers));
 
   const commitment = PedersenCommitment.generate(messages, randomizer)
 
@@ -95,16 +95,26 @@ const generatePedersenCommitment = (randomizers: ContestMap<string[]>, options?:
  * @description Checks if a commitment is valid, given a set of messages and a randomizer
  * @returns true if commitment passes validity check. Otherwise false.
  */
-const isValidPedersenCommitment = (commitment: string, randomizers: ContestMap<string[]>, randomizer: string) => {
+const isValidPedersenCommitment = (commitment: string, randomizers: ContestMap<string[][]>, randomizer: string) => {
   if([commitment, randomizer].some(m => !isValidHexString(m)))
     throw new Error("Input is not a valid hex string");
 
-  const messages = stringMapToBignumMap(randomizers);
+  const messages = stringMapToBignumMap(flattenRandomizers(randomizers));
   const pointCommitment = pointFromHex(commitment);
   const bnRandomizer = bignumFromHex(randomizer);
 
   return PedersenCommitment.verify(pointCommitment, messages, bnRandomizer);
 }
+
+function flattenRandomizers( randomizers: ContestMap<string[][]> ): ContestMap<string[]> {
+  const flatten = (arrays: string[][]) => Object.values(arrays).reduce((collector, pileRandomizers): string[] => {
+    return [...collector, ...pileRandomizers]
+  }, []);
+
+  const entries = Object.entries(randomizers).map(([reference, randomizers]) => [reference, flatten(randomizers)])
+  return Object.fromEntries(entries)
+}
+
 
 export {
   generatePedersenCommitment,
