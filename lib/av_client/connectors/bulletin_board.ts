@@ -52,7 +52,7 @@ export class BulletinBoard {
 
   async expireVoterSessions(authToken: string, parentAddress: string): Promise<AxiosResponse> {
     const response = await this.backend.post('voting/expirations', {
-      authToken,
+      expToken: authToken,
       parentAddress
     }).catch(error => {
       const response = error.response as AxiosResponse<BulletinBoardData>;
