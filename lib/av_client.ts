@@ -264,7 +264,7 @@ export class AVClient implements IAVClient {
     return this.createVoterRegistration();
   }
 
-  public async expireVoterSessions(votingRoundReference: string): Promise<void> {
+  public async expireVoterSessions(votingRoundReference: string): Promise<AxiosResponse> {
     const {
       url: vaUrl,
       contextUuid: vaUuid,
@@ -295,7 +295,7 @@ export class AVClient implements IAVClient {
     if(decodedAuthToken === null)
       throw new InvalidTokenError('Auth token could not be decoded');
 
-    await this.bulletinBoard.expireVoterSessions(authToken, latestConfigAddress);
+    return await this.bulletinBoard.expireVoterSessions(authToken, latestConfigAddress);
   }
 
   /**
