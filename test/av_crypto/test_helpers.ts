@@ -47,3 +47,7 @@ export function fixedPoint2(curve: Curve): SjclEllipticalPoint {
 
   return keyPair.pub._point;
 }
+
+export function hexString(hex: string): string {
+  return hex.replace(/\s/g, "")
+}

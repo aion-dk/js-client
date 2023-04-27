@@ -22,8 +22,7 @@ describe("ElGamal", () => {
       it ("produces a deterministic cryptogram", () => {
         const cryptogram = encrypt(message, encryptionKey, curve, randomness)
 
-        expect(cryptogram.toString())
-          .to.equal(
+        expect(cryptogram.toString()).to.equal(
             (
               "03" +
               "fdb56f2d 282189d5 592305cc cc5ba3f3" +

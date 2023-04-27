@@ -1,4 +1,4 @@
-import {BigNumber, SjclEllipticalCurve, SjclHashStatic} from "./sjcl/sjcl";
+import {BigNumber, SjclEllipticalCurve, SjclEllipticalPoint, SjclHashStatic} from "./sjcl/sjcl";
 import * as sjcl from "./sjcl/sjcl";
 
 export class Curve {
@@ -6,6 +6,10 @@ export class Curve {
 
   constructor(name: string) {
     this._curve = sjcl.ecc.curves[name]
+
+    if (this._curve === undefined) {
+      throw new Error("curve name is invalid")
+    }
   }
 
   public curve(): SjclEllipticalCurve {
@@ -16,8 +20,32 @@ export class Curve {
     return this._curve.r
   }
 
+  public prime(): BigNumber {
+    return this._curve.field.modulus
+  }
+
+  public a(): BigNumber {
+    return this._curve.a
+  }
+
+  public b(): BigNumber {
+    return this._curve.b
+  }
+
+  public G(): SjclEllipticalPoint {
+    return this._curve.G
+  }
+
   public sha(): SjclHashStatic {
     return sjcl.hash.sha256
+  }
+
+  public pointHexPattern(): RegExp {
+    return new RegExp('^' + this.pointHexPrimitive().source + '$')
+  }
+
+  public scalarHexPattern(): RegExp {
+    return new RegExp('^' + this.scalarHexPrimitive().source + '$')
   }
 
   public pointHexPrimitive(): RegExp {

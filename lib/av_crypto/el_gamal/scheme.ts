@@ -20,7 +20,7 @@ export function encrypt(
   }
 
   const r = randomness.pub._point
-  const c = addPoints(encryptionKey.mult(randomness.sec._exponent), message)
+  const c = addPoints([encryptionKey.mult(randomness.sec._exponent), message])
 
   return new Cryptogram(r, c)
 }

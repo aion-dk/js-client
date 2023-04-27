@@ -485,6 +485,8 @@ declare namespace sjcl {
         fromBits(bits: BitArray): SjclEllipticalPoint;
         field: PseudoMersennePrime;
         r: BigNumber;
+        a: BigNumber;
+        b: BigNumber;
         G: SjclEllipticalPoint;
     }
 
