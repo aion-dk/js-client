@@ -222,7 +222,7 @@ export class AVClient implements IAVClient {
 
       authorizationResponse = await coordinator.authorizeProofOfElectionCodes(this.keyPair.publicKey, this.proofOfElectionCodes, this.votingRoundReference)
     } else {
-      throw new InvalidConfigError('Unknown authorization mode of voter authorizer')
+      throw new InvalidConfigError(`Unknown authorization mode of voter authorizer: '${authorizationMode}'`)
     }
 
     const { authToken } = authorizationResponse.data;
@@ -262,6 +262,40 @@ export class AVClient implements IAVClient {
    */
   public async registerVoter(): Promise<void> {
     return this.createVoterRegistration();
+  }
+
+  public async expireVoterSessions(votingRoundReference: string): Promise<void> {
+    const {
+      url: vaUrl,
+      contextUuid: vaUuid,
+      authorizationMode,
+    } = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer;
+    const latestConfigAddress = this.getLatestConfig().items.latestConfigItem.address;
+    const coordinator = new VoterAuthorizationCoordinator(vaUrl, vaUuid);
+
+    let authorizationResponse: AxiosResponse
+
+    switch (authorizationMode) {
+      case "proof-of-election-codes":
+        authorizationResponse = await coordinator.authorizeProofOfElectionCodes(
+          this.keyPair.publicKey,
+          this.proofOfElectionCodes,
+          votingRoundReference,
+          "expire");
+        break;
+      case "proof-of-identity":
+        throw new InvalidStateError("voter_authorizer.expire_voter.proof_of_identity_not_supported");
+      default:
+        throw new InvalidConfigError(`Unknown authorization mode of voter authorizer: '${authorizationMode}'`);
+    }
+
+    const { authToken } = authorizationResponse.data;
+    const decodedAuthToken = jwtDecode<JwtPayload>(authToken);
+
+    if(decodedAuthToken === null)
+      throw new InvalidTokenError('Auth token could not be decoded');
+
+    await this.bulletinBoard.expireVoterSessions(authToken, latestConfigAddress);
   }
 
   /**
