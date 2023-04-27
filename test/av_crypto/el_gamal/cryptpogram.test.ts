@@ -18,10 +18,15 @@ describe("Cryptogram", () => {
 
   describe("toString()", () => {
     it ("returns the right pattern", () => {
-      const string = cryptogram.toString()
-      console.log(string)
+      expect(cryptogram.toString()).to.match(pattern(curve))
+    })
+  })
 
-      expect(string).to.match(pattern(curve))
+  describe("pattern()", () => {
+    it ("returns the right value", () => {
+      expect(pattern(curve).source).to.equal(
+        "^(((?:02|03)([a-f0-9]{64})|00),((?:02|03)([a-f0-9]{64})|00))$"
+      )
     })
   })
 })

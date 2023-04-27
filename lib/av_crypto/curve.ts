@@ -21,11 +21,11 @@ export class Curve {
   }
 
   public pointHexPrimitive(): RegExp {
-    return new RegExp('(?:02|03)' + this.scalarHexPrimitive() + '|00')
+    return new RegExp('((?:02|03)' + this.scalarHexPrimitive().source + '|00)')
   }
 
   public scalarHexPrimitive(): RegExp {
-    return new RegExp('[a-f0-9]{' + this.scalarHexSize() + '}')
+    return new RegExp('([a-f0-9]{' + this.scalarHexSize() + '})')
   }
 
   public scalarHexSize(): number {

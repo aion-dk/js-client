@@ -17,5 +17,11 @@ export class Cryptogram {
 }
 
 export function pattern(curve: Curve): RegExp {
-  return new RegExp(curve.pointHexPrimitive() + "," + curve.pointHexPrimitive());
+  return new RegExp(
+    "^(" +
+    curve.pointHexPrimitive().source +
+    "," +
+    curve.pointHexPrimitive().source +
+    ")$"
+  );
 }
