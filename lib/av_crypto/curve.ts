@@ -37,7 +37,12 @@ export class Curve {
   }
 
   public sha(): SjclHashStatic {
-    return sjcl.hash.sha256
+    switch (this._curve) {
+      case sjcl.ecc.curves.c521:
+        return sjcl.hash.sha512
+      default:
+        return sjcl.hash.sha256
+    }
   }
 
   public pointHexPattern(): RegExp {
@@ -60,7 +65,7 @@ export class Curve {
     return this.scalarByteSize() * 2;
   }
 
-  public scalarByteSize(): number {
+  private scalarByteSize(): number {
     return this._curve.field.modulus.bitLength() / 8;
   }
 }
