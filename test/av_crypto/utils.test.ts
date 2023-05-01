@@ -9,7 +9,7 @@ import {
   pointToHex,
   scalarToHex
 } from "../../lib/av_crypto/utils";
-import sjcl = require("../../lib/av_crypto/sjcl/sjcl");
+import * as sjcl from "sjcl-with-all";
 
 describe("AVCrypto Utils", () => {
   const curve = new Curve('k256');

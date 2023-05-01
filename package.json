@@ -31,14 +31,14 @@
     "base-x": "^4.0.0",
     "buffer": "^6.0.3",
     "jwt-decode": "^3.1.2",
-    "xml-js": "^1.6.11"
+    "xml-js": "^1.6.11",
+    "sjcl-with-all": "^1.0.8"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.21",
     "@types/mocha": "^9.0.0",
     "@types/node": "^17.0.9",
-    "@types/sjcl": "^1.0.30",
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "@typescript-eslint/parser": "^5.9.1",
     "chai": "^4.3.4",

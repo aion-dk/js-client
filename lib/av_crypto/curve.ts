@@ -1,5 +1,5 @@
-import {BigNumber, SjclEllipticalCurve, SjclEllipticalPoint, SjclHashStatic} from "./sjcl/sjcl";
-import * as sjcl from "./sjcl/sjcl";
+import {BigNumber, SjclEllipticalCurve, SjclEllipticalPoint, SjclHashStatic} from "./sjcl";
+import * as sjcl from "sjcl-with-all";
 
 export class Curve {
   private _curve: SjclEllipticalCurve

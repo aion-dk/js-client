@@ -1,4 +1,4 @@
-import {SjclEllipticalPoint} from "../sjcl/sjcl";
+import {SjclEllipticalPoint} from "../sjcl";
 import {pointToHex} from "../utils";
 import {Curve} from "../curve";
 

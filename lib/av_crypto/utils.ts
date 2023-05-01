@@ -1,6 +1,6 @@
-import {BigNumber, SjclEllipticalPoint} from "./sjcl/sjcl";
+import {BigNumber, SjclEllipticalPoint} from "./sjcl";
 import {Curve} from "./curve";
-import sjcl = require("./sjcl/sjcl");
+import * as sjcl from "sjcl-with-all";
 
 export function addPoints(points: Array<SjclEllipticalPoint>): SjclEllipticalPoint {
   if (points.length == 0) {
