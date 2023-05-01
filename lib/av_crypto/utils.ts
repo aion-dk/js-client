@@ -15,11 +15,13 @@ export function addPoints(points: Array<SjclEllipticalPoint>): SjclEllipticalPoi
 }
 
 export function pointEquals(point1: SjclEllipticalPoint, point2: SjclEllipticalPoint): boolean {
-  if (point1.isIdentity)
+  if (point1.isIdentity) {
     return point2.isIdentity
+  }
 
-  if (point2.isIdentity)
+  if (point2.isIdentity) {
     return false
+  }
 
   return point1.x.equals(point2.x) && point1.y.equals(point2.y)
 }
