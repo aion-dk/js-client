@@ -20,3 +20,10 @@ export function encrypt(
 
   return new Cryptogram(r, c)
 }
+
+export function homomorphicallyAdd(cryptograms: Array<Cryptogram>, curve: Curve): Cryptogram {
+  const newR = addPoints(cryptograms.map(cryptogram => cryptogram.r))
+  const newC = addPoints(cryptograms.map(cryptogram => cryptogram.c))
+
+  return new Cryptogram(newR, newC);
+}
