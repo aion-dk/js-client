@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import {Curve} from "../../lib/av_crypto/curve";
 import * as sjcl from "../../lib/av_crypto/sjcl/sjcl";
-import {pointToHex, scalarToHex} from "../../lib/av_crypto/utils";
 import {hexString} from "./test_helpers";
 
 describe("Curve", () => {
@@ -65,11 +64,12 @@ describe("Curve", () => {
     it("returns the correct value", () => {
       const name = "k256";
       const curve = new Curve(name)
-
-      expect(scalarToHex(curve.order(), curve)).to.equal(hexString(
+      const expected = sjcl.bn.fromBits(sjcl.codec.hex.toBits(hexString(
         "ffffffff ffffffff ffffffff fffffffe" +
         "baaedce6 af48a03b bfd25e8c d0364141"
-      ))
+      )))
+
+      expect(curve.order()).to.eql(expected)
     })
   })
 
@@ -77,11 +77,12 @@ describe("Curve", () => {
     it("returns the correct value", () => {
       const name = "k256";
       const curve = new Curve(name)
-
-      expect(scalarToHex(curve.prime(), curve)).to.equal(hexString(
+      const expected = sjcl.bn.fromBits(sjcl.codec.hex.toBits(hexString(
         "ffffffff ffffffff ffffffff ffffffff" +
         "ffffffff ffffffff fffffffe fffffc2f"
-      ))
+      )))
+
+      expect(curve.prime()).to.eql(expected)
     })
   })
 
@@ -90,10 +91,7 @@ describe("Curve", () => {
       const name = "k256";
       const curve = new Curve(name)
 
-      expect(scalarToHex(curve.a(), curve)).to.equal(hexString(
-        "00000000 00000000 00000000 00000000" +
-        "00000000 00000000 00000000 00000000"
-      ))
+      expect(curve.a().equals(new sjcl.bn(0))).to.be.true
     })
   })
 
@@ -102,10 +100,7 @@ describe("Curve", () => {
       const name = "k256";
       const curve = new Curve(name)
 
-      expect(scalarToHex(curve.b(), curve)).to.equal(hexString(
-        "00000000 00000000 00000000 00000000" +
-        "00000000 00000000 00000000 00000007"
-      ))
+      expect(curve.b().equals(new sjcl.bn(7))).to.be.true
     })
   })
 
@@ -114,11 +109,7 @@ describe("Curve", () => {
       const name = "k256";
       const curve = new Curve(name)
 
-      expect(pointToHex(curve.G())).to.equal(hexString(
-        "02" +
-        "79be667e f9dcbbac 55a06295 ce870b07" +
-        "029bfcdb 2dce28d9 59f2815b 16f81798"
-      ))
+      expect(curve.G()).to.eql(sjcl.ecc.curves.k256.G)
     })
   })
 

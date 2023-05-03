@@ -441,6 +441,7 @@ declare namespace sjcl {
         deserialize(key: SjclECCKeyPairData): SjclECCSecretKey;
         basicKey: SjclECCBasic;
         elGamal: SjclElGamal;
+        elGamalEncryption: AVElGamalEncryption;
         ecdsa: SjclECDSA;
     }
 
@@ -448,10 +449,12 @@ declare namespace sjcl {
         toJac(): SjclPointJacobian;
         mult(k: BigNumber): SjclEllipticalPoint;
         mult2(k: BigNumber, k2: BigNumber, affine2: SjclEllipticalPoint): SjclEllipticalPoint;
+        add(that: SjclEllipticalPoint): SjclEllipticalPoint;
         multiples(): Array<SjclEllipticalPoint>;
         negate(): SjclEllipticalPoint;
         isValid(): boolean;
-        toBits(): BitArray;
+        equals(that: SjclEllipticalPoint): boolean;
+        toBits(compressed?: boolean): BitArray;
         x: BigNumber;
         y: BigNumber;
         isIdentity: boolean;
@@ -483,6 +486,7 @@ declare namespace sjcl {
 
     interface SjclEllipticalCurve {
         fromBits(bits: BitArray): SjclEllipticalPoint;
+        infinity(): SjclEllipticalPoint;
         field: PseudoMersennePrime;
         r: BigNumber;
         a: BigNumber;
@@ -569,6 +573,30 @@ declare namespace sjcl {
         publicKey: SjclECCPublicKeyFactory<SjclElGamalPublicKey>;
         secretKey: SjclECCSecretKeyFactory<SjclElGamalSecretKey>;
         generateKeys: SjclKeysGenerator<SjclElGamalPublicKey, SjclElGamalSecretKey>;
+    }
+
+    class AVElGamalEncryptionPublicKey extends SjclECCPublicKey {
+      encrypt(
+        message: SjclEllipticalPoint,
+        randomness?: BigNumber,
+        paranoia?: number
+      ): AVCryptogram;
+    }
+
+    class AVElGamalEncryptionSecretKey extends SjclECCSecretKey {
+    }
+
+    class AVCryptogram {
+      toBits(): {
+        r: BitArray,
+        c: BitArray
+      }
+    }
+
+    interface AVElGamalEncryption {
+      publicKey: SjclECCPublicKeyFactory<AVElGamalEncryptionPublicKey>;
+      secretKey: SjclECCSecretKeyFactory<AVElGamalEncryptionSecretKey>;
+      generateKeys: SjclKeysGenerator<AVElGamalEncryptionPublicKey, AVElGamalEncryptionSecretKey>;
     }
 
     class SjclECDSAPublicKey extends SjclECCPublicKey {

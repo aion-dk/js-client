@@ -2,18 +2,18 @@ import {Curve} from "../../lib/av_crypto/curve";
 import * as sjcl from "../../lib/av_crypto/sjcl/sjcl";
 import {
   BigNumber,
-  SjclElGamalPublicKey,
-  SjclElGamalSecretKey,
+  SjclECCPublicKey,
+  SjclECCSecretKey,
   SjclEllipticalPoint,
   SjclKeyPair
 } from "../../lib/av_crypto/sjcl/sjcl";
 import {hashIntoScalar} from "../../lib/av_crypto/utils";
 
-export function fixedKeyPair(curve: Curve): SjclKeyPair<SjclElGamalPublicKey, SjclElGamalSecretKey> {
+export function fixedKeyPair(curve: Curve, context: string): SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey> {
   const seed = "fixed_keypair"
   const private_key = hashIntoScalar(seed, curve)
 
-  return sjcl.ecc.elGamal.generateKeys(curve.curve(), undefined, private_key);
+  return sjcl.ecc[context].generateKeys(curve.curve(), undefined, private_key);
 }
 
 export function fixedScalar1(curve: Curve): BigNumber {
