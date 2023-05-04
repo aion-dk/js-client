@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import {Curve} from "../../lib/av_crypto/curve";
-import * as sjcl from "../../lib/av_crypto/sjcl/sjcl";
+import * as sjcl from "sjcl-with-all";
 import {pointToHex, scalarToHex} from "../../lib/av_crypto/utils";
 import {hexString} from "./test_helpers";
 

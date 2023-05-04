@@ -31,7 +31,8 @@
     "base-x": "^4.0.0",
     "buffer": "^6.0.3",
     "jwt-decode": "^3.1.2",
-    "xml-js": "^1.6.11"
+    "xml-js": "^1.6.11",
+    "sjcl-with-all": "^1.0.8"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",

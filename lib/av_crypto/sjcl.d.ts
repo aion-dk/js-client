@@ -526,14 +526,14 @@ declare namespace sjcl {
         serialize(): SjclECCKeyPairData;
         get(): SjclECCPublicKeyData;
         getType(): string;
-        _point: SjclEllipticalPoint;
+        H: SjclEllipticalPoint;
     }
 
     class SjclECCSecretKey {
         serialize(): SjclECCKeyPairData;
         get(): BitArray;
         getType(): string;
-        _exponent: BigNumber;
+        S: BigNumber;
     }
 
     interface SjclECCPublicKeyFactory<T extends SjclECCPublicKey> {
