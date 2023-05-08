@@ -141,11 +141,11 @@ describe("Curve", () => {
 
     // SJCL doesn't support SHA384
     // TODO: Figure out workaround
-    context.skip("with curve secp384r1", () => {
+    context("with curve secp384r1", () => {
       it ("assigns the correct sha", () => {
         const curve = new Curve("c384")
-        // expect(curve.sha()).to.be.equal(sjcl.hash.sha384)
         expect(curve.sha()).to.exist
+        expect(curve.sha()).to.respondTo("hash")
       })
     })
 

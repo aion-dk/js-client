@@ -1,5 +1,6 @@
 import {BigNumber, SjclEllipticalCurve, SjclEllipticalPoint, SjclHashStatic} from "./sjcl";
 import * as sjcl from "sjcl-with-all";
+import {SHA384} from "./sha384";
 
 export class Curve {
   private _curve: SjclEllipticalCurve
@@ -40,6 +41,8 @@ export class Curve {
     switch (this._curve) {
       case sjcl.ecc.curves.c521:
         return sjcl.hash.sha512
+      case sjcl.ecc.curves.c384:
+        return SHA384;
       default:
         return sjcl.hash.sha256
     }
