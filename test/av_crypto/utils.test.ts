@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import {Curve} from "../../lib/av_crypto/curve";
-import {fixedPoint1, fixedPoint2, hexString} from "./test_helpers";
+import {fixedPoint1, fixedPoint2, fixedScalar1, hexString} from "./test_helpers";
 import {
   addPoints,
   hashIntoScalar, hexToPoint, hexToScalar,
@@ -108,6 +108,22 @@ describe("AVCrypto Utils", () => {
         "82cc7f95 e66deb3d 01fb772f 21d6ddf5"
       ));
     })
+
+    context("with curve secp521r1", () => {
+      const curve = new Curve('c521');
+
+      it ("produces a deterministic scalar", () => {
+        const scalar = hashIntoScalar(string, curve)
+
+        expect(scalarToHex(scalar, curve)).to.equal(hexString(
+          "0000" +
+          "078d899f c0d76556 a5fc8fec b59581d3" +
+          "244ab042 667411ef 65e21295 a6cc99b9" +
+          "96d82aaa d6968655 6b9e444d 47bbd038" +
+          "0d215c35 3c153489 eddf2a6c 4e3558c2"
+        ));
+      })
+    })
   })
 
   describe("pointToHex()", () => {
@@ -127,6 +143,22 @@ describe("AVCrypto Utils", () => {
 
         expect(pointToHex(point)).to.equal("00")
       });
+    })
+
+    context("with curve secp521r1", () => {
+      const curve = new Curve('c521');
+
+      it ("produces a deterministic scalar", () => {
+        const point = curve.G();
+
+        expect(pointToHex(point)).to.equal(hexString(
+          "0200c6" +
+          "858e06b7 0404e9cd 9e3ecb66 2395b442" +
+          "9c648139 053fb521 f828af60 6b4d3dba" +
+          "a14b5e77 efe75928 fe1dc127 a2ffa8de" +
+          "3348b3c1 856a429b f97e7e31 c2e5bd66"
+        ))
+      })
     })
   })
 
@@ -209,22 +241,47 @@ describe("AVCrypto Utils", () => {
 
   describe("scalarToHex()", () => {
     it("encodes the correct value", () => {
-      const scalar = curve.order();
+      const scalar = fixedScalar1(curve);
+      const hex = scalarToHex(scalar, curve);
 
-      expect(scalarToHex(scalar, curve)).to.equal(hexString(
-        "ffffffff ffffffff ffffffff fffffffe" +
-        "baaedce6 af48a03b bfd25e8c d0364141"
+      expect(hex).to.equal(hexString(
+        "384c99b4 bb217ca8 23fa158c 9a3e188f" +
+        "bc76fead 356ff050 c681c370 87565973"
       ))
+      expect(hex).to.match(curve.scalarHexPattern())
     })
 
     context("with a small scalar", () => {
       const scalar = new sjcl.bn(42);
 
-      expect(scalarToHex(scalar, curve)).to.equal(hexString(
-        "00000000 00000000 00000000 00000000" +
-        "00000000 00000000 00000000 0000002a"
-      ))
-    })
+      it("encodes the correct value", () => {
+        const hex = scalarToHex(scalar, curve);
+
+        expect(hex).to.equal(hexString(
+          "00000000 00000000 00000000 00000000" +
+          "00000000 00000000 00000000 0000002a"
+        ))
+        expect(hex).to.match(curve.scalarHexPattern())
+      });
+
+      context("with curve secp521r1", () => {
+        const curve = new Curve('c521');
+
+        it ("encodes the correct value", () => {
+          const hex = scalarToHex(scalar, curve);
+
+          expect(hex).to.equal(hexString(
+            "0000" +
+            "00000000 00000000 00000000 00000000" +
+            "00000000 00000000 00000000 00000000" +
+            "00000000 00000000 00000000 00000000" +
+            "00000000 00000000 00000000 0000002a"
+          ));
+          expect(hex).to.match(curve.scalarHexPattern())
+        })
+      })
+    });
+
   })
 
   describe("hexToScalar()", () => {

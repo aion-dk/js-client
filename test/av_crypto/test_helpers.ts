@@ -21,7 +21,7 @@ export function fixedScalar1(curve: Curve): BigNumber {
   const private_key = hashIntoScalar(seed, curve)
   const keyPair = sjcl.ecc.elGamal.generateKeys(curve.curve(), undefined, private_key);
 
-  return keyPair.sec._exponent;
+  return keyPair.sec.S;
 }
 
 export function fixedPoint1(curve: Curve): SjclEllipticalPoint {
@@ -37,7 +37,7 @@ export function fixedScalar2(curve: Curve): BigNumber {
   const private_key = hashIntoScalar(seed, curve)
   const keyPair = sjcl.ecc.elGamal.generateKeys(curve.curve(), undefined, private_key);
 
-  return keyPair.sec._exponent;
+  return keyPair.sec.S;
 }
 
 export function fixedPoint2(curve: Curve): SjclEllipticalPoint {
