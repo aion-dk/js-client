@@ -2,16 +2,16 @@ import { expect } from "chai";
 import {Curve} from "../../lib/av_crypto/curve";
 import {fixedPoint1, fixedPoint2, fixedScalar1, hexString} from "./test_helpers";
 import {
-  addPoints,
+  addPoints, concatForHashing,
   hashIntoScalar, hexToPoint, hexToScalar,
-  infinityPoint,
+  infinityPoint, multiplyAndSumScalarsAndPoints,
   pointEquals,
   pointToHex,
   scalarToHex
 } from "../../lib/av_crypto/utils";
 import * as sjcl from "sjcl-with-all";
 
-describe("AVCrypto Utils", () => {
+describe("AVCrypto utils", () => {
   const curve = new Curve('k256');
 
   describe("addPoints()", () => {
@@ -39,6 +39,45 @@ describe("AVCrypto Utils", () => {
         expect(() => {
           addPoints([])
         }).to.throw("array must not be empty")
+      })
+    })
+  })
+
+  describe("multiplyAndSumScalarsAndPoints()", () => {
+    const curve = new Curve('k256');
+    const pointG = curve.G()
+    const point2G = curve.G().mult(new sjcl.bn(2))
+    const scalar1 = new sjcl.bn(10)
+    const scalar2 = new sjcl.bn(42)
+
+    it("returns the correct point", () => {
+      const scalars = [scalar1, scalar2]
+      const points = [pointG, point2G]
+
+      const result = multiplyAndSumScalarsAndPoints(scalars, points)
+      const expected = curve.G().mult(new sjcl.bn(10 + 42 * 2))
+
+      expect(pointEquals(result, expected)).to.be.true;
+    })
+
+    context("with one value", () => {
+      it("returns the correct point", () => {
+        const result = multiplyAndSumScalarsAndPoints([scalar1], [pointG])
+        const expected = curve.G().mult(new sjcl.bn(10))
+
+        expect(pointEquals(result, expected)).to.be.true;
+      })
+    })
+
+    context("with different size scalars and points", () => {
+      const scalars = [scalar1]
+      const points = [pointG, point2G]
+
+
+      it("throws error", () => {
+        expect(() => {
+          multiplyAndSumScalarsAndPoints(scalars, points)
+        }).to.throw("scalars and points must have the same size")
       })
     })
   })
@@ -329,6 +368,14 @@ describe("AVCrypto Utils", () => {
           hexToScalar(string, curve)
         }).to.throw("scalar must be lower than the curve order")
       })
+    })
+  })
+
+  describe("concatForHashing()", () => {
+    const parts = ['hello', 1, "-world"]
+
+    it ("returns the concatenated value", () => {
+      expect(concatForHashing(parts)).to.equal("hello-1--world")
     })
   })
 })

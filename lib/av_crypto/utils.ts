@@ -14,6 +14,19 @@ export function addPoints(points: Array<SjclEllipticalPoint>): SjclEllipticalPoi
   return sum.toAffine()
 }
 
+export function multiplyAndSumScalarsAndPoints(scalars: Array<BigNumber>, points: Array<SjclEllipticalPoint>): SjclEllipticalPoint {
+  if (scalars.length != points.length) {
+    throw new Error("scalars and points must have the same size")
+  }
+
+  let result = points[0].toJac().mult(scalars[0], points[0])
+  for (let i=1; i<points.length; i++) {
+    const term = points[i].mult(scalars[i])
+    result = result.add(term)
+  }
+  return result.toAffine()
+}
+
 export function pointEquals(point1: SjclEllipticalPoint, point2: SjclEllipticalPoint): boolean {
   if (point1.isIdentity) {
     return point2.isIdentity
@@ -99,7 +112,7 @@ export function hexToScalar(string: string, curve: Curve): BigNumber {
   return scalar
 }
 
-function concatForHashing(parts: Array<string | number>): string {
+export function concatForHashing(parts: Array<string | number>): string {
   return parts.map( part => part.toString() ).join("-")
 }
 

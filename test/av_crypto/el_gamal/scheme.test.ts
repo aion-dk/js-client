@@ -4,7 +4,7 @@ import {fixedKeyPair, fixedPoint1, fixedPoint2, hexString} from "../test_helpers
 import {Curve} from "../../../lib/av_crypto/curve";
 import {Cryptogram} from "../../../lib/av_crypto/el_gamal/cryptogram";
 
-describe("ElGamal", () => {
+describe("ElGamal scheme", () => {
   const curve = new Curve('k256')
   const encryptionKey = fixedPoint1(curve)
   const message = fixedPoint2(curve)
