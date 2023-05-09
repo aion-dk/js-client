@@ -1,4 +1,4 @@
-import {BigNumber, SjclEllipticalPoint} from "./sjcl";
+import {BigNumber, SjclECCPublicKey, SjclECCSecretKey, SjclEllipticalPoint, SjclKeyPair} from "./sjcl";
 import {Curve} from "./curve";
 import * as sjcl from "sjcl-with-all";
 
@@ -54,6 +54,21 @@ export function hashIntoScalar(string: string, curve: Curve): BigNumber {
   }
 
   throw new Error("unable to hash " + string + " into a scalar")
+}
+
+export function hashIntoPoint(string: string, curve: Curve): SjclEllipticalPoint {
+  const sha = curve.sha()
+  for (let i = 0; i < 10_000; i++) {
+    let xHex = sjcl.codec.hex.fromBits(sha.hash(concatForHashing([string, i])))
+    if (curve.curve() === sjcl.ecc.curves['c521']) {
+      xHex = "0000" + xHex
+    }
+    try {
+      return hexToPoint("02" + xHex, curve)
+    } catch { continue; }
+  }
+
+  throw new Error("unable to hash " + string + " into a point on the curve")
 }
 
 export function pointToHex(point: SjclEllipticalPoint): string {
@@ -114,6 +129,18 @@ export function hexToScalar(string: string, curve: Curve): BigNumber {
 
 export function concatForHashing(parts: Array<string | number>): string {
   return parts.map( part => part.toString() ).join("-")
+}
+
+export function generateKeyPair(
+  curve: Curve,
+  privateKey?: BigNumber
+): SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey> {
+  if(privateKey !== undefined && privateKey.greaterEquals(curve.order())) {
+    throw new Error("privateKey must be lower than the curve order")
+  }
+
+  const keyPair = sjcl.ecc.elGamal.generateKeys(curve.curve(), undefined, privateKey)
+  return keyPair
 }
 
 function recoverY(x: BigNumber, flag: number, curve: Curve): BigNumber {

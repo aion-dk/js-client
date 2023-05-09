@@ -2,7 +2,7 @@ import { expect } from "chai";
 import {Curve} from "../../lib/av_crypto/curve";
 import {fixedPoint1, fixedPoint2, fixedScalar1, hexString} from "./test_helpers";
 import {
-  addPoints, concatForHashing,
+  addPoints, concatForHashing, generateKeyPair, hashIntoPoint,
   hashIntoScalar, hexToPoint, hexToScalar,
   infinityPoint, multiplyAndSumScalarsAndPoints,
   pointEquals,
@@ -156,6 +156,36 @@ describe("AVCrypto utils", () => {
 
         expect(scalarToHex(scalar, curve)).to.equal(hexString(
           "0000" +
+          "078d899f c0d76556 a5fc8fec b59581d3" +
+          "244ab042 667411ef 65e21295 a6cc99b9" +
+          "96d82aaa d6968655 6b9e444d 47bbd038" +
+          "0d215c35 3c153489 eddf2a6c 4e3558c2"
+        ));
+      })
+    })
+  })
+
+  describe("hashIntoPoint()", () => {
+    const string = "hello"
+
+    it ("produces a deterministic point", ()=> {
+      const point = hashIntoPoint(string, curve)
+
+      expect(pointToHex(point)).to.equal(hexString(
+        "02" +
+        "93bd07f0 7300b787 8f910d64 b2cf63d4" +
+        "864aeaed e343c292 98ce38af fe920bc0"
+      ));
+    })
+
+    context("with curve secp521r1", () => {
+      const curve = new Curve('c521');
+
+      it ("produces a deterministic point", () => {
+        const point = hashIntoPoint(string, curve)
+
+        expect(pointToHex(point)).to.equal(hexString(
+          "020000" +
           "078d899f c0d76556 a5fc8fec b59581d3" +
           "244ab042 667411ef 65e21295 a6cc99b9" +
           "96d82aaa d6968655 6b9e444d 47bbd038" +
@@ -376,6 +406,40 @@ describe("AVCrypto utils", () => {
 
     it ("returns the concatenated value", () => {
       expect(concatForHashing(parts)).to.equal("hello-1--world")
+    })
+  })
+
+  describe("generateKeyPair()", () => {
+    it("returns a sjcl key pair", () => {
+      const keyPair = generateKeyPair(curve)
+
+      expect(pointToHex(keyPair.pub.H)).to.match(curve.pointHexPattern());
+      expect(scalarToHex(keyPair.sec.S, curve)).to.match(curve.scalarHexPattern());
+    })
+
+    context("when given a private key", () => {
+      const privateKey = fixedScalar1(curve)
+
+      it("returns a deterministic key pair", () => {
+        const keyPair = generateKeyPair(curve, privateKey)
+
+        expect(keyPair.pub.H).to.eql(fixedPoint1(curve));
+        expect(keyPair.sec.S).to.eql(privateKey);
+      })
+
+      context("when given a private key that is larger than the curve's group order", () => {
+        const privateKey = sjcl.bn.fromBits(sjcl.codec.hex.toBits(hexString(
+          "ed" +
+          "c11c291d 73e08c6a 92c6df55 e8c66094" +
+          "9b35c4a0 0a027272 9e79aac7 fe37da11"
+        )))
+
+        it("throws error", () => {
+          expect(() => {
+            generateKeyPair(curve, privateKey)
+          }).to.throw("privateKey must be lower than the curve order")
+        })
+      })
     })
   })
 })
