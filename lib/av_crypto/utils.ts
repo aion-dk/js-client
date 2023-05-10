@@ -139,8 +139,7 @@ export function generateKeyPair(
     throw new Error("privateKey must be lower than the curve order")
   }
 
-  const keyPair = sjcl.ecc.elGamal.generateKeys(curve.curve(), undefined, privateKey)
-  return keyPair
+  return sjcl.ecc.elGamal.generateKeys(curve.curve(), undefined, privateKey)
 }
 
 function recoverY(x: BigNumber, flag: number, curve: Curve): BigNumber {

@@ -3,7 +3,6 @@ import {
   SjclEllipticalPoint,
   SjclKeyPair
 } from "../sjcl";
-import * as sjcl from "sjcl-with-all";
 import {
   concatForHashing,
   generateKeyPair,
@@ -39,7 +38,7 @@ export function commit(
   messages: Array<BigNumber> | BigNumber,
   context = "",
   curve: Curve,
-  randomness: SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey> = sjcl.ecc.elGamal.generateKeys(curve.curve())
+  randomness: SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey> = generateKeyPair(curve)
 ): Commitment {
   if (!Array.isArray(messages)) {
     messages = [messages]

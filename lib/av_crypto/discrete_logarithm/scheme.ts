@@ -3,10 +3,9 @@ import {
   SjclEllipticalPoint,
   SjclKeyPair
 } from "../sjcl";
-import * as sjcl from "sjcl-with-all";
 import {
   addPoints,
-  concatForHashing,
+  concatForHashing, generateKeyPair,
   hashIntoScalar,
   multiplyAndSumScalarsAndPoints,
   pointEquals,
@@ -45,7 +44,7 @@ export function prove(
   context = "",
   curve: Curve,
   generators: Array<SjclEllipticalPoint> = [curve.G()],
-  randomness: SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey> = sjcl.ecc.elGamal.generateKeys(curve.curve()),
+  randomness: SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey> = generateKeyPair(curve),
   points?: Array<SjclEllipticalPoint>
 ): Proof {
   points = points || generators.map( g => g.mult(knowledge))

@@ -21,7 +21,7 @@ export class Proof {
   }
 }
 
-export function fromString(string: string, curve: Curve) {
+export function fromString(string: string, curve: Curve): Proof {
   if (!string.match(pattern(curve))) {
     throw new Error("input must match " + pattern(curve).source)
   }
