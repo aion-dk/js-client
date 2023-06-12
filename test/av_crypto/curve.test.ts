@@ -125,6 +125,36 @@ describe("Curve", () => {
     })
   })
 
+  describe("degree()", () => {
+    context("with curve secp256k1", () => {
+      it ("assigns the correct sjcl curve", () => {
+        const curve = new Curve("k256")
+        expect(curve.degree()).to.equal(256)
+      })
+    })
+
+    context("with curve secp256r1", () => {
+      it ("assigns the correct sjcl curve", () => {
+        const curve = new Curve("c256")
+        expect(curve.degree()).to.equal(256)
+      })
+    })
+
+    context("with curve secp384r1", () => {
+      it ("assigns the correct sjcl curve", () => {
+        const curve = new Curve("c384")
+        expect(curve.degree()).to.equal(384)
+      })
+    })
+
+    context("with curve secp521r1", () => {
+      it ("assigns the correct sjcl curve", () => {
+        const curve = new Curve("c521")
+        expect(curve.degree()).to.equal(521)
+      })
+    })
+  })
+
   describe("a()", () => {
     it("returns the correct value", () => {
       const name = "k256";

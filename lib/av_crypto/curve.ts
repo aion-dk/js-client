@@ -24,6 +24,15 @@ export class Curve {
     return this._curve.field.modulus
   }
 
+  public degree(): number {
+    switch (this._curve) {
+      case sjcl.ecc.curves.c521:
+        return 521
+      default:
+        return this.prime().bitLength()
+    }
+  }
+
   public a(): BigNumber {
     return this._curve.a
   }
