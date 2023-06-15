@@ -2,6 +2,7 @@ import {BitArray, SjclEllipticalPoint} from "../sjcl";
 import {hexToPoint, pointToHex} from "../utils";
 import {Curve} from "../curve";
 import * as sjcl from "sjcl-with-all";
+import {IV_BYTE_SIZE, TAG_BYTE_SIZE} from "./aes";
 
 export class Ciphertext {
   public ciphertext: BitArray
@@ -10,6 +11,13 @@ export class Ciphertext {
   public ephemeralPublicKey: SjclEllipticalPoint
 
   constructor(ciphertext: BitArray, tag: BitArray, iv: BitArray, ephemeralPublicKey: SjclEllipticalPoint) {
+    if (sjcl.bitArray.bitLength(tag) != TAG_BYTE_SIZE * 8) {
+      throw new Error(`tag must be a ${TAG_BYTE_SIZE} bytes long BitArray`)
+    }
+    if (sjcl.bitArray.bitLength(iv) != IV_BYTE_SIZE * 8) {
+      throw new Error(`iv must be a ${IV_BYTE_SIZE} bytes long BitArray`)
+    }
+
     this.ciphertext = ciphertext;
     this.tag = tag;
     this.iv = iv;
