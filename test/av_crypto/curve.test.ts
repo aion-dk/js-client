@@ -3,6 +3,7 @@ import {Curve} from "../../lib/av_crypto/curve";
 import * as sjcl from "sjcl-with-all";
 import {pointToHex, scalarToHex} from "../../lib/av_crypto/utils";
 import {hexString} from "./test_helpers";
+import {SHA384} from "../../lib/av_crypto/sha384";
 
 describe("Curve", () => {
   describe("constructor", () => {
@@ -247,17 +248,16 @@ describe("Curve", () => {
       it ("assigns the correct sha", () => {
         const curve = new Curve("c256")
         expect(curve.sha()).to.exist
-        expect(curve.sha()).to.be.equal(sjcl.hash.sha256)
+        expect(curve.sha()).to.equal(sjcl.hash.sha256)
       })
     })
 
     // SJCL doesn't support SHA384
-    // TODO: Figure out workaround
     context("with curve secp384r1", () => {
       it ("assigns the correct sha", () => {
         const curve = new Curve("c384")
         expect(curve.sha()).to.exist
-        expect(curve.sha()).to.respondTo("hash")
+        expect(curve.sha()).to.equal(SHA384)
       })
     })
 

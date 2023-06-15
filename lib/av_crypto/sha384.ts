@@ -1,30 +1,33 @@
 import {BitArray, SjclHash} from "./sjcl";
 import * as sjcl from "sjcl-with-all";
-import jsSHA from 'jssha';
+import {sha384, SHA512} from '@noble/hashes/sha512';
+import {Hash} from "@noble/hashes/utils";
 
 export class SHA384 implements SjclHash {
-  private sha: jsSHA;
+  private sha: Hash<SHA512>;
   constructor() {
-    this.sha = new jsSHA("SHA-384", "TEXT", { encoding: "UTF8" });
+    this.sha = sha384.create()
   }
 
   finalize(): BitArray {
-    const hex = this.sha.getHash("HEX")
+    const digest = this.sha.digest()
 
-    return sjcl.codec.hex.toBits(hex);
+    return sjcl.codec.bytes.toBits(digest)
   }
 
   reset(): SjclHash {
-    this.sha = new jsSHA('SHA-384', 'TEXT');
+    this.sha = sha384.create();
 
     return this;
   }
 
   update(data: BitArray | string): SjclHash {
-    if (typeof data !== "string") {
-      data = sjcl.codec.utf8String.fromBits(data) as string
+    if (typeof data === "string") {
+      this.sha.update(data)
+    } else {
+      const byteArray = new Uint8Array(sjcl.codec.bytes.fromBits(data))
+      this.sha.update(byteArray)
     }
-    this.sha.update(data)
 
     return this;
   }

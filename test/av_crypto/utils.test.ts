@@ -148,6 +148,20 @@ describe("AVCrypto utils", () => {
       ));
     })
 
+    context("with curve secp384r1", () => {
+      const curve = new Curve('c384');
+
+      it ("produces a deterministic scalar", () => {
+        const scalar = hashIntoScalar(string, curve)
+
+        expect(scalarToHex(scalar, curve)).to.equal(hexString(
+          "54721188 e23e419c 5ca9f9b0 18a5b3aa" +
+          "bcd6dbc0 5fafe2c8 9eb95405 1e0a8f82" +
+          "305522eb 14a9e889 27f1c924 1cbf750e"
+        ));
+      })
+    })
+
     context("with curve secp521r1", () => {
       const curve = new Curve('c521');
 
@@ -176,6 +190,21 @@ describe("AVCrypto utils", () => {
         "93bd07f0 7300b787 8f910d64 b2cf63d4" +
         "864aeaed e343c292 98ce38af fe920bc0"
       ));
+    })
+
+    context("with curve secp384r1", () => {
+      const curve = new Curve('c384');
+
+      it ("produces a deterministic point", () => {
+        const point = hashIntoPoint(string, curve)
+
+        expect(pointToHex(point)).to.equal(hexString(
+          "02" +
+          "121cf2f2 663f9bb6 54e496d3 e176932d" +
+          "478bb0b0 b5fa32a5 fafad522 8e10ae47" +
+          "8bcee2aa 83b62d4e 146b2965 8b6e266c"
+        ));
+      })
     })
 
     context("with curve secp521r1", () => {
