@@ -1,17 +1,17 @@
 import { expect } from "chai";
 import {Curve} from "../../lib/av_crypto/curve";
-import {fixedPoint1, fixedPoint2, hexString} from "./test_helpers";
+import {fixedPoint1, fixedPoint2, fixedScalar1, hexString} from "./test_helpers";
 import {
-  addPoints,
+  addPoints, concatForHashing, generateKeyPair, hashIntoPoint,
   hashIntoScalar, hexToPoint, hexToScalar,
-  infinityPoint,
+  infinityPoint, multiplyAndSumScalarsAndPoints,
   pointEquals,
   pointToHex,
   scalarToHex
 } from "../../lib/av_crypto/utils";
 import * as sjcl from "sjcl-with-all";
 
-describe("AVCrypto Utils", () => {
+describe("AVCrypto utils", () => {
   const curve = new Curve('k256');
 
   describe("addPoints()", () => {
@@ -39,6 +39,45 @@ describe("AVCrypto Utils", () => {
         expect(() => {
           addPoints([])
         }).to.throw("array must not be empty")
+      })
+    })
+  })
+
+  describe("multiplyAndSumScalarsAndPoints()", () => {
+    const curve = new Curve('k256');
+    const pointG = curve.G()
+    const point2G = curve.G().mult(new sjcl.bn(2))
+    const scalar1 = new sjcl.bn(10)
+    const scalar2 = new sjcl.bn(42)
+
+    it("returns the correct point", () => {
+      const scalars = [scalar1, scalar2]
+      const points = [pointG, point2G]
+
+      const result = multiplyAndSumScalarsAndPoints(scalars, points)
+      const expected = curve.G().mult(new sjcl.bn(10 + 42 * 2))
+
+      expect(pointEquals(result, expected)).to.be.true;
+    })
+
+    context("with one value", () => {
+      it("returns the correct point", () => {
+        const result = multiplyAndSumScalarsAndPoints([scalar1], [pointG])
+        const expected = curve.G().mult(new sjcl.bn(10))
+
+        expect(pointEquals(result, expected)).to.be.true;
+      })
+    })
+
+    context("with different size scalars and points", () => {
+      const scalars = [scalar1]
+      const points = [pointG, point2G]
+
+
+      it("throws error", () => {
+        expect(() => {
+          multiplyAndSumScalarsAndPoints(scalars, points)
+        }).to.throw("scalars and points must have the same size")
       })
     })
   })
@@ -108,6 +147,52 @@ describe("AVCrypto Utils", () => {
         "82cc7f95 e66deb3d 01fb772f 21d6ddf5"
       ));
     })
+
+    context("with curve secp521r1", () => {
+      const curve = new Curve('c521');
+
+      it ("produces a deterministic scalar", () => {
+        const scalar = hashIntoScalar(string, curve)
+
+        expect(scalarToHex(scalar, curve)).to.equal(hexString(
+          "0000" +
+          "078d899f c0d76556 a5fc8fec b59581d3" +
+          "244ab042 667411ef 65e21295 a6cc99b9" +
+          "96d82aaa d6968655 6b9e444d 47bbd038" +
+          "0d215c35 3c153489 eddf2a6c 4e3558c2"
+        ));
+      })
+    })
+  })
+
+  describe("hashIntoPoint()", () => {
+    const string = "hello"
+
+    it ("produces a deterministic point", ()=> {
+      const point = hashIntoPoint(string, curve)
+
+      expect(pointToHex(point)).to.equal(hexString(
+        "02" +
+        "93bd07f0 7300b787 8f910d64 b2cf63d4" +
+        "864aeaed e343c292 98ce38af fe920bc0"
+      ));
+    })
+
+    context("with curve secp521r1", () => {
+      const curve = new Curve('c521');
+
+      it ("produces a deterministic point", () => {
+        const point = hashIntoPoint(string, curve)
+
+        expect(pointToHex(point)).to.equal(hexString(
+          "020000" +
+          "078d899f c0d76556 a5fc8fec b59581d3" +
+          "244ab042 667411ef 65e21295 a6cc99b9" +
+          "96d82aaa d6968655 6b9e444d 47bbd038" +
+          "0d215c35 3c153489 eddf2a6c 4e3558c2"
+        ));
+      })
+    })
   })
 
   describe("pointToHex()", () => {
@@ -127,6 +212,22 @@ describe("AVCrypto Utils", () => {
 
         expect(pointToHex(point)).to.equal("00")
       });
+    })
+
+    context("with curve secp521r1", () => {
+      const curve = new Curve('c521');
+
+      it ("produces a deterministic scalar", () => {
+        const point = curve.G();
+
+        expect(pointToHex(point)).to.equal(hexString(
+          "0200c6" +
+          "858e06b7 0404e9cd 9e3ecb66 2395b442" +
+          "9c648139 053fb521 f828af60 6b4d3dba" +
+          "a14b5e77 efe75928 fe1dc127 a2ffa8de" +
+          "3348b3c1 856a429b f97e7e31 c2e5bd66"
+        ))
+      })
     })
   })
 
@@ -209,22 +310,47 @@ describe("AVCrypto Utils", () => {
 
   describe("scalarToHex()", () => {
     it("encodes the correct value", () => {
-      const scalar = curve.order();
+      const scalar = fixedScalar1(curve);
+      const hex = scalarToHex(scalar, curve);
 
-      expect(scalarToHex(scalar, curve)).to.equal(hexString(
-        "ffffffff ffffffff ffffffff fffffffe" +
-        "baaedce6 af48a03b bfd25e8c d0364141"
+      expect(hex).to.equal(hexString(
+        "384c99b4 bb217ca8 23fa158c 9a3e188f" +
+        "bc76fead 356ff050 c681c370 87565973"
       ))
+      expect(hex).to.match(curve.scalarHexPattern())
     })
 
     context("with a small scalar", () => {
       const scalar = new sjcl.bn(42);
 
-      expect(scalarToHex(scalar, curve)).to.equal(hexString(
-        "00000000 00000000 00000000 00000000" +
-        "00000000 00000000 00000000 0000002a"
-      ))
-    })
+      it("encodes the correct value", () => {
+        const hex = scalarToHex(scalar, curve);
+
+        expect(hex).to.equal(hexString(
+          "00000000 00000000 00000000 00000000" +
+          "00000000 00000000 00000000 0000002a"
+        ))
+        expect(hex).to.match(curve.scalarHexPattern())
+      });
+
+      context("with curve secp521r1", () => {
+        const curve = new Curve('c521');
+
+        it ("encodes the correct value", () => {
+          const hex = scalarToHex(scalar, curve);
+
+          expect(hex).to.equal(hexString(
+            "0000" +
+            "00000000 00000000 00000000 00000000" +
+            "00000000 00000000 00000000 00000000" +
+            "00000000 00000000 00000000 00000000" +
+            "00000000 00000000 00000000 0000002a"
+          ));
+          expect(hex).to.match(curve.scalarHexPattern())
+        })
+      })
+    });
+
   })
 
   describe("hexToScalar()", () => {
@@ -271,6 +397,48 @@ describe("AVCrypto Utils", () => {
         expect(() => {
           hexToScalar(string, curve)
         }).to.throw("scalar must be lower than the curve order")
+      })
+    })
+  })
+
+  describe("concatForHashing()", () => {
+    const parts = ['hello', 1, "-world"]
+
+    it ("returns the concatenated value", () => {
+      expect(concatForHashing(parts)).to.equal("hello-1--world")
+    })
+  })
+
+  describe("generateKeyPair()", () => {
+    it("returns a sjcl key pair", () => {
+      const keyPair = generateKeyPair(curve)
+
+      expect(pointToHex(keyPair.pub.H)).to.match(curve.pointHexPattern());
+      expect(scalarToHex(keyPair.sec.S, curve)).to.match(curve.scalarHexPattern());
+    })
+
+    context("when given a private key", () => {
+      const privateKey = fixedScalar1(curve)
+
+      it("returns a deterministic key pair", () => {
+        const keyPair = generateKeyPair(curve, privateKey)
+
+        expect(keyPair.pub.H).to.eql(fixedPoint1(curve));
+        expect(keyPair.sec.S).to.eql(privateKey);
+      })
+
+      context("when given a private key that is larger than the curve's group order", () => {
+        const privateKey = sjcl.bn.fromBits(sjcl.codec.hex.toBits(hexString(
+          "ed" +
+          "c11c291d 73e08c6a 92c6df55 e8c66094" +
+          "9b35c4a0 0a027272 9e79aac7 fe37da11"
+        )))
+
+        it("throws error", () => {
+          expect(() => {
+            generateKeyPair(curve, privateKey)
+          }).to.throw("privateKey must be lower than the curve order")
+        })
       })
     })
   })

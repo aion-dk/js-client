@@ -71,6 +71,46 @@ describe("Curve", () => {
         "baaedce6 af48a03b bfd25e8c d0364141"
       ))
     })
+
+    context("with curve secp256r1", () => {
+      const name = "c256";
+      const curve = new Curve(name)
+
+      it ("returns the correct value", () => {
+        expect(scalarToHex(curve.order(), curve)).to.equal(hexString(
+          "ffffffff 00000000 ffffffff ffffffff" +
+          "bce6faad a7179e84 f3b9cac 2fc632551"
+        ))
+      })
+    })
+
+    context("with curve secp384r1", () => {
+      const name = "c384";
+      const curve = new Curve(name)
+
+      it ("returns the correct value", () => {
+        expect(scalarToHex(curve.order(), curve)).to.equal(hexString(
+          "ffffffff ffffffff ffffffff ffffffff" +
+          "ffffffff ffffffff c7634d81 f4372ddf" +
+          "581a0db2 48b0a77a ecec196a ccc52973"
+        ))
+      })
+    })
+
+    context("with curve secp521r1", () => {
+      const name = "c521";
+      const curve = new Curve(name)
+
+      it ("returns the correct value", () => {
+        expect(scalarToHex(curve.order(), curve)).to.equal(hexString(
+          "01ff" +
+          "ffffffff ffffffff ffffffff ffffffff" +
+          "ffffffff ffffffff ffffffff fffffffa" +
+          "51868783 bf2f966b 7fcc0148 f709a5d0" +
+          "3bb5c9b8 899c47ae bb6fb71e 91386409"
+        ))
+      })
+    })
   })
 
   describe("prime()", () => {
@@ -82,6 +122,36 @@ describe("Curve", () => {
         "ffffffff ffffffff ffffffff ffffffff" +
         "ffffffff ffffffff fffffffe fffffc2f"
       ))
+    })
+  })
+
+  describe("degree()", () => {
+    context("with curve secp256k1", () => {
+      it ("assigns the correct sjcl curve", () => {
+        const curve = new Curve("k256")
+        expect(curve.degree()).to.equal(256)
+      })
+    })
+
+    context("with curve secp256r1", () => {
+      it ("assigns the correct sjcl curve", () => {
+        const curve = new Curve("c256")
+        expect(curve.degree()).to.equal(256)
+      })
+    })
+
+    context("with curve secp384r1", () => {
+      it ("assigns the correct sjcl curve", () => {
+        const curve = new Curve("c384")
+        expect(curve.degree()).to.equal(384)
+      })
+    })
+
+    context("with curve secp521r1", () => {
+      it ("assigns the correct sjcl curve", () => {
+        const curve = new Curve("c521")
+        expect(curve.degree()).to.equal(521)
+      })
     })
   })
 
@@ -120,13 +190,55 @@ describe("Curve", () => {
         "029bfcdb 2dce28d9 59f2815b 16f81798"
       ))
     })
+
+    context("with curve secp256r1", () => {
+      const name = "c256";
+      const curve = new Curve(name)
+
+      it ("returns the correct value", () => {
+        expect(pointToHex(curve.G())).to.equal(hexString(
+          "03" +
+          "6b17d1f2 e12c4247 f8bce6e5 63a440f2" +
+          "77037d81 2deb33a0 f4a13945 d898c296"
+        ))
+      })
+    })
+
+    context("with curve secp384r1", () => {
+      const name = "c384";
+      const curve = new Curve(name)
+
+      it ("returns the correct value", () => {
+        expect(pointToHex(curve.G())).to.equal(hexString(
+          "03" +
+          "aa87ca22 be8b0537 8eb1c71e f320ad74" +
+          "6e1d3b62 8ba79b98 59f741e0 82542a38" +
+          "5502f25d bf55296c 3a545e38 72760ab7"
+        ))
+      })
+    })
+
+    context("with curve secp521r1", () => {
+      const name = "c521";
+      const curve = new Curve(name)
+
+      it ("returns the correct value", () => {
+        expect(pointToHex(curve.G())).to.equal(hexString(
+          "0200c6" +
+          "858e06b7 0404e9cd 9e3ecb66 2395b442" +
+          "9c648139 053fb521 f828af60 6b4d3dba" +
+          "a14b5e77 efe75928 fe1dc127 a2ffa8de" +
+          "3348b3c1 856a429b f97e7e31 c2e5bd66"
+        ))
+      })
+    })
   })
 
   describe("sha()", () => {
     context("with curve secp256k1", () => {
       it("returns the correct sha", () => {
         const curve = new Curve("k256")
-
+        expect(curve.sha()).to.exist
         expect(curve.sha()).to.equal(sjcl.hash.sha256)
       })
     })
@@ -134,8 +246,8 @@ describe("Curve", () => {
     context("with curve secp256r1", () => {
       it ("assigns the correct sha", () => {
         const curve = new Curve("c256")
-        expect(curve.sha()).to.be.equal(sjcl.hash.sha256)
         expect(curve.sha()).to.exist
+        expect(curve.sha()).to.be.equal(sjcl.hash.sha256)
       })
     })
 
@@ -149,13 +261,11 @@ describe("Curve", () => {
       })
     })
 
-    // SJCL has not been built with sha512
-    // TODO: load sjcl with sha512
-    context.skip("with curve secp521r1", () => {
+    context("with curve secp521r1", () => {
       it ("assigns the correct sha", () => {
         const curve = new Curve("c521")
-        expect(curve.sha()).to.be.equal(sjcl.hash.sha512)
         expect(curve.sha()).to.exist
+        expect(curve.sha()).to.be.equal(sjcl.hash.sha512)
       })
     })
   })

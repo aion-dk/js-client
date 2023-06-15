@@ -1,10 +1,9 @@
 import {
-  SjclElGamalPublicKey, SjclElGamalSecretKey,
+  SjclECCPublicKey, SjclECCSecretKey,
   SjclEllipticalPoint,
   SjclKeyPair
 } from "../sjcl";
-import * as sjcl from "sjcl-with-all";
-import {addPoints} from "../utils";
+import {addPoints, generateKeyPair} from "../utils";
 import {Cryptogram} from "./cryptogram";
 import {Curve} from "../curve";
 
@@ -12,7 +11,7 @@ export function encrypt(
   message: SjclEllipticalPoint,
   encryptionKey: SjclEllipticalPoint,
   curve: Curve,
-  randomness: SjclKeyPair<SjclElGamalPublicKey, SjclElGamalSecretKey> = sjcl.ecc.elGamal.generateKeys(curve.curve())
+  randomness: SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey> = generateKeyPair(curve)
 ): Cryptogram {
 
   const r = randomness.pub.H
