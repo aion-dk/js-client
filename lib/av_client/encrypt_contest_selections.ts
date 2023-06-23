@@ -5,11 +5,8 @@ import {
   ContestSelection,
   EncryptedPile, SelectionPile
 } from "./types";
-import { randomBN, ElGamalPointCryptogram } from "./aion_crypto";
-import { bignumToHex, pointFromHex } from "./crypto/util";
-import { bytesToPoints } from "./encoding/point_encoding";
 import { selectionPileToByteArray } from "./encoding/byte_encoding";
-import {SjclEllipticalPoint} from "./sjcl";
+import {AVCrypto} from "../av_crypto";
 
 export function encryptContestSelections(
   contestConfigs: ContestConfigMap,
@@ -31,10 +28,8 @@ function encryptContestSelection(
     throw new Error("contest selection does not match contest")
   }
 
-  const encryptionKeyPoint = pointFromHex(encryptionKey).toEccPoint();
-
   const encryptedPiles: EncryptedPile[] = contestSelection.piles.map(sp => {
-    return encryptSelectionPile(contestConfig, sp, encryptionKeyPoint)
+    return encryptSelectionPile(contestConfig, sp, encryptionKey)
   })
 
   return {
@@ -46,20 +41,16 @@ function encryptContestSelection(
 function encryptSelectionPile(
   contestConfig: ContestConfig,
   selectionPile: SelectionPile,
-  encryptionKeyPoint: SjclEllipticalPoint
+  encryptionKey: string
 ): EncryptedPile {
+  const crypto = new AVCrypto("secp256k1")
+
   const encodedSelectionPile = selectionPileToByteArray(contestConfig, selectionPile)
-  const pilePoints = bytesToPoints(encodedSelectionPile)
+  const {cryptograms, randomizers} = crypto.encryptVote(encodedSelectionPile, encryptionKey)
 
-  const encryptedPile: EncryptedPile = {multiplier: selectionPile.multiplier, cryptograms: [], randomizers: []}
-
-  pilePoints.map(votePoint => {
-    const randomizerBN = randomBN();
-    const cryptogram = ElGamalPointCryptogram.encrypt(votePoint, encryptionKeyPoint, randomizerBN);
-
-    encryptedPile.randomizers.push(bignumToHex(randomizerBN))
-    encryptedPile.cryptograms.push(cryptogram.toString())
-  })
-
-  return encryptedPile
+  return {
+    multiplier: selectionPile.multiplier,
+    cryptograms: cryptograms,
+    randomizers: randomizers
+  }
 }
