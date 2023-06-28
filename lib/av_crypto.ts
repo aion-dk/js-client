@@ -1,7 +1,9 @@
 import {Curve} from "./av_crypto/curve";
 import {Encoder} from "./av_crypto/encoder";
-import {hexToPoint, generateKeyPair, scalarToHex, hexToScalar} from "./av_crypto/utils";
+import {hexToPoint, generateKeyPair, scalarToHex, hexToScalar, pointToHex} from "./av_crypto/utils";
 import {encrypt as elGamalEncrypt} from "./av_crypto/el_gamal/scheme";
+import {commit as pedersenCommit, isValid as isValidPedersen} from "./av_crypto/pedersen/scheme";
+import {Commitment} from "./av_crypto/pedersen/commitment";
 
 export const SUPPORTED_ELLIPTIC_CURVE_NAMES = {
   'secp256k1': 'k256',
@@ -46,5 +48,51 @@ export class AVCrypto {
       cryptograms: cryptograms,
       randomizers: randomizers
     }
+  }
+
+  /**
+   * Commit to a number of private hexadecimal cryptogram randomizes. This is used when
+   * generating voter encryption commitments as well as the board encryption commitments.
+   *
+   * @param privateEncryptionRandomizers The collection of cryptogram randomizers
+   * @param context The context of the commitment
+   * @returns Returns the commitment and its randomizer as hexadecimal strings
+   */
+  public commit(privateEncryptionRandomizers: Array<string>, context = ""): {commitment: string, privateCommitmentRandomizer: string } {
+    const encryptionRandomizers = privateEncryptionRandomizers.map(s => {
+      return hexToScalar(s, this.curve)
+    });
+
+    const commitment = pedersenCommit(encryptionRandomizers, context, this.curve)
+    return {
+      commitment: pointToHex(commitment.c),
+      privateCommitmentRandomizer: scalarToHex(commitment.r!, this.curve)
+    }
+  }
+
+  /**
+   * Validate if a number of hexadecimal encryption randomizers, given the private
+   * commitment randomizer, and the public commitment is a valid commitment.
+   *
+   * This is used when spoiling a vote.
+   *
+   * @param commitment The commitment
+   * @param privateCommitmentRandomizer The randomizer of the commitment
+   * @param encryptionRandomizers The hexadecimal encryption randomizers
+   * @param context The context of the commitment
+   * @returns Returns validation
+   */
+  public isValidCommitment(
+    commitment: string,
+    privateCommitmentRandomizer: string,
+    encryptionRandomizers: Array<string>,
+    context = ""
+  ): boolean {
+    const c = hexToPoint(commitment, this.curve)
+    const r = hexToScalar(privateCommitmentRandomizer, this.curve)
+    const pedersenCommitment = new Commitment(c, r)
+    const messages = encryptionRandomizers.map(s => hexToScalar(s, this.curve))
+
+    return isValidPedersen(pedersenCommitment, messages, context, this.curve)
   }
 }
