@@ -1,7 +1,7 @@
 import { validateBallotSelection } from './validate_selections'
 import { InvalidStateError } from './errors'
-import { generatePedersenCommitment } from './crypto/pedersen_commitment'
-import { encryptContestSelections } from './encrypt_contest_selections'
+import { generateCommitment } from './new_crypto/commitments'
+import { encryptContestSelections } from './new_crypto/encrypt_contest_selections'
 import { BallotSelection, ContestEnvelope, ContestMap, ClientState } from './types'
 
 export function constructContestEnvelopes( state: ClientState, ballotSelection: BallotSelection ): ConstructResult {
@@ -11,7 +11,7 @@ export function constructContestEnvelopes( state: ClientState, ballotSelection: 
 
   const contestEnvelopes = encryptContestSelections(contestConfigs, ballotSelection.contestSelections, encryptionKey)
   const envelopeRandomizers = extractRandomizers(contestEnvelopes)
-  const pedersenCommitment = generatePedersenCommitment(envelopeRandomizers)
+  const pedersenCommitment = generateCommitment(envelopeRandomizers)
 
   return {
     pedersenCommitment,

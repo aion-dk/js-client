@@ -19,10 +19,11 @@ import {
 } from './av_client/types';
 import {hexToShortCode, shortCodeToHex} from './av_client/short_codes';
 import {fetchLatestConfig} from './av_client/election_config';
-import {decryptCommitmentOpening, validateCommmitmentOpening} from './av_client/crypto/commitments';
+import {decryptCommitmentOpening} from './av_client/crypto/commitments';
 import {InvalidContestError, InvalidTrackingCodeError} from './av_client/errors';
 import {decryptContestSelections} from './av_client/decrypt_contest_selections';
 import {makeOptionFinder} from './av_client/option_finder';
+import {validateCommitment} from "./av_client/new_crypto/commitments";
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -108,8 +109,8 @@ export class AVVerifier {
     const boardCommitmentOpening = decryptCommitmentOpening(this.verifierPrivateKey, this.boardCommitmentOpening.content.package)
     const voterCommitmentOpening = decryptCommitmentOpening(this.verifierPrivateKey, this.voterCommitmentOpening.content.package)
 
-    validateCommmitmentOpening(boardCommitmentOpening, this.boardCommitment, 'Board commitment not valid')
-    validateCommmitmentOpening(voterCommitmentOpening, this.voterCommitment, 'Voter commitment not valid')
+    validateCommitment(boardCommitmentOpening, this.boardCommitment, 'Board commitment not valid')
+    validateCommitment(voterCommitmentOpening, this.voterCommitment, 'Voter commitment not valid')
 
     return decryptContestSelections(
       this.latestConfig.items.contestConfigs,

@@ -4,9 +4,9 @@ import {
   ContestConfig,
   ContestSelection,
   EncryptedPile, SelectionPile
-} from "./types";
-import { selectionPileToByteArray } from "./encoding/byte_encoding";
-import {AVCrypto} from "../av_crypto";
+} from "../types";
+import { selectionPileToByteArray } from "../encoding/byte_encoding";
+import {AVCrypto} from "../../av_crypto";
 
 export function encryptContestSelections(
   contestConfigs: ContestConfigMap,
@@ -47,6 +47,8 @@ function encryptSelectionPile(
 
   const encodedSelectionPile = selectionPileToByteArray(contestConfig, selectionPile)
   const {cryptograms, randomizers} = crypto.encryptVote(encodedSelectionPile, encryptionKey)
+
+  console.log("AV_CRYPTO_ENCRYPT_VOTE_CALLED!")
 
   return {
     multiplier: selectionPile.multiplier,
