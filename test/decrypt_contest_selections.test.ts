@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import {decryptContestSelections} from '../lib/av_client/decrypt_contest_selections'
 import {CommitmentOpening, ContestConfig, ContestConfigMap, ContestEnvelope, ContestMap} from '../lib/av_client/types';
-import {finalizeCryptograms} from "../lib/av_client/finalize_cryptograms";
+import {finalizeCryptograms} from "../lib/av_client/new_crypto/finalize_cryptograms";
 import {baseItemAttributes} from "./fixtures/itemHelper";
 
 const encryptionKey = '021edaa87d7626dbd2faa99c4dc080f443c150ab70b24da411b13aa56249b5242e'

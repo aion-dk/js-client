@@ -3,7 +3,7 @@ import { BallotCryptogramItem, ContestEnvelope, ContestMap, VerificationStartIte
 import { signPayload, validatePayload, validateReceipt } from '../sign'
 import { BALLOT_CRYPTOGRAMS_ITEM } from '../constants'
 import { generateDiscreteLogarithmProof } from '../aion_crypto'
-import { finalizeCryptograms } from '../finalize_cryptograms'
+import { finalizeCryptograms } from '../new_crypto/finalize_cryptograms'
 
 export async function submitBallotCryptograms(
   bulletinBoard: BulletinBoard,

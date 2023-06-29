@@ -1,9 +1,10 @@
 import {Curve} from "./av_crypto/curve";
 import {Encoder} from "./av_crypto/encoder";
 import {hexToPoint, generateKeyPair, scalarToHex, hexToScalar, pointToHex} from "./av_crypto/utils";
-import {encrypt as elGamalEncrypt} from "./av_crypto/el_gamal/scheme";
+import * as elGamalScheme from "./av_crypto/el_gamal/scheme";
 import {commit as pedersenCommit, isValid as isValidPedersen} from "./av_crypto/pedersen/scheme";
 import {Commitment} from "./av_crypto/pedersen/commitment";
+import * as elGamalCryptogram from "./av_crypto/el_gamal/cryptogram";
 
 export const SUPPORTED_ELLIPTIC_CURVE_NAMES = {
   'secp256k1': 'k256',
@@ -38,7 +39,7 @@ export class AVCrypto {
 
     for (const point of points) {
       const randomness = generateKeyPair(this.curve)
-      const cryptogram = elGamalEncrypt(point, encryptionKeyPoint, this.curve, randomness)
+      const cryptogram = elGamalScheme.encrypt(point, encryptionKeyPoint, this.curve, randomness)
 
       cryptograms.push(cryptogram.toString())
       randomizers.push(scalarToHex(randomness.sec.S, this.curve))
@@ -48,6 +49,23 @@ export class AVCrypto {
       cryptograms: cryptograms,
       randomizers: randomizers
     }
+  }
+
+  /**
+   * Homomorphically combines two cryptograms.
+   *
+   * Used to combine the voter cryptogram with the empty cryptogram received form DBB.
+   *
+   * @param voterCryptogram The cryptogram of the voter
+   * @param serverCryptogram The empty cryptogram from the DBB
+   * @returns Returns the final cryptogram
+   */
+  public combineCryptograms(voterCryptogram: string, serverCryptogram: string): string {
+    const c1 = elGamalCryptogram.fromString(voterCryptogram, this.curve)
+    const c2 = elGamalCryptogram.fromString(serverCryptogram, this.curve)
+
+    const c3 = elGamalScheme.homomorphicallyAdd([c1, c2], this.curve)
+    return c3.toString()
   }
 
   /**

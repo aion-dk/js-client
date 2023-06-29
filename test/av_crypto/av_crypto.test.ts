@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import {AVCrypto} from "../../lib/av_crypto";
-import {fixedPoint1Hex, fixedScalar1Hex, fixedScalar2Hex} from "./test_helpers";
+import {fixedPoint1Hex, fixedPoint2Hex, fixedScalar1Hex, fixedScalar2Hex} from "./test_helpers";
 import {pattern as cryptogramPattern} from "../../lib/av_crypto/el_gamal/cryptogram";
 
 describe("AVCrypto", () => {
@@ -58,6 +58,20 @@ describe("AVCrypto", () => {
         expect(cryptograms.length).to.eql(2)
         expect(randomizers.length).to.eql(2)
       })
+    })
+  })
+
+  describe("combineCryptograms()", () => {
+    const curveName = "secp256k1";
+    const crypto = new AVCrypto(curveName)
+    const curve = crypto.curve
+    const voterCryptogram = [fixedPoint1Hex(curve),fixedPoint2Hex(curve)].join(",")
+    const serverCryptogram = [fixedPoint1Hex(curve),fixedPoint2Hex(curve)].join(",")
+
+    it("returns a cryptogram", () => {
+      const finalCryptogram = crypto.combineCryptograms(voterCryptogram, serverCryptogram)
+
+      expect(finalCryptogram).match(cryptogramPattern(curve))
     })
   })
 

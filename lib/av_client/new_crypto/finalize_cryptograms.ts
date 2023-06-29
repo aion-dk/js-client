@@ -1,5 +1,5 @@
-import {ContestEnvelope, ContestMap, SealedPile} from './types';
-import {ElGamalPointCryptogram} from './aion_crypto'
+import {ContestEnvelope, ContestMap, SealedPile} from '../types';
+import {AVCrypto} from "../../av_crypto";
 
 export function finalizeCryptograms(contestEnvelopes: ContestEnvelope[], serverCryptograms: ContestMap<string[][]>): ContestMap<SealedPile[]> {
   const entries = contestEnvelopes.map(ce => {
@@ -16,12 +16,9 @@ export function finalizeCryptograms(contestEnvelopes: ContestEnvelope[], serverC
 }
 
 function addCryptograms(list1: string[], list2: string[]) {
+  const crypto = new AVCrypto("secp256k1")
+
   return list1.map((cryptogram, i) => {
-    const point1 = ElGamalPointCryptogram.fromString(cryptogram);
-    const point2 = ElGamalPointCryptogram.fromString(list2[i]);
-
-    point1.homomorphicallyAddCryptogram(point2)
-
-    return point1.toString();
+    return crypto.combineCryptograms(cryptogram, list2[i])
   })
 }
