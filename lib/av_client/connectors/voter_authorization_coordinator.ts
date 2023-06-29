@@ -13,9 +13,9 @@ export default class VoterAuthorizationCoordinator {
   }
 
   /**
-   * 
-   * @param opaqueVoterId Gets 
-   * @returns 
+   *
+   * @param opaqueVoterId Gets
+   * @returns
    */
   createSession(opaqueVoterId: string, email: string): Promise<AxiosResponse> {
     return this.backend.post('create_session', {
@@ -57,8 +57,9 @@ export default class VoterAuthorizationCoordinator {
     })
   }
 
-  authorizeProofOfElectionCodes(publicKey: string, proof: ProofOfElectionCodes, votingRoundReference: string): Promise<AxiosResponse> {
+  authorizeProofOfElectionCodes(publicKey: string, proof: ProofOfElectionCodes, votingRoundReference: string, scope = "register"): Promise<AxiosResponse> {
     return this.backend.post('authorize_proof', {
+      scope: scope,
       electionContextUuid: this.electionContextUuid,
       voterPublicKey: proof.mainKeyPair.publicKey, // This public key is used by the VA to find the voter to authorize.
       sessionPublicKey: publicKey, // This public key is used for the auth token
