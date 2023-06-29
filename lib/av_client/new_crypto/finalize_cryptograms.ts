@@ -19,6 +19,10 @@ function addCryptograms(list1: string[], list2: string[]) {
   const crypto = new AVCrypto("secp256k1")
 
   return list1.map((cryptogram, i) => {
-    return crypto.combineCryptograms(cryptogram, list2[i])
+    const finalCryptogram = crypto.combineCryptograms(cryptogram, list2[i])
+
+    console.log("AV_CRYPTO_COMBINE_CRYPTOGRAMS_CALLED!")
+
+    return finalCryptogram
   })
 }
