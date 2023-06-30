@@ -405,6 +405,7 @@ export interface OptionContent {
   title: LocalString;
   subtitle?: LocalString;
   description?: LocalString;
+  image?: string;
   writeIn?: {
     maxSize: number
     encoding: 'utf8'
