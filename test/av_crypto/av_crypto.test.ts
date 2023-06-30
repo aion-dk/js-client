@@ -49,7 +49,7 @@ describe("AVCrypto", () => {
       expect(randomizers[0]).match(curve.scalarHexPattern())
     })
 
-    context("a vote that fits in multiple cryptograms", () => {
+    context("with a vote that fits in multiple cryptograms", () => {
       const vote = new Uint8Array(Array(32).fill(255))
 
       it("returns multiple cryptograms and randomizers", () => {
@@ -72,6 +72,39 @@ describe("AVCrypto", () => {
       const finalCryptogram = crypto.combineCryptograms(voterCryptogram, serverCryptogram)
 
       expect(finalCryptogram).match(cryptogramPattern(curve))
+    })
+  })
+
+  describe("revertEncryption()", () => {
+    const curveName = "secp256k1";
+    const crypto = new AVCrypto(curveName)
+    const curve = crypto.curve
+    const vote = new TextEncoder().encode("vote")
+    const encryptionKey = fixedPoint1Hex(curve)
+    const { cryptograms, randomizers } = crypto.encryptVote(vote, encryptionKey)
+
+    it("returns the vote back", () => {
+      const decrypted = crypto.revertEncryption(cryptograms, randomizers, encryptionKey)
+
+      expect(decrypted.slice(0, vote.length)).to.eql(vote)
+      decrypted.slice(vote.length).forEach(byte => {
+        expect(byte).to.eql(0)
+      })
+    })
+
+    context("with a vote that fits in multiple cryptograms", () => {
+      const vote = new Uint8Array(Array(32).fill(255))
+      const { cryptograms, randomizers } = crypto.encryptVote(vote, encryptionKey)
+
+      it("returns the vote back", () => {
+        const decrypted = crypto.revertEncryption(cryptograms, randomizers, encryptionKey)
+
+        expect(cryptograms.length).to.eql(2)
+        expect(decrypted.slice(0, vote.length)).to.eql(vote)
+        decrypted.slice(vote.length).forEach(byte => {
+          expect(byte).to.eql(0)
+        })
+      })
     })
   })
 

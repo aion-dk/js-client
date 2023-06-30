@@ -1,4 +1,5 @@
 import {
+  BigNumber,
   SjclECCPublicKey, SjclECCSecretKey,
   SjclEllipticalPoint,
   SjclKeyPair
@@ -20,7 +21,15 @@ export function encrypt(
   return new Cryptogram(r, c)
 }
 
-export function homomorphicallyAdd(cryptograms: Array<Cryptogram>, curve: Curve): Cryptogram {
+export function decrypt(
+  cryptogram: Cryptogram,
+  decryptionKey: BigNumber,
+): SjclEllipticalPoint {
+
+  return addPoints([cryptogram.c, cryptogram.r.mult(decryptionKey).negate()])
+}
+
+export function homomorphicallyAdd(cryptograms: Array<Cryptogram>): Cryptogram {
   const newR = addPoints(cryptograms.map(cryptogram => cryptogram.r))
   const newC = addPoints(cryptograms.map(cryptogram => cryptogram.c))
 

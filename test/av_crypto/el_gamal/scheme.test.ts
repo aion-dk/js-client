@@ -1,8 +1,9 @@
 import { expect } from "chai";
-import {encrypt, homomorphicallyAdd} from "../../../lib/av_crypto/el_gamal/scheme";
-import {fixedKeyPair, fixedPoint1, fixedPoint2, hexString} from "../test_helpers";
+import {decrypt, encrypt, homomorphicallyAdd} from "../../../lib/av_crypto/el_gamal/scheme";
+import {fixedKeyPair, fixedPoint1, fixedPoint2, fixedScalar1, hexString} from "../test_helpers";
 import {Curve} from "../../../lib/av_crypto/curve";
-import {Cryptogram} from "../../../lib/av_crypto/el_gamal/cryptogram";
+import {Cryptogram, fromString} from "../../../lib/av_crypto/el_gamal/cryptogram";
+import {pointToHex} from "../../../lib/av_crypto/utils";
 
 describe("ElGamal scheme", () => {
   const curve = new Curve('k256')
@@ -35,6 +36,27 @@ describe("ElGamal scheme", () => {
     })
   })
 
+  describe("decrypt()", () => {
+    const cryptogram = fromString(
+      hexString(
+        "03" +
+        "fdb56f2d 282189d5 592305cc cc5ba3f3" +
+        "b9e2d6a8 f373b436 4a7a20e1 54bac1b1" +
+        "," +
+        "03" +
+        "16b19bac 2033c9d5 63d0399d 26bfd10b" +
+        "a3cba736 aad9fa98 e4daad13 4bd07911"
+      ),
+      curve
+    );
+
+    it ("returns the correct point", () => {
+      const point = decrypt(cryptogram, fixedScalar1(curve))
+
+      expect(point).to.eql(message);
+    })
+  })
+
   describe("homomorphicallyAdd()", () => {
     const cryptograms = [
       new Cryptogram(fixedPoint1(curve), fixedPoint2(curve)),
@@ -42,7 +64,7 @@ describe("ElGamal scheme", () => {
     ]
 
     it ("produces a deterministic cryptogram", () => {
-      const sum = homomorphicallyAdd(cryptograms, curve)
+      const sum = homomorphicallyAdd(cryptograms)
 
       expect(sum.toString()).to.equal(hexString(
         "02" +

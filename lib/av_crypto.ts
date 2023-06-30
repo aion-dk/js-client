@@ -64,8 +64,34 @@ export class AVCrypto {
     const c1 = elGamalCryptogram.fromString(voterCryptogram, this.curve)
     const c2 = elGamalCryptogram.fromString(serverCryptogram, this.curve)
 
-    const c3 = elGamalScheme.homomorphicallyAdd([c1, c2], this.curve)
+    const c3 = elGamalScheme.homomorphicallyAdd([c1, c2])
     return c3.toString()
+  }
+
+  /**
+   * Revert the encryption done by the randomizer.
+   * Basically, it decrypts using the randomizer instead of the decryption key.
+   *
+   * This is used by the external verifier, when a ballot gets spoiled.
+   *
+   * @param cryptograms The cryptograms of the voter
+   * @param randomizers The randomizers used in the encryption
+   * @param encryptionKey The public encryption key used in the encryption
+   * @returns Returns the decrypted bytes
+   */
+  public revertEncryption(cryptograms: Array<string>, randomizers: Array<string>, encryptionKey: string): Uint8Array {
+    const pubKey = hexToPoint(encryptionKey, this.curve)
+
+    const points = cryptograms.map((cryptogram, i) => {
+      const c = elGamalCryptogram.fromString(cryptogram, this.curve)
+      const r = hexToScalar(randomizers[i], this.curve)
+
+      const c2 = new elGamalCryptogram.Cryptogram(pubKey, c.c)
+      return elGamalScheme.decrypt(c2, r)
+    })
+
+    const bytes = new Encoder(this.curve).pointsToBytes(points)
+    return new Uint8Array(bytes)
   }
 
   /**
