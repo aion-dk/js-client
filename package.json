@@ -6,6 +6,9 @@
   "main": "dist/lib/av_client.js",
   "types": "dist/lib/av_client.d.ts",
   "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/aion-dk/js-client.git"
