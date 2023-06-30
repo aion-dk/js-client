@@ -21,7 +21,7 @@ import {hexToShortCode, shortCodeToHex} from './av_client/short_codes';
 import {fetchLatestConfig} from './av_client/election_config';
 import {decryptCommitmentOpening} from './av_client/crypto/commitments';
 import {InvalidContestError, InvalidTrackingCodeError} from './av_client/errors';
-import {decryptContestSelections} from './av_client/decrypt_contest_selections';
+import {decryptContestSelections} from './av_client/new_crypto/decrypt_contest_selections';
 import {makeOptionFinder} from './av_client/option_finder';
 import {validateCommitment} from "./av_client/new_crypto/commitments";
 
