@@ -1,0 +1,12 @@
+import { Curve } from "../../lib/av_crypto/curve";
+import { BigNumber, SjclECCPublicKey, SjclECCSecretKey, SjclEllipticalPoint, SjclKeyPair } from "../../lib/av_crypto/sjcl";
+export declare function fixedKeyPair(curve: Curve): SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey>;
+export declare function fixedScalar1(curve: Curve): BigNumber;
+export declare function fixedPoint1(curve: Curve): SjclEllipticalPoint;
+export declare function fixedScalar2(curve: Curve): BigNumber;
+export declare function fixedPoint2(curve: Curve): SjclEllipticalPoint;
+export declare function fixedScalar1Hex(curve: Curve): string;
+export declare function fixedPoint1Hex(curve: Curve): string;
+export declare function fixedScalar2Hex(curve: Curve): string;
+export declare function fixedPoint2Hex(curve: Curve): string;
+export declare function hexString(hex: string): string;

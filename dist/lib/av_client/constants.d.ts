@@ -1,0 +1,12 @@
+import { BoardItemType } from "./types";
+export declare const BALLOT_CRYPTOGRAMS_ITEM: BoardItemType;
+export declare const VOTER_SESSION_ITEM: BoardItemType;
+export declare const VOTER_COMMITMENT_ITEM: BoardItemType;
+export declare const BOARD_COMMITMENT_ITEM: BoardItemType;
+export declare const CAST_REQUEST_ITEM: BoardItemType;
+export declare const SPOIL_REQUEST_ITEM: BoardItemType;
+export declare const VERIFIER_ITEM: BoardItemType;
+export declare const VERIFICATION_START_ITEM: BoardItemType;
+export declare const VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM = "VoterEncryptionCommitmentOpeningItem";
+export declare const MAX_POLL_ATTEMPTS = 600;
+export declare const POLLING_INTERVAL_MS = 1000;

@@ -1,0 +1,14 @@
+import { BigNumber, SjclECCPublicKey, SjclECCSecretKey, SjclEllipticalPoint, SjclKeyPair } from "./sjcl";
+import { Curve } from "./curve";
+export declare function addPoints(points: Array<SjclEllipticalPoint>): SjclEllipticalPoint;
+export declare function multiplyAndSumScalarsAndPoints(scalars: Array<BigNumber>, points: Array<SjclEllipticalPoint>): SjclEllipticalPoint;
+export declare function pointEquals(point1: SjclEllipticalPoint, point2: SjclEllipticalPoint): boolean;
+export declare function infinityPoint(curve: Curve): SjclEllipticalPoint;
+export declare function hashIntoScalar(string: string, curve: Curve): BigNumber;
+export declare function hashIntoPoint(string: string, curve: Curve): SjclEllipticalPoint;
+export declare function pointToHex(point: SjclEllipticalPoint): string;
+export declare function hexToPoint(string: string, curve: Curve): SjclEllipticalPoint;
+export declare function scalarToHex(scalar: BigNumber, curve: Curve): string;
+export declare function hexToScalar(string: string, curve: Curve): BigNumber;
+export declare function concatForHashing(parts: Array<string | number>): string;
+export declare function generateKeyPair(curve: Curve, privateKey?: BigNumber): SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey>;
