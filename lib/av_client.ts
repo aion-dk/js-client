@@ -456,7 +456,13 @@ export class AVClient implements IAVClient {
       validatePayload(castRequest, castRequestItem);
       validateReceipt([castRequest], receipt, this.getDbbPublicKey());
 
-      return generateReceipt(receipt, castRequest);
+      const clientReceipt = generateReceipt(receipt, castRequest)
+      const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
+      const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
+      const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
+
+      if (this.getLatestConfig().items.electionConfig.content.sendTrackingCodeByEmail) coordinator.sendReceipt(this.email, clientReceipt.trackingCode);
+      return clientReceipt
     }
 
   /**
