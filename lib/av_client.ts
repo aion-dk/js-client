@@ -103,7 +103,6 @@ export class AVClient implements IAVClient {
   private voterCommitmentOpening: CommitmentOpening;
   private spoilRequest: SpoilRequestItem
   private proofOfElectionCodes: ProofOfElectionCodes;
-  private opaqueVoterId: string
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -154,7 +153,6 @@ export class AVClient implements IAVClient {
     const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
     const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
-    this.opaqueVoterId = opaqueVoterId
 
     return coordinator.createSession(opaqueVoterId, email)
       .then(({ data: { sessionId } }) => {
@@ -463,7 +461,7 @@ export class AVClient implements IAVClient {
       const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
       const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
 
-      if (this.getLatestConfig().items.electionConfig.content.sendTrackingCodeByEmail) coordinator.sendReceipt(this.email, clientReceipt.trackingCode, this.opaqueVoterId);
+      if (this.getLatestConfig().items.electionConfig.content.sendTrackingCodeByEmail) coordinator.sendReceipt(clientReceipt.trackingCode, this.authorizationSessionId);
       return clientReceipt
     }
 
