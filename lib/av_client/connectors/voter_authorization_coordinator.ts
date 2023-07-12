@@ -47,10 +47,12 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
-  sendReceipt(email: string, trackingCode: string): Promise<AxiosResponse> {
+  sendReceipt(email: string, trackingCode: string, opaqueVoterId: string): Promise<AxiosResponse> {
     return this.backend.post('send_receipt', {
       email: email,
-      trackingCode: trackingCode
+      trackingCode: trackingCode,
+      electionContextUuid: this.electionContextUuid,
+      opaqueVoterId: opaqueVoterId
     })
   }
 
