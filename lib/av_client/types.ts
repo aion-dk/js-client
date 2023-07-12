@@ -462,6 +462,7 @@ export interface ElectionConfigContent {
     from: string
     to: string
   }
+  sendTrackingCodeByEmail?: boolean
 }
 
 // Genesis Config Item

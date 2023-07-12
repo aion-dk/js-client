@@ -47,6 +47,14 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
+  sendReceipt(trackingCode: string, authorizationSessionId: string): Promise<AxiosResponse> {
+    return this.backend.post('send_receipt', {
+      trackingCode: trackingCode,
+      electionContextUuid: this.electionContextUuid,
+      authorizationSessionId: authorizationSessionId
+    })
+  }
+
   requestPublicKeyAuthorization(sessionId: string, identityConfirmationToken: IdentityConfirmationToken, publicKey: string, votingRoundReference: string): Promise<AxiosResponse> {
     return this.backend.post('request_authorization', {
       electionContextUuid: this.electionContextUuid,
