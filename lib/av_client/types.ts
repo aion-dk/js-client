@@ -391,7 +391,8 @@ export interface ContestContent {
   resultType: ResultType
   options: OptionContent[]
   identifiable?: boolean
-  contestPositions?: ContestPositionMap
+  contestPositions?: ContestPositionMap,
+  searchForm?: boolean
 }
 
 export interface ResultType {
