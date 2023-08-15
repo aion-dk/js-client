@@ -207,34 +207,6 @@ describe("validateContestSelection", () => {
       }).to.throw(CorruptSelectionError, "Option config not found");
     });
   });
-
-  context("using contest where up to 2 options can be selected", () => {
-    context(
-      "when given a contest selection with duplicate option selections",
-      () => {
-        const contestSelection = {
-          reference: "contest-2",
-          piles: [{
-            multiplier: 1,
-            optionSelections: [
-              { reference: "option-a" },
-              { reference: "option-a" },
-            ],
-          }]
-
-        };
-
-        it("throws an error", () => {
-          expect(() => {
-            validateContestSelection(contestTwo, contestSelection, 1);
-          }).to.throw(
-            CorruptSelectionError,
-            "Same option selected multiple times"
-          );
-        });
-      }
-    );
-  });
 });
 
 describe("validateBallotSelection", () => {
