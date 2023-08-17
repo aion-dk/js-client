@@ -210,6 +210,7 @@ export interface MarkingType {
   maxPiles?: number
   voteVariation?: string
   blankSubmission: "disabled" | "active_choice" | "implicit"
+  votesAllowedPerOption?:number
   encoding: {
     codeSize: number
     maxSize: number
