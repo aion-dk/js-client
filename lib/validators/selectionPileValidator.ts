@@ -52,10 +52,12 @@ class SelectionPileValidator {
     return choices.length < this.contest.markingType.minMarks;
   }
   private tooManySelections(choices: OptionSelection[]) {
-    return (
-      choices.length > this.contest.markingType.maxMarks &&
-      choices.length > this.contest.markingType.votesAllowedPerOption
-    );
+    if (this.contest.markingType.votesAllowedPerOption) {
+      return (
+        choices.length > this.contest.markingType.maxMarks &&
+        choices.length > this.contest.markingType.votesAllowedPerOption
+      );
+    }
   }
   private exclusiveNotAlone(choices: OptionSelection[]) {
     if (this.selectedReferences(choices).length < 2) return false;
