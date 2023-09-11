@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface IAVClient {
   initialize(latestConfig: LatestConfig): Promise<void>
   initialize(): Promise<void>
@@ -210,7 +211,7 @@ export interface MarkingType {
   maxPiles?: number
   voteVariation?: string
   blankSubmission: "disabled" | "active_choice" | "implicit"
-  votesAllowedPerOption?:number
+  votesAllowedPerOption: number
   encoding: {
     codeSize: number
     maxSize: number
@@ -244,6 +245,7 @@ export type ContestSelection = {
 export type SelectionPile = {
   multiplier: number,
   optionSelections: OptionSelection[]
+  explicitBlank?: boolean;
 }
 
 export type OptionSelection = {
@@ -393,6 +395,9 @@ export interface ContestContent {
   options: OptionContent[]
   identifiable?: boolean
   contestPositions?: ContestPositionMap
+  collapsable?: boolean;
+  collapseDefault?: boolean;
+  searchForm?: boolean;
 }
 
 export interface ResultType {
@@ -410,6 +415,12 @@ export interface OptionContent {
     maxSize: number
     encoding: 'utf8'
   }
+  url?: LocalString;
+  videoUrl?: LocalString;
+  image?: string;
+  selectable?: boolean;
+  exclusive?: boolean;
+  voteLimit?: number;
 }
 
 // Voting Round Config Item
@@ -531,4 +542,9 @@ export interface ClientState {
   latestConfig: LatestConfig
   votingRoundReference: string
   voterSession: VoterSessionItem
+}
+
+export interface CheckedEventArgs {
+  reference: string;
+  amount: number;
 }

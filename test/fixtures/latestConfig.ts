@@ -60,6 +60,7 @@ const latestConfig: LatestConfig = {
           },
           markingType: {
             blankSubmission: "disabled",
+            votesAllowedPerOption: 1,
             minMarks: 1,
             maxMarks: 1,
             encoding: {
@@ -117,6 +118,7 @@ const latestConfig: LatestConfig = {
           },
           markingType: {
             blankSubmission: "disabled",
+            votesAllowedPerOption: 1,
             minMarks: 1,
             maxMarks: 1,
             encoding: {

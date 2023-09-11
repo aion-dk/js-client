@@ -13,6 +13,7 @@ const contestOne: ContestConfig = {
       minMarks: 1,
       maxMarks: 1,
       blankSubmission: "disabled",
+      votesAllowedPerOption: 1,
       encoding: {
         codeSize: 1,
         maxSize: 1,
