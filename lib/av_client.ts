@@ -214,7 +214,8 @@ export class AVClient implements IAVClient {
     this.votingRoundReference = votingRoundReference
 
     let authorizationResponse: AxiosResponse
-
+    
+    // This should be refactored when the DBB allows several authorization modes
     if(authorizationMode === 'proof-of-identity' || this.identityConfirmationToken) {
       if(!this.identityConfirmationToken)
         throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
