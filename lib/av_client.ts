@@ -197,6 +197,10 @@ export class AVClient implements IAVClient {
     this.proofOfElectionCodes = new ProofOfElectionCodes(electionCodes);
   }
 
+  setIdentityToken(token: string) {
+    this.identityConfirmationToken = token
+  }
+
   /**
    * Registers a voter based on the authorization mode of the Voter Authorizer
    * Authorization is done by 'proof-of-identity' or 'proof-of-election-codes'
@@ -211,7 +215,8 @@ export class AVClient implements IAVClient {
 
     let authorizationResponse: AxiosResponse
 
-    if(authorizationMode === 'proof-of-identity') {
+    // This should be refactored when the DBB allows several authorization modes
+    if(authorizationMode === 'proof-of-identity' || this.identityConfirmationToken) {
       if(!this.identityConfirmationToken)
         throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
 
