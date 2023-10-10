@@ -398,6 +398,7 @@ export interface ContestContent {
   collapsable?: boolean;
   collapseDefault?: boolean;
   searchForm?: boolean;
+  disregardVoterWeight?: boolean;
 }
 
 export interface ResultType {
