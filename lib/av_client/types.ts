@@ -399,6 +399,7 @@ export interface ContestContent {
   collapseDefault?: boolean;
   searchForm?: boolean;
   disregardVoterWeight?: boolean;
+  randomizeOptions?: boolean;
 }
 
 export interface ResultType {
