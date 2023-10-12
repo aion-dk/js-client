@@ -423,6 +423,7 @@ export interface OptionContent {
   selectable?: boolean;
   exclusive?: boolean;
   voteLimit?: number;
+  randomizeChildren?: boolean;
 }
 
 // Voting Round Config Item
