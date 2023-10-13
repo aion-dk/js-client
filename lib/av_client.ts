@@ -230,7 +230,8 @@ export class AVClient implements IAVClient {
       throw new InvalidConfigError(`Unknown authorization mode of voter authorizer: '${authorizationMode}'`)
     }
 
-    const { authToken } = authorizationResponse.data;
+    const { authToken, authorizationUuid } = authorizationResponse.data;
+    this.authorizationSessionId = this.authorizationSessionId ? this.authorizationSessionId : authorizationUuid
 
     const decoded = jwtDecode<JwtPayload>(authToken); // TODO: Verify against dbb pubkey: this.getLatestConfig().services.voterAuthorizer.public_key);
 
