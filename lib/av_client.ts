@@ -564,7 +564,7 @@ export class AVClient implements IAVClient {
     return this.voterSession
   }
 
-  public getSessionUuid(): String {
+  public getSessionUuid(): string {
     return this.authorizationSessionId
   }
 
