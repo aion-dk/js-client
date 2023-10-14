@@ -230,7 +230,8 @@ export class AVClient implements IAVClient {
       throw new InvalidConfigError(`Unknown authorization mode of voter authorizer: '${authorizationMode}'`)
     }
 
-    const { authToken } = authorizationResponse.data;
+    const { authToken, authorizationUuid } = authorizationResponse.data;
+    this.authorizationSessionId = this.authorizationSessionId ? this.authorizationSessionId : authorizationUuid
 
     const decoded = jwtDecode<JwtPayload>(authToken); // TODO: Verify against dbb pubkey: this.getLatestConfig().services.voterAuthorizer.public_key);
 
@@ -468,7 +469,7 @@ export class AVClient implements IAVClient {
         const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
         const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
         try {
-          coordinator.sendReceipt(clientReceipt.trackingCode, this.authorizationSessionId);
+          coordinator.sendReceipt(clientReceipt, this.authorizationSessionId);
         } catch(e) {
           console.error(e)
         }
@@ -561,6 +562,10 @@ export class AVClient implements IAVClient {
     }
 
     return this.voterSession
+  }
+
+  public getSessionUuid(): string {
+    return this.authorizationSessionId
   }
 
   public getVoterBallotConfig(): BallotConfig {

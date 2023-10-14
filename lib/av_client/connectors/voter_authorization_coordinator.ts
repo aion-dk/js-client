@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { IdentityConfirmationToken } from "./otp_provider";
 import { EmailDoesNotMatchVoterRecordError, NetworkError, UnsupportedServerReplyError, VoterRecordNotFoundError } from "../errors";
 import { ProofOfElectionCodes } from "../crypto/proof_of_election_codes";
+import { BallotBoxReceipt } from '../types';
 
 export default class VoterAuthorizationCoordinator {
   private backend: AxiosInstance;
@@ -47,11 +48,12 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
-  sendReceipt(trackingCode: string, authorizationSessionId: string): Promise<AxiosResponse> {
+  sendReceipt(receipt: BallotBoxReceipt, authorizationSessionId: string ): Promise<AxiosResponse> {
     return this.backend.post('send_receipt', {
-      trackingCode: trackingCode,
+      trackingCode: receipt.trackingCode,
       electionContextUuid: this.electionContextUuid,
-      authorizationSessionId: authorizationSessionId
+      authorizationSessionId: authorizationSessionId,
+      receipt: receipt.receipt
     })
   }
 
