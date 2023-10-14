@@ -564,6 +564,10 @@ export class AVClient implements IAVClient {
     return this.voterSession
   }
 
+  public getSessionUuid(): String {
+    return this.authorizationSessionId
+  }
+
   public getVoterBallotConfig(): BallotConfig {
     const voterSession = this.getVoterSession()
     const { items: { ballotConfigs } } = this.getLatestConfig()
