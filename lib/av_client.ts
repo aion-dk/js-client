@@ -368,7 +368,7 @@ export class AVClient implements IAVClient {
       pedersenCommitment,
       envelopeRandomizers,
       contestEnvelopes,
-    } = constructContestEnvelopes(state, ballotSelection, transparent); // TODO: Base this on some config
+    } = constructContestEnvelopes(state, ballotSelection, transparent);
 
     this.clientEnvelopes = contestEnvelopes;
 
