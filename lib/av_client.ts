@@ -362,11 +362,13 @@ export class AVClient implements IAVClient {
       votingRoundReference: this.votingRoundReference
     };
 
+    const transparent = state.latestConfig.items.votingRoundConfigs[this.votingRoundReference].content.handRaise || false;
+
     const {
       pedersenCommitment,
       envelopeRandomizers,
       contestEnvelopes,
-    } = constructContestEnvelopes(state, ballotSelection, true); // TODO: Base this on some config
+    } = constructContestEnvelopes(state, ballotSelection, transparent); // TODO: Base this on some config
 
     this.clientEnvelopes = contestEnvelopes;
 
