@@ -449,6 +449,7 @@ export interface VotingRoundContent {
   demo?: boolean
   identifiable?: boolean
   contestPositions?: ContestPositionMap;
+  handRaise?: boolean;
 }
 
 // Election Config Item
