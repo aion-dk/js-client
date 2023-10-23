@@ -423,6 +423,7 @@ export interface OptionContent {
   selectable?: boolean;
   exclusive?: boolean;
   voteLimit?: number;
+  color?: string;
   randomizeChildren?: boolean;
 }
 
@@ -551,4 +552,14 @@ export interface ClientState {
 export interface CheckedEventArgs {
   reference: string;
   amount: number;
+}
+
+export interface PartialResult {
+  reference: string;
+  results: PartialCount;
+}
+
+export interface PartialCount {
+  count: number;
+  percentage: number;
 }
