@@ -423,7 +423,7 @@ export interface OptionContent {
   selectable?: boolean;
   exclusive?: boolean;
   voteLimit?: number;
-  color?: string;
+  accentColor?: string;
   randomizeChildren?: boolean;
 }
 
