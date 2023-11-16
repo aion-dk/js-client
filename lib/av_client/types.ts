@@ -400,6 +400,7 @@ export interface ContestContent {
   searchForm?: boolean;
   disregardVoterWeight?: boolean;
   randomizeOptions?: boolean;
+  blankOptionColor?: string;
 }
 
 export interface ResultType {
@@ -425,7 +426,6 @@ export interface OptionContent {
   voteLimit?: number;
   accentColor?: string;
   randomizeChildren?: boolean;
-  blankOptionColor?: string;
 }
 
 // Voting Round Config Item
