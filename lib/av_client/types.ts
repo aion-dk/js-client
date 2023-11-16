@@ -425,7 +425,6 @@ export interface OptionContent {
   voteLimit?: number;
   accentColor?: string;
   randomizeChildren?: boolean;
-  blankOptionColor?: string;
 }
 
 // Voting Round Config Item
