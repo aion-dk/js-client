@@ -1,4 +1,4 @@
-import { ContestContent, OptionSelection, OptionContent, SelectionPile } from '../av_client/types';
+import { ContestContent, OptionSelection, SelectionPile } from '../av_client/types';
 
 class BelgiumBallotValidator {
   private contest: ContestContent;
@@ -26,13 +26,13 @@ class BelgiumBallotValidator {
    * Not allowed to vote in more than 50% of the candidates in the party
    */
   private tooManyInParty(choices: OptionSelection[]) {
-    let selectedReferences = this.selectedReferences(choices)
+    const selectedReferences = this.selectedReferences(choices)
     let error = false
 
     this.contest.options.forEach(parent =>  {
       if (!parent.children) return
 
-      let selectedInParty = parent.children.filter(child => selectedReferences.includes(child.reference))
+      const selectedInParty = parent.children.filter(child => selectedReferences.includes(child.reference))
 
       if (selectedInParty.length > parent.children.length / 2) {
         error = true
@@ -46,14 +46,14 @@ class BelgiumBallotValidator {
    * Not allowed to vote across parties
    */
   private partyExclusive(choices: OptionSelection[]) {
-    let selectedReferences = this.selectedReferences(choices)
+    const selectedReferences = this.selectedReferences(choices)
     let error = this.contest.options.filter(option => selectedReferences.includes(option.reference)).length > 1
 
     let found = false
     this.contest.options.forEach(parent =>  {
       if (!parent.children) return
 
-      let childChosen = parent.children.some(child => selectedReferences.includes(child.reference))
+      const childChosen = parent.children.some(child => selectedReferences.includes(child.reference))
       if(found && childChosen) {
         error = true
       } else if(childChosen) {
@@ -68,10 +68,10 @@ class BelgiumBallotValidator {
    * Not allowed to vote on a parent and child
    */
   private parentExclusive(choices: OptionSelection[]) {
-    let selectedReferences = this.selectedReferences(choices)
+    const selectedReferences = this.selectedReferences(choices)
     let error = false
 
-    let selectedParents = this.contest.options.filter(option => selectedReferences.includes(option.reference))
+    const selectedParents = this.contest.options.filter(option => selectedReferences.includes(option.reference))
     if (!selectedParents.length) return
 
     selectedParents.forEach(parent =>  {
