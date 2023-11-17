@@ -418,7 +418,7 @@ export interface OptionContent {
   selectable?: boolean
   exclusive?: boolean
   children?: OptionContent[]
-  parent?: OptionContent | null
+  parent?: ParentOption | null
   ancestry?: string
   position?: number
   randomizeChildren?: boolean
@@ -430,6 +430,27 @@ export interface OptionContent {
     maxSize: number
     encoding: 'utf8'
   }
+}
+
+export interface ParentOption {
+    reference: string
+    code: number
+    id: number
+    contest_id?: number
+    position?: number
+    ancestry?: string
+    data?: {
+      title: LocalString
+      image?: string | null
+      randomize_children?: boolean
+      accent_color?: string
+      description?: LocalString
+    }
+    created_at?: string
+    updated_at?: string
+    enabled?: boolean
+    exclusive?: boolean
+    selectable?: boolean
 }
 
 // Voting Round Config Item
