@@ -9,9 +9,6 @@ class BelgiumBallotValidator {
   validate(selectionPile: SelectionPile): string[] {
     const errors: string[] = [];
 
-    console.log("Validating Belgium Ballot");
-
-    if (this.tooManyInParty(selectionPile.optionSelections)) errors.push('too_many_in_party');
     if (this.partyExclusive(selectionPile.optionSelections)) errors.push('cross_party_voting');
     if (this.parentExclusive(selectionPile.optionSelections)) errors.push('parent_and_child_selected');
 
@@ -22,24 +19,8 @@ class BelgiumBallotValidator {
     return optionSelections.map((os) => os.reference);
   }
 
-  /**
-   * Not allowed to vote in more than 50% of the candidates in the party
-   */
-  private tooManyInParty(choices: OptionSelection[]) {
-    const selectedReferences = this.selectedReferences(choices)
-    let error = false
-
-    this.contest.options.forEach(parent =>  {
-      if (!parent.children) return
-
-      const selectedInParty = parent.children.filter(child => selectedReferences.includes(child.reference))
-
-      if (selectedInParty.length > parent.children.length / 2) {
-        error = true
-      }
-    })
-
-    return error
+  isComplete(selectionPile: SelectionPile) {
+    return this.validate(selectionPile).length == 0;
   }
 
   /**
