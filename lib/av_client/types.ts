@@ -390,16 +390,18 @@ export interface ContestContent {
   subtitle?: LocalString
   question?: LocalString
   description?: LocalString
+  collapsable?: boolean
+  collapseDefault?: boolean
+  searchForm?: boolean
+  disregardVoterWeight?: boolean
+  randomizeOptions?: boolean
   markingType: MarkingType
   resultType: ResultType
   options: OptionContent[]
   identifiable?: boolean
   contestPositions?: ContestPositionMap
-  collapsable?: boolean;
-  collapseDefault?: boolean;
-  searchForm?: boolean;
-  disregardVoterWeight?: boolean;
-  randomizeOptions?: boolean;
+  blankOptionColor?: string
+  attachments?: Attachment[]
 }
 
 export interface ResultType {
@@ -407,24 +409,48 @@ export interface ResultType {
 }
 
 export interface OptionContent {
-  reference: string;
-  code: number;
-  children?: OptionContent[];
-  title: LocalString;
-  subtitle?: LocalString;
-  description?: LocalString;
+  reference: string
+  code: number
+  title: LocalString
+  subtitle?: LocalString
+  description?: LocalString
+  image?: string
+  selectable?: boolean
+  exclusive?: boolean
+  children?: OptionContent[]
+  parent?: ParentOption | null
+  ancestry?: string
+  position?: number
+  randomizeChildren?: boolean
+  accentColor?: string
+  url?: LocalString
+  videoUrl?: LocalString
+  voteLimit?: number
   writeIn?: {
     maxSize: number
     encoding: 'utf8'
   }
-  url?: LocalString;
-  videoUrl?: LocalString;
-  image?: string;
-  selectable?: boolean;
-  exclusive?: boolean;
-  voteLimit?: number;
-  color?: string;
-  randomizeChildren?: boolean;
+}
+
+export interface ParentOption {
+    reference: string
+    code: number
+    id: number
+    contest_id?: number
+    position?: number
+    ancestry?: string
+    data?: {
+      title: LocalString
+      image?: string | null
+      randomize_children?: boolean
+      accent_color?: string
+      description?: LocalString
+    }
+    created_at?: string
+    updated_at?: string
+    enabled?: boolean
+    exclusive?: boolean
+    selectable?: boolean
 }
 
 // Voting Round Config Item
@@ -440,15 +466,20 @@ export interface VotingRoundConfig extends BaseBoardItem {
 export interface VotingRoundContent {
   reference: string
   status: "open" | "scheduled" | "closed"
-  resultPublicationDelay?: number
+  title?: LocalString
+  name?: string
+  contestReferences: string[]
+  identifiable?: boolean
+  demo?: boolean
+  handRaise?: boolean
+  contestPositions?: ContestPositionMap
   schedule?: {
     from: string
     to: string
   }
-  contestReferences: string[]
-  demo?: boolean
-  identifiable?: boolean
-  contestPositions?: ContestPositionMap;
+  resultPublicationDelay?: number
+  recasting?: boolean
+  attachments?: Attachment[]
 }
 
 // Election Config Item
@@ -537,6 +568,11 @@ export interface ExtractionConfirmations {
   signature?: string
   content?: string
   attachment?: string
+}
+
+export interface Attachment {
+  name: string
+  sha: string
 }
 
 // We define the client state to only require a subset of the electionConfig and voterSession
