@@ -18,10 +18,7 @@ class SelectionPileValidator {
   }
 
   optionIsExclusive(optionReference: string) {
-    console.log(optionReference);
-    console.log(this.contest.options);
     const current = this.contest.options.find(option => option.reference === optionReference);
-    console.log(current);
     return current?.exclusive;
   }
 
