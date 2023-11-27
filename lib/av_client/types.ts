@@ -401,6 +401,7 @@ export interface ContestContent {
   identifiable?: boolean
   contestPositions?: ContestPositionMap
   blankOptionColor?: string
+  customRulesets?: string[]
   attachments?: Attachment[]
 }
 
