@@ -1,5 +1,5 @@
 {
-  "version": "3.1.13-alpha.9",
+  "version": "3.1.14",
   "name": "@aion-dk/js-client",
   "license": "MIT",
   "description": "Assembly Voting JS client",
