@@ -17,9 +17,15 @@ class SelectionPileValidator {
     return errors;
   }
 
+  optionIsExclusive(optionReference: string) {
+    const current = this.contest.options.find(option => option.reference === optionReference);
+    return current?.exclusive;
+  }
+
   isComplete(selectionPile: SelectionPile) {
     const enoughVotes =
       selectionPile.explicitBlank ||
+      (selectionPile.optionSelections.length === 1 && this.optionIsExclusive(selectionPile.optionSelections[0].reference)) ||
       this.implicitlyBlank(selectionPile.optionSelections) ||
       !this.tooFewSelections(selectionPile.optionSelections);
     return enoughVotes && this.validate(selectionPile).length == 0;
