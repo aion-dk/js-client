@@ -48,17 +48,20 @@ export function validateContestSelection( contestConfig: ContestConfig, contestS
 function validateSelectionPile(pile: SelectionPile, markingType: MarkingType, options: OptionContent[]) {
   const isBlank = pile.optionSelections.length === 0
 
+  const getOption = makeGetOption(options)
+
+  // Belgian ballot custom rules
+  const bypassMinMarksIfExclusive = getOption(pile.optionSelections[0]).exclusive ? 1 : markingType.minMarks
+
   // Validate blankSubmission
   if( isBlank && markingType.blankSubmission == 'disabled'){
     throw new CorruptSelectionError('Blank submissions are not allowed in this contest')
   }
 
   // Validate that mark count is within bounds
-  if( !isBlank && !withinBounds(markingType.minMarks, pile.optionSelections.length, markingType.maxMarks) ){
+  if( !isBlank && !withinBounds(bypassMinMarksIfExclusive, pile.optionSelections.length, markingType.maxMarks) ){
     throw new CorruptSelectionError('Contest selection does not contain a valid amount of option selections')
   }
-
-  const getOption = makeGetOption(options)
 
   pile.optionSelections.forEach(optionSelection => {
     const option = getOption(optionSelection)
