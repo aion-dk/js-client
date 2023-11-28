@@ -55,14 +55,17 @@ function validateSelectionPile(pile: SelectionPile, markingType: MarkingType, op
     throw new CorruptSelectionError('Blank submissions are not allowed in this contest')
   }
 
-  // Validate that mark count is within bounds
-  const calculatedMinMarks = !isBlank && getOption(pile.optionSelections[0]).exclusive ? 1 : markingType.minMarks;
-  if( !isBlank && !withinBounds(calculatedMinMarks, pile.optionSelections.length, markingType.maxMarks) ){
-    throw new CorruptSelectionError('Contest selection does not contain a valid amount of option selections')
-  }
-
   pile.optionSelections.forEach(optionSelection => {
     const option = getOption(optionSelection)
+
+    // Validate that mark count is within bounds
+
+    const isExlusive = pile.optionSelections?.length && option?.exclusive
+    const calculatedMinMarks = !isBlank && isExlusive ? 1 : markingType.minMarks;
+
+    if( !isBlank && !withinBounds(calculatedMinMarks, pile.optionSelections.length, markingType.maxMarks) ){
+      throw new CorruptSelectionError('Contest selection does not contain a valid amount of option selections')
+    }
 
     if( option.writeIn ){
       if( !optionSelection.text ){
