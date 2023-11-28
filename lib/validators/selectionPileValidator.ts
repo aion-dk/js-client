@@ -73,11 +73,8 @@ class SelectionPileValidator {
 
   private optionIsExclusive(selectionPile: SelectionPile) {
     if (selectionPile.optionSelections?.length) {
-      selectionPile.optionSelections.forEach(optionSelection => {
-        const current = this.contest.options.find(option =>
-          option.reference === selectionPile.optionSelections[optionSelection.reference].reference);
-        return selectionPile.optionSelections.length === 1 && current?.exclusive;
-      })
+      const current = this.contest.options.find(option => option.reference === selectionPile.optionSelections[0].reference);
+      return selectionPile.optionSelections.length === 1 && current?.exclusive;
     }
 
     return true;
