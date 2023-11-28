@@ -591,6 +591,7 @@ export interface CheckedEventArgs {
 }
 
 export interface PartialResult {
+  showPercentage?: boolean;
   reference: string;
   results: PartialCount;
 }
