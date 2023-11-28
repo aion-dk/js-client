@@ -72,7 +72,7 @@ class SelectionPileValidator {
   }
 
   private optionIsExclusive(selectionPile: SelectionPile) {
-    return selectionPile.optionSelections.length === 1 &&
+    return selectionPile.optionSelections?.length === 1 &&
       this.contest.options.find(option => option.reference === selectionPile.optionSelections[0].reference)?.exclusive;
   }
 }
