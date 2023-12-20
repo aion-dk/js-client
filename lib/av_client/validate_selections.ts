@@ -48,20 +48,24 @@ export function validateContestSelection( contestConfig: ContestConfig, contestS
 function validateSelectionPile(pile: SelectionPile, markingType: MarkingType, options: OptionContent[]) {
   const isBlank = pile.optionSelections.length === 0
 
+  const getOption = makeGetOption(options)
+
   // Validate blankSubmission
-  if( isBlank && markingType.blankSubmission == 'disabled'){
+  if( isBlank && markingType.blankSubmission === 'disabled'){
     throw new CorruptSelectionError('Blank submissions are not allowed in this contest')
   }
 
-  // Validate that mark count is within bounds
-  if( !isBlank && !withinBounds(markingType.minMarks, pile.optionSelections.length, markingType.maxMarks) ){
-    throw new CorruptSelectionError('Contest selection does not contain a valid amount of option selections')
-  }
-
-  const getOption = makeGetOption(options)
-
   pile.optionSelections.forEach(optionSelection => {
     const option = getOption(optionSelection)
+
+    // Validate that mark count is within bounds
+
+    const isExlusive = pile.optionSelections?.length && option?.exclusive
+    const calculatedMinMarks = !isBlank && isExlusive ? 1 : markingType.minMarks;
+
+    if( !isBlank && !withinBounds(calculatedMinMarks, pile.optionSelections.length, markingType.maxMarks) ){
+      throw new CorruptSelectionError('Contest selection does not contain a valid amount of option selections')
+    }
 
     if( option.writeIn ){
       if( !optionSelection.text ){

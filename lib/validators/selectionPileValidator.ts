@@ -20,6 +20,7 @@ class SelectionPileValidator {
   isComplete(selectionPile: SelectionPile) {
     const enoughVotes =
       selectionPile.explicitBlank ||
+      this.optionIsExclusive(selectionPile) ||
       this.implicitlyBlank(selectionPile.optionSelections) ||
       !this.tooFewSelections(selectionPile.optionSelections);
     return enoughVotes && this.validate(selectionPile).length == 0;
@@ -48,17 +49,15 @@ class SelectionPileValidator {
   private implicitlyBlank(choices: OptionSelection[]) {
     return this.contest.markingType.blankSubmission === 'implicit' && choices.length === 0;
   }
+
   private tooFewSelections(choices: OptionSelection[]) {
     return choices.length < this.contest.markingType.minMarks;
   }
+
   private tooManySelections(choices: OptionSelection[]) {
-    if (this.contest.markingType.votesAllowedPerOption) {
-      return (
-        choices.length > this.contest.markingType.maxMarks &&
-        choices.length > this.contest.markingType.votesAllowedPerOption
-      );
-    }
+    return choices.length > this.contest.markingType.maxMarks;
   }
+
   private exclusiveNotAlone(choices: OptionSelection[]) {
     if (this.selectedReferences(choices).length < 2) return false;
 
@@ -67,8 +66,14 @@ class SelectionPileValidator {
       .map((ref) => options.find((option) => option.reference === ref))
       .some((option) => option?.exclusive === true);
   }
+
   private blankNotAlone(choices: OptionSelection[], explicitlyBlank: boolean | undefined) {
     return choices.length > 0 && explicitlyBlank;
+  }
+
+  private optionIsExclusive(selectionPile: SelectionPile) {
+    return selectionPile.optionSelections?.length === 1 &&
+      this.contest.options.find(option => option.reference === selectionPile.optionSelections[0].reference)?.exclusive;
   }
 }
 
