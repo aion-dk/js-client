@@ -4,7 +4,7 @@ import { signPayload, validatePayload, validateReceipt } from '../sign'
 import { BALLOT_CRYPTOGRAMS_ITEM } from '../constants'
 import { generateDiscreteLogarithmProof } from '../aion_crypto'
 import { finalizeCryptograms } from '../finalize_cryptograms'
-
+var cryptogramTimes: Array<number> = []
 export async function submitBallotCryptograms(
   bulletinBoard: BulletinBoard,
   clientEnvelopes: ContestEnvelope[],
@@ -31,7 +31,13 @@ export async function submitBallotCryptograms(
     proofs: generateEnvelopeProofs(clientEnvelopes)
   }
 
+  var startTime = performance.now()
   const response = (await bulletinBoard.submitVotes(itemWithProofs));
+  var endTime = performance.now()
+
+  cryptogramTimes.push(endTime - startTime)
+  console.log("Cryptograms:\t" +  (endTime - startTime) +  "\t | Avg: ", cryptogramTimes.reduce((a, b) => a + b) / cryptogramTimes.length + "\t | Max: " + Math.max(...cryptogramTimes));
+
   const ballotCryptogramsItemCopy = response.data.vote;
   const verificationItem = response.data.verification;
   const receipt = response.data.receipt;

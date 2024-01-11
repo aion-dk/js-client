@@ -2,6 +2,7 @@ import { BulletinBoard } from "../connectors/bulletin_board";
 import { BOARD_COMMITMENT_ITEM, VOTER_COMMITMENT_ITEM } from "../constants";
 import { signPayload, validatePayload, validateReceipt } from "../sign";
 import { BoardCommitmentItem, ContestMap, VoterCommitmentItem } from "../types";
+var commitmentTimes: Array<number> = []
 
 type SubmitVoterCommitmentResponse = {
   voterCommitment: VoterCommitmentItem
@@ -27,8 +28,11 @@ const submitVoterCommitment = async (
   };
 
   const signedCommitmentItem = signPayload(voterCommitmentItem, voterSigningKey);
+  var start = performance.now()
   const response = await bulletinBoard.submitCommitment(signedCommitmentItem);
-
+  var end = performance.now()
+  commitmentTimes.push(end - start)
+  console.log("Commitment:\t" +  (end - start) +  "\t | Avg: ", commitmentTimes.reduce((a, b) => a + b) / commitmentTimes.length + "\t | Max: " + Math.max(...commitmentTimes) );
   const voterCommitmentCopy: VoterCommitmentItem = response.data.voterCommitment;
   const boardCommitment = response.data.boardCommitment;
   const serverEnvelopes = response.data.envelopes;

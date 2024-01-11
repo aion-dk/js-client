@@ -51,6 +51,8 @@ import { submitBallotCryptograms } from './av_client/actions/submit_ballot_crypt
 import {AxiosResponse} from "axios";
 import { ProofOfElectionCodes } from "./av_client/crypto/proof_of_election_codes";
 import { dhEncrypt } from "./av_client/crypto/aes";
+var castTimes: Array<number> = []
+var authTimes: Array<number> = []
 
 /** @internal */
 export const sjcl = sjclLib;
@@ -224,8 +226,11 @@ export class AVClient implements IAVClient {
     } else if(authorizationMode === 'proof-of-election-codes') {
       if(this.proofOfElectionCodes == null)
         throw new InvalidStateError('Cannot register voter without proof of election codes. User has not generated an election codes proof.')
-
+      var startTime = performance.now()
       authorizationResponse = await coordinator.authorizeProofOfElectionCodes(this.keyPair.publicKey, this.proofOfElectionCodes, this.votingRoundReference)
+      var end = performance.now()
+      authTimes.push(end - startTime)
+      console.log("Auth:\t\t" +  (end - startTime) +  "\t | Avg: ", authTimes.reduce((a, b) => a + b) / authTimes.length  + "\t | Max: " + Math.max(...authTimes));
     } else {
       throw new InvalidConfigError(`Unknown authorization mode of voter authorizer: '${authorizationMode}'`)
     }
@@ -428,6 +433,7 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
+
     public async castBallot(affidavit?: Affidavit): Promise<BallotBoxReceipt> {
       // Affidavit must be base64 encoded
 
@@ -458,8 +464,14 @@ export class AVClient implements IAVClient {
         signedPayload['attachment'] = `data:text/plain;base64,${Buffer.from(encryptedAffidavit).toString('base64')}`
       }
 
+      var start = performance.now()
       const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
+      var end = performance.now()
+      castTimes.push(end - start)
+      console.log("Cast:\t\t" +  (end - start) +  "\t | Avg: ", castTimes.reduce((a, b) => a + b) / castTimes.length + "\t | Max: " + Math.max(...castTimes));
       const { castRequest, receipt } = response.data;
+
+
 
       validatePayload(castRequest, castRequestItem);
       validateReceipt([castRequest], receipt, this.getDbbPublicKey());

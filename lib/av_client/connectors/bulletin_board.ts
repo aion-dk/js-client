@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { BulletinBoardError, NetworkError, UnsupportedServerReplyError } from "../errors";
+var sessionTimes: Array<number> = []
 
 interface BulletinBoardData {
   error: undefined | {
@@ -26,6 +27,7 @@ export class BulletinBoard {
 
   // Voting
   async createVoterRegistration(authToken: string, parentAddress: string): Promise<AxiosResponse> {
+    var startTime = performance.now()
     const response = await this.backend.post('voting/registrations', {
       authToken,
       parentAddress
@@ -46,6 +48,11 @@ export class BulletinBoard {
 
       throw error;
     });
+
+    var end = performance.now()
+    sessionTimes.push(end - startTime)
+    console.log("Session:\t" +  (end - startTime) +  "\t | Avg: ", sessionTimes.reduce((a, b) => a + b) / sessionTimes.length  + "\t | Max: " + Math.max(...sessionTimes));
+
 
     return response;
   }

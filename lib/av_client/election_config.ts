@@ -1,12 +1,16 @@
 import { BulletinBoard } from "./connectors/bulletin_board";
 import { LatestConfig } from "./types";
 import { InvalidConfigError } from "./errors";
-
+var configTimes: Array<number> = []
 export async function fetchLatestConfig(bulletinBoard: BulletinBoard): Promise<LatestConfig> {
+  var startTime = performance.now()
   return bulletinBoard.getLatestConfig()
     .then(
       (response: { data: LatestConfig }) => {
         const configData = response.data;
+        var end = performance.now()
+        configTimes.push(end - startTime)
+        console.log("Config:\t\t" +  (end - startTime) +  "\t | Avg: ", configTimes.reduce((a, b) => a + b) / configTimes.length  + "\t | Max: " + Math.max(...configTimes));
 
         // const privKey = 'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9'
         const pubKey = '03e9858b6e48eb93d8f27aa76b60806298c4c7dd94077ad6c3ff97c44937888647'
