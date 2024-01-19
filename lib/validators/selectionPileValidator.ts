@@ -12,7 +12,7 @@ class SelectionPileValidator {
     if (this.referenceMissing(selectionPile.optionSelections)) errors.push('invalid_reference');
     if (this.tooManySelections(selectionPile.optionSelections)) errors.push('too_many');
     if (this.blankNotAlone(selectionPile.optionSelections, selectionPile.explicitBlank)) errors.push('blank');
-    if (this.exclusiveNotAlone(selectionPile.optionSelections)) errors.push('exclusive');
+    if (this.exclusiveNotAlone(selectionPile.optionSelections) && !this.contest.customRulesets?.includes('belgian_ballot_rules')) errors.push('exclusive');
 
     return errors;
   }
