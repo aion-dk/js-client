@@ -27,7 +27,7 @@
     "node": ">=14"
   },
   "dependencies": {
-    "axios": "^0.25.0",
+    "axios": "^1.6.0",
     "base-x": "^4.0.0",
     "buffer": "^6.0.3",
     "jwt-decode": "^3.1.2",
