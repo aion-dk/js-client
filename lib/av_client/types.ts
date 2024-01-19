@@ -384,6 +384,8 @@ export interface ContestConfig extends BaseBoardItem {
   type: 'ContestConfigItem'
 }
 
+export type availableCustomRulesets = 'belgian_ballot_rules';
+
 export interface ContestContent {
   reference: string
   title: LocalString
@@ -401,7 +403,7 @@ export interface ContestContent {
   identifiable?: boolean
   contestPositions?: ContestPositionMap
   blankOptionColor?: string
-  customRulesets?: string[]
+  customRulesets?: availableCustomRulesets[]
   attachments?: Attachment[]
 }
 
@@ -419,6 +421,7 @@ export interface OptionContent {
   selectable?: boolean
   exclusive?: boolean
   children?: OptionContent[]
+  parentContent?: OptionContent
   parent?: ParentOption | null
   ancestry?: string
   position?: number
