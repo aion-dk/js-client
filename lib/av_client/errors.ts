@@ -77,6 +77,15 @@ export class EmailDoesNotMatchVoterRecordError extends AvClientError {
   }
 }
 
+export class DBBError extends AvClientError {
+  readonly name = "DBB_ERROR";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, DBBError.prototype);
+  }
+}
+
 export class VoterRecordNotFoundError extends AvClientError {
   readonly name = "VoterRecordNotFoundError";
 

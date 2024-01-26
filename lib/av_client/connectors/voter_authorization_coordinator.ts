@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { IdentityConfirmationToken } from "./otp_provider";
-import { EmailDoesNotMatchVoterRecordError, NetworkError, UnsupportedServerReplyError, VoterRecordNotFoundError } from "../errors";
+import { EmailDoesNotMatchVoterRecordError, NetworkError, UnsupportedServerReplyError, VoterRecordNotFoundError, DBBError } from "../errors";
 import { ProofOfElectionCodes } from "../crypto/proof_of_election_codes";
 import { BallotBoxReceipt } from '../types';
 
@@ -40,6 +40,8 @@ export default class VoterAuthorizationCoordinator {
             throw new NetworkError(errorMessage);
           case 'VOTER_RECORD_NOT_FOUND_ERROR':
             throw new VoterRecordNotFoundError(errorMessage)
+          case 'DBB_ERROR':
+            throw new DBBError(errorMessage)
           default: throw new UnsupportedServerReplyError(`Unsupported server error: ${errorMessage}`);
         }
       }
