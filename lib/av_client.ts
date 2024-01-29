@@ -472,7 +472,7 @@ export class AVClient implements IAVClient {
         const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
         const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
         try {
-          coordinator.sendReceipt(clientReceipt, this.authorizationSessionId);
+          coordinator.sendReceipt(clientReceipt, this.authorizationSessionId, this.getLatestConfig().items.electionConfig.content.dbasUrl);
         } catch(e) {
           console.error(e)
         }
