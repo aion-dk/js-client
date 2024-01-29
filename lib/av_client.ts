@@ -37,7 +37,8 @@ import {
   InvalidConfigError,
   InvalidStateError,
   NetworkError,
-  InvalidTokenError
+  InvalidTokenError,
+  DBBError
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
@@ -698,5 +699,6 @@ export {
   EmailDoesNotMatchVoterRecordError,
   InvalidConfigError,
   InvalidStateError,
-  NetworkError
+  NetworkError,
+  DBBError
 }
