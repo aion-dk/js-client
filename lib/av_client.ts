@@ -146,17 +146,19 @@ export class AVClient implements IAVClient {
    *
    * @param opaqueVoterId Voter ID that preserves voter anonymity.
    * @param email where the voter expects to receive otp code.
+   * @param ballotReference The ballot which which voter voter intends to vote on
    * @returns Returns undefined or throws an error.
    * @throws VoterRecordNotFound if no voter was found
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
+  public async requestAccessCode(opaqueVoterId: string, email: string, ballotReference?: string): Promise<void> {
     const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
     const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
 
-    return coordinator.createSession(opaqueVoterId, email)
+    return coordinator.createSession(opaqueVoterId, email, ballotReference)
       .then(({ data: { sessionId } }) => {
+        // In the US voters are allowed to chose their ballot
         return sessionId as string
       })
       .then(async sessionId => {
