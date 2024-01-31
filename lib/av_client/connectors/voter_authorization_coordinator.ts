@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { IdentityConfirmationToken } from "./otp_provider";
-import { EmailDoesNotMatchVoterRecordError, NetworkError, UnsupportedServerReplyError, VoterRecordNotFoundError, DBBError } from "../errors";
+import { EmailDoesNotMatchVoterRecordError, NetworkError, UnsupportedServerReplyError, VoterRecordNotFoundError, DBBError, BallotReferenceNotOnVoterRecord } from "../errors";
 import { ProofOfElectionCodes } from "../crypto/proof_of_election_codes";
 import { BallotBoxReceipt } from '../types';
 
@@ -18,11 +18,12 @@ export default class VoterAuthorizationCoordinator {
    * @param opaqueVoterId Gets
    * @returns
    */
-  createSession(opaqueVoterId: string, email: string): Promise<AxiosResponse> {
+  createSession(opaqueVoterId: string, email: string, ballotReference?: string): Promise<AxiosResponse> {
     return this.backend.post('create_session', {
       electionContextUuid: this.electionContextUuid,
       opaqueVoterId: opaqueVoterId,
-      email
+      ballotReference: ballotReference,
+      email,
     }).catch(error => {
       const response = error.response;
 
@@ -34,6 +35,8 @@ export default class VoterAuthorizationCoordinator {
         const errorCode = response.data.error_code;
         const errorMessage = response.data.error_message;
         switch(errorCode) {
+          case 'BALLOT_REFERERENCE_NOT_ON_VOTER_RECORD':
+            throw new BallotReferenceNotOnVoterRecord(errorMessage);
           case 'EMAIL_DOES_NOT_MATCH_VOTER_RECORD':
             throw new EmailDoesNotMatchVoterRecordError(errorMessage);
           case 'COULD_NOT_CONNECT_TO_OTP_PROVIDER':
