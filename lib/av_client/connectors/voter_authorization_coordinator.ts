@@ -19,8 +19,6 @@ export default class VoterAuthorizationCoordinator {
    * @returns
    */
   createSession(opaqueVoterId: string, email: string, ballotReference?: string): Promise<AxiosResponse> {
-    console.log(ballotReference);
-
     return this.backend.post('create_session', {
       electionContextUuid: this.electionContextUuid,
       opaqueVoterId: opaqueVoterId,
