@@ -65,7 +65,7 @@ class SelectionPileValidator {
   private exceededListVotes(choices: OptionSelection[]) {
     const options = this.recursiveFlattener(this.contest.options as OptionContent[]);
 
-    const optionsWithListLimit = options.map((op) => !!op?.maxChooseableSuboptions ? op : null)
+    const optionsWithListLimit = options.map((op) => op?.maxChooseableSuboptions ? op : null)
 
     let exceeded = false
     
