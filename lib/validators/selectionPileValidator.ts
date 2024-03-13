@@ -13,6 +13,10 @@ class SelectionPileValidator {
     if (this.tooManySelections(selectionPile.optionSelections)) errors.push('too_many');
     if (this.blankNotAlone(selectionPile.optionSelections, selectionPile.explicitBlank)) errors.push('blank');
     if (this.exclusiveNotAlone(selectionPile.optionSelections)) errors.push('exclusive');
+    if (this.exceededListVotes(selectionPile.optionSelections)) errors.push('exceeded_list_limit')
+
+    console.log("test2");
+
 
     return errors;
   }
@@ -56,6 +60,24 @@ class SelectionPileValidator {
 
   private tooManySelections(choices: OptionSelection[]) {
     return choices.length > this.contest.markingType.maxMarks;
+  }
+
+  private exceededListVotes(choices: OptionSelection[]) {
+    const options = this.recursiveFlattener(this.contest.options as OptionContent[]);
+
+    const optionsWithListLimit = options.map((op) => !!op?.maxChooseableSuboptions ? op : null)
+
+    let exceeded = false
+    
+    optionsWithListLimit.forEach(op => {
+      const amountOfChildrenSelected = op?.children?.filter(child => this.selectedReferences(choices).includes(child.reference)).length
+
+      if((amountOfChildrenSelected && op.maxChooseableSuboptions) && amountOfChildrenSelected > op.maxChooseableSuboptions) {
+        exceeded = true
+      }
+    })
+
+    return exceeded
   }
 
   private exclusiveNotAlone(choices: OptionSelection[]) {
