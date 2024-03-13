@@ -15,9 +15,6 @@ class SelectionPileValidator {
     if (this.exclusiveNotAlone(selectionPile.optionSelections)) errors.push('exclusive');
     if (this.exceededListVotes(selectionPile.optionSelections)) errors.push('exceeded_list_limit')
 
-    console.log("test2");
-
-
     return errors;
   }
 
@@ -68,7 +65,7 @@ class SelectionPileValidator {
     const optionsWithListLimit = options.map((op) => op?.maxChooseableSuboptions ? op : null)
 
     let exceeded = false
-    
+
     optionsWithListLimit.forEach(op => {
       const amountOfChildrenSelected = op?.children?.filter(child => this.selectedReferences(choices).includes(child.reference)).length
 
