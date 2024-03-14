@@ -67,14 +67,28 @@ class SelectionPileValidator {
     let exceeded = false
 
     optionsWithListLimit.forEach(op => {
-      const amountOfChildrenSelected = op?.children?.filter(child => this.selectedReferences(choices).includes(child.reference)).length
-
-      if((amountOfChildrenSelected && op.maxChooseableSuboptions) && amountOfChildrenSelected > op.maxChooseableSuboptions) {
+      if (op?.maxChooseableSuboptions && this.selectedChildren(choices, [op]) > op.maxChooseableSuboptions) {
         exceeded = true
       }
     })
 
     return exceeded
+  }
+
+  private selectedChildren(choices: OptionSelection[], options?: OptionContent[], count = 0): number {
+    if (!options) return count
+
+    options.forEach(op => {
+      const childrenSelected = op?.children?.filter(child => this.selectedReferences(choices).includes(child.reference))
+
+      count += childrenSelected?.length || 0
+
+      if (op.children) {
+        count = this.selectedChildren(choices, op.children, count)
+      }
+    })
+
+    return count
   }
 
   private exclusiveNotAlone(choices: OptionSelection[]) {
