@@ -407,6 +407,11 @@ export interface ContestContent {
   attachments?: Attachment[]
 }
 
+export interface Error {
+  message: string,
+  keys?: any
+}
+
 export interface ResultType {
   name: string
 }
@@ -435,7 +440,7 @@ export interface OptionContent {
     encoding: 'utf8'
   }
   maxChooseableSuboptions?: number
-}
+  }
 
 export interface ParentOption {
     reference: string

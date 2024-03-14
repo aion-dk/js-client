@@ -1,4 +1,4 @@
-import { ContestContent, OptionSelection, OptionContent, SelectionPile } from '../av_client/types';
+import { ContestContent, OptionSelection, OptionContent, SelectionPile, Error } from '../av_client/types';
 
 class SelectionPileValidator {
   private contest: ContestContent;
@@ -6,14 +6,15 @@ class SelectionPileValidator {
     this.contest = contest;
   }
 
-  validate(selectionPile: SelectionPile): string[] {
-    const errors: string[] = [];
+  validate(selectionPile: SelectionPile): Error[] {
+    const errors: Error[] = [];
 
-    if (this.referenceMissing(selectionPile.optionSelections)) errors.push('invalid_reference');
-    if (this.tooManySelections(selectionPile.optionSelections)) errors.push('too_many');
-    if (this.blankNotAlone(selectionPile.optionSelections, selectionPile.explicitBlank)) errors.push('blank');
-    if (this.exclusiveNotAlone(selectionPile.optionSelections)) errors.push('exclusive');
-    if (this.exceededListVotes(selectionPile.optionSelections)) errors.push('exceeded_list_limit')
+    if (this.referenceMissing(selectionPile.optionSelections)) errors.push({ message: 'invalid_reference'});
+    if (this.tooManySelections(selectionPile.optionSelections)) errors.push({ message: 'too_many'});
+    if (this.blankNotAlone(selectionPile.optionSelections, selectionPile.explicitBlank)) errors.push({message: 'blank'});
+    if (this.exclusiveNotAlone(selectionPile.optionSelections)) errors.push({ message: 'exclusive' });
+
+    errors.push(...this.exceededListVotes(selectionPile.optionSelections))
 
     return errors;
   }
@@ -64,15 +65,15 @@ class SelectionPileValidator {
 
     const optionsWithListLimit = options.map((op) => op?.maxChooseableSuboptions ? op : null)
 
-    let exceeded = false
+    const errors: Error[] = []
 
     optionsWithListLimit.forEach(op => {
       if (op?.maxChooseableSuboptions && this.selectedChildren(choices, [op]) > op.maxChooseableSuboptions) {
-        exceeded = true
+        errors.push({message: "exceeded_list_limit", keys: { list_name: op.title, max_list_marks: op.maxChooseableSuboptions }})
       }
     })
 
-    return exceeded
+    return errors
   }
 
   private selectedChildren(choices: OptionSelection[], options?: OptionContent[], count = 0): number {
