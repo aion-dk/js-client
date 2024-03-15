@@ -71,6 +71,13 @@ const contestOne: ContestConfig = {
         description: { en: "Parent 2" },
         exclusive: true,
       },
+      {
+        reference: "parent-3",
+        code: 4,
+        title: { en: "Parent 3" },
+        subtitle: { en: "Parent 3" },
+        description: { en: "Parent 3" },
+      },
     ],
   },
 };
@@ -87,7 +94,7 @@ const selectionPile = {
 
 const validator = new SelectionPileValidator(contestOne.content)
 
-describe.only("validate", () => {
+describe("validate", () => {
   context("when given a valid selectionPile", () => {
     it("returns no errors", () => {
       expect(validator.validate(selectionPile)).to.have.lengthOf(0)
@@ -96,10 +103,10 @@ describe.only("validate", () => {
 
   context("when given too many selections", () => {
     const optionSelections = [
-      { reference: "parent-1"},
       { reference: "parent-1" },
-      { reference: "child-1" },
-      { reference: "child-2" }
+      { reference: "parent-3" },
+      { reference: "child-2" },
+      { reference: "child-3" }
     ]
 
     const selectionPile = {
