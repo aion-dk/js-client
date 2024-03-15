@@ -1,4 +1,5 @@
 import { ContestContent, OptionSelection, SelectionPile } from '../av_client/types';
+import { Error } from "../av_client/types"
 
 class BelgiumBallotValidator {
   private contest: ContestContent;
@@ -6,10 +7,10 @@ class BelgiumBallotValidator {
     this.contest = contest;
   }
 
-  validate(selectionPile: SelectionPile): string[] {
-    const errors: string[] = [];
+  validate(selectionPile: SelectionPile): Error[] {
+    const errors: Error[] = [];
 
-    if (this.partyExclusive(selectionPile.optionSelections)) errors.push('cross_party_voting');
+    if (this.partyExclusive(selectionPile.optionSelections)) errors.push({ message: 'cross_party_voting' });
 
     return errors
   }
