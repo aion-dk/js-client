@@ -164,7 +164,7 @@ describe.only("validate", () => {
       explicitBlank: false
     }
 
-    it("returns 'blank' error", () => {
+    it("returns 'exceeded_list_limit' error", () => {
       expect(validator.validate(selectionPile)).to.have.lengthOf(1)
       expect(validator.validate(selectionPile)[0].message).to.equal("exceeded_list_limit")
     });
