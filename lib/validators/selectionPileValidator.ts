@@ -9,9 +9,6 @@ class SelectionPileValidator {
   validate(selectionPile: SelectionPile): Error[] {
     const errors: Error[] = [];
 
-    // throw "d"
-    console.log(selectionPile.optionSelections);
-
     if (this.referenceMissing(selectionPile.optionSelections)) errors.push({ message: 'invalid_reference'});
     if (this.tooManySelections(selectionPile.optionSelections)) errors.push({ message: 'too_many'});
     if (this.blankNotAlone(selectionPile.optionSelections, selectionPile.explicitBlank)) errors.push({message: 'blank'});
