@@ -157,7 +157,7 @@ describe("validate", () => {
       explicitBlank: false
     }
 
-    it("returns 'blank' error", () => {
+    it("returns 'exclusive' error", () => {
       expect(validator.validate(selectionPile)).to.have.lengthOf(1)
       expect(validator.validate(selectionPile)[0].message).to.equal("exclusive")
     });
