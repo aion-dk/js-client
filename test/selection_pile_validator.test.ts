@@ -97,9 +97,9 @@ describe.only("validate", () => {
   context("when given too many selections", () => {
     const optionSelections = [
       { reference: "parent-1"},
-      {reference: "parent-1" },
-      {reference: "child-1"},
-      {reference: "child-2"}
+      { reference: "parent-1" },
+      { reference: "child-1" },
+      { reference: "child-2" }
     ]
 
     const selectionPile = {
