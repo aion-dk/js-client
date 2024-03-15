@@ -440,7 +440,7 @@ export interface OptionContent {
     encoding: 'utf8'
   }
   maxChooseableSuboptions?: number
-  }
+}
 
 export interface ParentOption {
     reference: string
