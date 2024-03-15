@@ -1,4 +1,4 @@
-import { ContestContent, ContestSelection } from '../av_client/types';
+import { ContestContent, ContestSelection, Error } from '../av_client/types';
 import SelectionPileValidator from './selectionPileValidator';
 
 export default class ContestSelectionValidator {
@@ -14,8 +14,8 @@ export default class ContestSelectionValidator {
     return this.allWeightUsed(contestSelection) && this.validate(contestSelection).length == 0;
   }
 
-  validate(contestSelection: ContestSelection): string[] {
-    let errors: string[] = [];
+  validate(contestSelection: ContestSelection): Error[] {
+    let errors: Error[] = [];
     const selectionPileValidator = new SelectionPileValidator(this.contest);
 
     contestSelection.piles.forEach((pile) => {
@@ -23,7 +23,7 @@ export default class ContestSelectionValidator {
     });
 
     contestSelection.piles.forEach((pile) => {
-      if (!selectionPileValidator.isComplete(pile)) errors.push('A selection is not complete');
+      if (!selectionPileValidator.isComplete(pile)) errors.push({ message: 'A selection is not complete' });
     });
 
     return errors;
