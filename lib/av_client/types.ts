@@ -440,6 +440,7 @@ export interface OptionContent {
     encoding: 'utf8'
   }
   maxChooseableSuboptions?: number
+  minChooseableSuboptions?: number
 }
 
 export interface ParentOption {

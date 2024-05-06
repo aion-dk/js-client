@@ -6,7 +6,7 @@ class SelectionPileValidator {
     this.contest = contest;
   }
 
-  validate(selectionPile: SelectionPile): Error[] {
+  validate(selectionPile: SelectionPile, includeLazyErrors: boolean = false): Error[] {
     const errors: Error[] = [];
 
     if (this.referenceMissing(selectionPile.optionSelections)) errors.push({ message: 'invalid_reference'});
@@ -15,6 +15,10 @@ class SelectionPileValidator {
     if (this.exclusiveNotAlone(selectionPile.optionSelections)) errors.push({ message: 'exclusive' });
 
     errors.push(...this.exceededListVotes(selectionPile.optionSelections))
+
+    if (includeLazyErrors) {
+      errors.push(...this.belowMinListVotes(selectionPile.optionSelections))
+    }
 
     return errors;
   }
@@ -58,6 +62,22 @@ class SelectionPileValidator {
 
   private tooManySelections(choices: OptionSelection[]) {
     return choices.length > this.contest.markingType.maxMarks;
+  }
+
+  private belowMinListVotes(choices: OptionSelection[]) {
+      const options = this.recursiveFlattener(this.contest.options as OptionContent[]);
+
+    const optionsWithListLimit = options.map((op) => op?.minChooseableSuboptions ? op : null)
+
+    const errors: Error[] = []
+
+    optionsWithListLimit.forEach(op => {
+      if (op?.minChooseableSuboptions && this.selectedChildren(choices, [op]) < op.minChooseableSuboptions) {
+        errors.push({message: "below_list_limit", keys: { list_name: op.title, min_list_marks: op.minChooseableSuboptions }})
+      }
+    })
+
+    return errors
   }
 
   private exceededListVotes(choices: OptionSelection[]) {
