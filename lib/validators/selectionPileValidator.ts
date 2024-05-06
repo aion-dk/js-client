@@ -6,7 +6,7 @@ class SelectionPileValidator {
     this.contest = contest;
   }
 
-  validate(selectionPile: SelectionPile, includeLazyErrors: boolean = false): Error[] {
+  validate(selectionPile: SelectionPile, includeLazyErrors = false): Error[] {
     const errors: Error[] = [];
 
     if (this.referenceMissing(selectionPile.optionSelections)) errors.push({ message: 'invalid_reference'});
