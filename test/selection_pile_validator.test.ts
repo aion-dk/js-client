@@ -39,6 +39,7 @@ const contestOne: ContestConfig = {
         subtitle: { en: "Parent 1" },
         description: { en: "Parent 1" },
         maxChooseableSuboptions: 2,
+        minChooseableSuboptions: 2,
         children: [
           {
             reference: "child-1",
@@ -175,5 +176,21 @@ describe("validate", () => {
       expect(validator.validate(selectionPile)).to.have.lengthOf(1)
       expect(validator.validate(selectionPile)[0].message).to.equal("exceeded_list_limit")
     });
+  })
+
+  context("with lazy errors", ()=> {
+    context("with below list limit", () => {
+      const optionSelections = [ { reference: "child-1" } ]
+      const selectionPile = {
+        multiplier: 1,
+        optionSelections: optionSelections,
+        explicitBlank: false
+      }
+
+      it("returns 'below_list_limit' error", () => {
+        expect(validator.validate(selectionPile, true)).to.have.lengthOf(1)
+        expect(validator.validate(selectionPile, true)[0].message).to.equal("below_list_limit")
+      });
+    })
   })
 });
