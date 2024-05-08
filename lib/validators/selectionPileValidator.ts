@@ -16,6 +16,8 @@ class SelectionPileValidator {
 
     errors.push(...this.exceededListVotes(selectionPile.optionSelections))
 
+    if (selectionPile.explicitBlank || this.implicitlyBlank(selectionPile.optionSelections)) return errors
+
     if (includeLazyErrors) {
       errors.push(...this.belowMinListVotes(selectionPile.optionSelections))
     }
@@ -65,7 +67,7 @@ class SelectionPileValidator {
   }
 
   private belowMinListVotes(choices: OptionSelection[]) {
-      const options = this.recursiveFlattener(this.contest.options as OptionContent[]);
+    const options = this.recursiveFlattener(this.contest.options as OptionContent[]);
 
     const optionsWithListLimit = options.map((op) => op?.minChooseableSuboptions ? op : null)
 
