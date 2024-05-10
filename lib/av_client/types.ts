@@ -227,11 +227,6 @@ export type BallotStatus = {
   }
 }
 
-export interface AffidavitConfig {
-  curve: string;
-  encryptionKey: string;
-}
-
 export type BallotSelection = {
   reference: string
   contestSelections: ContestSelection[]
@@ -279,7 +274,6 @@ export type ReadableOptionSelection = {
 export interface LatestConfig {
   items: LatestConfigItems
   receipt?: string
-  affidavit?: AffidavitConfig
 }
 
 export interface LatestConfigItems {
