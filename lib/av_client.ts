@@ -609,7 +609,7 @@ export class AVClient implements IAVClient {
   }
 
   public generateSignature(payload: string): string {
-    return Crypto.generateSchnorrSignature(payload, this.proofOfElectionCodes.mainKeyPair.privateKey)
+    return Crypto.generateSchnorrSignature(payload, this.privateKey())
   }
 
   /**
