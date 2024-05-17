@@ -435,6 +435,7 @@ export interface OptionContent {
   }
   maxChooseableSuboptions?: number
   minChooseableSuboptions?: number
+  candidateId?: number
 }
 
 export interface ParentOption {

@@ -8,6 +8,7 @@ import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, 
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import { Buffer } from 'buffer'
+import * as Crypto from "../lib/av_client/aion_crypto.js"
 import jwtDecode, { JwtPayload } from "jwt-decode";
 
 import {
@@ -605,6 +606,10 @@ export class AVClient implements IAVClient {
 
   private privateKey(): BigNum {
     return this.keyPair.privateKey
+  }
+
+  public generateSignature(payload: string): string {
+    return Crypto.generateSchnorrSignature(payload, this.privateKey())
   }
 
   /**
