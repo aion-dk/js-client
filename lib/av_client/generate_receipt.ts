@@ -6,6 +6,9 @@ export function generateReceipt(serverReceipt: string, castRequest: BoardItem): 
     trackingCode: hexToShortCode(castRequest.address.substring(0,10)),
     receipt: {
       address: castRequest.address,
+      parentAddress: castRequest.parentAddress,
+      previousAddress: castRequest.previousAddress,
+      registeredAt: castRequest.registeredAt,
       dbbSignature: serverReceipt,
       voterSignature: castRequest.signature
     }

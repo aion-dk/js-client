@@ -81,6 +81,9 @@ export type BallotBoxReceipt = {
   trackingCode: string
   receipt: {
     address: string
+    parentAddress: string
+    previousAddress: string
+    registeredAt: string
     dbbSignature: string
     voterSignature: string
   }
