@@ -1,7 +1,7 @@
 import { hexToShortCode } from "./short_codes";
-import { BallotBoxReceipt, BoardItem } from "./types"
+import { BallotBoxReceipt, CastRequestItem } from "./types"
 
-export function generateReceipt(serverReceipt: string, castRequest: BoardItem): BallotBoxReceipt {  
+export function generateReceipt(serverReceipt: string, castRequest: CastRequestItem): BallotBoxReceipt {
   return {
     trackingCode: hexToShortCode(castRequest.address.substring(0,10)),
     receipt: {

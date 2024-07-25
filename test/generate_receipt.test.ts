@@ -1,9 +1,9 @@
 import {expect} from 'chai';
 import {generateReceipt} from '../lib/av_client/generate_receipt';
-import {BoardItem} from '../lib/av_client/types';
+import {CastRequestItem} from '../lib/av_client/types';
 import {baseItemAttributes} from "./fixtures/itemHelper";
 
-const castRequest: BoardItem = {
+const castRequest: CastRequestItem = {
   ...baseItemAttributes(),
   type: 'CastRequestItem'
 }
