@@ -93,7 +93,8 @@ export type BoardItem =
   VoterSessionItem |
   VoterCommitmentItem |
   BoardCommitmentItem |
-  BallotCryptogramItem
+  BallotCryptogramItem |
+  CastRequestItem
 
 export type BoardItemType =
   "BallotCryptogramsItem" |
@@ -188,6 +189,10 @@ export interface VerifierItem extends BaseVerificationItem {
 
 export interface SpoilRequestItem extends BaseBoardItem {
   type: "SpoilRequestItem"
+}
+
+export interface CastRequestItem extends BaseBoardItem {
+  type: "CastRequestItem"
 }
 
 export interface CommitmentOpening {
