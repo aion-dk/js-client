@@ -93,8 +93,9 @@ export type BoardItem =
   VoterSessionItem |
   VoterCommitmentItem |
   BoardCommitmentItem |
-  BallotCryptogramItem |
-  CastRequestItem
+  BallotCryptogramItem
+  // BallotCryptogramItem |
+  // CastRequestItem
 
 export type BoardItemType =
   "BallotCryptogramsItem" |
@@ -191,9 +192,9 @@ export interface SpoilRequestItem extends BaseBoardItem {
   type: "SpoilRequestItem"
 }
 
-export interface CastRequestItem extends BaseBoardItem {
-  type: "CastRequestItem"
-}
+// export interface CastRequestItem extends BaseBoardItem {
+//   type: "CastRequestItem"
+// }
 
 export interface CommitmentOpening {
   randomizers: ContestMap<string[][]>
