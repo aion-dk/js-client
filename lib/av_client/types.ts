@@ -79,14 +79,7 @@ export interface Election {
  */
 export type BallotBoxReceipt = {
   trackingCode: string
-  receipt: {
-    address: string
-    parentAddress: string
-    previousAddress: string
-    registeredAt: string
-    dbbSignature: string
-    voterSignature: string
-  }
+  receipt: string
 }
 
 export type BoardItem =
