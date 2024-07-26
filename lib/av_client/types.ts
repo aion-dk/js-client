@@ -86,7 +86,8 @@ export type BoardItem =
   VoterSessionItem |
   VoterCommitmentItem |
   BoardCommitmentItem |
-  BallotCryptogramItem
+  BallotCryptogramItem |
+  CastRequestItem
 
 export type BoardItemType =
   "BallotCryptogramsItem" |

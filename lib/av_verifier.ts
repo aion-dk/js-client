@@ -15,7 +15,7 @@ import {
   BallotCryptogramItem,
   ContestSelection,
   ReadableContestSelection,
-  LatestConfig
+  LatestConfig, BoardItem, CastRequestItem
 } from './av_client/types';
 import {hexToShortCode, shortCodeToHex} from './av_client/short_codes';
 import {fetchLatestConfig} from './av_client/election_config';
@@ -23,6 +23,7 @@ import {decryptCommitmentOpening, validateCommmitmentOpening} from './av_client/
 import {InvalidContestError, InvalidTrackingCodeError} from './av_client/errors';
 import {decryptContestSelections} from './av_client/decrypt_contest_selections';
 import {makeOptionFinder} from './av_client/option_finder';
+import {isAddressValid, isItemValid} from "./av_client/item_validator";
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -202,6 +203,14 @@ export class AVVerifier {
 
     return new Promise(executePoll);
   }
+
+  public isReceiptValid(receipt: string): boolean {
+    const item = parseCastRequestItem(receipt)
+
+    // TODO: continue
+    // validate dbb signature
+    return isAddressValid(item)
+  }
 }
 
 function makeLocalizer(locale: string) {
@@ -213,4 +222,18 @@ function makeLocalizer(locale: string) {
 
     return field[locale] || field[availableFields[0]]
   }
+}
+
+function parseCastRequestItem(receipt: string): CastRequestItem {
+  const receiptData = JSON.parse(atob(receipt))
+  return {
+    type: "CastRequestItem",
+    author: "a voter",
+    address: receiptData.address,
+    parentAddress: receiptData.parentAddress,
+    previousAddress: receiptData.previousAddress,
+    content: {},
+    registeredAt: receiptData.registeredAt,
+    signature: receiptData.voterSignature
+  } as CastRequestItem
 }
