@@ -12,6 +12,6 @@ export function generateReceipt(serverReceipt: string, castRequest: CastRequestI
   }
   return {
     trackingCode: hexToShortCode(castRequest.address.substring(0,10)),
-    receipt: Buffer.from(JSON.stringify(receiptData)).toString("base64")
+    receipt: btoa(JSON.stringify(receiptData))
   }
 }
