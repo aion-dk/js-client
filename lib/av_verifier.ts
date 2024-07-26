@@ -7,7 +7,7 @@ import {
   VERIFIER_ITEM
 } from './av_client/constants';
 import {randomKeyPair} from './av_client/generate_key_pair';
-import {signPayload} from './av_client/sign';
+import {signPayload, validatePayload, validateReceipt} from './av_client/sign';
 import {
   VerifierItem,
   BoardCommitmentOpeningItem,
@@ -205,11 +205,19 @@ export class AVVerifier {
   }
 
   public isReceiptValid(receipt: string): boolean {
-    const item = parseCastRequestItem(receipt)
+    const receiptData = JSON.parse(atob(receipt))
+    const item = parseCastRequestItem(receiptData)
 
+    const castRequestItemExpectations = {
+      type: CAST_REQUEST_ITEM,
+      content: {},
+      parentAddress: receiptData.parentAddress
+    }
+    validatePayload(item,castRequestItemExpectations)
+    validateReceipt([item], receiptData.dbbSignature, this.latestConfig.items.genesisConfig.content.publicKey)
     // TODO: continue
     // validate dbb signature
-    return isAddressValid(item)
+    return true
   }
 }
 
@@ -224,8 +232,7 @@ function makeLocalizer(locale: string) {
   }
 }
 
-function parseCastRequestItem(receipt: string): CastRequestItem {
-  const receiptData = JSON.parse(atob(receipt))
+function parseCastRequestItem(receiptData: any): CastRequestItem {
   return {
     type: "CastRequestItem",
     author: "a voter",
