@@ -7,7 +7,7 @@ import {
   VERIFIER_ITEM
 } from './av_client/constants';
 import {randomKeyPair} from './av_client/generate_key_pair';
-import {signPayload, validatePayload, validateReceipt} from './av_client/sign';
+import {signPayload, validateReceipt, verifyAddress} from './av_client/sign';
 import {
   VerifierItem,
   BoardCommitmentOpeningItem,
@@ -15,7 +15,7 @@ import {
   BallotCryptogramItem,
   ContestSelection,
   ReadableContestSelection,
-  LatestConfig, BoardItem, CastRequestItem
+  LatestConfig, CastRequestItem
 } from './av_client/types';
 import {hexToShortCode, shortCodeToHex} from './av_client/short_codes';
 import {fetchLatestConfig} from './av_client/election_config';
@@ -23,7 +23,6 @@ import {decryptCommitmentOpening, validateCommmitmentOpening} from './av_client/
 import {InvalidContestError, InvalidTrackingCodeError} from './av_client/errors';
 import {decryptContestSelections} from './av_client/decrypt_contest_selections';
 import {makeOptionFinder} from './av_client/option_finder';
-import {isAddressValid, isItemValid} from "./av_client/item_validator";
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -204,19 +203,15 @@ export class AVVerifier {
     return new Promise(executePoll);
   }
 
-  public isReceiptValid(receipt: string): boolean {
-    const receiptData = JSON.parse(atob(receipt))
-    const item = parseCastRequestItem(receiptData)
+  public isReceiptValid(encodedReceipt: string): boolean {
+    const [castRequestItem, receipt] = parseReceipt(encodedReceipt)
 
-    const castRequestItemExpectations = {
-      type: CAST_REQUEST_ITEM,
-      content: {},
-      parentAddress: receiptData.parentAddress
+    try {
+      verifyAddress(castRequestItem)
+      validateReceipt([castRequestItem], receipt, this.latestConfig.items.genesisConfig.content.publicKey)
+    } catch (err) {
+      return false
     }
-    validatePayload(item,castRequestItemExpectations)
-    validateReceipt([item], receiptData.dbbSignature, this.latestConfig.items.genesisConfig.content.publicKey)
-    // TODO: continue
-    // validate dbb signature
     return true
   }
 }
@@ -232,10 +227,17 @@ function makeLocalizer(locale: string) {
   }
 }
 
-function parseCastRequestItem(receiptData: any): CastRequestItem {
-  return {
-    type: "CastRequestItem",
-    author: "a voter",
+function parseReceipt(encodedReceipt: string) {
+  let receiptData
+  try {
+    receiptData = JSON.parse(atob(encodedReceipt))
+  } catch (err) {
+    throw new Error("Receipt string is invalid")
+  }
+
+  const castRequestItem = {
+    type: CAST_REQUEST_ITEM,
+    author: "",
     address: receiptData.address,
     parentAddress: receiptData.parentAddress,
     previousAddress: receiptData.previousAddress,
@@ -243,4 +245,7 @@ function parseCastRequestItem(receiptData: any): CastRequestItem {
     registeredAt: receiptData.registeredAt,
     signature: receiptData.voterSignature
   } as CastRequestItem
+  const receipt = receiptData.dbbSignature
+
+  return [castRequestItem, receipt]
 }

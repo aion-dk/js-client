@@ -5,7 +5,7 @@ import { LatestConfig } from '../../lib/av_client/types';
 import latestConfig from '../fixtures/latestConfig';
 
 
-describe.only('#isReceiptValid', () => {
+describe('#isReceiptValid', () => {
   let verifier: AVVerifier;
   const config: LatestConfig = latestConfig;
 
@@ -15,18 +15,58 @@ describe.only('#isReceiptValid', () => {
   });
 
   context('given valid receipt', () => {
-    const receipt = "valid"
+    const receipt =
+        "eyJhZGRyZXNzIjoiMmU0YTNmMTU2OGE5NWQwMjA3YWUwY2QyM2MwYTU1NDJhOGQ3NWU0Y2EyMmI2YWFlNDJmNzNmOGFkNWJmYWFmZSIsInBh\n" +
+        "cmVudEFkZHJlc3MiOiIxMTRlOTJhMTU5OGQ3YzM2MDVmYTgxYmY1ZTQzYjM2NWMxNmZhN2QwMTI5NWVjYWM5YmYzZmFjMWMyYWI0YjIwIiwi\n" +
+        "cHJldmlvdXNBZGRyZXNzIjoiMTE0ZTkyYTE1OThkN2MzNjA1ZmE4MWJmNWU0M2IzNjVjMTZmYTdkMDEyOTVlY2FjOWJmM2ZhYzFjMmFiNGIy\n" +
+        "MCIsInJlZ2lzdGVyZWRBdCI6IjIwMjQtMDctMjlUMDc6MTg6MzYuMjAyWiIsImRiYlNpZ25hdHVyZSI6ImFjMDlhYTMwMTI2ZDE2YzczZDIw\n" +
+        "Y2I5MmQ3ZDU4YzgwYzExM2YyZmRhYjliMjI4NTkyZDQyMmEyY2Y1M2E0OTMsOTBhMWM0N2U4MTc2NjIxODQ2NGU1ZjIzODdhYjViNDE5MGYy\n" +
+        "MzdjMjMwN2ZhODAyYzk3ODQ2ZmE3ZmJkY2RmMiIsInZvdGVyU2lnbmF0dXJlIjoiM2JjYTVmNGRlZTNjZjJhYmJjZDY3NjYzYTU4ZjBmYjc0\n" +
+        "NTk0MDRjOWNmYThlNmNkZjg5ZWQzZGZiZTgxM2UyZiwwOWYzZGFlYzEzMDJlNzEwOTYzNWEyZmUzNTlhODU4MTJjNWI5Y2EyYjEyNzYzMmUw\n" +
+        "NDRjNTdkZTcwNDYwODZmIn0="
+
+    before(() => {
+      config.items.genesisConfig.content.publicKey = "029abf158b2438e561afe4bc5b85629d46610a526c8a6284f24076c4e4b03264aa"
+    })
 
     it('returns returns true', async () => {
       expect(verifier.isReceiptValid(receipt)).to.be.true
     });
+
+    context('given a different signing key', () => {
+      before(() => {
+        config.items.genesisConfig.content.publicKey = "0220f81d43002c88229ed8c80cfc7f84f9700ee13d80e1be1cd8a3677f84e99ae1"
+      })
+
+      it('returns false', async () => {
+        expect(verifier.isReceiptValid(receipt)).to.be.false
+      });
+    });
+
+    context('given an item with broken address', () => {
+      // The registered_at attribute is changed
+      const receipt =
+          "eyJhZGRyZXNzIjoiMmU0YTNmMTU2OGE5NWQwMjA3YWUwY2QyM2MwYTU1NDJhOGQ3NWU0Y2EyMmI2YWFlNDJmNzNmOGFkNWJmYWFmZSIsInBh\n" +
+          "cmVudEFkZHJlc3MiOiIxMTRlOTJhMTU5OGQ3YzM2MDVmYTgxYmY1ZTQzYjM2NWMxNmZhN2QwMTI5NWVjYWM5YmYzZmFjMWMyYWI0YjIwIiwi\n" +
+          "cHJldmlvdXNBZGRyZXNzIjoiMTE0ZTkyYTE1OThkN2MzNjA1ZmE4MWJmNWU0M2IzNjVjMTZmYTdkMDEyOTVlY2FjOWJmM2ZhYzFjMmFiNGIy\n" +
+          "MCIsInJlZ2lzdGVyZWRBdCI6IjIwMjMtMDctMjlUMDc6MTg6MzYuMjAyWiIsImRiYlNpZ25hdHVyZSI6ImFjMDlhYTMwMTI2ZDE2YzczZDIw\n" +
+          "Y2I5MmQ3ZDU4YzgwYzExM2YyZmRhYjliMjI4NTkyZDQyMmEyY2Y1M2E0OTMsOTBhMWM0N2U4MTc2NjIxODQ2NGU1ZjIzODdhYjViNDE5MGYy\n" +
+          "MzdjMjMwN2ZhODAyYzk3ODQ2ZmE3ZmJkY2RmMiIsInZvdGVyU2lnbmF0dXJlIjoiM2JjYTVmNGRlZTNjZjJhYmJjZDY3NjYzYTU4ZjBmYjc0\n" +
+          "NTk0MDRjOWNmYThlNmNkZjg5ZWQzZGZiZTgxM2UyZiwwOWYzZGFlYzEzMDJlNzEwOTYzNWEyZmUzNTlhODU4MTJjNWI5Y2EyYjEyNzYzMmUw\n" +
+          "NDRjNTdkZTcwNDYwODZmIn0="
+
+      it('returns false', async () => {
+        expect(verifier.isReceiptValid(receipt)).to.be.false
+      });
+    });
+
   });
 
   context('given invalid receipt', () => {
     const receipt = "invalid"
 
-    it('returns returns true', async () => {
-      expect(verifier.isReceiptValid(receipt)).to.be.false
+    it('returns throws error', async () => {
+      expect(() => verifier.isReceiptValid(receipt)).to.throw(Error, "Receipt string is invalid");
     });
   });
 });

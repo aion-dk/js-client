@@ -59,7 +59,7 @@ const verifyContent = (actual: Record<string, unknown>, expectations: Record<str
   }
 };
 
-const verifyAddress = (item: BoardItem) => {
+export const verifyAddress = (item: BoardItem) => {
   const uniformer = new Uniformer();
 
   const addressHashSource = uniformer.formString({

@@ -185,6 +185,7 @@ export interface SpoilRequestItem extends BaseBoardItem {
 }
 
 export interface CastRequestItem extends BaseBoardItem {
+  content: Record<string, never>  // empty object
   type: "CastRequestItem"
 }
 
