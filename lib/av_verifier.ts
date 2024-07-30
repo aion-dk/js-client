@@ -173,13 +173,9 @@ export class AVVerifier {
         piles: readablePiles
       }
     })
-
-
   }
 
-  public async
-
-  pollForCommitmentOpening() {
+  public async pollForCommitmentOpening() {
     let attempts = 0;
 
     const executePoll = async (resolve, reject) => {
