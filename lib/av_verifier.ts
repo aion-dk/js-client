@@ -20,7 +20,7 @@ import {
 import {hexToShortCode, shortCodeToHex} from './av_client/short_codes';
 import {fetchLatestConfig} from './av_client/election_config';
 import {decryptCommitmentOpening, validateCommmitmentOpening} from './av_client/crypto/commitments';
-import {InvalidContestError, InvalidTrackingCodeError} from './av_client/errors';
+import {InvalidContestError, InvalidReceiptError, InvalidTrackingCodeError} from './av_client/errors';
 import {decryptContestSelections} from './av_client/decrypt_contest_selections';
 import {makeOptionFinder} from './av_client/option_finder';
 
@@ -199,16 +199,46 @@ export class AVVerifier {
     return new Promise(executePoll);
   }
 
-  public isReceiptValid(encodedReceipt: string): boolean {
-    const [castRequestItem, receipt] = parseReceipt(encodedReceipt)
+  public validateReceipt(encodedReceipt: string, trackingCode: string) {
+    const [castRequestItem, receipt] = this.parseReceipt(encodedReceipt)
+    this.validateTrackingCode(trackingCode, castRequestItem)
 
     try {
       verifyAddress(castRequestItem)
       validateReceipt([castRequestItem], receipt, this.latestConfig.items.genesisConfig.content.publicKey)
     } catch (err) {
-      return false
+      throw new InvalidReceiptError(err.message)
     }
-    return true
+  }
+
+  private validateTrackingCode(trackingCode: string, castRequestItem: CastRequestItem) {
+    const shortAddress = shortCodeToHex(trackingCode)
+    if (shortAddress != castRequestItem.address.substring(0,10)) {
+      throw new InvalidTrackingCodeError("Tracking code does not match the receipt")
+    }
+  }
+
+  private parseReceipt(encodedReceipt: string) {
+    let receiptData
+    try {
+      receiptData = JSON.parse(atob(encodedReceipt))
+    } catch (err) {
+      throw new InvalidReceiptError("Receipt string is invalid")
+    }
+
+    const castRequestItem = {
+      type: CAST_REQUEST_ITEM,
+      author: "",
+      address: receiptData.address,
+      parentAddress: receiptData.parentAddress,
+      previousAddress: receiptData.previousAddress,
+      content: {},
+      registeredAt: receiptData.registeredAt,
+      signature: receiptData.voterSignature
+    } as CastRequestItem
+    const receipt = receiptData.dbbSignature
+
+    return [castRequestItem, receipt]
   }
 }
 
@@ -221,27 +251,4 @@ function makeLocalizer(locale: string) {
 
     return field[locale] || field[availableFields[0]]
   }
-}
-
-function parseReceipt(encodedReceipt: string) {
-  let receiptData
-  try {
-    receiptData = JSON.parse(atob(encodedReceipt))
-  } catch (err) {
-    throw new Error("Receipt string is invalid")
-  }
-
-  const castRequestItem = {
-    type: CAST_REQUEST_ITEM,
-    author: "",
-    address: receiptData.address,
-    parentAddress: receiptData.parentAddress,
-    previousAddress: receiptData.previousAddress,
-    content: {},
-    registeredAt: receiptData.registeredAt,
-    signature: receiptData.voterSignature
-  } as CastRequestItem
-  const receipt = receiptData.dbbSignature
-
-  return [castRequestItem, receipt]
 }
