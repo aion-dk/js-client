@@ -235,8 +235,8 @@ export class AVVerifier {
       throw new InvalidReceiptError("Receipt string is invalid")
     }
 
-    const castRequestItem = {
-      type: CAST_REQUEST_ITEM,
+    const castRequestItem: CastRequestItem = {
+      type: "CastRequestItem",
       author: "",
       address: receiptData.address,
       parentAddress: receiptData.parentAddress,
@@ -244,7 +244,7 @@ export class AVVerifier {
       content: {},
       registeredAt: receiptData.registeredAt,
       signature: receiptData.voterSignature
-    } as CastRequestItem
+    }
     const receipt = receiptData.dbbSignature
 
     return [castRequestItem, receipt]
