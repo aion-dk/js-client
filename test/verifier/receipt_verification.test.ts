@@ -1,9 +1,11 @@
 import { AVVerifier } from '../../lib/av_verifier';
 import { expect } from 'chai';
+import sinon = require('sinon');
 import { bulletinBoardHost } from '../test_helpers'
 import { LatestConfig } from '../../lib/av_client/types';
 import latestConfig from '../fixtures/latestConfig';
 import {InvalidReceiptError, InvalidTrackingCodeError} from "../../lib/av_client/errors";
+import * as Crypto from '../../lib/av_client/aion_crypto';
 
 
 describe('#isReceiptValid', () => {
@@ -79,4 +81,25 @@ describe('#isReceiptValid', () => {
       });
     });
   });
+
+  context('when a generic error is thrown', () => {
+    const receipt =
+      "eyJhZGRyZXNzIjoiMDFkOTc2OTZjNTlmYWFmMWFiYjhmNDJhZDY2MTMxZGUwNThkZWE4MTU1N2NiNTI2N2E0ZjcwOTlkMjNhNjEzZiIsInBh\n" +
+      "cmVudEFkZHJlc3MiOiI5MmVmOTU0MzcyNmEyZDhlMjFiMGVlOGE0ZDQwMDdlZGE1MzkzYzMyMDA2ZjU4ZWFhMTJkZTczNzQ2MjQ3NWU0Iiwi\n" +
+      "cHJldmlvdXNBZGRyZXNzIjoiOTJlZjk1NDM3MjZhMmQ4ZTIxYjBlZThhNGQ0MDA3ZWRhNTM5M2MzMjAwNmY1OGVhYTEyZGU3Mzc0NjI0NzVl\n" +
+      "NCIsInJlZ2lzdGVyZWRBdCI6IjIwMjQtMDctMzBUMTE6NDY6MzUuMDc3WiIsImRiYlNpZ25hdHVyZSI6IjYwNzMzNTI4MTYzZTM5ZDk2ZDJl\n" +
+      "YTUxNWNjZjZlMjA2MTdiZjllOWQyNTcyZmYzZjRlMjU0ODQ2ZjczZjRlNTYsMDk4ZDcxYTdlYTAzYjY2NDUwYTk0ZDIzMWQzNTViNjZmMTNh\n" +
+      "YzI4NDZhMzhjODk4ZGEzNjRjOGI3MDJhY2YwNyIsInZvdGVyU2lnbmF0dXJlIjoiMWFhYWZiZWNhMjdiYWE1ZWQ4ZDUxMDg2OWIyNzg3ZDk3\n" +
+      "NWQ4M2M4MjRhYzZmMGRhYWZhMzA2YjVlZDMzZGY3YSwyZDUzN2Q5ZWUzZGE0YWM4YjU1MjM3N2U1YTk2MmY0OGNmNmVmZTNmN2M1MzVkNTc5\n" +
+      "MDc2Mjg5NGRkYmNlODk2In0="
+    const trackingCode = "1D6vybS"
+
+    before(() => {
+      sinon.replace(Crypto, 'hashString', sinon.fake.throws(new Error('Error')));
+    })
+
+    it('bubbles up', () => {
+      expect(() => verifier.validateReceipt(receipt, trackingCode)).to.throw(Error, "Error");
+    })
+  })
 });

@@ -208,6 +208,16 @@ export class AVVerifier {
       validateReceipt([castRequestItem], receipt, this.latestConfig.items.genesisConfig.content.publicKey)
     } catch (err) {
       throw new InvalidReceiptError(err.message)
+      // This checks for the specific error messages that invalidate a receipt. Other different errors would bubble up.
+      if (
+        /^Unknown parameter type /.test(err.message) ||                             // if the unifier encounters unsupported data types
+        /^BoardItem address does not match expected address /.test(err.message) ||  // if crypto fails on validating the address
+        err.message == "Board receipt verification failed"                          // if crypto fails on validating the dbb signature
+      ) {
+        throw new InvalidReceiptError(err.message)
+      } else {
+        throw err
+      }
     }
   }
 
