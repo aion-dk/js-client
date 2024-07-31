@@ -207,7 +207,6 @@ export class AVVerifier {
       verifyAddress(castRequestItem)
       validateReceipt([castRequestItem], receipt, this.latestConfig.items.genesisConfig.content.publicKey)
     } catch (err) {
-      throw new InvalidReceiptError(err.message)
       // This checks for the specific error messages that invalidate a receipt. Other different errors would bubble up.
       if (
         /^Unknown parameter type /.test(err.message) ||                             // if the unifier encounters unsupported data types
