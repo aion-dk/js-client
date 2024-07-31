@@ -95,11 +95,11 @@ describe('#isReceiptValid', () => {
     const trackingCode = "1D6vybS"
 
     before(() => {
-      sinon.replace(Crypto, 'hashString', sinon.fake.throws(new Error('Error')));
+      sinon.replace(Crypto, 'hashString', sinon.fake.throws(new SyntaxError('Error')));
     })
 
     it('bubbles up', () => {
-      expect(() => verifier.validateReceipt(receipt, trackingCode)).to.throw(Error, "Error");
+      expect(() => verifier.validateReceipt(receipt, trackingCode)).to.throw(SyntaxError, "Error");
     })
   })
 });
