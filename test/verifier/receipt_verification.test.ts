@@ -42,7 +42,7 @@ describe('#isReceiptValid', () => {
         config.items.genesisConfig.content.publicKey = "0220f81d43002c88229ed8c80cfc7f84f9700ee13d80e1be1cd8a3677f84e99ae1"
       })
 
-      it('throw validation error', async () => {
+      it('throws validation error', async () => {
         expect(() => verifier.validateReceipt(receipt, trackingCode)).to.throw(InvalidReceiptError, 'Board receipt verification failed')
       });
     });
@@ -50,7 +50,7 @@ describe('#isReceiptValid', () => {
     context('given a mismatching tracking code', () => {
       const trackingCode = "1nvaLid"
 
-      it('throw validation error', async () => {
+      it('throws validation error', async () => {
         expect(() => verifier.validateReceipt(receipt, trackingCode)).to.throw(InvalidTrackingCodeError, 'Tracking code does not match the receipt')
       });
     });
