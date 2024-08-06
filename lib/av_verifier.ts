@@ -7,7 +7,7 @@ import {
   VERIFIER_ITEM
 } from './av_client/constants';
 import {randomKeyPair} from './av_client/generate_key_pair';
-import {signPayload} from './av_client/sign';
+import {signPayload, validateReceipt, verifyAddress} from './av_client/sign';
 import {
   VerifierItem,
   BoardCommitmentOpeningItem,
@@ -15,12 +15,12 @@ import {
   BallotCryptogramItem,
   ContestSelection,
   ReadableContestSelection,
-  LatestConfig
+  LatestConfig, CastRequestItem
 } from './av_client/types';
 import {hexToShortCode, shortCodeToHex} from './av_client/short_codes';
 import {fetchLatestConfig} from './av_client/election_config';
 import {decryptCommitmentOpening, validateCommmitmentOpening} from './av_client/crypto/commitments';
-import {InvalidContestError, InvalidTrackingCodeError} from './av_client/errors';
+import {InvalidContestError, InvalidReceiptError, InvalidTrackingCodeError} from './av_client/errors';
 import {decryptContestSelections} from './av_client/decrypt_contest_selections';
 import {makeOptionFinder} from './av_client/option_finder';
 
@@ -173,13 +173,9 @@ export class AVVerifier {
         piles: readablePiles
       }
     })
-
-
   }
 
-  public async
-
-  pollForCommitmentOpening() {
+  public async pollForCommitmentOpening() {
     let attempts = 0;
 
     const executePoll = async (resolve, reject) => {
@@ -201,6 +197,57 @@ export class AVVerifier {
     };
 
     return new Promise(executePoll);
+  }
+
+  public validateReceipt(encodedReceipt: string, trackingCode: string) {
+    const [castRequestItem, receipt] = this.parseReceipt(encodedReceipt)
+    this.validateTrackingCode(trackingCode, castRequestItem)
+
+    try {
+      verifyAddress(castRequestItem)
+      validateReceipt([castRequestItem], receipt, this.latestConfig.items.genesisConfig.content.publicKey)
+    } catch (err) {
+      // This checks for the specific error messages that invalidate a receipt. Other different errors would bubble up.
+      if (
+        /^Unknown parameter type /.test(err.message) ||                             // if the unifier encounters unsupported data types
+        /^BoardItem address does not match expected address /.test(err.message) ||  // if crypto fails on validating the address
+        err.message == "Board receipt verification failed"                          // if crypto fails on validating the dbb signature
+      ) {
+        throw new InvalidReceiptError(err.message)
+      } else {
+        throw err
+      }
+    }
+  }
+
+  private validateTrackingCode(trackingCode: string, castRequestItem: CastRequestItem) {
+    const shortAddress = shortCodeToHex(trackingCode)
+    if (shortAddress != castRequestItem.address.substring(0,10)) {
+      throw new InvalidTrackingCodeError("Tracking code does not match the receipt")
+    }
+  }
+
+  private parseReceipt(encodedReceipt: string) {
+    let receiptData
+    try {
+      receiptData = JSON.parse(atob(encodedReceipt))
+    } catch (err) {
+      throw new InvalidReceiptError("Receipt string is invalid")
+    }
+
+    const castRequestItem: CastRequestItem = {
+      type: "CastRequestItem",
+      author: "",
+      address: receiptData.address,
+      parentAddress: receiptData.parentAddress,
+      previousAddress: receiptData.previousAddress,
+      content: {},
+      registeredAt: receiptData.registeredAt,
+      signature: receiptData.voterSignature
+    }
+    const receipt = receiptData.dbbSignature
+
+    return [castRequestItem, receipt]
   }
 }
 

@@ -79,18 +79,15 @@ export interface Election {
  */
 export type BallotBoxReceipt = {
   trackingCode: string
-  receipt: {
-    address: string
-    dbbSignature: string
-    voterSignature: string
-  }
+  receipt: string
 }
 
 export type BoardItem =
   VoterSessionItem |
   VoterCommitmentItem |
   BoardCommitmentItem |
-  BallotCryptogramItem
+  BallotCryptogramItem |
+  CastRequestItem
 
 export type BoardItemType =
   "BallotCryptogramsItem" |
@@ -185,6 +182,11 @@ export interface VerifierItem extends BaseVerificationItem {
 
 export interface SpoilRequestItem extends BaseBoardItem {
   type: "SpoilRequestItem"
+}
+
+export interface CastRequestItem extends BaseBoardItem {
+  content: Record<string, never>  // empty object
+  type: "CastRequestItem"
 }
 
 export interface CommitmentOpening {

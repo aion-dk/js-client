@@ -166,6 +166,15 @@ export class InvalidTrackingCodeError extends AvClientError {
   }
 }
 
+export class InvalidReceiptError extends AvClientError {
+  readonly name = "InvalidReceiptError";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, InvalidReceiptError.prototype);
+  }
+}
+
 export class InvalidContestError extends AvClientError {
   readonly name = "InvalidContestError";
 
