@@ -53,8 +53,8 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
-  sendReceipt(receipt: BallotBoxReceipt, authorizationSessionId: string, dbasUrl?: string ): Promise<AxiosResponse> {
-    return this.backend.post('send_receipt', {
+  sendReceipt(receipt: BallotBoxReceipt, authorizationSessionId: string, dbasUrl?: string, locale = "en"): Promise<AxiosResponse> {
+    return this.backend.post(`${locale}/send_receipt`, {
       trackingCode: receipt.trackingCode,
       electionContextUuid: this.electionContextUuid,
       authorizationSessionId: authorizationSessionId,
