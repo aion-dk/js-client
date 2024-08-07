@@ -420,6 +420,7 @@ export class AVClient implements IAVClient {
    *
    *
    * @param affidavit The {@link Affidavit | affidavit} document.
+   * @param locale The locale which the email with the vote receipt should be sent in
    * @return Returns the vote receipt. Example of a receipt:
    * ```javascript
    * {
@@ -432,7 +433,7 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-    public async castBallot(affidavit?: Affidavit): Promise<BallotBoxReceipt> {
+    public async castBallot(affidavit?: Affidavit, locale = "en"): Promise<BallotBoxReceipt> {
       // Affidavit must be base64 encoded
 
       if(!(this.voterSession)) {
@@ -475,7 +476,7 @@ export class AVClient implements IAVClient {
         const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
         const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
         try {
-          coordinator.sendReceipt(clientReceipt, this.authorizationSessionId, this.getLatestConfig().items.electionConfig.content.dbasUrl);
+          coordinator.sendReceipt(clientReceipt, this.authorizationSessionId, this.getLatestConfig().items.electionConfig.content.dbasUrl, locale);
         } catch(e) {
           console.error(e)
         }
