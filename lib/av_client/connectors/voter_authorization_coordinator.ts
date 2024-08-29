@@ -84,6 +84,14 @@ export default class VoterAuthorizationCoordinator {
     })
   }
 
+  getVoterInfo(identification: string) {
+    return this.backend.get("voter_info", {
+      params: {
+        identification: identification,
+      },
+    });
+  }
+
   private createBackendClient(baseURL: string, timeout: number) {
     this.backend = axios.create({
       baseURL: baseURL,

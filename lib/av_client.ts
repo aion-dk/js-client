@@ -205,6 +205,14 @@ export class AVClient implements IAVClient {
     this.identityConfirmationToken = token
   }
 
+  public async getCoordinatorVoterInfo(): Promise<AxiosResponse> {
+    const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
+    const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
+    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
+    const identification = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.authorizationMode === 'proof-of-identity' ? this.identityConfirmationToken : this.proofOfElectionCodes.mainKeyPair.publicKey
+    return await coordinator.getVoterInfo(identification)
+  }
+
   /**
    * Registers a voter based on the authorization mode of the Voter Authorizer
    * Authorization is done by 'proof-of-identity' or 'proof-of-election-codes'
