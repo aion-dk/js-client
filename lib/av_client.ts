@@ -210,7 +210,7 @@ export class AVClient implements IAVClient {
     const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
 
-    let identity = {}
+    const identity = {}
 
     if (this.proofOfElectionCodes) {
       identity["publicKey"] = this.proofOfElectionCodes.mainKeyPair.publicKey
