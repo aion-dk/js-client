@@ -89,6 +89,11 @@ export type BoardItem =
   BallotCryptogramItem |
   CastRequestItem
 
+interface IdentityConfirmationTokenIdentification { identitiyConfirmationToken: string }
+interface PublicKeyIdentification { publicKey: string }
+
+export type VoterAuthorizationIdentification = IdentityConfirmationTokenIdentification | PublicKeyIdentification;
+
 export type BoardItemType =
   "BallotCryptogramsItem" |
   "BoardEncryptionCommitmentItem" |
