@@ -210,12 +210,12 @@ export class AVClient implements IAVClient {
     const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
 
-    const identity = {}
+    let identity;
 
     if (this.proofOfElectionCodes) {
-      identity["publicKey"] = this.proofOfElectionCodes.mainKeyPair.publicKey
+      identity = { publicKey: this.proofOfElectionCodes.mainKeyPair.publicKey }
     } else if (this.identityConfirmationToken)  {
-      identity["identitiyConfirmationToken"] = this.identityConfirmationToken
+      identity = { identitiyConfirmationToken: this.identityConfirmationToken };
     } else {
       throw new InvalidStateError("No way of identifying voter. Please generate a public key or supply an identityToken")
     }
