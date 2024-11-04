@@ -1,11 +1,23 @@
 import { expect } from "chai";
-import {fixedPoint1, fixedPoint2, hexString} from "./test_helpers";
-import {Curve} from "../../lib/av_crypto/curve";
-import {addPoints, scalarToHex} from "../../lib/av_crypto/utils";
-import {computeLambda, computePublicShare} from "../../lib/av_crypto/threshold";
+import {fixedKeyPair, fixedPoint1, fixedPoint2, hexString} from "../test_helpers";
+import {Curve} from "../../../lib/av_crypto/curve";
+import {addPoints, scalarToHex} from "../../../lib/av_crypto/utils";
+import {computeLambda, computePublicShare, generatePolynomial} from "../../../lib/av_crypto/threshold/scheme";
 import * as sjcl from "sjcl-with-all";
 
-describe("Threshold ceremony computation", () => {
+describe("Threshold ceremony computation ========================================================", () => {
+
+  describe("generatePolynomial()", () => {
+    const curve = new Curve('k256');
+    const firstCoefficient = fixedKeyPair(curve);
+    const degree = 2;
+    const polynomial = generatePolynomial(degree, firstCoefficient, curve);
+
+    it("constructs a polynomial", () => {
+      expect(polynomial.coefficients.length).to.eql(degree)
+      expect(polynomial.coefficients[0]).to.eql(firstCoefficient)
+    })
+  })
 
   describe("computePublicShare()", () => {
     const curve = new Curve('k256');
