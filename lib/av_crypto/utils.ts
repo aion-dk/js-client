@@ -27,6 +27,18 @@ export function multiplyAndSumScalarsAndPoints(scalars: Array<BigNumber>, points
   return result.toAffine()
 }
 
+export function addScalars(scalars: Array<BigNumber>, curve: Curve): BigNumber {
+  if (scalars.length == 0) {
+    throw new Error("array must not be empty")
+  }
+
+  let sum = scalars[0]
+  for (let i=1; i<scalars.length; i++) {
+    sum = sum.add(scalars[i])
+  }
+  return sum.mod(curve.order())
+}
+
 export function pointEquals(point1: SjclEllipticalPoint, point2: SjclEllipticalPoint): boolean {
   if (point1.isIdentity) {
     return point2.isIdentity

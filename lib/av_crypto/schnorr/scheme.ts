@@ -19,7 +19,7 @@ export function isValid(
   curve: Curve
 ): boolean {
   const r = computeR(signature, publicKey, curve);
-  const recomputedE = computeE(message, r, curve)
+  const recomputedE = deriveChallenge(message, r, curve)
 
   return signature.e.equals(recomputedE)
 }
@@ -30,12 +30,12 @@ export function sign(
   curve: Curve,
   randomness: SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey> = generateKeyPair(curve)
 ): Signature {
-  const e = computeE(message, randomness.pub.H, curve)
+  const e = deriveChallenge(message, randomness.pub.H, curve)
   const s = computeS(privateKey, randomness.sec.S, e, curve)
   return new Signature(e, s, curve)
 }
 
-function computeE(message: string, r: SjclEllipticalPoint, curve: Curve): BigNumber {
+export function deriveChallenge(message: string, r: SjclEllipticalPoint, curve: Curve): BigNumber {
   const string = concatForHashing([
     pointToHex(r),
     message

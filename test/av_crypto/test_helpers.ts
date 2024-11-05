@@ -13,6 +13,13 @@ export function fixedKeyPair(curve: Curve): SjclKeyPair<SjclECCPublicKey, SjclEC
   return generateKeyPair(curve, private_key);
 }
 
+export function fixedKeyPair2(curve: Curve): SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey> {
+  const seed = "other_fixed_keypair"
+  const private_key = hashIntoScalar(seed, curve)
+
+  return generateKeyPair(curve, private_key);
+}
+
 export function fixedScalar1(curve: Curve): BigNumber {
   const seed = "fixed value 1"
   const private_key = hashIntoScalar(seed, curve)
