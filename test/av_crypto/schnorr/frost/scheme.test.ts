@@ -2,7 +2,7 @@ import { expect } from "chai";
 import {describe} from "mocha";
 import * as sjcl from "sjcl-with-all";
 import {Curve} from "../../../../lib/av_crypto/curve";
-import {partialSign} from "../../../../lib/av_crypto/schnorr/frost/scheme";
+import {isValid, partialSign} from "../../../../lib/av_crypto/schnorr/frost/scheme";
 import {
   fixedKeyPair,
   fixedKeyPair2,
@@ -14,8 +14,9 @@ import {
 } from "../../test_helpers";
 import {SingleUseNonce} from "../../../../lib/av_crypto/schnorr/frost/single_use_nonce";
 import {CommitmentShare} from "../../../../lib/av_crypto/schnorr/frost/commitment_share";
-import {addScalars, scalarToHex} from "../../../../lib/av_crypto/utils";
+import {addScalars, hexToScalar, scalarToHex} from "../../../../lib/av_crypto/utils";
 import {Polynomial} from "../../../../lib/av_crypto/threshold/polynomial";
+import {computePublicShare} from "../../../../lib/av_crypto/threshold/scheme";
 
 describe("Schnorr FROST threshold signature scheme", () => {
   const curve = new Curve('k256')
@@ -35,7 +36,7 @@ describe("Schnorr FROST threshold signature scheme", () => {
     new CommitmentShare(id2, fixedPoint2(curve), fixedPoint1(curve), curve),
   ]
 
-  describe("partial sign()", () => {
+  describe("partialSign()", () => {
     it("returns a partial signature", () => {
       const signature = partialSign(message, privateShare, id1, nonce1, commitments, curve)
 
@@ -43,6 +44,21 @@ describe("Schnorr FROST threshold signature scheme", () => {
         "1896251c 9dbcf4c7 f6c29cc4 88c531d7" +
         "f9756907 658645e3 03193d5f d61c491b"
       ));
+    })
+  })
+
+  describe("isValid()", () => {
+    const partialSignature = hexToScalar(hexString(
+      "1896251c 9dbcf4c7 f6c29cc4 88c531d7" +
+      "f9756907 658645e3 03193d5f d61c491b"
+    ), curve)
+    const publicKeys = [keyPair1.pub.H, keyPair2.pub.H]
+    const coefficients = [[keyPair2.pub.H], [keyPair1.pub.H]]
+    const publicShare = computePublicShare(id1, publicKeys, coefficients, curve)
+    it("returns true", () => {
+      const valid = isValid(message, partialSignature, publicShare, id1, commitments, curve)
+
+      expect(valid).to.be.true
     })
   })
 })
