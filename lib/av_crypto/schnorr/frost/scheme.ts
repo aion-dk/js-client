@@ -3,7 +3,7 @@ import {Curve} from "../../curve";
 import {SingleUseNonce} from "./single_use_nonce";
 import {CommitmentShare} from "./commitment_share";
 import {
-  addPoints,
+  addPoints, addScalars,
   concatForHashing,
   hashIntoScalar,
   multiplyAndSumScalarsAndPoints,
@@ -13,6 +13,7 @@ import {
 import {computeLambda} from "../../threshold/scheme";
 import * as sjcl from "sjcl-with-all";
 import {deriveChallenge} from "../scheme";
+import {Signature} from "../signature";
 
 export function partialSign(
   message: string,
@@ -26,7 +27,7 @@ export function partialSign(
   const rho = computeBindingValue(id, message, commitmentsContext, curve)
   const otherIds = otherIdsThan(id, commitments);
   const lambda = computeLambda(id, otherIds, curve);
-  const r = computeGroupCommitment(commitments, message, commitmentsContext, curve)
+  const r = computeGroupCommitment(commitments, message, curve)
   const c = deriveChallenge(message, r, curve)
 
   return computeSignature(nonce, privateShare, c, rho, lambda, curve)
@@ -37,7 +38,7 @@ export function isValid(message: string, partialSignature: BigNumber, publicShar
   const rho = computeBindingValue(id, message, commitmentsContext, curve)
   const otherIds = otherIdsThan(id, commitments);
   const lambda = computeLambda(id, otherIds, curve);
-  const r = computeGroupCommitment(commitments, message, commitmentsContext, curve)
+  const r = computeGroupCommitment(commitments, message, curve)
   const c = deriveChallenge(message, r, curve)
   const commitmentShare = commitments.find(c => c.i.equals(id))
   if (commitmentShare === undefined) {
@@ -48,6 +49,25 @@ export function isValid(message: string, partialSignature: BigNumber, publicShar
   const rhs = computeRHS(commitmentShare, c, lambda, rho, publicShare, curve)
 
   return pointEquals(lhs, rhs);
+}
+
+export function aggregateSignatures(c: BigNumber, z: Array<BigNumber>, curve: Curve): Signature {
+  return new Signature(c, addScalars(z, curve), curve)
+}
+
+export function computeGroupCommitment(commitments: Array<CommitmentShare>, message: string, curve: Curve): SjclEllipticalPoint {
+  const scalars = new Array<BigNumber>;
+  const points = new Array<SjclEllipticalPoint>;
+
+  const commitmentsContext = renderCommitmentContext(commitments)
+  commitments.forEach(commitment => {
+    const rho = computeBindingValue(commitment.i, message, commitmentsContext, curve)
+
+    scalars.push(new sjcl.bn(1), rho)
+    points.push(commitment.d, commitment.e)
+  })
+
+  return multiplyAndSumScalarsAndPoints(scalars, points);
 }
 
 function computeLHS(z: BigNumber, curve: Curve): SjclEllipticalPoint {
@@ -65,20 +85,6 @@ function computeRHS(commitment: CommitmentShare, c: BigNumber, lambda: BigNumber
 function computeBindingValue(i: BigNumber, message: string, commitmentsContext: string, curve: Curve): BigNumber {
   const string = concatForHashing([scalarToHex(i, curve), message, commitmentsContext])
   return hashIntoScalar(string, curve)
-}
-
-function computeGroupCommitment(commitments: Array<CommitmentShare>, message: string, commitmentsContext: string, curve: Curve): SjclEllipticalPoint {
-  const scalars = new Array<BigNumber>;
-  const points = new Array<SjclEllipticalPoint>;
-
-  commitments.forEach(commitment => {
-    const rho = computeBindingValue(commitment.i, message, commitmentsContext, curve)
-
-    scalars.push(new sjcl.bn(1), rho)
-    points.push(commitment.d, commitment.e)
-  })
-
-  return multiplyAndSumScalarsAndPoints(scalars, points);
 }
 
 function renderCommitmentContext(commitments: Array<CommitmentShare>): string {
