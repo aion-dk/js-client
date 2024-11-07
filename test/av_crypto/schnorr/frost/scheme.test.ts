@@ -55,10 +55,46 @@ describe("Schnorr FROST threshold signature scheme", () => {
     const publicKeys = [keyPair1.pub.H, keyPair2.pub.H]
     const coefficients = [[keyPair2.pub.H], [keyPair1.pub.H]]
     const publicShare = computePublicShare(id1, publicKeys, coefficients, curve)
+
     it("returns true", () => {
       const valid = isValid(message, partialSignature, publicShare, id1, commitments, curve)
 
       expect(valid).to.be.true
+    })
+
+    context("with id not included in commitments", () => {
+      const id = new sjcl.bn(100)
+      it("throws error", () => {
+        expect(() => {
+          isValid(message, partialSignature, publicShare, id, commitments, curve)
+        }).to.throw("id must be included in the list of commitments")
+      })
+    })
+
+    context("with different message", () => {
+      const message = "different"
+      it("returns false", () => {
+        const valid = isValid(message, partialSignature, publicShare, id1, commitments, curve)
+
+        expect(valid).to.be.false
+      })
+    })
+
+    context("with different partial signature", () => {
+      const partialSignature = new sjcl.bn(100)
+      it("returns false", () => {
+        const valid = isValid(message, partialSignature, publicShare, id1, commitments, curve)
+
+        expect(valid).to.be.false
+      })
+    })
+
+    context("with different id", () => {
+      it("returns false", () => {
+        const valid = isValid(message, partialSignature, publicShare, id2, commitments, curve)
+
+        expect(valid).to.be.false
+      })
     })
   })
 })
