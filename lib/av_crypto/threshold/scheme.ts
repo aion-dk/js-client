@@ -1,7 +1,15 @@
-import {BigNumber, SjclEllipticalPoint} from "./sjcl";
-import {multiplyAndSumScalarsAndPoints} from "./utils";
-import {Curve} from "./curve";
+import {BigNumber, SjclECCPublicKey, SjclECCSecretKey, SjclEllipticalPoint, SjclKeyPair} from "../sjcl";
+import {generateKeyPair, multiplyAndSumScalarsAndPoints} from "../utils";
+import {Curve} from "../curve";
 import * as sjcl from "sjcl-with-all";
+import {Polynomial} from "./polynomial";
+
+export function generatePolynomial(degree: number, firstCoefficient: SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey>, curve: Curve): Polynomial {
+  const coefficients = Array(degree - 1).fill(generateKeyPair(curve));
+  coefficients.unshift(firstCoefficient);
+
+  return new Polynomial(coefficients, curve);
+}
 
 export function computePublicShare(
   id: BigNumber,
