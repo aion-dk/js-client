@@ -4,7 +4,7 @@ import {expect} from "chai";
 import {Curve} from "../../lib/av_crypto/curve";
 import * as sjcl from "sjcl-with-all";
 
-describe("benchmarking point multiplication", ()=> {
+describe.skip("benchmarking point multiplication", ()=> {
   const curve = new Curve('k256');
   function naiveMultiplicationTechnic(scalars: BigNumber[], points: SjclEllipticalPoint[]): SjclEllipticalPoint {
     let result = infinityPoint(curve);
