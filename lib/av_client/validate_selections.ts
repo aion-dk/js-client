@@ -1,4 +1,14 @@
-import { BallotConfig, BallotSelection, ContestSelection, OptionSelection, ContestConfig, ContestConfigMap, OptionContent, VotingRoundConfig } from './types';
+import {
+  BallotConfig,
+  BallotSelection,
+  ContestSelection,
+  OptionSelection,
+  ContestConfig,
+  ContestConfigMap,
+  OptionContent,
+  VotingRoundConfig,
+  SelectionPile, MarkingType
+} from './types';
 import { flattenOptions } from './flatten_options'
 import { CorruptSelectionError as CorruptSelectionError } from './errors';
 
@@ -35,29 +45,27 @@ export function validateContestSelection( contestConfig: ContestConfig, contestS
   contestSelection.piles.forEach(pile => validateSelectionPile(pile, markingType, options))
 }
 
-function validateSelectionPile(pile, markingType, options) {
+function validateSelectionPile(pile: SelectionPile, markingType: MarkingType, options: OptionContent[]) {
   const isBlank = pile.optionSelections.length === 0
-
-  // Validate blankSubmission
-  if( isBlank && markingType.blankSubmission == 'disabled'){
-    throw new CorruptSelectionError('Blank submissions are not allowed in this contest')
-  }
-
-  // Validate that mark count is within bounds
-  if( !isBlank && !withinBounds(markingType.minMarks, pile.optionSelections.length, markingType.maxMarks) ){
-    throw new CorruptSelectionError('Contest selection does not contain a valid amount of option selections')
-  }
-
-  // Validate duplicates - that any vote selection is not referencing the same option multiple times
-  const selectedOptions = pile.optionSelections.map(os => os.reference)
-  if( hasDuplicates(selectedOptions) ){
-    throw new CorruptSelectionError('Same option selected multiple times')
-  }
 
   const getOption = makeGetOption(options)
 
+  // Validate blankSubmission
+  if( isBlank && markingType.blankSubmission === 'disabled'){
+    throw new CorruptSelectionError('Blank submissions are not allowed in this contest')
+  }
+
   pile.optionSelections.forEach(optionSelection => {
     const option = getOption(optionSelection)
+
+    // Validate that mark count is within bounds
+
+    const isExlusive = pile.optionSelections?.length && option?.exclusive
+    const calculatedMinMarks = !isBlank && isExlusive ? 1 : markingType.minMarks;
+
+    if( !isBlank && !withinBounds(calculatedMinMarks, pile.optionSelections.length, markingType.maxMarks) ){
+      throw new CorruptSelectionError('Contest selection does not contain a valid amount of option selections')
+    }
 
     if( option.writeIn ){
       if( !optionSelection.text ){
@@ -100,14 +108,6 @@ function makeGetOption(options: OptionContent[]){
 
 function withinBounds(min: number, n: number, max: number){
   return min <= n && n <= max
-}
-
-function hasDuplicates(arr: string[]) {
-  const seen = {}
-  return arr.some(str => {
-    if( seen[str] ) return true
-    seen[str] = true
-  })
 }
 
 function containsSameStrings( array1: string[], array2: string[] ){

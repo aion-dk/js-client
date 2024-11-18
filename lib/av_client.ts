@@ -8,6 +8,7 @@ import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, 
 import { randomKeyPair } from './av_client/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import { Buffer } from 'buffer'
+import * as Crypto from "../lib/av_client/aion_crypto.js"
 import jwtDecode, { JwtPayload } from "jwt-decode";
 
 import {
@@ -37,7 +38,8 @@ import {
   InvalidConfigError,
   InvalidStateError,
   NetworkError,
-  InvalidTokenError
+  InvalidTokenError,
+  DBBError
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
@@ -146,17 +148,19 @@ export class AVClient implements IAVClient {
    *
    * @param opaqueVoterId Voter ID that preserves voter anonymity.
    * @param email where the voter expects to receive otp code.
+   * @param ballotReference The ballot which which voter voter intends to vote on
    * @returns Returns undefined or throws an error.
    * @throws VoterRecordNotFound if no voter was found
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async requestAccessCode(opaqueVoterId: string, email: string): Promise<void> {
+  public async requestAccessCode(opaqueVoterId: string, email: string, ballotReference?: string): Promise<void> {
     const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
     const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
     const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
 
-    return coordinator.createSession(opaqueVoterId, email)
+    return coordinator.createSession(opaqueVoterId, email, ballotReference)
       .then(({ data: { sessionId } }) => {
+        // In the US voters are allowed to chose their ballot
         return sessionId as string
       })
       .then(async sessionId => {
@@ -198,6 +202,28 @@ export class AVClient implements IAVClient {
     this.proofOfElectionCodes = new ProofOfElectionCodes(electionCodes);
   }
 
+  setIdentityToken(token: string) {
+    this.identityConfirmationToken = token
+  }
+
+  public async getCoordinatorVoterInfo(): Promise<AxiosResponse> {
+    const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
+    const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
+    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
+
+    let identity;
+
+    if (this.proofOfElectionCodes) {
+      identity = { publicKey: this.proofOfElectionCodes.mainKeyPair.publicKey }
+    } else if (this.identityConfirmationToken)  {
+      identity = { identitiyConfirmationToken: this.identityConfirmationToken };
+    } else {
+      throw new InvalidStateError("No way of identifying voter. Please generate a public key or supply an identityToken")
+    }
+
+    return await coordinator.getVoterInfo(identity)
+  }
+
   /**
    * Registers a voter based on the authorization mode of the Voter Authorizer
    * Authorization is done by 'proof-of-identity' or 'proof-of-election-codes'
@@ -212,7 +238,8 @@ export class AVClient implements IAVClient {
 
     let authorizationResponse: AxiosResponse
 
-    if(authorizationMode === 'proof-of-identity') {
+    // This should be refactored when the DBB allows several authorization modes
+    if(authorizationMode === 'proof-of-identity' || this.identityConfirmationToken) {
       if(!this.identityConfirmationToken)
         throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
 
@@ -226,7 +253,8 @@ export class AVClient implements IAVClient {
       throw new InvalidConfigError(`Unknown authorization mode of voter authorizer: '${authorizationMode}'`)
     }
 
-    const { authToken } = authorizationResponse.data;
+    const { authToken, authorizationUuid } = authorizationResponse.data;
+    this.authorizationSessionId = this.authorizationSessionId ? this.authorizationSessionId : authorizationUuid
 
     const decoded = jwtDecode<JwtPayload>(authToken); // TODO: Verify against dbb pubkey: this.getLatestConfig().services.voterAuthorizer.public_key);
 
@@ -357,11 +385,13 @@ export class AVClient implements IAVClient {
       votingRoundReference: this.votingRoundReference
     };
 
+    const transparent = state.latestConfig.items.votingRoundConfigs[this.votingRoundReference].content.handRaise || false;
+
     const {
       pedersenCommitment,
       envelopeRandomizers,
       contestEnvelopes,
-    } = constructContestEnvelopes(state, ballotSelection);
+    } = constructContestEnvelopes(state, ballotSelection, transparent);
 
     this.clientEnvelopes = contestEnvelopes;
 
@@ -409,6 +439,7 @@ export class AVClient implements IAVClient {
    *
    *
    * @param affidavit The {@link Affidavit | affidavit} document.
+   * @param locale The locale which the email with the vote receipt should be sent in
    * @return Returns the vote receipt. Example of a receipt:
    * ```javascript
    * {
@@ -421,7 +452,7 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-    public async castBallot(affidavit?: Affidavit): Promise<BallotBoxReceipt> {
+    public async castBallot(affidavit?: Affidavit, locale = "en"): Promise<BallotBoxReceipt> {
       // Affidavit must be base64 encoded
 
       if(!(this.voterSession)) {
@@ -457,7 +488,20 @@ export class AVClient implements IAVClient {
       validatePayload(castRequest, castRequestItem);
       validateReceipt([castRequest], receipt, this.getDbbPublicKey());
 
-      return generateReceipt(receipt, castRequest);
+      const clientReceipt = generateReceipt(receipt, castRequest);
+
+      if (this.getLatestConfig().items.electionConfig.content.sendTrackingCodeByEmail) {
+        const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
+        const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
+        const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
+        try {
+          coordinator.sendReceipt(clientReceipt, this.authorizationSessionId, this.getLatestConfig().items.electionConfig.content.dbasUrl, locale);
+        } catch(e) {
+          console.error(e)
+        }
+      }
+
+      return clientReceipt
     }
 
   /**
@@ -546,6 +590,10 @@ export class AVClient implements IAVClient {
     return this.voterSession
   }
 
+  public getSessionUuid(): string {
+    return this.authorizationSessionId
+  }
+
   public getVoterBallotConfig(): BallotConfig {
     const voterSession = this.getVoterSession()
     const { items: { ballotConfigs } } = this.getLatestConfig()
@@ -578,6 +626,10 @@ export class AVClient implements IAVClient {
 
   private privateKey(): BigNum {
     return this.keyPair.privateKey
+  }
+
+  public generateSignature(payload: string): string {
+    return Crypto.generateSchnorrSignature(payload, this.privateKey())
   }
 
   /**
@@ -674,5 +726,6 @@ export {
   EmailDoesNotMatchVoterRecordError,
   InvalidConfigError,
   InvalidStateError,
-  NetworkError
+  NetworkError,
+  DBBError
 }

@@ -77,6 +77,24 @@ export class EmailDoesNotMatchVoterRecordError extends AvClientError {
   }
 }
 
+export class BallotReferenceNotOnVoterRecord extends AvClientError {
+  readonly name = "BallotReferenceNotOnVoterRecord";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, BallotReferenceNotOnVoterRecord.prototype);
+  }
+}
+
+export class DBBError extends AvClientError {
+  readonly name = "DBB_ERROR";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, DBBError.prototype);
+  }
+}
+
 export class VoterRecordNotFoundError extends AvClientError {
   readonly name = "VoterRecordNotFoundError";
 
@@ -145,6 +163,15 @@ export class InvalidTrackingCodeError extends AvClientError {
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, InvalidTrackingCodeError.prototype);
+  }
+}
+
+export class InvalidReceiptError extends AvClientError {
+  readonly name = "InvalidReceiptError";
+
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, InvalidReceiptError.prototype);
   }
 }
 
