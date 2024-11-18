@@ -12,3 +12,10 @@ export function encryptCommitmentOpening( verifierPublicKey: string, commitmentO
   const dhPackage = dhEncrypt(verifierPublicKey, message)
   return dhPackage.toString()
 }
+
+export function validateCommmitmentOpening(commitmentOpening: CommitmentOpening, commitment: string, customErrorMessage?: string ): void {
+  // TODO: figure out how to validate this one
+  // if (!isValidPedersenCommitment(commitment, commitmentOpening.randomizers, commitmentOpening.commitmentRandomness)) {
+  //   throw new Error(customErrorMessage || 'Pedersen commitment not valid')
+  // }
+}
