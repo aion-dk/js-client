@@ -33,6 +33,19 @@ describe("AVCrypto", () => {
     })
   })
 
+  describe("generateKeyPair()" , () => {
+    const curveName = "secp256k1";
+    const crypto = new AVCrypto(curveName)
+    const curve = crypto.curve
+
+    it("returns a private public key pair", () => {
+      const {privateKey, publicKey} = crypto.generateKeyPair()
+
+      expect(privateKey).match(curve.scalarHexPattern())
+      expect(publicKey).match(curve.pointHexPattern())
+    })
+  })
+
   describe("encryptVote()", () => {
     const curveName = "secp256k1";
     const crypto = new AVCrypto(curveName)

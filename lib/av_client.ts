@@ -5,7 +5,7 @@ import { extractContestSelections } from './util/nist_cvr_extractor';
 import { AVVerifier } from './av_verifier';
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
 import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig } from './av_client/types';
-import { randomKeyPair } from './av_client/generate_key_pair';
+import { randomKeyPair } from './av_client/new_crypto/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import { Buffer } from 'buffer'
 import * as Crypto from "../lib/av_client/aion_crypto.js"

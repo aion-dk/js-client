@@ -23,6 +23,21 @@ export class AVCrypto {
     this.curve = new Curve(SUPPORTED_ELLIPTIC_CURVE_NAMES[curveName]);
   }
 
+
+  /**
+   * Generates a private public hexadecimal key pair.
+   *
+   * @returns Returns a private key and the corresponding public key.
+   */
+  public generateKeyPair(): { privateKey: string, publicKey: string } {
+    const keyPair = generateKeyPair(this.curve);
+
+    return {
+      privateKey: scalarToHex(keyPair.sec.S, this.curve),
+      publicKey: pointToHex(keyPair.pub.H)
+    }
+  }
+
   /**
    * Encrypts a vote with the provided encryption key.
    *
