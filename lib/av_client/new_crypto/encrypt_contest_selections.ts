@@ -6,8 +6,7 @@ import {
   EncryptedPile, SelectionPile
 } from "../types";
 import { selectionPileToByteArray } from "../encoding/byte_encoding";
-import {AVCrypto} from "../../av_crypto";
-import { bytesToPoints } from "../encoding/point_encoding";
+import { AVCrypto } from "../../av_crypto";
 
 export function encryptContestSelections(
   contestConfigs: ContestConfigMap,
@@ -50,19 +49,13 @@ function encryptSelectionPile(
   const crypto = new AVCrypto("secp256k1")
 
   const encodedSelectionPile = selectionPileToByteArray(contestConfig, selectionPile)
-  const pilePoints = bytesToPoints(encodedSelectionPile)
-
+  // TODO: include `transparent` flag into `encryptVote` function; defaults to `false`
+  const encryptedSelectionPile = crypto.encryptVote(encodedSelectionPile, encryptionKey)
   console.log("AV_CRYPTO_ENCRYPT_VOTE_CALLED!")
 
-  const encryptedPile: EncryptedPile = {multiplier: selectionPile.multiplier, cryptograms: [], randomizers: []}
-  pilePoints.map(votePoint => {
-    // TODO: include `transparent` flag into `encryptVote` function; defaults to `false`
-    // const randomizerBN = transparent ? new bn(0) : randomBN();
-    const { cryptograms, randomizers } = crypto.encryptVote(encodedSelectionPile, encryptionKey)
-
-    encryptedPile.cryptograms.push(cryptograms[0])
-    encryptedPile.randomizers.push(randomizers[0])
-  })
-
-  return encryptedPile
+  return {
+    multiplier: selectionPile.multiplier,
+    cryptograms: encryptedSelectionPile.cryptograms,
+    randomizers: encryptedSelectionPile.randomizers
+  }
 }
