@@ -2,6 +2,7 @@ import { expect } from "chai";
 import {AVCrypto} from "../../lib/av_crypto";
 import {fixedPoint1Hex, fixedPoint2Hex, fixedScalar1Hex, fixedScalar2Hex} from "./test_helpers";
 import {pattern as cryptogramPattern} from "../../lib/av_crypto/el_gamal/cryptogram";
+import {pattern as proofPattern} from "../../lib/av_crypto/discrete_logarithm/proof";
 
 describe("AVCrypto", () => {
   describe("constructor", () => {
@@ -118,6 +119,19 @@ describe("AVCrypto", () => {
           expect(byte).to.eql(0)
         })
       })
+    })
+  })
+
+  describe("generateProofOfCorrectEncryption", () => {
+    const curveName = "secp256k1";
+    const crypto = new AVCrypto(curveName)
+    const curve = crypto.curve
+    const randomizer = fixedScalar1Hex(curve)
+
+    it("return a discrete logarithm proof", () => {
+      const proof = crypto.generateProofOfCorrectEncryption(randomizer)
+
+      expect(proof).to.match(proofPattern(curve))
     })
   })
 
