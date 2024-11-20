@@ -1,10 +1,10 @@
 import { expect } from "chai";
-import {fixedKeyPair, fixedScalar1, fixedScalar2, hexString} from "../test_helpers";
-import {Curve} from "../../../lib/av_crypto/curve";
+import {fixedKeyPair, fixedScalar1, fixedScalar2, hexString} from "./test_helpers";
+import {Curve} from "../../lib/av_crypto/curve";
 import {describe} from "mocha";
-import {commit, isValid} from "../../../lib/av_crypto/pedersen/scheme";
-import {Commitment} from "../../../lib/av_crypto/pedersen/commitment";
-import {hexToPoint, pointToHex} from "../../../lib/av_crypto/utils";
+import {commit, isValid} from "../../lib/av_crypto/pedersen/scheme";
+import {Commitment} from "../../lib/av_crypto/pedersen/commitment";
+import {hexToPoint, pointToHex} from "../../lib/av_crypto/utils";
 
 describe("Pedersen commitment scheme", () => {
   const curve = new Curve('k256')

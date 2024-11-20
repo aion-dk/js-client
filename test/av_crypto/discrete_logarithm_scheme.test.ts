@@ -1,9 +1,9 @@
 import { expect } from "chai";
-import {fixedKeyPair, fixedPoint1, fixedPoint2, fixedScalar1, fixedScalar2, hexString} from "../test_helpers";
-import {Curve} from "../../../lib/av_crypto/curve";
+import {fixedKeyPair, fixedPoint1, fixedPoint2, fixedScalar1, fixedScalar2, hexString} from "./test_helpers";
+import {Curve} from "../../lib/av_crypto/curve";
 import {describe} from "mocha";
-import {isValid, prove} from "../../../lib/av_crypto/discrete_logarithm/scheme";
-import {Proof, fromString} from "../../../lib/av_crypto/discrete_logarithm/proof";
+import {isValid, prove} from "../../lib/av_crypto/discrete_logarithm/scheme";
+import {Proof, fromString} from "../../lib/av_crypto/discrete_logarithm/proof";
 
 describe("Discrete logarithm scheme", () => {
   const curve = new Curve('k256')

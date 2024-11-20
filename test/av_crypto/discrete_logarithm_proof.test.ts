@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import {fixedPoint1, fixedPoint1Hex, fixedScalar2, fixedScalar2Hex} from "../test_helpers";
-import {Curve} from "../../../lib/av_crypto/curve";
-import {fromString, pattern, Proof} from "../../../lib/av_crypto/discrete_logarithm/proof";
+import {fixedPoint1, fixedPoint1Hex, fixedScalar2, fixedScalar2Hex} from "./test_helpers";
+import {Curve} from "../../lib/av_crypto/curve";
+import {fromString, pattern, Proof} from "../../lib/av_crypto/discrete_logarithm/proof";
 
 describe("Discrete logarithm proof", () => {
   const curve = new Curve('k256')

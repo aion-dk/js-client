@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import {fixedPoint1, fixedPoint1Hex, fixedPoint2, fixedPoint2Hex} from "../test_helpers";
-import {Curve} from "../../../lib/av_crypto/curve";
-import {Cryptogram, pattern, fromString} from "../../../lib/av_crypto/el_gamal/cryptogram";
+import {fixedPoint1, fixedPoint1Hex, fixedPoint2, fixedPoint2Hex} from "./test_helpers";
+import {Curve} from "../../lib/av_crypto/curve";
+import {Cryptogram, pattern, fromString} from "../../lib/av_crypto/el_gamal/cryptogram";
 
 describe("ElGamal cryptogram", () => {
   const curve = new Curve('k256')

@@ -1,10 +1,10 @@
 import { expect } from "chai";
-import {fixedKeyPair, fixedPoint1, fixedPoint2, fixedScalar1, fixedScalar2, hexString} from "../test_helpers";
-import {Curve} from "../../../lib/av_crypto/curve";
+import {fixedKeyPair, fixedPoint1, fixedPoint2, fixedScalar1, fixedScalar2, hexString} from "./test_helpers";
+import {Curve} from "../../lib/av_crypto/curve";
 import {describe} from "mocha";
-import {generateKeyPair} from "../../../lib/av_crypto/utils";
-import {isValid, sign} from "../../../lib/av_crypto/schnorr/scheme";
-import {fromString, Signature} from "../../../lib/av_crypto/schnorr/signature";
+import {generateKeyPair} from "../../lib/av_crypto/utils";
+import {isValid, sign} from "../../lib/av_crypto/schnorr/scheme";
+import {fromString, Signature} from "../../lib/av_crypto/schnorr/signature";
 import * as sjcl from "sjcl-with-all";
 
 describe("Schnorr signature scheme", () => {

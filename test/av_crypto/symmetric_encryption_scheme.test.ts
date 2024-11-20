@@ -1,8 +1,8 @@
 import { expect } from "chai";
-import {fixedPoint1, fixedPoint2, fixedScalar1} from "../test_helpers";
-import {Curve} from "../../../lib/av_crypto/curve";
-import {decrypt, encrypt} from "../../../lib/av_crypto/symmetric_encryption/scheme";
-import {Ciphertext} from "../../../lib/av_crypto/symmetric_encryption/ciphertext";
+import {fixedPoint1, fixedPoint2, fixedScalar1} from "./test_helpers";
+import {Curve} from "../../lib/av_crypto/curve";
+import {decrypt, encrypt} from "../../lib/av_crypto/symmetric_encryption/scheme";
+import {Ciphertext} from "../../lib/av_crypto/symmetric_encryption/ciphertext";
 import * as sjcl from "sjcl-with-all";
 
 describe("Symmetric Encryption scheme", () => {

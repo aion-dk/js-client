@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import * as sjcl from "sjcl-with-all";
-import {decrypt, encrypt} from "../../../lib/av_crypto/symmetric_encryption/aes";
+import {decrypt, encrypt} from "../../lib/av_crypto/symmetric_encryption/aes";
 
 describe("AES Encryption", () => {
   const message = 'hello'

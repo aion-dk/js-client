@@ -1,9 +1,9 @@
 import { expect } from "chai";
-import {decrypt, encrypt, homomorphicallyAdd} from "../../../lib/av_crypto/el_gamal/scheme";
-import {fixedKeyPair, fixedPoint1, fixedPoint2, fixedScalar1, hexString} from "../test_helpers";
-import {Curve} from "../../../lib/av_crypto/curve";
-import {Cryptogram, fromString} from "../../../lib/av_crypto/el_gamal/cryptogram";
-import {pointToHex} from "../../../lib/av_crypto/utils";
+import {decrypt, encrypt, homomorphicallyAdd} from "../../lib/av_crypto/el_gamal/scheme";
+import {fixedKeyPair, fixedPoint1, fixedPoint2, fixedScalar1, hexString} from "./test_helpers";
+import {Curve} from "../../lib/av_crypto/curve";
+import {Cryptogram, fromString} from "../../lib/av_crypto/el_gamal/cryptogram";
+import {pointToHex} from "../../lib/av_crypto/utils";
 
 describe("ElGamal scheme", () => {
   const curve = new Curve('k256')

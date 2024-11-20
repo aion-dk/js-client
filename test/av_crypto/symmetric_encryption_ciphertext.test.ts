@@ -1,8 +1,8 @@
 import { expect } from "chai";
-import {fixedPoint1} from "../test_helpers";
-import {Curve} from "../../../lib/av_crypto/curve";
+import {fixedPoint1} from "./test_helpers";
+import {Curve} from "../../lib/av_crypto/curve";
 import * as sjcl from "sjcl-with-all";
-import {Ciphertext} from "../../../lib/av_crypto/symmetric_encryption/ciphertext";
+import {Ciphertext} from "../../lib/av_crypto/symmetric_encryption/ciphertext";
 
 describe("Symmetric Encryption Ciphertext", () => {
   const ciphertext = sjcl.codec.utf8String.toBits("encrypted hello")

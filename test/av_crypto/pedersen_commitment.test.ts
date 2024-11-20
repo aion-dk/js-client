@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import {fixedPoint1, fixedScalar2} from "../test_helpers";
-import {Curve} from "../../../lib/av_crypto/curve";
-import {Commitment} from "../../../lib/av_crypto/pedersen/commitment";
+import {fixedPoint1, fixedScalar2} from "./test_helpers";
+import {Curve} from "../../lib/av_crypto/curve";
+import {Commitment} from "../../lib/av_crypto/pedersen/commitment";
 
 describe("Pedersen commitment", () => {
   const curve = new Curve('k256')

@@ -3,9 +3,9 @@ import {
   fixedScalar1,
   fixedScalar1Hex,
   fixedScalar2, fixedScalar2Hex
-} from "../test_helpers";
-import {Curve} from "../../../lib/av_crypto/curve";
-import {fromString, pattern, Signature} from "../../../lib/av_crypto/schnorr/signature";
+} from "./test_helpers";
+import {Curve} from "../../lib/av_crypto/curve";
+import {fromString, pattern, Signature} from "../../lib/av_crypto/schnorr/signature";
 
 describe("Schnorr signature", () => {
   const curve = new Curve('k256')
