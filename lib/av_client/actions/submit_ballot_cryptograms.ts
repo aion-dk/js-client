@@ -2,8 +2,7 @@ import { BulletinBoard } from '../connectors/bulletin_board'
 import { BallotCryptogramItem, ContestEnvelope, ContestMap, VerificationStartItem } from '../types'
 import { signPayload, validatePayload, validateReceipt } from '../sign'
 import { BALLOT_CRYPTOGRAMS_ITEM } from '../constants'
-import { generateDiscreteLogarithmProof } from '../aion_crypto'
-import { finalizeCryptograms } from '../new_crypto/finalize_cryptograms'
+import { finalizeCryptograms, generateEnvelopeProofs } from '../new_crypto/finalize_cryptograms'
 
 export async function submitBallotCryptograms(
   bulletinBoard: BulletinBoard,
@@ -43,15 +42,4 @@ export async function submitBallotCryptograms(
     ballotCryptogramsItemCopy as BallotCryptogramItem,
     verificationItem as VerificationStartItem
   ]
-}
-
-function generateEnvelopeProofs( contestEnvelopes: ContestEnvelope[] ): ContestMap<string[][]> {
-  const entries = contestEnvelopes.map(ce => {
-    const envelopeProofs = ce.piles.map((p) => {
-      return p.randomizers.map(r => generateDiscreteLogarithmProof(r))
-    })
-    return [ce.reference, envelopeProofs]
-  }
-  )
-  return Object.fromEntries(entries)
 }
