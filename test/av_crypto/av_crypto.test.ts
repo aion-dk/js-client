@@ -3,6 +3,8 @@ import {AVCrypto} from "../../lib/av_crypto";
 import {fixedPoint1Hex, fixedPoint2Hex, fixedScalar1Hex, fixedScalar2Hex} from "./test_helpers";
 import {pattern as cryptogramPattern} from "../../lib/av_crypto/el_gamal/cryptogram";
 import {pattern as proofPattern} from "../../lib/av_crypto/discrete_logarithm/proof";
+import * as sjcl from "sjcl-with-all";
+import {scalarToHex} from "../../lib/av_crypto/utils";
 
 describe("AVCrypto", () => {
   describe("constructor", () => {
@@ -96,9 +98,10 @@ describe("AVCrypto", () => {
     const vote = new TextEncoder().encode("vote")
     const encryptionKey = fixedPoint1Hex(curve)
     const { cryptograms, randomizers } = crypto.encryptVote(vote, encryptionKey)
+    const boardRandomizers = [scalarToHex(new sjcl.bn(0), curve)]
 
     it("returns the vote back", () => {
-      const decrypted = crypto.revertEncryption(cryptograms, randomizers, encryptionKey)
+      const decrypted = crypto.revertEncryption(cryptograms, boardRandomizers, randomizers, encryptionKey)
 
       expect(decrypted.slice(0, vote.length)).to.eql(vote)
       decrypted.slice(vote.length).forEach(byte => {
@@ -109,9 +112,10 @@ describe("AVCrypto", () => {
     context("with a vote that fits in multiple cryptograms", () => {
       const vote = new Uint8Array(Array(32).fill(255))
       const { cryptograms, randomizers } = crypto.encryptVote(vote, encryptionKey)
+      const boardRandomizers = [scalarToHex(new sjcl.bn(0), curve), scalarToHex(new sjcl.bn(0), curve)]
 
       it("returns the vote back", () => {
-        const decrypted = crypto.revertEncryption(cryptograms, randomizers, encryptionKey)
+        const decrypted = crypto.revertEncryption(cryptograms, boardRandomizers, randomizers, encryptionKey)
 
         expect(cryptograms.length).to.eql(2)
         expect(decrypted.slice(0, vote.length)).to.eql(vote)

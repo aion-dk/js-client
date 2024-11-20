@@ -109,16 +109,19 @@ export class AVCrypto {
    * This is used by the external verifier, when a ballot gets spoiled.
    *
    * @param cryptograms The cryptograms of the voter
-   * @param randomizers The randomizers used in the encryption
+   * @param boardRandomizers The randomizers used by the DBB in the encryption
+   * @param voterRandomizers The randomizers used by the voter in the encryption
    * @param encryptionKey The public encryption key used in the encryption
    * @returns Returns the decrypted bytes
    */
-  public revertEncryption(cryptograms: Array<string>, randomizers: Array<string>, encryptionKey: string): Uint8Array {
+  public revertEncryption(cryptograms: Array<string>, boardRandomizers: Array<string>, voterRandomizers: Array<string>, encryptionKey: string): Uint8Array {
     const pubKey = hexToPoint(encryptionKey, this.curve)
 
     const points = cryptograms.map((cryptogram, i) => {
       const c = elGamalCryptogram.fromString(cryptogram, this.curve)
-      const r = hexToScalar(randomizers[i], this.curve)
+      const br = hexToScalar(boardRandomizers[i], this.curve)
+      const vr = hexToScalar(voterRandomizers[i], this.curve)
+      const r = br.add(vr).mod(this.curve.order())
 
       const c2 = new elGamalCryptogram.Cryptogram(pubKey, c.c)
       return elGamalScheme.decrypt(c2, r)

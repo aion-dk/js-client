@@ -1,5 +1,4 @@
 import {ContestConfigMap, ContestSelection, ContestMap, CommitmentOpening, SealedPile} from "../types"
-import { addBigNums } from "./../aion_crypto"
 import { byteArrayToSelectionPile } from "../encoding/byte_encoding"
 import {AVCrypto} from "../../av_crypto";
 
@@ -19,9 +18,10 @@ export function decryptContestSelections(
     const otherPiles = piles.map((sealedPile, index) => {
       const pileCryptograms = sealedPile.cryptograms
       const pileMultiplier = sealedPile.multiplier
-      const randomizers = combineRandomizers(contestReference, index, boardCommitmentOpening, voterCommitmentOpening)
+      const boardRandomizers = boardCommitmentOpening.randomizers[contestReference][index]
+      const voterRandomizers = voterCommitmentOpening.randomizers[contestReference][index]
 
-      const bytes = crypto.revertEncryption(pileCryptograms, randomizers, encryptionKey)
+      const bytes = crypto.revertEncryption(pileCryptograms, boardRandomizers, voterRandomizers, encryptionKey)
       const encodedContestSelection = bytes.slice(0, maxSize)
 
       console.log("AV_CRYPTO_REVERT_ENCRYPTION_CALLED!")
@@ -35,16 +35,4 @@ export function decryptContestSelections(
   })
 
   return contestSelections;
-}
-
-function combineRandomizers(
-  contestReference: string,
-  index: number,
-  boardCommitmentOpening: CommitmentOpening,
-  voterCommitmentOpening: CommitmentOpening
-): string[] {
-  const br = boardCommitmentOpening.randomizers[contestReference][index]
-  const vr = voterCommitmentOpening.randomizers[contestReference][index]
-
-  return Object.keys(vr).map(i => addBigNums(vr[i], br[i]))
 }
