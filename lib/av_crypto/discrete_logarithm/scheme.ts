@@ -43,7 +43,7 @@ export function prove(
   knowledge: BigNumber,
   context = "",
   curve: Curve,
-  generators: Array<SjclEllipticalPoint> = [curve.G()],
+  generators: Array<SjclEllipticalPoint> = [],
   randomness: SjclKeyPair<SjclECCPublicKey, SjclECCSecretKey> = generateKeyPair(curve),
   points?: Array<SjclEllipticalPoint>
 ): Proof {
