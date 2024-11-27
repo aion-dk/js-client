@@ -198,7 +198,7 @@ export class AVClient implements IAVClient {
   }
 
   generateProofOfElectionCodes(electionCodes : Array<string>) {
-    this.proofOfElectionCodes = new ProofOfElectionCodes(electionCodes);
+    this.proofOfElectionCodes = new ProofOfElectionCodes(electionCodes, this.keyPair.publicKey);
   }
 
   setIdentityToken(token: string) {
