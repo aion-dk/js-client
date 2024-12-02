@@ -49,9 +49,12 @@ function encryptSelectionPile(
   const crypto = new AVCrypto("secp256k1")
 
   const encodedSelectionPile = selectionPileToByteArray(contestConfig, selectionPile)
-  // TODO: include `transparent` flag into `encryptVote` function; defaults to `false`
-  const encryptedSelectionPile = crypto.encryptVote(encodedSelectionPile, encryptionKey)
+  const encryptedSelectionPile  = transparent ?
+    crypto.encryptTransparentVote(encodedSelectionPile, encryptionKey) :
+    crypto.encryptVote(encodedSelectionPile, encryptionKey);
+
   console.log("AV_CRYPTO_ENCRYPT_VOTE_CALLED!")
+  console.log("TRANSPARENT " + transparent)
 
   return {
     multiplier: selectionPile.multiplier,

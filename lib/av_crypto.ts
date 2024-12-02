@@ -6,6 +6,7 @@ import {commit as pedersenCommit, isValid as isValidPedersen} from "./av_crypto/
 import {Commitment} from "./av_crypto/pedersen/commitment";
 import * as elGamalCryptogram from "./av_crypto/el_gamal/cryptogram";
 import * as discreteLogarithmScheme from "./av_crypto/discrete_logarithm/scheme"
+import * as sjcl from "sjcl-with-all";
 
 export const SUPPORTED_ELLIPTIC_CURVE_NAMES = {
   'secp256k1': 'k256',
@@ -59,6 +60,41 @@ export class AVCrypto {
 
       cryptograms.push(cryptogram.toString())
       randomizers.push(scalarToHex(randomness.sec.S, this.curve))
+    }
+
+    return {
+      cryptograms: cryptograms,
+      randomizers: randomizers
+    }
+  }
+
+  /**
+   * Converts a vote into a cryptogram format, which is not encrypted.
+   * This should be used when the vote secrecy is disabled.
+   * The returned `randomizers` are all zeros.
+   *
+   * To secretly encrypt a vote use `.encryptVote()` instead.
+   *
+   * @param vote The byte representation of the vote
+   * @param encryptionKey The public encryption key
+   * @returns Returns the cryptograms and their respective randomizers
+   */
+  public encryptTransparentVote(vote: Uint8Array, encryptionKey: string): { cryptograms: Array<string>, randomizers: Array<string> } {
+    const points = new Encoder(this.curve).bytesToPoints(Array.from(vote))
+    const encryptionKeyPoint = hexToPoint(encryptionKey, this.curve)
+
+    const cryptograms: Array<string> = []
+    const randomizers: Array<string> = []
+
+    const zero = new sjcl.bn(0)
+    const randomness = generateKeyPair(this.curve, zero)
+    const zeroHex = scalarToHex(zero, this.curve)
+
+    for (const point of points) {
+      const cryptogram = elGamalScheme.encrypt(point, encryptionKeyPoint, this.curve, randomness)
+
+      cryptograms.push(cryptogram.toString())
+      randomizers.push(zeroHex)
     }
 
     return {

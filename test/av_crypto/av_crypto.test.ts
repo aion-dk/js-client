@@ -77,6 +77,41 @@ describe("AVCrypto", () => {
     })
   })
 
+  describe("encryptTransparentVote()", () => {
+    const curveName = "secp256k1";
+    const crypto = new AVCrypto(curveName)
+    const curve = crypto.curve
+    const vote = new TextEncoder().encode("vote")
+    const encryptionKey = fixedPoint1Hex(curve)
+    const transparentCryptogramPattern = new RegExp("^(00," + curve.pointHexPrimitive().source +")$")
+
+    it("returns 1 cryptogram and 1 randomizer that is zero", () => {
+      const {cryptograms, randomizers} = crypto.encryptTransparentVote(vote, encryptionKey)
+
+      expect(cryptograms.length).to.eql(1)
+      expect(randomizers.length).to.eql(1)
+      expect(cryptograms[0]).to.match(transparentCryptogramPattern)
+      expect(randomizers[0]).to.eql("0000000000000000000000000000000000000000000000000000000000000000")
+    })
+
+    context("with a vote that fits in multiple cryptograms", () => {
+      const vote = new Uint8Array(Array(32).fill(255))
+
+      it("returns multiple cryptograms and randomizers that are zeros", () => {
+        const {cryptograms, randomizers} = crypto.encryptTransparentVote(vote, encryptionKey)
+
+        expect(cryptograms.length).to.eql(2)
+        expect(randomizers.length).to.eql(2)
+        cryptograms.forEach(cryptogram => {
+          expect(cryptogram).to.match(transparentCryptogramPattern)
+        })
+        randomizers.forEach(randomizer => {
+          expect(randomizer).to.eql("0000000000000000000000000000000000000000000000000000000000000000")
+        })
+      })
+    })
+  })
+
   describe("combineCryptograms()", () => {
     const curveName = "secp256k1";
     const crypto = new AVCrypto(curveName)

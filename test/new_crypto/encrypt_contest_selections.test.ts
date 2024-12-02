@@ -144,4 +144,13 @@ describe('encryptContestSelections', () => {
       expect(contestEnvelope.piles[0].randomizers.length).to.eql(2)
     })
   })
+
+  context("when transparent is true", () => {
+    it('returns transparent contest envelopes', () => {
+      const contestEnvelopes = encryptContestSelections(contestConfigs, contestSelections, encryptionKey, true)
+
+      expect(contestEnvelopes.length).to.eql(1)
+      expect(contestEnvelopes[0].piles[0].randomizers[0]).to.eql("0000000000000000000000000000000000000000000000000000000000000000")
+    })
+  })
 })
