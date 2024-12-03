@@ -27,6 +27,16 @@ describe("Symmetric Encryption scheme", () => {
         expect(ciphertext).to.be.instanceof(Ciphertext);
       })
     })
+
+    context("then decrypt()", () => {
+      const decryptionKey = fixedScalar1(curve)
+      it("returns the same message", () => {
+        const ciphertext = encrypt(message, encryptionKey, curve)
+        const decrypted = decrypt(ciphertext, decryptionKey, curve)
+
+        expect(decrypted).to.eql(message)
+      })
+    })
   })
 
   describe("decrypt()", () => {

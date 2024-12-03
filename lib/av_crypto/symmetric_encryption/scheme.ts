@@ -20,7 +20,7 @@ export function encrypt(
   const derivedKey = deriveKey(ephemeralKeyPair, encryptionKey, curve)
   const [ciphertext, tag, iv] = aesEncrypt(derivedKey, message)
 
-  return new Ciphertext(ciphertext, tag, iv, encryptionKey)
+  return new Ciphertext(ciphertext, tag, iv, ephemeralKeyPair.pub.H)
 }
 
 export function decrypt(ciphertext: Ciphertext, decryptionKey: BigNumber, curve: Curve): string {
@@ -36,4 +36,3 @@ function deriveKey(secretKeyPair: SjclKeyPair<SjclElGamalPublicKey, SjclElGamalS
 
   return hkdf(derivedKey, KEY_BYTE_SIZE)
 }
-
