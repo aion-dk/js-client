@@ -19,7 +19,7 @@ import {
 } from './av_client/types';
 import {hexToShortCode, shortCodeToHex} from './av_client/short_codes';
 import {fetchLatestConfig} from './av_client/election_config';
-import {decryptCommitmentOpening, validateCommmitmentOpening} from './av_client/crypto/commitments';
+import {decryptCommitmentOpening} from './av_client/new_crypto/commitment_opening_encryption';
 import {InvalidContestError, InvalidReceiptError, InvalidTrackingCodeError} from './av_client/errors';
 import {decryptContestSelections} from './av_client/new_crypto/decrypt_contest_selections';
 import {makeOptionFinder} from './av_client/option_finder';

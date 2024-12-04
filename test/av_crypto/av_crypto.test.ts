@@ -240,4 +240,35 @@ describe("AVCrypto", () => {
       })
     })
   })
+
+  describe("encryptText()", () => {
+    const curveName = "secp256k1";
+    const crypto = new AVCrypto(curveName)
+
+    const encryptionKey = fixedPoint1Hex(crypto.curve)
+
+    it("returns a ciphertext", () => {
+      const ciphertext = crypto.encryptText("hello world", encryptionKey)
+
+      expect(ciphertext).to.be.a("string");
+    })
+  })
+
+  describe("decryptText()", () => {
+    const curveName = "secp256k1";
+    const crypto = new AVCrypto(curveName)
+
+    const decryptionKey = fixedScalar1Hex(crypto.curve)
+    const ciphertext = '{' +
+      '"ciphertext":"Oz9R53w3osJ8ogQ=",' +
+      '"tag":"GNNEi13wIJR71NTeLGUjCw==",' +
+      '"iv":"2/kdEBQXcCx5REIz",' +
+      '"ephemeralPublicKey":"02bdfd41e1d8e80c2aef757713599ce80435f73b294bcbf15d4039bbe663fb69f1"' +
+      '}'
+
+    it("returns the text", () => {
+      const text = crypto.decryptText(ciphertext, decryptionKey)
+      expect(text).to.eql("hello world");
+    })
+  })
 })

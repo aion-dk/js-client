@@ -6,7 +6,9 @@ import {commit as pedersenCommit, isValid as isValidPedersen} from "./av_crypto/
 import {Commitment} from "./av_crypto/pedersen/commitment";
 import * as elGamalCryptogram from "./av_crypto/el_gamal/cryptogram";
 import * as discreteLogarithmScheme from "./av_crypto/discrete_logarithm/scheme"
+import * as symmetricEncryptionScheme from "./av_crypto/symmetric_encryption/scheme"
 import * as sjcl from "sjcl-with-all";
+import * as aesCiphertext from "./av_crypto/symmetric_encryption/ciphertext";
 
 export const SUPPORTED_ELLIPTIC_CURVE_NAMES = {
   'secp256k1': 'k256',
@@ -211,5 +213,41 @@ export class AVCrypto {
     const messages = encryptionRandomizers.map(s => hexToScalar(s, this.curve))
 
     return isValidPedersen(pedersenCommitment, messages, context, this.curve)
+  }
+
+  /**
+   * Encrypts any arbitrary length string using symmetric AES encryption.
+   * The symmetric encryption key is generated using a Diffie Hellman based hkdf algorithm,
+   * combining the `encryptionKey` with a randomly generated ephemeral key pair.
+   *
+   * @param text The string to be encrypted
+   * @param encryptionKey The public key used to derive the symmetric encryption key
+   * @returns Returns the encrypted ciphertext
+   */
+  public encryptText(text: string, encryptionKey: string): string {
+    const encryptionKeyPoint = hexToPoint(encryptionKey, this.curve)
+
+    const ciphertext = symmetricEncryptionScheme.encrypt(text, encryptionKeyPoint, this.curve)
+    return ciphertext.toString()
+  }
+
+  /**
+   * Decrypts a string using symmetric AES decryption.
+   * The symmetric encryption key is generated using a Diffie Hellman based hkdf algorithm,
+   * combining the `decryptionKey` with the ephemeral key pair included in the ciphertext.
+   *
+   * @param ciphertext The string to be decrypted
+   * @param decryptionKey The private key used to derive the symmetric encryption key
+   * @returns Returns the decrypted plain text
+   */
+  public decryptText(ciphertext: string, decryptionKey: string): string {
+    const parsedCiphertext = aesCiphertext.fromString(ciphertext, this.curve)
+    const decryptionKeyScalar = hexToScalar(decryptionKey, this.curve)
+
+    return symmetricEncryptionScheme.decrypt(
+      parsedCiphertext,
+      decryptionKeyScalar,
+      this.curve
+    )
   }
 }

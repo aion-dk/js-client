@@ -48,7 +48,7 @@ import { signPayload, validatePayload, validateReceipt } from './av_client/sign'
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
-import { encryptCommitmentOpening } from './av_client/crypto/commitments';
+import { encryptCommitmentOpening } from './av_client/new_crypto/commitment_opening_encryption';
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
 import {AxiosResponse} from "axios";
 import { ProofOfElectionCodes } from "./av_client/crypto/proof_of_election_codes";
