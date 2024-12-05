@@ -4,7 +4,7 @@ import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/o
 import { extractContestSelections } from './util/nist_cvr_extractor';
 import { AVVerifier } from './av_verifier';
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
-import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig } from './av_client/types';
+import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig, ProofOfElectionCodes } from './av_client/types';
 import { randomKeyPair } from './av_client/new_crypto/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import { Buffer } from 'buffer'
@@ -51,7 +51,7 @@ import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 import { encryptCommitmentOpening } from './av_client/new_crypto/commitment_opening_encryption';
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
 import {AxiosResponse} from "axios";
-import { ProofOfElectionCodes } from "./av_client/crypto/proof_of_election_codes";
+import { proofOfElectionCodes } from "./av_client/new_crypto/proof_of_election_codes";
 import {validateCommitment} from "./av_client/new_crypto/commitments";
 
 /** @internal */
@@ -198,7 +198,7 @@ export class AVClient implements IAVClient {
   }
 
   generateProofOfElectionCodes(electionCodes : Array<string>) {
-    this.proofOfElectionCodes = new ProofOfElectionCodes(electionCodes);
+    this.proofOfElectionCodes = proofOfElectionCodes(electionCodes);
   }
 
   setIdentityToken(token: string) {

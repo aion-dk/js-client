@@ -9,6 +9,7 @@ import * as discreteLogarithmScheme from "./av_crypto/discrete_logarithm/scheme"
 import * as symmetricEncryptionScheme from "./av_crypto/symmetric_encryption/scheme"
 import * as sjcl from "sjcl-with-all";
 import * as aesCiphertext from "./av_crypto/symmetric_encryption/ciphertext";
+import {pbkdf2} from "./av_crypto/key_derivation";
 
 export const SUPPORTED_ELLIPTIC_CURVE_NAMES = {
   'secp256k1': 'k256',
@@ -249,5 +250,31 @@ export class AVCrypto {
       decryptionKeyScalar,
       this.curve
     )
+  }
+
+  /**
+   * Generate a hexadecimal keypair based on a number of string election codes.
+   * Generate a hexadecimal discrete logarithm proof of knowledge of the private key.
+   *
+   * @param electionCodes The list of election codes
+   * @returns Returns the private-public key pair and the proof as hexadecimal strings
+   */
+  public generateProofOfElectionCodes(electionCodes: Array<string>): { privateKey: string, publicKey: string, proof: string } {
+    const byteLength = Math.floor(this.curve.degree() / 8.0)
+
+    const sum = new sjcl.bn(0)
+    electionCodes
+      .map(electionCode => pbkdf2(electionCode, byteLength))
+      .map(bitArray => sjcl.bn.fromBits(bitArray))
+      .forEach(term => sum.addM(term))
+
+    const keyPair = generateKeyPair(this.curve, sum.mod(this.curve.order()));
+    const proof = discreteLogarithmScheme.prove(keyPair.sec.S, "", this.curve)
+
+    return {
+      privateKey: scalarToHex(keyPair.sec.S, this.curve),
+      publicKey: pointToHex(keyPair.pub.H),
+      proof: proof.toString()
+    }
   }
 }

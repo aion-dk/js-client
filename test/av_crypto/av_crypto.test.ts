@@ -271,4 +271,19 @@ describe("AVCrypto", () => {
       expect(text).to.eql("hello world");
     })
   })
+
+  describe("generateProofOfElectionCodes", () => {
+    const curveName = "secp256k1";
+    const crypto = new AVCrypto(curveName)
+    const curve = crypto.curve
+
+    it("returns a private public key pair", () => {
+      const electionCodes = ["a", "b", "c"]
+      const {privateKey, publicKey, proof} = crypto.generateProofOfElectionCodes(electionCodes)
+
+      expect(privateKey).match(curve.scalarHexPattern())
+      expect(publicKey).match(curve.pointHexPattern())
+      expect(proof).match(proofPattern(curve))
+    })
+  })
 })
