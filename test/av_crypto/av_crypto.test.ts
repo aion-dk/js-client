@@ -3,6 +3,7 @@ import {AVCrypto} from "../../lib/av_crypto";
 import {fixedPoint1Hex, fixedPoint2Hex, fixedScalar1Hex, fixedScalar2Hex} from "./test_helpers";
 import {pattern as cryptogramPattern} from "../../lib/av_crypto/el_gamal/cryptogram";
 import {pattern as proofPattern} from "../../lib/av_crypto/discrete_logarithm/proof";
+import {pattern as signaturePattern} from "../../lib/av_crypto/schnorr/signature";
 import * as sjcl from "sjcl-with-all";
 import {scalarToHex} from "../../lib/av_crypto/utils";
 
@@ -272,7 +273,7 @@ describe("AVCrypto", () => {
     })
   })
 
-  describe("generateProofOfElectionCodes", () => {
+  describe("generateProofOfElectionCodes()", () => {
     const curveName = "secp256k1";
     const crypto = new AVCrypto(curveName)
     const curve = crypto.curve
@@ -284,6 +285,39 @@ describe("AVCrypto", () => {
       expect(privateKey).match(curve.scalarHexPattern())
       expect(publicKey).match(curve.pointHexPattern())
       expect(proof).match(proofPattern(curve))
+    })
+  })
+
+  describe("sign()", () => {
+    const crypto = new AVCrypto("secp256k1")
+
+    it("returns a string signature", () => {
+      const signature = crypto.sign("hello", fixedScalar1Hex(crypto.curve))
+
+      console.log(signature)
+
+      expect(signature).to.match(signaturePattern(crypto.curve))
+    })
+  })
+
+  describe("isValidSignature()", () => {
+    const crypto = new AVCrypto("secp256k1")
+    const signature = "4b477c20f9babaab476eece0f240552c6a84cc15939e1e14e31170a7e35d24e1,281f71f08c1474b01c9dc82bdf06b126b76c1eaa604292a69a6d1f836a949648"
+    const message = "hello"
+
+    it("returns true", () => {
+      const valid = crypto.isValidSignature(signature, message, fixedPoint1Hex(crypto.curve))
+
+      expect(valid).to.be.true
+    })
+
+    context("with a different message", () => {
+      const message = "different message"
+      it("returns false", () => {
+        const valid = crypto.isValidSignature(signature, message, fixedPoint1Hex(crypto.curve))
+
+        expect(valid).to.be.false
+      })
     })
   })
 })

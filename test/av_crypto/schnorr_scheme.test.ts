@@ -29,6 +29,16 @@ describe("Schnorr signature scheme", () => {
       expect(signature.s.greaterEquals(0)).to.equal(1)
     })
 
+    context("then verify", () => {
+      it("validates", () => {
+        const publicKey = fixedPoint1(curve)
+        const signature = sign(message, privateKey, curve)
+        const valid = isValid(signature, message, publicKey, curve)
+
+        expect(valid).to.be.true
+      })
+    })
+
     context("when given randomness", () => {
       const randomness = fixedKeyPair(curve)
 

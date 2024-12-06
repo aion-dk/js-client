@@ -7,8 +7,6 @@ import { constructContestEnvelopes } from './av_client/construct_contest_envelop
 import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig, ProofOfElectionCodes } from './av_client/types';
 import { randomKeyPair } from './av_client/new_crypto/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
-import { Buffer } from 'buffer'
-import * as Crypto from "../lib/av_client/aion_crypto.js"
 import jwtDecode, { JwtPayload } from "jwt-decode";
 
 import {
@@ -43,7 +41,7 @@ import {
 } from './av_client/errors';
 
 import * as sjclLib from './av_client/sjcl';
-import { signPayload, validatePayload, validateReceipt } from './av_client/sign';
+import { signPayload, validatePayload, validateReceipt } from './av_client/new_crypto/signing';
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
@@ -606,10 +604,6 @@ export class AVClient implements IAVClient {
 
   private privateKey(): BigNum {
     return this.keyPair.privateKey
-  }
-
-  public generateSignature(payload: string): string {
-    return Crypto.generateSchnorrSignature(payload, this.privateKey())
   }
 
   /**

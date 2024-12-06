@@ -1,6 +1,6 @@
 import { BulletinBoard } from '../connectors/bulletin_board'
 import { BallotCryptogramItem, ContestEnvelope, ContestMap, VerificationStartItem } from '../types'
-import { signPayload, validatePayload, validateReceipt } from '../sign'
+import { signPayload, validatePayload, validateReceipt } from '../new_crypto/signing'
 import { BALLOT_CRYPTOGRAMS_ITEM } from '../constants'
 import { finalizeCryptograms, generateEnvelopeProofs } from '../new_crypto/finalize_cryptograms'
 

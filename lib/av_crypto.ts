@@ -1,11 +1,13 @@
 import {Curve} from "./av_crypto/curve";
 import {Encoder} from "./av_crypto/encoder";
 import {hexToPoint, generateKeyPair, scalarToHex, hexToScalar, pointToHex} from "./av_crypto/utils";
-import * as elGamalScheme from "./av_crypto/el_gamal/scheme";
 import {commit as pedersenCommit, isValid as isValidPedersen} from "./av_crypto/pedersen/scheme";
 import {Commitment} from "./av_crypto/pedersen/commitment";
 import * as elGamalCryptogram from "./av_crypto/el_gamal/cryptogram";
+import * as elGamalScheme from "./av_crypto/el_gamal/scheme";
 import * as discreteLogarithmScheme from "./av_crypto/discrete_logarithm/scheme"
+import * as Signature from "./av_crypto/schnorr/signature"
+import * as signatureScheme from "./av_crypto/schnorr/scheme"
 import * as symmetricEncryptionScheme from "./av_crypto/symmetric_encryption/scheme"
 import * as sjcl from "sjcl-with-all";
 import * as aesCiphertext from "./av_crypto/symmetric_encryption/ciphertext";
@@ -276,5 +278,34 @@ export class AVCrypto {
       publicKey: pointToHex(keyPair.pub.H),
       proof: proof.toString()
     }
+  }
+
+  /**
+   * Generates a hexadecimal Schnorr signature on a particular message.
+   *
+   * @param message The message to be signed.
+   * @param signingKey The signing key as a hexadecimal string
+   * @return {string} The signature as a string
+   */
+  public sign(message: string, signingKey: string): string {
+    const signingKeyScalar = hexToScalar(signingKey, this.curve)
+    const signature = signatureScheme.sign(message, signingKeyScalar, this.curve)
+
+    return signature.toString()
+  }
+
+  /**
+   * Verifies a Schnorr signature on a particular message
+   *
+   * @param signature The signature as a string.
+   * @param message The message to be signed.
+   * @param signingPublicKey The signature verification key as a string
+   * @return {boolean}
+   */
+  public isValidSignature(signature: string, message: string, signingPublicKey: string): boolean {
+    const signatureInstance = Signature.fromString(signature, this.curve)
+    const signingPublicKeyPoint = hexToPoint(signingPublicKey, this.curve)
+
+    return signatureScheme.isValid(signatureInstance, message, signingPublicKeyPoint, this.curve)
   }
 }

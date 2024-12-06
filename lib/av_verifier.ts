@@ -7,7 +7,7 @@ import {
   VERIFIER_ITEM
 } from './av_client/constants';
 import {randomKeyPair} from './av_client/new_crypto/generate_key_pair';
-import {signPayload, validateReceipt, verifyAddress} from './av_client/sign';
+import {signPayload, validateReceipt, verifyAddress} from './av_client/new_crypto/signing';
 import {
   VerifierItem,
   BoardCommitmentOpeningItem,
