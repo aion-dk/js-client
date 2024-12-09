@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import {AVCrypto} from "../../lib/av_crypto";
+import {AVCrypto, hexDigest} from "../../lib/av_crypto";
 import {fixedPoint1Hex, fixedPoint2Hex, fixedScalar1Hex, fixedScalar2Hex} from "./test_helpers";
 import {pattern as cryptogramPattern} from "../../lib/av_crypto/el_gamal/cryptogram";
 import {pattern as proofPattern} from "../../lib/av_crypto/discrete_logarithm/proof";
@@ -318,6 +318,14 @@ describe("AVCrypto", () => {
 
         expect(valid).to.be.false
       })
+    })
+  })
+
+  describe("hexDigest()", () => {
+    it("returns the hash", () => {
+      const hash = hexDigest("The quick brown fox jumps over the lazy dog")
+
+      expect(hash).to.eql("d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592")
     })
   })
 })

@@ -309,3 +309,15 @@ export class AVCrypto {
     return signatureScheme.isValid(signatureInstance, message, signingPublicKeyPoint, this.curve)
   }
 }
+
+/**
+ * Computes the digest of an arbitrary string.
+ *
+ * @param string The string to digest.
+ * @return {string} The digest as a hex string
+ */
+export function hexDigest(string: string): string {
+  const digest = sjcl.hash.sha256.hash(string)
+
+  return sjcl.codec.hex.fromBits(digest)
+}

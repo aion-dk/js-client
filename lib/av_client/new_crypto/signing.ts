@@ -1,8 +1,6 @@
 import { BoardItem, ItemExpectation } from '../types'
-import {AVCrypto} from "../../av_crypto";
+import {AVCrypto, hexDigest} from "../../av_crypto";
 import {Uniformer} from '../../util/uniformer';
-// Crypto should be completely removed
-import * as Crypto from '../aion_crypto'
 
 export function signPayload(obj: Record<string, unknown>, privateKey: string) {
   const uniformer = new Uniformer();
@@ -75,8 +73,7 @@ export function verifyAddress(item: BoardItem): void {
     registeredAt: item.registeredAt
   });
 
-  // TODO: hashing the content into an address should be handled by AVCrypto
-  const expectedItemAddress = Crypto.hashString(addressHashSource);
+  const expectedItemAddress = hexDigest(addressHashSource);
 
   if(item.address != expectedItemAddress) {
     throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
