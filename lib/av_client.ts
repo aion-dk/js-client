@@ -40,7 +40,6 @@ import {
   DBBError
 } from './av_client/errors';
 
-import * as sjclLib from './av_client/sjcl';
 import { signPayload, validatePayload, validateReceipt } from './av_client/new_crypto/signing';
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
@@ -51,9 +50,6 @@ import { submitBallotCryptograms } from './av_client/actions/submit_ballot_crypt
 import {AxiosResponse} from "axios";
 import { proofOfElectionCodes } from "./av_client/new_crypto/proof_of_election_codes";
 import {validateCommitment} from "./av_client/new_crypto/commitments";
-
-/** @internal */
-export const sjcl = sjclLib;
 
 /**
  * # Assembly Voting Client API

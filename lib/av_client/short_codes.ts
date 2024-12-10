@@ -1,9 +1,11 @@
 import * as base from 'base-x'
 import { InvalidTrackingCodeError } from './errors'
-import * as sjcl from './sjcl'
 
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 const bs58 = base(BASE58)
+
+const BASEHEX = '0123456789abcdef'
+const bsHEX = base(BASEHEX)
 
 const BASE58_PAD = BASE58[0]
 const HEX_PAD = '0'
@@ -19,9 +21,7 @@ export function hexToShortCode(input: string): string {
   if( ! input.match(/^[0-9a-f]*$/i) ){
     throw new Error('Non-hex character')
   }
-  const bits = sjcl.codec.hex.toBits(input)
-  const bytes = sjcl.codec.bytes.fromBits(bits)
-  const byteArray = leftTrim(Uint8Array.from(bytes))
+  const byteArray = leftTrim(bsHEX.decode(input.toLowerCase()))
 
   if( byteArray.length > 5 ){
     throw new InvalidTrackingCodeError("Invalid input. Only up to 40 bits are supported.")
@@ -43,9 +43,7 @@ export function shortCodeToHex(input: string): string {
   if( byteArray.length > 5 ){
     throw new InvalidTrackingCodeError("Invalid input. Only up to 40 bits are supported.")
   }
-
-  const bits = sjcl.codec.bytes.toBits(Array.from(byteArray))
-  const hex = sjcl.codec.hex.fromBits(bits)
+  const hex = bsHEX.encode(byteArray)
 
   return hex.padStart(10, HEX_PAD)
 }
