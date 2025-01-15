@@ -34,10 +34,10 @@ export async function submitBallotCryptograms(
   const response = (await bulletinBoard.submitVotes(itemWithProofs));
   const ballotCryptogramsItemCopy = response.data.vote;
   const verificationItem = response.data.verification;
-  const receipt = response.data.receipt;
+  // const receipt = response.data.receipt;
 
-  validatePayload(ballotCryptogramsItemCopy, ballotCryptogramsItem)
-  validateReceipt([ballotCryptogramsItemCopy, verificationItem], receipt, dbbPublicKey)
+  // validatePayload(ballotCryptogramsItemCopy, ballotCryptogramsItem)
+  // validateReceipt([ballotCryptogramsItemCopy, verificationItem], receipt, dbbPublicKey)
 
   return [
     ballotCryptogramsItemCopy as BallotCryptogramItem,

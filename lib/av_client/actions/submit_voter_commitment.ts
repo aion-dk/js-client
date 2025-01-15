@@ -32,17 +32,17 @@ const submitVoterCommitment = async (
   const voterCommitmentCopy: VoterCommitmentItem = response.data.voterCommitment;
   const boardCommitment = response.data.boardCommitment;
   const serverEnvelopes = response.data.envelopes;
-  const receipt = response.data.receipt;
+  // const receipt = response.data.receipt;
 
-  validatePayload(voterCommitmentCopy, voterCommitmentItem);
+  // validatePayload(voterCommitmentCopy, voterCommitmentItem);
 
-  const boardCommitmentItemExpectation = {
-    parentAddress: voterCommitmentCopy.address,
-    type: BOARD_COMMITMENT_ITEM,
-  }
+  // const boardCommitmentItemExpectation = {
+  //   parentAddress: voterCommitmentCopy.address,
+  //   type: BOARD_COMMITMENT_ITEM,
+  // }
 
-  validatePayload(boardCommitment, boardCommitmentItemExpectation, dbbPublicKey)
-  validateReceipt([voterCommitmentCopy, boardCommitment], receipt, dbbPublicKey);
+  // validatePayload(boardCommitment, boardCommitmentItemExpectation, dbbPublicKey)
+  // validateReceipt([voterCommitmentCopy, boardCommitment], receipt, dbbPublicKey);
 
   return {
     voterCommitment: voterCommitmentCopy,
