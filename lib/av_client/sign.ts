@@ -61,6 +61,8 @@ const verifyContent = (actual: Record<string, unknown>, expectations: Record<str
 };
 
 export const verifyAddress = (item: BoardItem) => {
+  console.log("Not verifying address");
+
   return
   const uniformer = new Uniformer();
 
