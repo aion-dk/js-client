@@ -15,9 +15,24 @@ export const signPayload = (obj: Record<string, unknown>, privateKey: string) =>
 }
 
 export const validatePayload = (item: BoardItem, expectations: ItemExpectation, signaturePublicKey?: string) => {
-  console.log("Not validating payload");
+  if(expectations.type != item.type) {
+    throw new Error(`BoardItem did not match expected type '${expectations.type}'`);
+  }
 
-  return
+  if(expectations.parentAddress != item.parentAddress) {
+    throw new Error(`BoardItem did not match expected parent address ${expectations.parentAddress}`);
+  }
+  if(expectations.content !== undefined) {
+    const requiredContentAttributes = Object.keys(expectations.content)
+    const itemContent = Object.fromEntries(Object.entries(item.content).filter(([key]) => requiredContentAttributes.includes(key)));
+    verifyContent(itemContent, expectations.content);
+  }
+
+  verifyAddress(item);
+
+  if(signaturePublicKey !== undefined) {
+    verifySignature(item, signaturePublicKey);
+  }
 }
 
 const verifySignature = (item: BoardItem, signaturePublicKey: string) => {
@@ -34,7 +49,6 @@ const verifySignature = (item: BoardItem, signaturePublicKey: string) => {
 };
 
 const verifyContent = (actual: Record<string, unknown>, expectations: Record<string, unknown>) => {
-  return
   const uniformer = new Uniformer();
 
   const expectedContent = uniformer.formString(expectations);
@@ -46,9 +60,6 @@ const verifyContent = (actual: Record<string, unknown>, expectations: Record<str
 };
 
 export const verifyAddress = (item: BoardItem) => {
-  console.log("Not verifying address");
-
-  return
   const uniformer = new Uniformer();
 
   const addressHashSource = uniformer.formString({

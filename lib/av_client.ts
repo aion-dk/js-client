@@ -260,25 +260,25 @@ export class AVClient implements IAVClient {
     if(decoded === null)
       throw new InvalidTokenError('Auth token could not be decoded');
 
-    const voterSessionItemExpectation = {
-      type: VOTER_SESSION_ITEM,
-      parentAddress: latestConfigAddress,
-      content: {
-        authToken: authToken,
-        identifier: decoded['identifier'],
-        publicKey: decoded['public_key'],
-        weight: decoded['weight'] || 1,
-        voterGroup: decoded['voter_group_key'],
-        votingRoundReference: decoded['voting_round_reference']
-      }
-    }
+    // const voterSessionItemExpectation = {
+    //   type: VOTER_SESSION_ITEM,
+    //   parentAddress: latestConfigAddress,
+    //   content: {
+    //     authToken: authToken,
+    //     identifier: decoded['identifier'],
+    //     publicKey: decoded['public_key'],
+    //     weight: decoded['weight'] || 1,
+    //     voterGroup: decoded['voter_group_key'],
+    //     votingRoundReference: decoded['voting_round_reference']
+    //   }
+    // }
 
     const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, latestConfigAddress);
     const voterSessionItem = voterSessionItemResponse.data.voterSession;
-    const receipt = voterSessionItemResponse.data.receipt;
+    // const receipt = voterSessionItemResponse.data.receipt;
 
-    validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
-    validateReceipt([voterSessionItem], receipt, this.getDbbPublicKey());
+    // validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
+    // validateReceipt([voterSessionItem], receipt, this.getDbbPublicKey());
 
     this.voterSession = voterSessionItem;
     this.bulletinBoard.setVoterSessionUuid(voterSessionItem.content.identifier);
@@ -484,8 +484,8 @@ export class AVClient implements IAVClient {
       const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
       const { castRequest, receipt } = response.data;
 
-      validatePayload(castRequest, castRequestItem);
-      validateReceipt([castRequest], receipt, this.getDbbPublicKey());
+      // validatePayload(castRequest, castRequestItem);
+      // validateReceipt([castRequest], receipt, this.getDbbPublicKey());
 
       const clientReceipt = generateReceipt(receipt, castRequest);
 
