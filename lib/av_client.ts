@@ -9,7 +9,7 @@ import { randomKeyPair } from './av_client/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import { Buffer } from 'buffer'
 import * as Crypto from "../lib/av_client/aion_crypto.js"
-import jwtDecode, { JwtPayload } from "jwt-decode";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 
 import {
   fetchLatestConfig,
