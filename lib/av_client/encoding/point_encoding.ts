@@ -73,7 +73,7 @@ const bytesToPoint = (bytes: number[]): any => {
             const point = crypto.pointFromBits(pointBits)
 
             return point
-        } catch (err) {
+        } catch (_err) {
             // increment
             x = x.add(INCREMENTER)
         }
