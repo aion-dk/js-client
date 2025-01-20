@@ -2,13 +2,13 @@ version: 2.1
 orbs:
   node: circleci/node@7.0.0
 executors:
-  node18:
+  node22:
     docker:
       - image: cimg/node:22.13
 jobs:
   lint_test_build:
     executor:
-      name: node18
+      name: node22
     steps:
       - checkout
       - restore_cache:
@@ -28,17 +28,17 @@ jobs:
       - persist_to_workspace:
           root: /home/circleci/project
           paths:
-            - ./aion-dk-js-client*.tgz
+            - ./aion-dk-js-client-*.tgz
   publish:
     executor:
-      name: node18
+      name: node22
     steps:
       - attach_workspace:
           at: /tmp/workspace
       - run:
           name: Move files
           command: |
-            mv /tmp/workspace/aion-dk-js-client*.tgz ./
+            mv /tmp/workspace/aion-dk-js-client-*.tgz ./
       - run:
           name: Set npm access token
           command: |
@@ -46,7 +46,7 @@ jobs:
       - run:
           name: Publish to NPM
           command: |
-            package_file=$(ls aion-dk-js-client*.tgz)
+            package_file=$(ls aion-dk-js-client-*.tgz)
             if echo "${package_file}" | grep -E "alpha|beta" > /dev/null; then
               prerelease=$(echo "${package_file}" | grep -E -o "alpha|beta")
               echo "Publishing prerelease with tag ${prerelease} to NPM"
