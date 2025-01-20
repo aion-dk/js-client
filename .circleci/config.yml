@@ -40,7 +40,7 @@ jobs:
           command: |
             mv /tmp/workspace/aion-dk-js-client-*.tgz ./
       - run:
-          name: Set npm access token
+          name: Set npm access token 
           command: |
             npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
       - run:
