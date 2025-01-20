@@ -4,11 +4,7 @@ orbs:
 executors:
   node18:
     docker:
-      - image: cimg/node:18.20
-parameters:
-  packagename:
-    type: string
-    default: "aion-dk-js-client"
+      - image: cimg/node:22.13
 jobs:
   lint_test_build:
     executor:
@@ -26,62 +22,48 @@ jobs:
             - ./node_modules
           key: v1-dependencies-{{ checksum "yarn.lock" }}
       - run: yarn run lint
-      - run: yarn run test
+      - run: yarn run coverage
       - run: yarn run build
-      - run: yarn pack --out /home/circleci/project/${packagename}.tgz
+      - run: yarn pack
       - persist_to_workspace:
           root: /home/circleci/project
           paths:
-            - ./${packagename}.tgz
+            - ./aion-dk-js-client*.tgz
   publish:
     executor:
       name: node18
-    parameters:
-      is_beta:
-        description: "Defines if version is beta"
-        type: boolean
-        default: false
     steps:
       - attach_workspace:
           at: /tmp/workspace
       - run:
           name: Move files
           command: |
-            mv /tmp/workspace/${packagename}.tgz ./
+            mv /tmp/workspace/aion-dk-js-client*.tgz ./
       - run:
           name: Set npm access token
           command: |
             npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
-      - when:
-          condition: << parameters.is_beta >>
-          steps:
-            - run:
-                name: Publish with beta tag
-                command: |
-                  package_file=$(ls ${packagename}.tgz)
-                  if echo "${package_file}" | grep -v "beta." > /dev/null; then
-                    echo "Early exit due to missing beta version when on development branch"
-                  else
-                    echo publishing with tag beta
-                    npm publish ${package_file} --tag beta
-                  fi
-      - unless:
-          condition: << parameters.is_beta >>
-          steps:
-            - run:
-                name: Publishing using git tag
-                command: |
-                  package_file=$(ls ${packagename}.tgz)
-                  if echo "${package_file}" | grep "beta." > /dev/null && [ -n "${CIRCLE_TAG}" ]; then
-                    echo "Early exit due to beta package version when push was done using git tag ${CIRCLE_TAG}"
-                  else
-                    echo Publishing using git tag ${CIRCLE_TAG}
-                    npm publish ${package_file}
-                  fi
+      - run:
+          name: Publish to NPM
+          command: |
+            package_file=$(ls aion-dk-js-client*.tgz)
+            if echo "${package_file}" | grep -E "alpha|beta" > /dev/null; then
+              prerelease=$(echo "${package_file}" | grep -E -o "alpha|beta")
+              echo "Publishing prerelease with tag ${prerelease} to NPM"
+              npm publish ${package_file} --tag ${prerelease}
+            else
+              echo "Publishing release with to NPM"
+              npm publish ${package_file}
+            fi
 workflows:
   build_and_deploy:
     jobs:
-      - lint_test_build
+      - lint_test_build:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /^v.*/
       - publish:
           requires:
             - lint_test_build
@@ -89,12 +71,4 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /^v([0-9]|[1-9][0-9]*)\.([0-9]|[1-9][0-9]*)\.([0-9]|[1-9][0-9])+(?:-(sc|rc).*)?$/
-      - publish:
-          is_beta: true
-          requires:
-            - lint_test_build
-          filters:
-            branches:
-              ignore:
-                - main
+              only: /^v.*/
