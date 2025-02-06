@@ -1,8 +1,11 @@
 import { expect } from 'chai';
 import { encryptContestSelections } from '../../lib/av_client/new_crypto/encrypt_contest_selections'
 import { ContestConfig, ContestConfigMap } from '../../lib/av_client/types';
+import {AVCrypto} from "../../lib/av_crypto";
 
 const encryptionKey = '021edaa87d7626dbd2faa99c4dc080f443c150ab70b24da411b13aa56249b5242e'
+
+const crypto = new AVCrypto("secp256k1")
 
 const contestOne: ContestConfig = {
   address: '',
@@ -63,7 +66,7 @@ describe('encryptContestSelections', () => {
 
   context('when given a valid contest selection', () => {
     it('returns an array of contest envelopes', () => {
-      const contestEnvelopes = encryptContestSelections(contestConfigs, contestSelections, encryptionKey, false)
+      const contestEnvelopes = encryptContestSelections(crypto, contestConfigs, contestSelections, encryptionKey, false)
 
       expect(contestEnvelopes.length).to.eql(1)
 
@@ -135,7 +138,7 @@ describe('encryptContestSelections', () => {
     ]
 
     it('returns an array of one contest envelope that contains 2 cryptograms and 2 randomizers', () => {
-      const contestEnvelopes = encryptContestSelections(contestConfigs, contestSelections, encryptionKey, false)
+      const contestEnvelopes = encryptContestSelections(crypto, contestConfigs, contestSelections, encryptionKey, false)
       expect(contestEnvelopes.length).to.eql(1)
 
       const contestEnvelope = contestEnvelopes[0]
@@ -147,7 +150,7 @@ describe('encryptContestSelections', () => {
 
   context("when transparent is true", () => {
     it('returns transparent contest envelopes', () => {
-      const contestEnvelopes = encryptContestSelections(contestConfigs, contestSelections, encryptionKey, true)
+      const contestEnvelopes = encryptContestSelections(crypto, contestConfigs, contestSelections, encryptionKey, true)
 
       expect(contestEnvelopes.length).to.eql(1)
       expect(contestEnvelopes[0].piles[0].randomizers[0]).to.eql("0000000000000000000000000000000000000000000000000000000000000000")

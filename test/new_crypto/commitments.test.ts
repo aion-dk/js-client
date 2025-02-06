@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import {generateCommitment, validateCommitment} from "../../lib/av_client/new_crypto/commitments";
+import {AVCrypto} from "../../lib/av_crypto";
 
 describe("Pedersen Commitment", () => {
   const messages = {
@@ -12,10 +13,11 @@ describe("Pedersen Commitment", () => {
       "000000dcc29734c7e06d53b37cc2724c000000dcc29734c7e06d53b37cc2724c"
     ]]
   };
+  const crypto = new AVCrypto("secp256k1")
 
   describe("generateCommitment()", () => {
     it("generate commitment from single message", () => {
-      const result = generateCommitment(messages);
+      const result = generateCommitment(crypto, messages);
 
       expect(result.commitment).to.exist
       expect(result.randomizer).to.exist
@@ -31,9 +33,9 @@ describe("Pedersen Commitment", () => {
     }
 
     it("validates", () => {
-      const result = validateCommitment(commitmentOpening, commitment);
-
-      expect(result).to.be.undefined
+      expect(() => {
+        validateCommitment(crypto, commitmentOpening, commitment)
+      }).to.not.throw()
     })
 
     context("when wrong commitment", () => {
@@ -41,7 +43,7 @@ describe("Pedersen Commitment", () => {
 
       it("throws error", () => {
         expect(() => {
-          validateCommitment(commitmentOpening, commitment)
+          validateCommitment(crypto, commitmentOpening, commitment)
         }).to.throw('Pedersen commitment not valid')
       })
 
@@ -50,7 +52,7 @@ describe("Pedersen Commitment", () => {
 
         it("throws a custom error", () => {
           expect(() => {
-            validateCommitment(commitmentOpening, commitment, message)
+            validateCommitment(crypto, commitmentOpening, commitment, message)
           }).to.throw(message)
         })
       })

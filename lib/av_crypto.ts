@@ -262,11 +262,9 @@ export class AVCrypto {
    * @returns Returns the private-public key pair and the proof as hexadecimal strings
    */
   public generateProofOfElectionCodes(electionCodes: Array<string>): { privateKey: string, publicKey: string, proof: string } {
-    const byteLength = Math.floor(this.curve.degree() / 8.0)
-
     const sum = new sjcl.bn(0)
     electionCodes
-      .map(electionCode => pbkdf2(electionCode, byteLength))
+      .map(electionCode => pbkdf2(electionCode, this.curve.scalarByteSize()))
       .map(bitArray => sjcl.bn.fromBits(bitArray))
       .forEach(term => sum.addM(term))
 

@@ -1,16 +1,10 @@
 import {ContestEnvelope, ContestMap, SealedPile} from '../types';
 import {AVCrypto} from "../../av_crypto";
 
-export function generateEnvelopeProofs( contestEnvelopes: ContestEnvelope[] ): ContestMap<string[][]> {
-  const crypto = new AVCrypto("secp256k1")
-
+export function generateEnvelopeProofs( crypto: AVCrypto, contestEnvelopes: ContestEnvelope[] ): ContestMap<string[][]> {
   const entries = contestEnvelopes.map(ce => {
       const envelopeProofs = ce.piles.map((p) => {
-        const proofs = p.randomizers.map(r => crypto.generateProofOfCorrectEncryption(r))
-
-        console.log("AV_CRYPTO_GENERATE_PROOF_OF_CORRECT_ENCRYPTION_CALLED!")
-
-        return proofs
+        return p.randomizers.map(r => crypto.generateProofOfCorrectEncryption(r))
       })
       return [ce.reference, envelopeProofs]
     }
@@ -18,12 +12,12 @@ export function generateEnvelopeProofs( contestEnvelopes: ContestEnvelope[] ): C
   return Object.fromEntries(entries)
 }
 
-export function finalizeCryptograms(contestEnvelopes: ContestEnvelope[], serverCryptograms: ContestMap<string[][]>): ContestMap<SealedPile[]> {
+export function finalizeCryptograms(crypto: AVCrypto, contestEnvelopes: ContestEnvelope[], serverCryptograms: ContestMap<string[][]>): ContestMap<SealedPile[]> {
   const entries = contestEnvelopes.map(ce => {
       const finalizedCryptograms = ce.piles.map((p, index) => {
         return {
           multiplier: p.multiplier,
-          cryptograms: addCryptograms(p.cryptograms, serverCryptograms[ce.reference][index])
+          cryptograms: addCryptograms(crypto, p.cryptograms, serverCryptograms[ce.reference][index])
         }
       })
       return [ce.reference, finalizedCryptograms]
@@ -32,14 +26,8 @@ export function finalizeCryptograms(contestEnvelopes: ContestEnvelope[], serverC
   return Object.fromEntries(entries)
 }
 
-function addCryptograms(list1: string[], list2: string[]) {
-  const crypto = new AVCrypto("secp256k1")
-
+function addCryptograms(crypto: AVCrypto, list1: string[], list2: string[]) {
   return list1.map((cryptogram, i) => {
-    const finalCryptogram = crypto.combineCryptograms(cryptogram, list2[i])
-
-    console.log("AV_CRYPTO_COMBINE_CRYPTOGRAMS_CALLED!")
-
-    return finalCryptogram
+    return crypto.combineCryptograms(cryptogram, list2[i])
   })
 }

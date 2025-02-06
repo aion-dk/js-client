@@ -2,11 +2,10 @@ import { BoardItem, ItemExpectation } from '../types'
 import {AVCrypto, hexDigest} from "../../av_crypto";
 import {Uniformer} from '../../util/uniformer';
 
-export function signPayload(obj: Record<string, unknown>, privateKey: string) {
+export function signPayload(crypto: AVCrypto, obj: Record<string, unknown>, privateKey: string) {
   const uniformer = new Uniformer();
   const uniformPayload = uniformer.formString(obj);
 
-  const crypto = new AVCrypto("secp256k1")
   const signature = crypto.sign(uniformPayload, privateKey);
 
   return {
@@ -15,7 +14,7 @@ export function signPayload(obj: Record<string, unknown>, privateKey: string) {
   }
 }
 
-export function validatePayload(item: BoardItem, expectations: ItemExpectation, signaturePublicKey?: string): void {
+export function validatePayload(crypto: AVCrypto, item: BoardItem, expectations: ItemExpectation, signaturePublicKey?: string): void {
   if(expectations.type != item.type) {
     throw new Error(`BoardItem did not match expected type '${expectations.type}'`);
   }
@@ -33,11 +32,11 @@ export function validatePayload(item: BoardItem, expectations: ItemExpectation, 
   verifyAddress(item);
 
   if(signaturePublicKey !== undefined) {
-    verifySignature(item, signaturePublicKey);
+    verifySignature(crypto, item, signaturePublicKey);
   }
 }
 
-function verifySignature(item: BoardItem, signaturePublicKey: string): void {
+function verifySignature(crypto: AVCrypto, item: BoardItem, signaturePublicKey: string): void {
   const uniformer = new Uniformer();
   const signedPayload = uniformer.formString({
     content: item.content,
@@ -45,7 +44,6 @@ function verifySignature(item: BoardItem, signaturePublicKey: string): void {
     parentAddress: item.parentAddress
   });
 
-  const crypto = new AVCrypto("secp256k1")
   if(!crypto.isValidSignature(item.signature, signedPayload, signaturePublicKey)) {
     throw new Error('Board signature verification failed');
   }
@@ -80,7 +78,7 @@ export function verifyAddress(item: BoardItem): void {
   }
 }
 
-export function validateReceipt(items: BoardItem[], receipt: string, publicKey: string): void {
+export function validateReceipt(crypto: AVCrypto, items: BoardItem[], receipt: string, publicKey: string): void {
   const uniformer = new Uniformer();
 
   const content = {
@@ -90,7 +88,6 @@ export function validateReceipt(items: BoardItem[], receipt: string, publicKey: 
 
   const message = uniformer.formString(content);
 
-  const crypto = new AVCrypto("secp256k1")
   if(!crypto.isValidSignature(receipt, message, publicKey)) {
     throw new Error('Board receipt verification failed');
   }

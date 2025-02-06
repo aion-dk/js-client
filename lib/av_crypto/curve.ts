@@ -26,11 +26,12 @@ export class Curve {
   }
 
   public degree(): number {
-    switch (this._curve) {
-      case sjcl.ecc.curves.c521:
+    const degree = this.prime().bitLength()
+    switch (degree) {
+      case 528:
         return 521
       default:
-        return this.prime().bitLength()
+        return degree
     }
   }
 
@@ -47,10 +48,10 @@ export class Curve {
   }
 
   public sha(): SjclHashStatic {
-    switch (this._curve) {
-      case sjcl.ecc.curves.c521:
+    switch (this.degree()) {
+      case 521:
         return sjcl.hash.sha512
-      case sjcl.ecc.curves.c384:
+      case 384:
         return SHA384;
       default:
         return sjcl.hash.sha256
@@ -77,7 +78,7 @@ export class Curve {
     return this.scalarByteSize() * 2;
   }
 
-  private scalarByteSize(): number {
-    return this._curve.field.modulus.bitLength() / 8;
+  public scalarByteSize(): number {
+    return Math.ceil(this.degree() / 8);
   }
 }

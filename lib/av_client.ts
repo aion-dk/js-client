@@ -50,6 +50,7 @@ import { submitBallotCryptograms } from './av_client/actions/submit_ballot_crypt
 import {AxiosResponse} from "axios";
 import { proofOfElectionCodes } from "./av_client/new_crypto/proof_of_election_codes";
 import {validateCommitment} from "./av_client/new_crypto/commitments";
+import {AVCrypto} from "./av_crypto";
 
 /**
  * # Assembly Voting Client API
@@ -88,6 +89,7 @@ export class AVClient implements IAVClient {
 
   private bulletinBoard: BulletinBoard;
   private latestConfig?: LatestConfig;
+  private crypto: AVCrypto;
   private keyPair: KeyPair;
 
   private clientEnvelopes: ContestEnvelope[];
@@ -125,10 +127,13 @@ export class AVClient implements IAVClient {
       this.latestConfig = await fetchLatestConfig(this.bulletinBoard);
     }
 
+    this.crypto = new AVCrypto(this.latestConfig.items.genesisConfig.content.eaCurveName)
+
     if (keyPair) {
       this.keyPair = keyPair;
+      // TODO: validate keyPair
     } else {
-      this.keyPair = randomKeyPair();
+      this.keyPair = randomKeyPair(this.crypto);
     }
   }
 
@@ -192,7 +197,7 @@ export class AVClient implements IAVClient {
   }
 
   generateProofOfElectionCodes(electionCodes : Array<string>) {
-    this.proofOfElectionCodes = proofOfElectionCodes(electionCodes);
+    this.proofOfElectionCodes = proofOfElectionCodes(this.crypto, electionCodes);
   }
 
   setIdentityToken(token: string) {
@@ -271,8 +276,8 @@ export class AVClient implements IAVClient {
     const voterSessionItem = voterSessionItemResponse.data.voterSession;
     const receipt = voterSessionItemResponse.data.receipt;
 
-    validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
-    validateReceipt([voterSessionItem], receipt, this.getDbbPublicKey());
+    validatePayload(this.crypto, voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
+    validateReceipt(this.crypto, [voterSessionItem], receipt, this.getDbbPublicKey());
 
     this.voterSession = voterSessionItem;
     this.bulletinBoard.setVoterSessionUuid(voterSessionItem.content.identifier);
@@ -384,7 +389,7 @@ export class AVClient implements IAVClient {
       pedersenCommitment,
       envelopeRandomizers,
       contestEnvelopes,
-    } = constructContestEnvelopes(state, ballotSelection, transparent);
+    } = constructContestEnvelopes(this.crypto, state, ballotSelection, transparent);
 
     this.clientEnvelopes = contestEnvelopes;
 
@@ -399,6 +404,7 @@ export class AVClient implements IAVClient {
       boardCommitment,
       serverEnvelopes
     } = await submitVoterCommitment(
+      this.crypto,
       this.bulletinBoard,
       this.voterSession.address,
       pedersenCommitment.commitment,
@@ -410,6 +416,7 @@ export class AVClient implements IAVClient {
     this.serverEnvelopes = serverEnvelopes;
 
     const [ ballotCryptogramItem, verificationStartItem ]  = await submitBallotCryptograms(
+      this.crypto,
       this.bulletinBoard,
       this.clientEnvelopes,
       this.serverEnvelopes,
@@ -454,13 +461,13 @@ export class AVClient implements IAVClient {
           type: CAST_REQUEST_ITEM,
           content: {}
       };
-      const signedPayload = signPayload(castRequestItem, this.privateKey());
+      const signedPayload = signPayload(this.crypto, castRequestItem, this.privateKey());
 
       const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
       const { castRequest, receipt } = response.data;
 
-      validatePayload(castRequest, castRequestItem);
-      validateReceipt([castRequest], receipt, this.getDbbPublicKey());
+      validatePayload(this.crypto, castRequest, castRequestItem);
+      validateReceipt(this.crypto, [castRequest], receipt, this.getDbbPublicKey());
 
       const clientReceipt = generateReceipt(receipt, castRequest);
 
@@ -498,7 +505,7 @@ export class AVClient implements IAVClient {
         content: {}
     }
 
-    const signedPayload = signPayload(spoilRequestItem, this.privateKey());
+    const signedPayload = signPayload(this.crypto, spoilRequestItem, this.privateKey());
 
     const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload))
 
@@ -506,9 +513,9 @@ export class AVClient implements IAVClient {
 
     this.spoilRequest = spoilRequest
 
-    validatePayload(spoilRequest, spoilRequestItem);
-    validateReceipt([spoilRequest], receipt, this.getDbbPublicKey());
-    validateCommitment(boardCommitmentOpening, this.boardCommitment.content.commitment, 'Board commitment is not valid')
+    validatePayload(this.crypto, spoilRequest, spoilRequestItem);
+    validateReceipt(this.crypto, [spoilRequest], receipt, this.getDbbPublicKey());
+    validateCommitment(this.crypto, boardCommitmentOpening, this.boardCommitment.content.commitment, 'Board commitment is not valid')
 
     return spoilRequest.address
   }
@@ -531,11 +538,11 @@ export class AVClient implements IAVClient {
       parentAddress: this.verifierItem.address,
       type: VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM,
       content: {
-        package: encryptCommitmentOpening(this.verifierItem.content.publicKey, this.voterCommitmentOpening)
+        package: encryptCommitmentOpening(this.crypto, this.verifierItem.content.publicKey, this.voterCommitmentOpening)
       }
     }
 
-    const signedVoterCommitmentOpeningItem = signPayload(voterCommitmentOpeningItem, this.privateKey())
+    const signedVoterCommitmentOpeningItem = signPayload(this.crypto, voterCommitmentOpeningItem, this.privateKey())
 
     this.bulletinBoard.submitCommitmentOpenings(signedVoterCommitmentOpeningItem)
   }

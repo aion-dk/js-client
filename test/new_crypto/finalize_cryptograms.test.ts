@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import { finalizeCryptograms, generateEnvelopeProofs } from '../../lib/av_client/new_crypto/finalize_cryptograms'
 import { ContestEnvelope, ContestMap } from '../../lib/av_client/types'
+import {AVCrypto} from "../../lib/av_crypto";
 
 const voterEnvelopes: ContestEnvelope[] = [
   {
@@ -27,10 +28,12 @@ const emptyCryptograms: ContestMap<string[][]> = {
   ]]
 }
 
+const crypto = new AVCrypto("secp256k1")
+
 describe('finalizeCryptograms', () => {
   it('adds cryptograms together', () => {
 
-    const finalizedCryptograms = finalizeCryptograms(voterEnvelopes, emptyCryptograms)
+    const finalizedCryptograms = finalizeCryptograms(crypto, voterEnvelopes, emptyCryptograms)
 
     expect(finalizedCryptograms).to.deep.equal({
       'big-contest': [{
@@ -46,7 +49,7 @@ describe('finalizeCryptograms', () => {
 
 describe("generateEnvelopeProofs", () => {
   it("generates proofs of correct encryption", () => {
-    const proofs = generateEnvelopeProofs(voterEnvelopes)
+    const proofs = generateEnvelopeProofs(crypto, voterEnvelopes)
 
     expect(proofs).to.have.all.keys('big-contest')
     expect(proofs['big-contest'].length).to.eql(1)

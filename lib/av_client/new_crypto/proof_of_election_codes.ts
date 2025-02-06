@@ -1,8 +1,7 @@
 import {ProofOfElectionCodes} from "../types";
 import {AVCrypto} from "../../av_crypto";
 
-export function proofOfElectionCodes(electionCodes : Array<string>): ProofOfElectionCodes {
-    const crypto = new AVCrypto("secp256k1")
+export function proofOfElectionCodes(crypto: AVCrypto, electionCodes : Array<string>): ProofOfElectionCodes {
     const {privateKey, publicKey, proof} = crypto.generateProofOfElectionCodes(electionCodes)
 
   return {

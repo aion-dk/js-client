@@ -9,6 +9,7 @@ import { selectionPileToByteArray } from "../encoding/byte_encoding";
 import { AVCrypto } from "../../av_crypto";
 
 export function encryptContestSelections(
+  crypto: AVCrypto,
   contestConfigs: ContestConfigMap,
   contestSelections: ContestSelection[],
   encryptionKey: string,
@@ -16,11 +17,12 @@ export function encryptContestSelections(
 ): ContestEnvelope[] {
   return contestSelections.map(contestSelection => {
     const contestConfig = contestConfigs[contestSelection.reference]
-    return encryptContestSelection(contestConfig, contestSelection, encryptionKey, transparent)
+    return encryptContestSelection(crypto, contestConfig, contestSelection, encryptionKey, transparent)
   })
 }
 
 function encryptContestSelection(
+  crypto: AVCrypto,
   contestConfig: ContestConfig,
   contestSelection: ContestSelection,
   encryptionKey: string,
@@ -31,7 +33,7 @@ function encryptContestSelection(
   }
 
   const encryptedPiles: EncryptedPile[] = contestSelection.piles.map(sp => {
-    return encryptSelectionPile(contestConfig, sp, encryptionKey, transparent)
+    return encryptSelectionPile(crypto, contestConfig, sp, encryptionKey, transparent)
   })
 
   return {
@@ -41,20 +43,16 @@ function encryptContestSelection(
 }
 
 function encryptSelectionPile(
+  crypto: AVCrypto,
   contestConfig: ContestConfig,
   selectionPile: SelectionPile,
   encryptionKey: string,
   transparent: boolean
 ): EncryptedPile {
-  const crypto = new AVCrypto("secp256k1")
-
   const encodedSelectionPile = selectionPileToByteArray(contestConfig, selectionPile)
   const encryptedSelectionPile  = transparent ?
     crypto.encryptTransparentVote(encodedSelectionPile, encryptionKey) :
     crypto.encryptVote(encodedSelectionPile, encryptionKey);
-
-  console.log("AV_CRYPTO_ENCRYPT_VOTE_CALLED!")
-  console.log("TRANSPARENT " + transparent)
 
   return {
     multiplier: selectionPile.multiplier,

@@ -60,7 +60,7 @@ export function hashIntoPoint(string: string, curve: Curve): SjclEllipticalPoint
   const sha = curve.sha()
   for (let i = 0; i < 10_000; i++) {
     let xHex = sjcl.codec.hex.fromBits(sha.hash(concatForHashing([string, i])))
-    if (curve.curve() === sjcl.ecc.curves['c521']) {
+    if (curve.degree() == 521) {
       xHex = "0000" + xHex
     }
     try {

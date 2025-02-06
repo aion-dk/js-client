@@ -2,6 +2,7 @@ import { BulletinBoard } from "../connectors/bulletin_board";
 import { BOARD_COMMITMENT_ITEM, VOTER_COMMITMENT_ITEM } from "../constants";
 import { signPayload, validatePayload, validateReceipt } from "../new_crypto/signing";
 import { BoardCommitmentItem, ContestMap, VoterCommitmentItem } from "../types";
+import {AVCrypto} from "../../av_crypto";
 
 type SubmitVoterCommitmentResponse = {
   voterCommitment: VoterCommitmentItem
@@ -10,6 +11,7 @@ type SubmitVoterCommitmentResponse = {
 }
 
 const submitVoterCommitment = async (
+  crypto: AVCrypto,
   bulletinBoard: BulletinBoard,
   sessionAddress: string,
   commitment: string,
@@ -26,7 +28,7 @@ const submitVoterCommitment = async (
     }
   };
 
-  const signedCommitmentItem = signPayload(voterCommitmentItem, voterSigningKey);
+  const signedCommitmentItem = signPayload(crypto, voterCommitmentItem, voterSigningKey);
   const response = await bulletinBoard.submitCommitment(signedCommitmentItem);
 
   const voterCommitmentCopy: VoterCommitmentItem = response.data.voterCommitment;
@@ -34,15 +36,15 @@ const submitVoterCommitment = async (
   const serverEnvelopes = response.data.envelopes;
   const receipt = response.data.receipt;
 
-  validatePayload(voterCommitmentCopy, voterCommitmentItem);
+  validatePayload(crypto, voterCommitmentCopy, voterCommitmentItem);
 
   const boardCommitmentItemExpectation = {
     parentAddress: voterCommitmentCopy.address,
     type: BOARD_COMMITMENT_ITEM,
   }
 
-  validatePayload(boardCommitment, boardCommitmentItemExpectation, dbbPublicKey)
-  validateReceipt([voterCommitmentCopy, boardCommitment], receipt, dbbPublicKey);
+  validatePayload(crypto, boardCommitment, boardCommitmentItemExpectation, dbbPublicKey)
+  validateReceipt(crypto, [voterCommitmentCopy, boardCommitment], receipt, dbbPublicKey);
 
   return {
     voterCommitment: voterCommitmentCopy,

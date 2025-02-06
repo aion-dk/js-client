@@ -1,8 +1,7 @@
 import { KeyPair } from '../types';
 import { AVCrypto } from "../../av_crypto";
 
-export function randomKeyPair(): KeyPair {
-  const crypto = new AVCrypto("secp256k1")
+export function randomKeyPair(crypto: AVCrypto): KeyPair {
   const keyPair = crypto.generateKeyPair()
 
   return {

@@ -3,6 +3,7 @@ import { byteArrayToSelectionPile } from "../encoding/byte_encoding"
 import {AVCrypto} from "../../av_crypto";
 
 export function decryptContestSelections(
+  crypto: AVCrypto,
   contestConfigs: ContestConfigMap,
   encryptionKey: string,
   contests: ContestMap<SealedPile[]>,
@@ -11,7 +12,6 @@ export function decryptContestSelections(
 ): ContestSelection[] {
 
   const contestSelections = Object.entries(contests).map(function([contestReference, piles]): ContestSelection {
-    const crypto = new AVCrypto("secp256k1")
     const contestConfig = contestConfigs[contestReference]
     const maxSize = contestConfig.content.markingType.encoding.maxSize
 
@@ -23,8 +23,6 @@ export function decryptContestSelections(
 
       const bytes = crypto.revertEncryption(pileCryptograms, boardRandomizers, voterRandomizers, encryptionKey)
       const encodedContestSelection = bytes.slice(0, maxSize)
-
-      console.log("AV_CRYPTO_REVERT_ENCRYPTION_CALLED!")
 
       return byteArrayToSelectionPile(contestConfig, encodedContestSelection, pileMultiplier)
     });

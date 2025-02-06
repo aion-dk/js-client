@@ -3,6 +3,7 @@ import {constructContestEnvelopes} from '../lib/av_client/construct_contest_enve
 import {ContestConfig, BallotConfig, ClientState, VotingRoundConfig, BallotSelection} from '../lib/av_client/types';
 import latestConfig from './fixtures/latestConfig';
 import {baseItemAttributes} from "./fixtures/itemHelper";
+import {AVCrypto} from "../lib/av_crypto";
 
 const contestOne: ContestConfig = {
   ...baseItemAttributes(),
@@ -116,10 +117,12 @@ const ballotSelection: BallotSelection = {
   ]
 }
 
+const crypto = new AVCrypto("secp256k1")
+
 describe('constructContestEnvelopes', () => {
   context('when given a valid arguments', () => {
     it('encrypts without errors', async () => {
-      const result = constructContestEnvelopes(clientState, ballotSelection)
+      const result = constructContestEnvelopes(crypto, clientState, ballotSelection)
       expect(result).to.have.keys('pedersenCommitment', 'envelopeRandomizers', 'contestEnvelopes')
     })
   })

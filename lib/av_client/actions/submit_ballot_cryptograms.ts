@@ -3,8 +3,10 @@ import { BallotCryptogramItem, ContestEnvelope, ContestMap, VerificationStartIte
 import { signPayload, validatePayload, validateReceipt } from '../new_crypto/signing'
 import { BALLOT_CRYPTOGRAMS_ITEM } from '../constants'
 import { finalizeCryptograms, generateEnvelopeProofs } from '../new_crypto/finalize_cryptograms'
+import {AVCrypto} from "../../av_crypto";
 
 export async function submitBallotCryptograms(
+  crypto: AVCrypto,
   bulletinBoard: BulletinBoard,
   clientEnvelopes: ContestEnvelope[],
   serverEnvelopes: ContestMap<string[][]>,
@@ -13,7 +15,7 @@ export async function submitBallotCryptograms(
   dbbPublicKey: string
 ): Promise<[BallotCryptogramItem, VerificationStartItem]> {
 
-  const finalizedCryptograms = finalizeCryptograms(clientEnvelopes, serverEnvelopes)
+  const finalizedCryptograms = finalizeCryptograms(crypto, clientEnvelopes, serverEnvelopes)
 
   const ballotCryptogramsItem = {
     parentAddress: boardCommitmentAddress,
@@ -23,11 +25,11 @@ export async function submitBallotCryptograms(
     }
   }
 
-  const signedBallotCryptogramsItem = signPayload(ballotCryptogramsItem, voterPrivateKey)
+  const signedBallotCryptogramsItem = signPayload(crypto, ballotCryptogramsItem, voterPrivateKey)
 
   const itemWithProofs = {
     ...signedBallotCryptogramsItem,
-    proofs: generateEnvelopeProofs(clientEnvelopes)
+    proofs: generateEnvelopeProofs(crypto, clientEnvelopes)
   }
 
   const response = (await bulletinBoard.submitVotes(itemWithProofs));
@@ -35,8 +37,8 @@ export async function submitBallotCryptograms(
   const verificationItem = response.data.verification;
   const receipt = response.data.receipt;
 
-  validatePayload(ballotCryptogramsItemCopy, ballotCryptogramsItem)
-  validateReceipt([ballotCryptogramsItemCopy, verificationItem], receipt, dbbPublicKey)
+  validatePayload(crypto, ballotCryptogramsItemCopy, ballotCryptogramsItem)
+  validateReceipt(crypto, [ballotCryptogramsItemCopy, verificationItem], receipt, dbbPublicKey)
 
   return [
     ballotCryptogramsItemCopy as BallotCryptogramItem,

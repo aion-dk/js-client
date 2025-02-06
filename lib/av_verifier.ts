@@ -24,6 +24,7 @@ import {InvalidContestError, InvalidReceiptError, InvalidTrackingCodeError} from
 import {decryptContestSelections} from './av_client/new_crypto/decrypt_contest_selections';
 import {makeOptionFinder} from './av_client/option_finder';
 import {validateCommitment} from "./av_client/new_crypto/commitments";
+import {AVCrypto} from "./av_crypto";
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -37,6 +38,7 @@ export class AVVerifier {
   private voterCommitmentOpening: BoardCommitmentOpeningItem
   private latestConfig: LatestConfig
   private bulletinBoard: BulletinBoard;
+  private crypto: AVCrypto;
 
   /**
    * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
@@ -61,6 +63,8 @@ export class AVVerifier {
     } else {
       this.latestConfig = await fetchLatestConfig(this.bulletinBoard)
     }
+
+    this.crypto = new AVCrypto(this.latestConfig.items.genesisConfig.content.eaCurveName)
   }
 
   public async findBallot(trackingCode: string): Promise<string> {
@@ -82,7 +86,7 @@ export class AVVerifier {
   }
 
   public async submitVerifierKey(spoilRequestAddress: string): Promise<string> {
-    const keyPair = randomKeyPair()
+    const keyPair = randomKeyPair(this.crypto)
     this.verifierPrivateKey = keyPair.privateKey
 
     const verfierItem = {
@@ -93,7 +97,7 @@ export class AVVerifier {
       }
     }
 
-    const signedVerifierItem = signPayload(verfierItem, keyPair.privateKey)
+    const signedVerifierItem = signPayload(this.crypto, verfierItem, keyPair.privateKey)
     // TODO: Validate payload and receipt
     // check verifierItem.previousAddress === verificationTrackStartItem address
     this.verifierItem = (await this.bulletinBoard.submitVerifierItem(signedVerifierItem)).data.verifier
@@ -106,13 +110,14 @@ export class AVVerifier {
       throw new Error('Verifier private key not present')
     }
 
-    const boardCommitmentOpening = decryptCommitmentOpening(this.verifierPrivateKey, this.boardCommitmentOpening.content.package)
-    const voterCommitmentOpening = decryptCommitmentOpening(this.verifierPrivateKey, this.voterCommitmentOpening.content.package)
+    const boardCommitmentOpening = decryptCommitmentOpening(this.crypto, this.verifierPrivateKey, this.boardCommitmentOpening.content.package)
+    const voterCommitmentOpening = decryptCommitmentOpening(this.crypto, this.verifierPrivateKey, this.voterCommitmentOpening.content.package)
 
-    validateCommitment(boardCommitmentOpening, this.boardCommitment, 'Board commitment not valid')
-    validateCommitment(voterCommitmentOpening, this.voterCommitment, 'Voter commitment not valid')
+    validateCommitment(this.crypto, boardCommitmentOpening, this.boardCommitment, 'Board commitment not valid')
+    validateCommitment(this.crypto, voterCommitmentOpening, this.voterCommitment, 'Voter commitment not valid')
 
     return decryptContestSelections(
+      this.crypto,
       this.latestConfig.items.contestConfigs,
       this.latestConfig.items.thresholdConfig.content.encryptionKey,
       this.ballotCryptograms.content.contests,
@@ -206,7 +211,7 @@ export class AVVerifier {
 
     try {
       verifyAddress(castRequestItem)
-      validateReceipt([castRequestItem], receipt, this.latestConfig.items.genesisConfig.content.publicKey)
+      validateReceipt(this.crypto, [castRequestItem], receipt, this.latestConfig.items.genesisConfig.content.publicKey)
     } catch (err) {
       // This checks for the specific error messages that invalidate a receipt. Other different errors would bubble up.
       if (
