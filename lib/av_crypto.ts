@@ -1,6 +1,6 @@
 import {Curve} from "./av_crypto/curve";
 import {Encoder} from "./av_crypto/encoder";
-import {hexToPoint, generateKeyPair, scalarToHex, hexToScalar, pointToHex} from "./av_crypto/utils";
+import {hexToPoint, generateKeyPair, scalarToHex, hexToScalar, pointToHex, addPoints} from "./av_crypto/utils";
 import {commit as pedersenCommit, isValid as isValidPedersen} from "./av_crypto/pedersen/scheme";
 import {Commitment} from "./av_crypto/pedersen/commitment";
 import * as elGamalCryptogram from "./av_crypto/el_gamal/cryptogram";
@@ -12,6 +12,7 @@ import * as symmetricEncryptionScheme from "./av_crypto/symmetric_encryption/sch
 import * as sjcl from "sjcl-with-all";
 import * as aesCiphertext from "./av_crypto/symmetric_encryption/ciphertext";
 import {pbkdf2} from "./av_crypto/key_derivation";
+import {computePartialSecretShare, isValidPartialSecretShare} from "./av_crypto/threshold";
 
 export const SUPPORTED_ELLIPTIC_CURVE_NAMES = {
   'secp256k1': 'k256',
@@ -305,6 +306,85 @@ export class AVCrypto {
     const signingPublicKeyPoint = hexToPoint(signingPublicKey, this.curve)
 
     return signatureScheme.isValid(signatureInstance, message, signingPublicKeyPoint, this.curve)
+  }
+
+  /**
+   * Aggregate a number of public keys together and represent them as a hexadecimal string.
+   *
+   * @param publicKeys The public keys to be aggregated
+   * @return {string} The resulting point as a string
+   */
+  public aggregatePublicKeys(publicKeys: Array<string>): string {
+    const points = publicKeys.map(publicKey => hexToPoint(publicKey, this.curve));
+    const result = addPoints(points);
+
+    return pointToHex(result);
+  }
+
+  /**
+   * Computes the partial share of the decryption key of the other trustee. The
+   * partial share is computed by this trustee. This trustee should compute a
+   * partial share for each of the other trustees.
+   *
+   * This is used during the threshold ceremony.
+   *
+   * @param otherTrusteeId The id of the trustee the partial share is computed for.
+   * @param thisTrusteePrivateKey The private key of the trustee that computes the partial share.
+   * @param thisTrusteePrivateCoefficients The list of secret polynomial coefficients of this trustee.
+   * @return {string} The computed partial share for the other trustee as a string.
+   */
+  public computePartialDecryptionKeyShare(otherTrusteeId: string, thisTrusteePrivateKey: string, thisTrusteePrivateCoefficients: Array<string>): string {
+    const id = sjcl.bn.fromBits(sjcl.codec.hex.toBits(otherTrusteeId));
+    const privateKeyScalar = hexToScalar(thisTrusteePrivateKey, this.curve)
+    const coefficientScalars = thisTrusteePrivateCoefficients.map(coefficient => hexToScalar(coefficient, this.curve))
+
+    const partialShare = computePartialSecretShare(id, privateKeyScalar, coefficientScalars, this.curve);
+
+    return scalarToHex(partialShare, this.curve);
+  }
+
+  /**
+   * Validates the correctness of a partial secret share received from another trustee. This should be
+   * called for each partial secret share received from each of the other trustees.
+   *
+   * This is used during the threshold ceremony.
+   *
+   * @param partialShare The partial share of the decryption key received from the other trustee.
+   * @param thisTrusteeId The uuid of this trustee.
+   * @param otherTrusteePublicKey The public key of the other trustee.
+   * @param otherTrusteePublicCoefficients The public polynomial coefficient of the other trustee.
+   * @return {boolean}
+   */
+  public isValidPartialDecryptionKeyShare(
+    partialShare: string,
+    thisTrusteeId: string,
+    otherTrusteePublicKey: string,
+    otherTrusteePublicCoefficients: Array<string>
+  ): boolean {
+    const id = sjcl.bn.fromBits(sjcl.codec.hex.toBits(thisTrusteeId));
+    const partialShareScalar = hexToScalar(partialShare, this.curve)
+    const publicKey = hexToPoint(otherTrusteePublicKey, this.curve)
+    const coefficients = otherTrusteePublicCoefficients.map(coefficient => hexToPoint(coefficient, this.curve))
+
+    return isValidPartialSecretShare(partialShareScalar, id, publicKey, coefficients, this.curve);
+  }
+
+  /**
+   * Computes the share of the decryption key of a trustee by aggregating all partial shares received from
+   * all trustees. Note that partial shares should have been validated before.
+   *
+   * This is used during the threshold ceremony.
+   *
+   * @param partialShares The partial shares of the decryption key received from all the trustee.
+   * @return {string} The aggregated secret share of the decryption key.
+   */
+  public computeDecryptionKeyShare(partialShares: Array<string>): string {
+    const scalars = partialShares.map(share => hexToScalar(share, this.curve));
+    let sum = new sjcl.bn(0);
+    scalars.forEach((scalar) => (sum = sum.add(scalar)));
+    sum = sum.mod(this.curve.order());
+
+    return scalarToHex(sum, this.curve);
   }
 }
 

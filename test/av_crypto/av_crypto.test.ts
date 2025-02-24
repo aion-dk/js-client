@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import {AVCrypto, hexDigest} from "../../lib/av_crypto";
-import {fixedPoint1Hex, fixedPoint2Hex, fixedScalar1Hex, fixedScalar2Hex} from "./test_helpers";
+import {fixedPoint1Hex, fixedPoint2Hex, fixedScalar1, fixedScalar1Hex, fixedScalar2Hex} from "./test_helpers";
 import {pattern as cryptogramPattern} from "../../lib/av_crypto/el_gamal/cryptogram";
 import {pattern as proofPattern} from "../../lib/av_crypto/discrete_logarithm/proof";
 import {pattern as signaturePattern} from "../../lib/av_crypto/schnorr/signature";
@@ -349,6 +349,59 @@ describe("AVCrypto", () => {
 
         expect(valid).to.be.false
       })
+    })
+  })
+
+  describe("computePartialDecryptionKeyShare()", () => {
+    const crypto = new AVCrypto("secp256k1")
+    const curve = crypto.curve
+    const otherTrusteeId = "03"
+    const thisTrusteePrivateKey = fixedScalar1Hex(curve)
+    const thisTrusteePrivateCoefficients = [fixedScalar1Hex(curve), fixedScalar2Hex(curve)]
+
+    it("returns a string key share", () => {
+      const partialShare = crypto.computePartialDecryptionKeyShare(otherTrusteeId, thisTrusteePrivateKey, thisTrusteePrivateCoefficients)
+
+      expect(partialShare).match(curve.scalarHexPattern())
+    })
+  })
+
+  describe("isValidPartialDecryptionKeyShare()", () => {
+    const crypto = new AVCrypto("secp256k1")
+    const curve = crypto.curve
+    const thisTrusteeId = "03"
+    const otherTrusteePublicKey = fixedPoint1Hex(curve)
+    const otherTrusteePublicCoefficients = [fixedPoint1Hex(curve), fixedPoint2Hex(curve)]
+    const partialShare = "e12b0318372b40d3d71d9048b8412ee5c808045ff830f445f0d629a7a54381a9";
+
+    it("returns true", () => {
+      const valid = crypto.isValidPartialDecryptionKeyShare(partialShare, thisTrusteeId, otherTrusteePublicKey, otherTrusteePublicCoefficients)
+
+      expect(valid).to.be.true
+    })
+  })
+
+  describe("computeDecryptionKeyShare()", () => {
+    const crypto = new AVCrypto("secp256k1")
+    const curve = crypto.curve
+    const partialShares = [fixedScalar1Hex(curve), fixedScalar2Hex(curve)]
+
+    it("returns the aggregated value", () => {
+      const secretShare = crypto.computeDecryptionKeyShare(partialShares);
+
+      expect(secretShare).match(curve.scalarHexPattern())
+    })
+  })
+
+  describe("aggregatePublicKeys()", () => {
+    const crypto = new AVCrypto("secp256k1")
+    const curve = crypto.curve
+    const publicKeys = [fixedPoint1Hex(curve), fixedPoint2Hex(curve)]
+
+    it("returns the aggregated value", () => {
+      const point = crypto.aggregatePublicKeys(publicKeys);
+
+      expect(point).match(curve.pointHexPattern())
     })
   })
 

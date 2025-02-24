@@ -1,5 +1,5 @@
 import {BigNumber, SjclEllipticalPoint} from "./sjcl";
-import {multiplyAndSumScalarsAndPoints} from "./utils";
+import {addPoints, multiplyAndSumScalarsAndPoints, pointEquals} from "./utils";
 import {Curve} from "./curve";
 import * as sjcl from "sjcl-with-all";
 
@@ -21,6 +21,41 @@ export function computePublicShare(
 
   return multiplyAndSumScalarsAndPoints(scalars, points)
 }
+
+export function computePartialSecretShare(
+  id: BigNumber,
+  privateKey: BigNumber,
+  coefficients: Array<BigNumber>,
+  curve: Curve
+): BigNumber {
+  let partialShare = privateKey;
+  for (let i = 0; i < coefficients.length; i++) {
+    // degree = i + 1 because i is a 0 based index
+    const exponent = id.powermod(i + 1, curve.order());
+    partialShare = partialShare.add(coefficients[i].mulmod(exponent, curve.order()));
+  }
+
+  return partialShare.mod(curve.order());
+}
+
+export function isValidPartialSecretShare(
+  partialShare: BigNumber,
+  id: BigNumber,
+  publicKey: SjclEllipticalPoint,
+  coefficients: Array<SjclEllipticalPoint>,
+  curve: Curve
+): boolean {
+  const terms = coefficients.map((coefficient, i) => {
+    // degree = i + 1 because i is a 0 based index
+    const scalar = id.powermod(i + 1, curve.order());
+    return coefficient.mult(scalar);
+  })
+  terms.unshift(publicKey);
+  const partialPublicShare = addPoints(terms);
+
+  return pointEquals(partialPublicShare, curve.G().mult(partialShare));
+}
+
 
 export function computeLambda(id: BigNumber, otherIDs: Array<BigNumber>, curve: Curve): BigNumber {
   const i = id
