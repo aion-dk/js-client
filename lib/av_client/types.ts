@@ -390,6 +390,7 @@ export type availableCustomRulesets = 'belgian_ballot_rules';
 export interface ContestContent {
   reference: string
   title: LocalString
+  id?: number
   subtitle?: LocalString
   question?: LocalString
   description?: LocalString
@@ -420,6 +421,7 @@ export interface ResultType {
 export interface OptionContent {
   reference: string
   code: number
+  id?: number
   title: LocalString
   subtitle?: LocalString
   description?: LocalString
