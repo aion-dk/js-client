@@ -609,6 +609,10 @@ export class AVClient implements IAVClient {
     return this.keyPair.privateKey
   }
 
+  public generateSignature(payload: string): string {
+    return this.crypto.sign(payload, this.privateKey())
+  }
+
   /**
    * Registers a voter by proof of identity
    * Used when the authorization mode of the Voter Authorizer is 'proof-of-identity'
