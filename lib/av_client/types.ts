@@ -407,6 +407,7 @@ export interface ContestContent {
   blankOptionColor?: string
   customRulesets?: availableCustomRulesets[]
   attachments?: Attachment[]
+  displayScrollToBottomBtn?: boolean
 }
 
 export interface Error {
