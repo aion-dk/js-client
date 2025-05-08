@@ -429,6 +429,7 @@ export interface OptionContent {
   image?: string
   selectable?: boolean
   exclusive?: boolean
+  excluded?: boolean;
   children?: OptionContent[]
   parentContent?: OptionContent
   parent?: ParentOption | null
