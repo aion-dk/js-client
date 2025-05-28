@@ -1,4 +1,3 @@
-/*eslint-disable @typescript-eslint/no-explicit-any*/
 import {AVClient, LatestConfig} from '../lib/av_client';
 import latestConfig from './fixtures/latestConfig'
 import {expect} from "chai";

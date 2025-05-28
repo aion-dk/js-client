@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import {AVCrypto, hexDigest} from "../../lib/av_crypto";
-import {fixedPoint1Hex, fixedPoint2Hex, fixedScalar1, fixedScalar1Hex, fixedScalar2Hex} from "./test_helpers";
+import {fixedPoint1Hex, fixedPoint2Hex, fixedScalar1Hex, fixedScalar2Hex} from "./test_helpers";
 import {pattern as cryptogramPattern} from "../../lib/av_crypto/el_gamal/cryptogram";
 import {pattern as proofPattern} from "../../lib/av_crypto/discrete_logarithm/proof";
 import {pattern as signaturePattern} from "../../lib/av_crypto/schnorr/signature";
@@ -289,7 +289,7 @@ describe("AVCrypto", () => {
 
     it("returns deterministic keypair", () => {
       const electionCodes = ["1"]
-      const {privateKey, publicKey, proof} = crypto.generateProofOfElectionCodes(electionCodes)
+      const {privateKey, publicKey} = crypto.generateProofOfElectionCodes(electionCodes)
 
       expect(privateKey).eql("a259f4b44e30abc0cd53379381bdc86f44723911a5bc03bf4ff21d1b49b53efd")
       expect(publicKey).eql("0290d410a7d25411bdd3d82ace5f707d02c054b60e7dc8883c1f07be4265704dd6")
@@ -311,7 +311,7 @@ describe("AVCrypto", () => {
 
       it("returns deterministic keypair", () => {
         const electionCodes = ["1"]
-        const {privateKey, publicKey, proof} = crypto.generateProofOfElectionCodes(electionCodes)
+        const {privateKey, publicKey} = crypto.generateProofOfElectionCodes(electionCodes)
 
         expect(privateKey).eql("0059f4b44e30abc0cd53379381bdc86f44723911a5bc03bf4ff21d1b49b53efd4bcd1311e502bbc66c29d2302b3ba26700225a76e6bb867063dfe7f34f259add7741")
         expect(publicKey).eql("0201966d91cae0ae153148b68ff1c04a86e38ca4d693ebe5fa39288e1c871e15642b10494cf566d739146e659c8e50a0b7b5d4571f3ad4b5e3077af5181ad6101ffc0b")
