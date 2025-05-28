@@ -1,7 +1,7 @@
 /*eslint-disable @typescript-eslint/no-explicit-any*/
 import { expect } from 'chai';
 import sinon = require('sinon');
-import * as sjcl from '../lib/av_client/sjcl';
+import * as sjcl from 'sjcl-with-all';
 import 'dotenv/config'
 
 function getEnvVar(name: string): string {
