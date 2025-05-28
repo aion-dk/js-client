@@ -1,4 +1,4 @@
-import * as base from 'base-x'
+import base from 'base-x'
 import { InvalidTrackingCodeError } from './errors'
 
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
@@ -11,9 +11,9 @@ const BASE58_PAD = BASE58[0]
 const HEX_PAD = '0'
 
 /**
- * Converts from hex to base58. 
+ * Converts from hex to base58.
  * The returned base58 string is padded to 7 chars.
- * 
+ *
  * @param hex hex string of 10 chars
  * @returns a base58 string of 7 chars
  */
@@ -32,9 +32,9 @@ export function hexToShortCode(input: string): string {
 }
 
 /**
- * Converts from base58 to hex. 
+ * Converts from base58 to hex.
  * The returned hex string is padded to 10 chars.
- * 
+ *
  * @param input base58 string of 7 chars
  * @returns hex string of 10 chars
  */

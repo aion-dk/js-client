@@ -237,7 +237,7 @@ export class AVVerifier {
     let receiptData
     try {
       receiptData = JSON.parse(atob(encodedReceipt))
-    } catch (err) {
+    } catch (_err) {
       throw new InvalidReceiptError("Receipt string is invalid")
     }
 

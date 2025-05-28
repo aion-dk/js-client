@@ -7,7 +7,7 @@ import { constructContestEnvelopes } from './av_client/construct_contest_envelop
 import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig, ProofOfElectionCodes } from './av_client/types';
 import { randomKeyPair } from './av_client/new_crypto/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
-import jwtDecode, { JwtPayload } from "jwt-decode";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 
 import {
   fetchLatestConfig,
