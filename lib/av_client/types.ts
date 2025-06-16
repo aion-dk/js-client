@@ -529,6 +529,7 @@ export interface ElectionConfigContent {
   }
   sendTrackingCodeByEmail?: boolean
   dbasUrl?: string
+  utilizeScreenspace?: boolean
 }
 
 // Genesis Config Item
