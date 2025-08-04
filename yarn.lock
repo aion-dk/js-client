@@ -15,7 +15,7 @@
     "@jridgewell/gen-mapping" "^0.3.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@assemblyvoting/av-crypto@~1.0.0":
+"@assemblyvoting/av-crypto@~1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@assemblyvoting/av-crypto/-/av-crypto-1.0.1.tgz#e9d2e451fca59d2eec41bd786b533c460d6ddf92"
   integrity sha512-EF62ZWNfnsHuARjTpHBofqoO5f4PDcD7ut+zzLQorFsC3RjK6TIYfUYdrqRtf4CVnboRb+1t2uvRUzj+ReIPHw==
