@@ -1,5 +1,5 @@
 import {ContestEnvelope, ContestMap, SealedPile} from '../types';
-import {AVCrypto} from "../../av_crypto";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 export function generateEnvelopeProofs( crypto: AVCrypto, contestEnvelopes: ContestEnvelope[] ): ContestMap<string[][]> {
   const entries = contestEnvelopes.map(ce => {

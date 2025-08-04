@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import {generateCommitment, validateCommitment} from "../../lib/av_client/new_crypto/commitments";
-import {AVCrypto} from "../../lib/av_crypto";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 describe("Pedersen Commitment", () => {
   const messages = {

@@ -5,7 +5,7 @@ import { bulletinBoardHost } from '../test_helpers'
 import { LatestConfig } from '../../lib/av_client/types';
 import latestConfig from '../fixtures/latestConfig';
 import {InvalidReceiptError, InvalidTrackingCodeError} from "../../lib/av_client/errors";
-import * as AVCrypto from "../../lib/av_crypto";
+import * as AVCrypto from "@assemblyvoting/av-crypto";
 
 
 describe('#isReceiptValid', () => {

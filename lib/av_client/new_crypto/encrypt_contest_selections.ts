@@ -6,7 +6,7 @@ import {
   EncryptedPile, SelectionPile
 } from "../types";
 import { selectionPileToByteArray } from "../encoding/byte_encoding";
-import { AVCrypto } from "../../av_crypto";
+import { AVCrypto } from "@assemblyvoting/av-crypto";
 
 export function encryptContestSelections(
   crypto: AVCrypto,

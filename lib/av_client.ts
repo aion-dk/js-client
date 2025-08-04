@@ -50,7 +50,7 @@ import { submitBallotCryptograms } from './av_client/actions/submit_ballot_crypt
 import {AxiosResponse} from "axios";
 import { proofOfElectionCodes } from "./av_client/new_crypto/proof_of_election_codes";
 import {validateCommitment} from "./av_client/new_crypto/commitments";
-import {AVCrypto} from "./av_crypto";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 /**
  * # Assembly Voting Client API

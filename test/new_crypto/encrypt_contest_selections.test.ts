@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { encryptContestSelections } from '../../lib/av_client/new_crypto/encrypt_contest_selections'
 import { ContestConfig, ContestConfigMap } from '../../lib/av_client/types';
-import {AVCrypto} from "../../lib/av_crypto";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 const encryptionKey = '021edaa87d7626dbd2faa99c4dc080f443c150ab70b24da411b13aa56249b5242e'
 

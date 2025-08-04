@@ -3,7 +3,7 @@ import {constructContestEnvelopes} from '../lib/av_client/construct_contest_enve
 import {ContestConfig, BallotConfig, ClientState, VotingRoundConfig, BallotSelection} from '../lib/av_client/types';
 import latestConfig from './fixtures/latestConfig';
 import {baseItemAttributes} from "./fixtures/itemHelper";
-import {AVCrypto} from "../lib/av_crypto";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 const contestOne: ContestConfig = {
   ...baseItemAttributes(),

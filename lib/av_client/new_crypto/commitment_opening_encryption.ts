@@ -2,7 +2,7 @@ import {
   CommitmentOpening,
   EncryptedCommitmentOpening
 } from "../types";
-import {AVCrypto} from "../../av_crypto";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 export function encryptCommitmentOpening(crypto: AVCrypto, verifierPublicKey: string, commitmentOpening: CommitmentOpening): EncryptedCommitmentOpening {
   const text = JSON.stringify(commitmentOpening)

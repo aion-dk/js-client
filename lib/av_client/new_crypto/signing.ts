@@ -1,5 +1,5 @@
 import { BoardItem, ItemExpectation } from '../types'
-import {AVCrypto, hexDigest} from "../../av_crypto";
+import {AVCrypto, hexDigest} from "@assemblyvoting/av-crypto";
 import {Uniformer} from '../../util/uniformer';
 
 export function signPayload(crypto: AVCrypto, obj: Record<string, unknown>, privateKey: string) {

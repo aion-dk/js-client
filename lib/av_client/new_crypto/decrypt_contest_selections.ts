@@ -1,6 +1,6 @@
 import {ContestConfigMap, ContestSelection, ContestMap, CommitmentOpening, SealedPile} from "../types"
 import { byteArrayToSelectionPile } from "../encoding/byte_encoding"
-import {AVCrypto} from "../../av_crypto";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 export function decryptContestSelections(
   crypto: AVCrypto,

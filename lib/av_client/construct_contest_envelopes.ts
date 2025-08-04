@@ -3,7 +3,7 @@ import { InvalidStateError } from './errors'
 import { generateCommitment } from './new_crypto/commitments'
 import { encryptContestSelections } from './new_crypto/encrypt_contest_selections'
 import { BallotSelection, ContestEnvelope, ContestMap, ClientState } from './types'
-import {AVCrypto} from "../av_crypto";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 export function constructContestEnvelopes( crypto: AVCrypto, state: ClientState, ballotSelection: BallotSelection, transparent = false ): ConstructResult {
   const { contestConfigs, ballotConfig, encryptionKey, votingRoundConfig, weight } = extractConfig(state)

@@ -3,7 +3,7 @@ import { BallotCryptogramItem, ContestEnvelope, ContestMap, VerificationStartIte
 import { signPayload, validatePayload, validateReceipt } from '../new_crypto/signing'
 import { BALLOT_CRYPTOGRAMS_ITEM } from '../constants'
 import { finalizeCryptograms, generateEnvelopeProofs } from '../new_crypto/finalize_cryptograms'
-import {AVCrypto} from "../../av_crypto";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 export async function submitBallotCryptograms(
   crypto: AVCrypto,

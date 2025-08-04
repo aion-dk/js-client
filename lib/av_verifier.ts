@@ -24,7 +24,7 @@ import {InvalidContestError, InvalidReceiptError, InvalidTrackingCodeError} from
 import {decryptContestSelections} from './av_client/new_crypto/decrypt_contest_selections';
 import {makeOptionFinder} from './av_client/option_finder';
 import {validateCommitment} from "./av_client/new_crypto/commitments";
-import {AVCrypto} from "./av_crypto";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;

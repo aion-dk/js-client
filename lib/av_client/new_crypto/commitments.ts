@@ -2,8 +2,8 @@ import {
   CommitmentOpening,
   ContestMap
 } from "../types";
-import {AVCrypto} from "../../av_crypto";
-import {concatForHashing} from "../../av_crypto/utils";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
+import {concatForHashing} from "@assemblyvoting/av-crypto/dist/lib/av_crypto/utils";
 
 export function generateCommitment(crypto: AVCrypto, randomizersMap: ContestMap<string[][]>): { commitment: string, randomizer: string } {
   const randomizers = flattenRandomizers(randomizersMap)

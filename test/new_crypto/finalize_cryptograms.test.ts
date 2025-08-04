@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { finalizeCryptograms, generateEnvelopeProofs } from '../../lib/av_client/new_crypto/finalize_cryptograms'
 import { ContestEnvelope, ContestMap } from '../../lib/av_client/types'
-import {AVCrypto} from "../../lib/av_crypto";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 const voterEnvelopes: ContestEnvelope[] = [
   {

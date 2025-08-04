@@ -2,7 +2,7 @@ import { BulletinBoard } from "../connectors/bulletin_board";
 import { BOARD_COMMITMENT_ITEM, VOTER_COMMITMENT_ITEM } from "../constants";
 import { signPayload, validatePayload, validateReceipt } from "../new_crypto/signing";
 import { BoardCommitmentItem, ContestMap, VoterCommitmentItem } from "../types";
-import {AVCrypto} from "../../av_crypto";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 type SubmitVoterCommitmentResponse = {
   voterCommitment: VoterCommitmentItem
