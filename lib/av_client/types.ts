@@ -408,6 +408,7 @@ export interface ContestContent {
   customRulesets?: availableCustomRulesets[]
   attachments?: Attachment[]
   displayScrollToBottomBtn?: boolean
+  mode?: "list" | "gallery"
 }
 
 export interface Error {
@@ -528,6 +529,7 @@ export interface ElectionConfigContent {
   }
   sendTrackingCodeByEmail?: boolean
   dbasUrl?: string
+  utilizeScreenspace?: boolean
 }
 
 // Genesis Config Item
