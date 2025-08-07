@@ -79,6 +79,22 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
+  sendSms(
+    receipt: BallotBoxReceipt,
+    authorizationSessionId: string,
+    dbasUrl?: string,
+    locale = "en"
+  ): Promise<AxiosResponse> {
+    return this.backend.post(`${locale}/send_sms`, {
+      trackingCode: receipt.trackingCode,
+      electionContextUuid: this.electionContextUuid,
+      authorizationSessionId: authorizationSessionId,
+      receipt: receipt.receipt,
+      dbasUrl: dbasUrl,
+    });
+  }
+
+
   requestPublicKeyAuthorization(
     sessionId: string,
     identityConfirmationToken: IdentityConfirmationToken,
