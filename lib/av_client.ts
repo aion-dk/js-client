@@ -500,6 +500,17 @@ export class AVClient implements IAVClient {
         }
       }
 
+      if (this.getLatestConfig().items.electionConfig.content.sendSmsAfterVoting) {
+        const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
+        const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
+        const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
+        try {
+          await coordinator.sendSms(clientReceipt, this.authorizationSessionId, this.getLatestConfig().items.electionConfig.content.dbasUrl, locale);
+        } catch(e) {
+          console.error(e)
+        }
+      }
+
       return clientReceipt
     }
 
