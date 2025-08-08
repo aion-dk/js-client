@@ -1,17 +1,18 @@
 import { validateBallotSelection } from './validate_selections'
 import { InvalidStateError } from './errors'
-import { generatePedersenCommitment } from './crypto/pedersen_commitment'
-import { encryptContestSelections } from './encrypt_contest_selections'
+import { generateCommitment } from './new_crypto/commitments'
+import { encryptContestSelections } from './new_crypto/encrypt_contest_selections'
 import { BallotSelection, ContestEnvelope, ContestMap, ClientState } from './types'
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
-export function constructContestEnvelopes( state: ClientState, ballotSelection: BallotSelection, transparent = false ): ConstructResult {
+export function constructContestEnvelopes( crypto: AVCrypto, state: ClientState, ballotSelection: BallotSelection, transparent = false ): ConstructResult {
   const { contestConfigs, ballotConfig, encryptionKey, votingRoundConfig, weight } = extractConfig(state)
 
   validateBallotSelection(ballotConfig, contestConfigs, ballotSelection, votingRoundConfig, weight)
 
-  const contestEnvelopes = encryptContestSelections(contestConfigs, ballotSelection.contestSelections, encryptionKey, transparent)
+  const contestEnvelopes = encryptContestSelections(crypto, contestConfigs, ballotSelection.contestSelections, encryptionKey, transparent)
   const envelopeRandomizers = extractRandomizers(contestEnvelopes)
-  const pedersenCommitment = generatePedersenCommitment(envelopeRandomizers)
+  const pedersenCommitment = generateCommitment(crypto, envelopeRandomizers)
 
   return {
     pedersenCommitment,

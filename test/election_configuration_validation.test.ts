@@ -7,7 +7,7 @@ import latestConfig from './fixtures/latestConfig'
 
 describe('election configuration validation', () => {
   let client: AVClient;
-  const config: LatestConfig = latestConfig
+  const config: LatestConfig = latestConfig;
 
   beforeEach(async () => {
     client = new AVClient('http://nothing.local');
@@ -22,9 +22,9 @@ describe('election configuration validation', () => {
         client.initialize(config),
         InvalidConfigError,
         'Received invalid election configuration. Errors: Configuration is missing OTP Provider URL'
-        );
+      );
 
-        latestConfig.items.voterAuthorizerConfig.content.identityProvider.url = 'http://otp:3001';
+      latestConfig.items.voterAuthorizerConfig.content.identityProvider.url = 'http://otp:3001';
     });
   });
 
@@ -37,11 +37,14 @@ describe('election configuration validation', () => {
         InvalidConfigError,
         'Received invalid election configuration. Errors: Configuration is missing Voter Authorizer URL'
       );
+
+      latestConfig.items.voterAuthorizerConfig.content.voterAuthorizer.url = 'http://voter-authorizer:3002/';
     });
   });
 
   context('services key is missing', () => {
     it('fails with an error', async () => {
+      const vaConfig = config.items.voterAuthorizerConfig;
       delete (config as any).items.voterAuthorizerConfig;
 
       await expectError(
@@ -54,6 +57,8 @@ describe('election configuration validation', () => {
         "Configuration is missing Voter Authorizer election context uuid,\n" +
         "Configuration is missing Voter Authorizer public key"
       );
+
+      latestConfig.items.voterAuthorizerConfig = vaConfig;
     });
   });
 });

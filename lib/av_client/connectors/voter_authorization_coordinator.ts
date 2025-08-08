@@ -1,8 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { IdentityConfirmationToken } from "./otp_provider";
 import { EmailDoesNotMatchVoterRecordError, NetworkError, UnsupportedServerReplyError, VoterRecordNotFoundError, DBBError, BallotReferenceNotOnVoterRecord } from "../errors";
-import { ProofOfElectionCodes } from "../crypto/proof_of_election_codes";
-import { BallotBoxReceipt, VoterAuthorizationIdentification } from '../types';
+import { BallotBoxReceipt, VoterAuthorizationIdentification, ProofOfElectionCodes } from '../types';
 
 export default class VoterAuthorizationCoordinator {
   private backend: AxiosInstance;

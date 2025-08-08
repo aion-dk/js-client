@@ -1,6 +1,7 @@
 import { expect } from 'chai'
-import { finalizeCryptograms } from '../lib/av_client/finalize_cryptograms'
-import { ContestEnvelope, ContestMap } from '../lib/av_client/types'
+import { finalizeCryptograms, generateEnvelopeProofs } from '../../lib/av_client/new_crypto/finalize_cryptograms'
+import { ContestEnvelope, ContestMap } from '../../lib/av_client/types'
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 const voterEnvelopes: ContestEnvelope[] = [
   {
@@ -27,10 +28,12 @@ const emptyCryptograms: ContestMap<string[][]> = {
   ]]
 }
 
+const crypto = new AVCrypto("secp256k1")
+
 describe('finalizeCryptograms', () => {
   it('adds cryptograms together', () => {
 
-    const finalizedCryptograms = finalizeCryptograms(voterEnvelopes, emptyCryptograms)
+    const finalizedCryptograms = finalizeCryptograms(crypto, voterEnvelopes, emptyCryptograms)
 
     expect(finalizedCryptograms).to.deep.equal({
       'big-contest': [{
@@ -40,6 +43,19 @@ describe('finalizeCryptograms', () => {
           '02486067b22601134dd07a92dee56a16bb335cd2ff4512f49348c5d4669aa25e16,03844d69aa79b9e361c4e57135944c86413eb1b3c810d0d84ce029e47c13c6c3ac'
         ]
       }]
+    })
+  })
+})
+
+describe("generateEnvelopeProofs", () => {
+  it("generates proofs of correct encryption", () => {
+    const proofs = generateEnvelopeProofs(crypto, voterEnvelopes)
+
+    expect(proofs).to.have.all.keys('big-contest')
+    expect(proofs['big-contest'].length).to.eql(1)
+    expect(proofs['big-contest'][0].length).to.eql(2)
+    proofs['big-contest'][0].forEach((proof) => {
+      expect(proof).to.be.a('string')
     })
   })
 })
