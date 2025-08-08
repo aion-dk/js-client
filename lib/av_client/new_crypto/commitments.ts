@@ -3,12 +3,10 @@ import {
   ContestMap
 } from "../types";
 import {AVCrypto} from "@assemblyvoting/av-crypto";
-import {concatForHashing} from "@assemblyvoting/av-crypto/dist/lib/av_crypto/utils";
 
 export function generateCommitment(crypto: AVCrypto, randomizersMap: ContestMap<string[][]>): { commitment: string, randomizer: string } {
   const randomizers = flattenRandomizers(randomizersMap)
-  const context = concatContext(randomizersMap)
-
+  const context = contestReferences(randomizersMap)
   const commitment = crypto.commit(randomizers, context)
 
   return {
@@ -16,10 +14,9 @@ export function generateCommitment(crypto: AVCrypto, randomizersMap: ContestMap<
     randomizer: commitment.privateCommitmentRandomizer,
   }
 }
-
 export function validateCommitment(crypto: AVCrypto, commitmentOpening: CommitmentOpening, commitment: string, customErrorMessage?: string ): void {
   const encryptionRandomizers = flattenRandomizers(commitmentOpening.randomizers)
-  const context = concatContext(commitmentOpening.randomizers)
+  const context = contestReferences(commitmentOpening.randomizers)
 
   const valid = crypto.isValidCommitment(
     commitment,
@@ -39,8 +36,6 @@ function flattenRandomizers(randomizersMap: ContestMap<string[][]>): string[] {
   return iterator.map(([_, matrix]) => matrix).flat(2)
 }
 
-function concatContext(randomizersMap: ContestMap<string[][]>): string {
-  const iterator = Object.entries(randomizersMap)
-
-  return concatForHashing(iterator.map(([reference, _]) => reference))
+function contestReferences(randomizersMap: ContestMap<string[][]>): string[] {
+  return Object.keys(randomizersMap)
 }
