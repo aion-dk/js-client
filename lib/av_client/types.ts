@@ -448,6 +448,7 @@ export interface OptionContent {
   maxChooseableSuboptions?: number
   minChooseableSuboptions?: number
   candidateId?: number
+  isParty?: boolean
 }
 
 export interface ParentOption {
