@@ -499,6 +499,7 @@ export interface VotingRoundContent {
   resultPublicationDelay?: number
   recasting?: boolean
   attachments?: Attachment[]
+  prefilledContestSelections?: ContestSelection[]
 }
 
 // Election Config Item
