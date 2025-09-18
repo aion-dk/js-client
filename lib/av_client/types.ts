@@ -408,6 +408,7 @@ export interface ContestContent {
   customRulesets?: availableCustomRulesets[]
   attachments?: Attachment[]
   displayScrollToBottomBtn?: boolean
+  displayDescriptionOnSummary?: boolean
   mode?: "list" | "gallery"
 }
 
