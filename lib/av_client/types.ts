@@ -408,6 +408,7 @@ export interface ContestContent {
   customRulesets?: availableCustomRulesets[]
   attachments?: Attachment[]
   displayScrollToBottomBtn?: boolean
+  displayDescriptionOnSummary?: boolean
   mode?: "list" | "gallery"
 }
 
@@ -448,6 +449,7 @@ export interface OptionContent {
   maxChooseableSuboptions?: number
   minChooseableSuboptions?: number
   candidateId?: number
+  isParty?: boolean
 }
 
 export interface ParentOption {
@@ -498,6 +500,7 @@ export interface VotingRoundContent {
   resultPublicationDelay?: number
   recasting?: boolean
   attachments?: Attachment[]
+  prefilledContestSelections?: ContestSelection[]
 }
 
 // Election Config Item
