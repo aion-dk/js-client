@@ -1,8 +1,29 @@
-import { validatePayload, validateReceipt } from '../lib/av_client/sign';
+import {signPayload, validatePayload, validateReceipt} from '../lib/av_client/new_crypto/signing';
 import { ItemExpectation, BoardItem } from '../lib/av_client/types';
 import { expect } from 'chai';
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 describe('Validation checks', () => {
+  const crypto = new AVCrypto("secp256k1")
+
+  context('signPayload', () => {
+    const item = {
+      parentAddress: "parent address",
+      type: "type",
+      content: {
+        key: "value"
+      }
+    }
+
+    const privateKey = 'c459c2064e36420e54c799fb8801b63e470d8e6e683b985906b4a1bac39311a4';
+    it("adds a signature", () => {
+      const signedPayload = signPayload(crypto, item, privateKey)
+
+      expect(signedPayload).to.include.all.keys("signature");
+      expect(signedPayload.signature).to.be.a('string')
+    });
+  })
+
   context('validatePayload', () => {
     const expectedItem: ItemExpectation = {
       parentAddress: "12345",
@@ -58,37 +79,37 @@ describe('Validation checks', () => {
     }
 
     it("Session payload is correct", () => {
-      expect(() => validatePayload(receivedSessionItem, expectedSessionItem)).not.to.throw();
+      expect(() => validatePayload(crypto, receivedSessionItem, expectedSessionItem)).not.to.throw();
     });
 
     it("Payload is correct", () => {
-      expect(() => validatePayload(receivedItem, expectedItem)).not.to.throw();
+      expect(() => validatePayload(crypto, receivedItem, expectedItem)).not.to.throw();
     });
 
     it("Type doesn't match", () => {
       const wrongType:ItemExpectation = { ...expectedItem, type: "VoterEncryptionCommitmentItem" };
-      expect(() => validatePayload(receivedItem, wrongType)).to.throw("BoardItem did not match expected type");
+      expect(() => validatePayload(crypto, receivedItem, wrongType)).to.throw("BoardItem did not match expected type");
     });
 
     it("Parent address doesn't match", () => {
       const wrongAddress:ItemExpectation = { ...expectedItem, parentAddress: "67890" };
-      expect(() => validatePayload(receivedItem, wrongAddress)).to.throw("BoardItem did not match expected parent address");
+      expect(() => validatePayload(crypto, receivedItem, wrongAddress)).to.throw("BoardItem did not match expected parent address");
     });
 
     it("Content/address doesn't match", () => {
       const wrongContent:ItemExpectation = { ...expectedItem, content: { cryptograms: "cryptostuff" } };
-      expect(() => validatePayload(receivedItem, wrongContent)).to.throw("Item payload failed sanity check");
+      expect(() => validatePayload(crypto, receivedItem, wrongContent)).to.throw("Item payload failed sanity check");
     });
 
     it("Signature doesn't match", () => {
       const signature = "something,somethingelse";
-      expect(() => validatePayload(receivedItem, expectedItem, signature)).to.throw("invalid number of arguments in encoding");
+      expect(() => validatePayload(crypto, receivedItem, expectedItem, signature)).to.throw("input must match ^(([a-f0-9]{64}),([a-f0-9]{64}))$");
     });
   });
 
   context('validateReceipt', () => {
-    const publicKey = 'c459c2064e36420e54c799fb8801b63e470d8e6e683b985906b4a1bac39311a4';
-    // const privateKey = '02049ff8df4763cd2a85bfcd3a1bfde12ec8dc863509646556d922944ef4e870dc';
+    // const privateKey = 'c459c2064e36420e54c799fb8801b63e470d8e6e683b985906b4a1bac39311a4';
+    const publicKey = '02049ff8df4763cd2a85bfcd3a1bfde12ec8dc863509646556d922944ef4e870dc';
 
     const item: BoardItem = {
       address: "bfaef009311cd6d6f36acb31db1f44468b8f2ef23d606b7ca7331e9fb3b1e4fa",
@@ -131,18 +152,18 @@ describe('Validation checks', () => {
     ];
 
     it("Receipt is valid", () => {
-      const receipt = "2b68859d219385f1913f0f3570f21ce6816237041bccc64e58eba6b268d8c98c,de749a195554ef256dcb9556cb86a4708b05bc229bed2c6522efdf3fdbe53f83";
-      expect(() => validateReceipt(items, receipt, publicKey)).to.not.throw;
+      const receipt = "84cc25b182c377e22283c0704769fc7453fd51ef84cd40ae899399ee6240965d,092139e51200b6e842c66954bfd1199b8d01d2eece8eabd98b9224c4e717d6b1";
+      expect(() => validateReceipt(crypto, items, receipt, publicKey)).to.not.throw();
     });
 
     it("Signature has wrong number of arguments", () => {
       const receipt = "something";
-      expect(() => validateReceipt(items, receipt, publicKey)).to.throw("invalid number of arguments in encoding, SchnorrSignature");
+      expect(() => validateReceipt(crypto, items, receipt, publicKey)).to.throw("input must match ^(([a-f0-9]{64}),([a-f0-9]{64}))$");
     });
 
     it("Receipt is invalid", () => {
       const receipt = "71b8d5d9565d7a174cc2938b1a591281538bbbd913032ff87f7d92071e01f335,70cef6d1f4d1ef06f5a1a207c70dcd936a2c6fb508361e61cf4c77aa1175319d";
-      expect(() => validateReceipt(items, receipt, publicKey)).to.throw("not on the curve!");
+      expect(() => validateReceipt(crypto, items, receipt, publicKey)).to.throw("Board receipt verification failed");
     });
   });
 });

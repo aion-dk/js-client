@@ -1,11 +1,12 @@
 import { BulletinBoard } from '../connectors/bulletin_board'
 import { BallotCryptogramItem, ContestEnvelope, ContestMap, VerificationStartItem } from '../types'
-import { signPayload, validatePayload, validateReceipt } from '../sign'
+import { signPayload, validatePayload, validateReceipt } from '../new_crypto/signing'
 import { BALLOT_CRYPTOGRAMS_ITEM } from '../constants'
-import { generateDiscreteLogarithmProof } from '../aion_crypto'
-import { finalizeCryptograms } from '../finalize_cryptograms'
+import { finalizeCryptograms, generateEnvelopeProofs } from '../new_crypto/finalize_cryptograms'
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 export async function submitBallotCryptograms(
+  crypto: AVCrypto,
   bulletinBoard: BulletinBoard,
   clientEnvelopes: ContestEnvelope[],
   serverEnvelopes: ContestMap<string[][]>,
@@ -14,7 +15,7 @@ export async function submitBallotCryptograms(
   dbbPublicKey: string
 ): Promise<[BallotCryptogramItem, VerificationStartItem]> {
 
-  const finalizedCryptograms = finalizeCryptograms(clientEnvelopes, serverEnvelopes)
+  const finalizedCryptograms = finalizeCryptograms(crypto, clientEnvelopes, serverEnvelopes)
 
   const ballotCryptogramsItem = {
     parentAddress: boardCommitmentAddress,
@@ -24,11 +25,11 @@ export async function submitBallotCryptograms(
     }
   }
 
-  const signedBallotCryptogramsItem = signPayload(ballotCryptogramsItem, voterPrivateKey)
+  const signedBallotCryptogramsItem = signPayload(crypto, ballotCryptogramsItem, voterPrivateKey)
 
   const itemWithProofs = {
     ...signedBallotCryptogramsItem,
-    proofs: generateEnvelopeProofs(clientEnvelopes)
+    proofs: generateEnvelopeProofs(crypto, clientEnvelopes)
   }
 
   const response = (await bulletinBoard.submitVotes(itemWithProofs));
@@ -36,22 +37,11 @@ export async function submitBallotCryptograms(
   const verificationItem = response.data.verification;
   const receipt = response.data.receipt;
 
-  validatePayload(ballotCryptogramsItemCopy, ballotCryptogramsItem)
-  validateReceipt([ballotCryptogramsItemCopy, verificationItem], receipt, dbbPublicKey)
+  validatePayload(crypto, ballotCryptogramsItemCopy, ballotCryptogramsItem)
+  validateReceipt(crypto, [ballotCryptogramsItemCopy, verificationItem], receipt, dbbPublicKey)
 
   return [
     ballotCryptogramsItemCopy as BallotCryptogramItem,
     verificationItem as VerificationStartItem
   ]
-}
-
-function generateEnvelopeProofs( contestEnvelopes: ContestEnvelope[] ): ContestMap<string[][]> {
-  const entries = contestEnvelopes.map(ce => {
-    const envelopeProofs = ce.piles.map((p) => {
-      return p.randomizers.map(r => generateDiscreteLogarithmProof(r))
-    })
-    return [ce.reference, envelopeProofs]
-  }
-  )
-  return Object.fromEntries(entries)
 }

@@ -4,11 +4,9 @@ import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/o
 import { extractContestSelections } from './util/nist_cvr_extractor';
 import { AVVerifier } from './av_verifier';
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
-import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig } from './av_client/types';
-import { randomKeyPair } from './av_client/generate_key_pair';
+import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig, ProofOfElectionCodes } from './av_client/types';
+import { randomKeyPair } from './av_client/new_crypto/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
-import { Buffer } from 'buffer'
-import * as Crypto from "../lib/av_client/aion_crypto.js"
 import { JwtPayload, jwtDecode } from "jwt-decode";
 
 import {
@@ -42,20 +40,17 @@ import {
   DBBError
 } from './av_client/errors';
 
-import * as sjclLib from './av_client/sjcl';
-import { signPayload, validatePayload, validateReceipt } from './av_client/sign';
+import { signPayload, validatePayload, validateReceipt } from './av_client/new_crypto/signing';
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
-import { encryptCommitmentOpening, validateCommmitmentOpening } from './av_client/crypto/commitments';
+import { encryptCommitmentOpening } from './av_client/new_crypto/commitment_opening_encryption';
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
 import {AxiosResponse} from "axios";
-import { ProofOfElectionCodes } from "./av_client/crypto/proof_of_election_codes";
-import { dhEncrypt } from "./av_client/crypto/aes";
-
-/** @internal */
-export const sjcl = sjclLib;
+import { proofOfElectionCodes } from "./av_client/new_crypto/proof_of_election_codes";
+import {validateCommitment} from "./av_client/new_crypto/commitments";
+import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 /**
  * # Assembly Voting Client API
@@ -94,6 +89,7 @@ export class AVClient implements IAVClient {
 
   private bulletinBoard: BulletinBoard;
   private latestConfig?: LatestConfig;
+  private crypto: AVCrypto;
   private keyPair: KeyPair;
 
   private clientEnvelopes: ContestEnvelope[];
@@ -131,10 +127,13 @@ export class AVClient implements IAVClient {
       this.latestConfig = await fetchLatestConfig(this.bulletinBoard);
     }
 
+    this.crypto = new AVCrypto(this.latestConfig.items.genesisConfig.content.eaCurveName)
+
     if (keyPair) {
       this.keyPair = keyPair;
+      // TODO: validate keyPair
     } else {
-      this.keyPair = randomKeyPair();
+      this.keyPair = randomKeyPair(this.crypto);
     }
   }
 
@@ -198,7 +197,7 @@ export class AVClient implements IAVClient {
   }
 
   generateProofOfElectionCodes(electionCodes : Array<string>) {
-    this.proofOfElectionCodes = new ProofOfElectionCodes(electionCodes);
+    this.proofOfElectionCodes = proofOfElectionCodes(this.crypto, electionCodes);
   }
 
   setIdentityToken(token: string) {
@@ -277,8 +276,8 @@ export class AVClient implements IAVClient {
     const voterSessionItem = voterSessionItemResponse.data.voterSession;
     const receipt = voterSessionItemResponse.data.receipt;
 
-    validatePayload(voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
-    validateReceipt([voterSessionItem], receipt, this.getDbbPublicKey());
+    validatePayload(this.crypto, voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
+    validateReceipt(this.crypto, [voterSessionItem], receipt, this.getDbbPublicKey());
 
     this.voterSession = voterSessionItem;
     this.bulletinBoard.setVoterSessionUuid(voterSessionItem.content.identifier);
@@ -390,7 +389,7 @@ export class AVClient implements IAVClient {
       pedersenCommitment,
       envelopeRandomizers,
       contestEnvelopes,
-    } = constructContestEnvelopes(state, ballotSelection, transparent);
+    } = constructContestEnvelopes(this.crypto, state, ballotSelection, transparent);
 
     this.clientEnvelopes = contestEnvelopes;
 
@@ -405,6 +404,7 @@ export class AVClient implements IAVClient {
       boardCommitment,
       serverEnvelopes
     } = await submitVoterCommitment(
+      this.crypto,
       this.bulletinBoard,
       this.voterSession.address,
       pedersenCommitment.commitment,
@@ -416,6 +416,7 @@ export class AVClient implements IAVClient {
     this.serverEnvelopes = serverEnvelopes;
 
     const [ ballotCryptogramItem, verificationStartItem ]  = await submitBallotCryptograms(
+      this.crypto,
       this.bulletinBoard,
       this.clientEnvelopes,
       this.serverEnvelopes,
@@ -437,7 +438,6 @@ export class AVClient implements IAVClient {
    * Requests that the previously constructed ballot is cast.
    *
    *
-   * @param affidavit The {@link Affidavit | affidavit} document.
    * @param locale The locale which the email with the vote receipt should be sent in
    * @return Returns the vote receipt. Example of a receipt:
    * ```javascript
@@ -451,9 +451,7 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-    public async castBallot(affidavit?: Affidavit, locale = "en"): Promise<BallotBoxReceipt> {
-      // Affidavit must be base64 encoded
-
+    public async castBallot(locale = "en"): Promise<BallotBoxReceipt> {
       if(!(this.voterSession)) {
         throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
       }
@@ -463,29 +461,13 @@ export class AVClient implements IAVClient {
           type: CAST_REQUEST_ITEM,
           content: {}
       };
-
-      let encryptedAffidavit;
-
-      if (affidavit && this?.latestConfig?.items?.electionConfig?.content?.castRequestItemAttachmentEncryptionKey) {
-        try {
-          encryptedAffidavit = dhEncrypt(this.latestConfig.items.electionConfig.content.castRequestItemAttachmentEncryptionKey, affidavit).toString()
-
-          castRequestItem.content['attachment'] = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(encryptedAffidavit))
-        } catch (err) {
-          console.error(err)
-        }
-      }
-
-      const signedPayload = signPayload(castRequestItem, this.privateKey());
-      if (encryptedAffidavit) {
-        signedPayload['attachment'] = `data:text/plain;base64,${Buffer.from(encryptedAffidavit).toString('base64')}`
-      }
+      const signedPayload = signPayload(this.crypto, castRequestItem, this.privateKey());
 
       const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
       const { castRequest, receipt } = response.data;
 
-      validatePayload(castRequest, castRequestItem);
-      validateReceipt([castRequest], receipt, this.getDbbPublicKey());
+      validatePayload(this.crypto, castRequest, castRequestItem);
+      validateReceipt(this.crypto, [castRequest], receipt, this.getDbbPublicKey());
 
       const clientReceipt = generateReceipt(receipt, castRequest);
 
@@ -523,7 +505,7 @@ export class AVClient implements IAVClient {
         content: {}
     }
 
-    const signedPayload = signPayload(spoilRequestItem, this.privateKey());
+    const signedPayload = signPayload(this.crypto, spoilRequestItem, this.privateKey());
 
     const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload))
 
@@ -531,9 +513,9 @@ export class AVClient implements IAVClient {
 
     this.spoilRequest = spoilRequest
 
-    validatePayload(spoilRequest, spoilRequestItem);
-    validateReceipt([spoilRequest], receipt, this.getDbbPublicKey());
-    validateCommmitmentOpening(boardCommitmentOpening, this.boardCommitment.content.commitment, 'Board commitment is not valid')
+    validatePayload(this.crypto, spoilRequest, spoilRequestItem);
+    validateReceipt(this.crypto, [spoilRequest], receipt, this.getDbbPublicKey());
+    validateCommitment(this.crypto, boardCommitmentOpening, this.boardCommitment.content.commitment, 'Board commitment is not valid')
 
     return spoilRequest.address
   }
@@ -556,11 +538,11 @@ export class AVClient implements IAVClient {
       parentAddress: this.verifierItem.address,
       type: VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM,
       content: {
-        package: encryptCommitmentOpening(this.verifierItem.content.publicKey, this.voterCommitmentOpening)
+        package: encryptCommitmentOpening(this.crypto, this.verifierItem.content.publicKey, this.voterCommitmentOpening)
       }
     }
 
-    const signedVoterCommitmentOpeningItem = signPayload(voterCommitmentOpeningItem, this.privateKey())
+    const signedVoterCommitmentOpeningItem = signPayload(this.crypto, voterCommitmentOpeningItem, this.privateKey())
 
     this.bulletinBoard.submitCommitmentOpenings(signedVoterCommitmentOpeningItem)
   }
@@ -628,7 +610,7 @@ export class AVClient implements IAVClient {
   }
 
   public generateSignature(payload: string): string {
-    return Crypto.generateSchnorrSignature(payload, this.privateKey())
+    return this.crypto.sign(payload, this.privateKey())
   }
 
   /**

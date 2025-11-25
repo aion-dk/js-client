@@ -622,3 +622,8 @@ export interface PartialCount {
   count: number;
   percentage: number;
 }
+
+export interface ProofOfElectionCodes {
+  mainKeyPair: KeyPair;
+  proof: string;
+}

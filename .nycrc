@@ -8,7 +8,6 @@
     "html_docs/*",
     "typedoc-wide-theme/*",
     "test/*",
-    "lib/av_client/sjcl.js",
     "demo/*"
   ]
 }

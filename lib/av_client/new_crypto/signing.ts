@@ -1,12 +1,12 @@
-import { BoardItem, ItemExpectation } from './types'
-import * as Crypto from './aion_crypto';
-import {Uniformer} from '../util/uniformer';
+import { BoardItem, ItemExpectation } from '../types'
+import {AVCrypto, hexDigest} from "@assemblyvoting/av-crypto";
+import {Uniformer} from '../../util/uniformer';
 
-export const signPayload = (obj: Record<string, unknown>, privateKey: string) => {
+export function signPayload(crypto: AVCrypto, obj: Record<string, unknown>, privateKey: string) {
   const uniformer = new Uniformer();
   const uniformPayload = uniformer.formString(obj);
 
-  const signature = Crypto.generateSchnorrSignature(uniformPayload, privateKey);
+  const signature = crypto.sign(uniformPayload, privateKey);
 
   return {
     ...obj,
@@ -14,7 +14,7 @@ export const signPayload = (obj: Record<string, unknown>, privateKey: string) =>
   }
 }
 
-export const validatePayload = (item: BoardItem, expectations: ItemExpectation, signaturePublicKey?: string) => {
+export function validatePayload(crypto: AVCrypto, item: BoardItem, expectations: ItemExpectation, signaturePublicKey?: string): void {
   if(expectations.type != item.type) {
     throw new Error(`BoardItem did not match expected type '${expectations.type}'`);
   }
@@ -22,6 +22,7 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
   if(expectations.parentAddress != item.parentAddress) {
     throw new Error(`BoardItem did not match expected parent address ${expectations.parentAddress}`);
   }
+
   if(expectations.content !== undefined) {
     const requiredContentAttributes = Object.keys(expectations.content)
     const itemContent = Object.fromEntries(Object.entries(item.content).filter(([key]) => requiredContentAttributes.includes(key)));
@@ -31,11 +32,11 @@ export const validatePayload = (item: BoardItem, expectations: ItemExpectation, 
   verifyAddress(item);
 
   if(signaturePublicKey !== undefined) {
-    verifySignature(item, signaturePublicKey);
+    verifySignature(crypto, item, signaturePublicKey);
   }
 }
 
-const verifySignature = (item: BoardItem, signaturePublicKey: string) => {
+function verifySignature(crypto: AVCrypto, item: BoardItem, signaturePublicKey: string): void {
   const uniformer = new Uniformer();
   const signedPayload = uniformer.formString({
     content: item.content,
@@ -43,12 +44,12 @@ const verifySignature = (item: BoardItem, signaturePublicKey: string) => {
     parentAddress: item.parentAddress
   });
 
-  if(!Crypto.verifySchnorrSignature(item.signature, signedPayload, signaturePublicKey)) {
+  if(!crypto.isValidSignature(item.signature, signedPayload, signaturePublicKey)) {
     throw new Error('Board signature verification failed');
   }
-};
+}
 
-const verifyContent = (actual: Record<string, unknown>, expectations: Record<string, unknown>) => {
+function verifyContent(actual: Record<string, unknown>, expectations: Record<string, unknown>): void {
   const uniformer = new Uniformer();
 
   const expectedContent = uniformer.formString(expectations);
@@ -57,9 +58,9 @@ const verifyContent = (actual: Record<string, unknown>, expectations: Record<str
   if(expectedContent != actualContent) {
     throw new Error('Item payload failed sanity check. Received item did not match expected');
   }
-};
+}
 
-export const verifyAddress = (item: BoardItem) => {
+export function verifyAddress(item: BoardItem): void {
   const uniformer = new Uniformer();
 
   const addressHashSource = uniformer.formString({
@@ -70,14 +71,14 @@ export const verifyAddress = (item: BoardItem) => {
     registeredAt: item.registeredAt
   });
 
-  const expectedItemAddress = Crypto.hashString(addressHashSource);
+  const expectedItemAddress = hexDigest(addressHashSource);
 
   if(item.address != expectedItemAddress) {
     throw new Error(`BoardItem address does not match expected address '${expectedItemAddress}'`);
   }
 }
 
-export const validateReceipt = (items: BoardItem[], receipt: string, publicKey: string) => {
+export function validateReceipt(crypto: AVCrypto, items: BoardItem[], receipt: string, publicKey: string): void {
   const uniformer = new Uniformer();
 
   const content = {
@@ -87,7 +88,7 @@ export const validateReceipt = (items: BoardItem[], receipt: string, publicKey: 
 
   const message = uniformer.formString(content);
 
-  if(!Crypto.verifySchnorrSignature(receipt, message, publicKey)) {
+  if(!crypto.isValidSignature(receipt, message, publicKey)) {
     throw new Error('Board receipt verification failed');
   }
 }

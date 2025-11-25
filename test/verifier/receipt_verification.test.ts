@@ -5,7 +5,7 @@ import { bulletinBoardHost } from '../test_helpers'
 import { LatestConfig } from '../../lib/av_client/types';
 import latestConfig from '../fixtures/latestConfig';
 import {InvalidReceiptError, InvalidTrackingCodeError} from "../../lib/av_client/errors";
-import * as Crypto from '../../lib/av_client/aion_crypto';
+import * as AVCrypto from "@assemblyvoting/av-crypto";
 
 
 describe('#isReceiptValid', () => {
@@ -95,7 +95,7 @@ describe('#isReceiptValid', () => {
     const trackingCode = "1D6vybS"
 
     before(() => {
-      sinon.replace(Crypto, 'hashString', sinon.fake.throws(new SyntaxError('Error')));
+      sinon.replace(AVCrypto, 'hexDigest', sinon.fake.throws(new SyntaxError('Error')));
     })
 
     it('bubbles up', () => {
