@@ -550,6 +550,7 @@ export interface GenesisConfigContent {
   electionSlug: string
   publicKey: string
   resultExtraction: 'post-election' | 'throughout-election'
+  electionCommittee?: boolean
 }
 
 // Segments Config Item
