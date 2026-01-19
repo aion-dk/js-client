@@ -611,6 +611,8 @@ export interface ClientState {
 export interface CheckedEventArgs {
   reference: string;
   amount: number;
+  text?: string;
+  onlyUpdate?: boolean;
 }
 
 export interface PartialResult {
