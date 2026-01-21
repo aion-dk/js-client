@@ -8,11 +8,25 @@ class SelectionPileValidator {
 
   validate(selectionPile: SelectionPile, includeLazyErrors = false): Error[] {
     const errors: Error[] = [];
+    const writeIns = this.contest.options.filter(option => option.writeIn !== undefined);
 
     if (this.referenceMissing(selectionPile.optionSelections)) errors.push({ message: 'invalid_reference'});
     if (this.tooManySelections(selectionPile.optionSelections)) errors.push({ message: 'too_many'});
     if (this.blankNotAlone(selectionPile.optionSelections, selectionPile.explicitBlank)) errors.push({message: 'blank'});
     if (this.exclusiveNotAlone(selectionPile.optionSelections)) errors.push({ message: 'exclusive' });
+    if (writeIns.length) {
+      selectionPile.optionSelections.forEach(selection => {
+        const writeInOptionsInSelection = writeIns.filter(option => option.reference === selection.reference);
+        if (writeInOptionsInSelection.length) {
+          writeInOptionsInSelection.forEach(selectedOption => {
+            if (!selection.text || new Blob([selection.text]).size < 0) errors.push({ message: 'write_in_required'});
+            if (selectedOption.writeIn?.maxSize) {
+              if (selection.text && new Blob([selection.text]).size > selectedOption.writeIn?.maxSize) errors.push({ message: 'write_in_too_long'});
+            }
+          });
+        }
+      }
+    )}
 
     errors.push(...this.exceededListVotes(selectionPile.optionSelections))
 
