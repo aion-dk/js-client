@@ -444,7 +444,8 @@ export interface OptionContent {
   voteLimit?: number
   writeIn?: {
     maxSize: number
-    encoding: 'utf8'
+    encoding: "utf8"
+    placeholder?: LocalString
   }
   maxChooseableSuboptions?: number
   minChooseableSuboptions?: number
