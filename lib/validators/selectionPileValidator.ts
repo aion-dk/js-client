@@ -23,6 +23,16 @@ class SelectionPileValidator {
             if (selectedOption.writeIn?.maxSize) {
               if (selection.text && new Blob([selection.text]).size > selectedOption.writeIn?.maxSize) errors.push({ message: 'write_in_too_long'});
             }
+            if (selection.text) {
+              /**
+               * \p{L} - All letters from any language
+               * \p{N} - Numbers
+               * \p{Z} - Whitespace separators
+               * ,.?!  - Any extra symbols we want to accept
+               */
+              const regexp = /[^\p{L}\p{N}\p{Z},.'()?!@€£¥\n]/gu
+              if (regexp.test(selection.text)) errors.push({ message: 'write_in_not_supported'});
+            }
           });
         }
       }
