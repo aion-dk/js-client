@@ -67,14 +67,25 @@ function validateSelectionPile(pile: SelectionPile, markingType: MarkingType, op
       throw new CorruptSelectionError('Contest selection does not contain a valid amount of option selections')
     }
 
-    if( option.writeIn ){
-      if( !optionSelection.text ){
-        throw new CorruptSelectionError('Expected write in text missing for option selection')
+    if (option.writeIn) {
+      if(!optionSelection.text){
+        throw new CorruptSelectionError('Expected write in text missing for option selection');
       }
 
-      const textByteSize = new TextEncoder().encode(optionSelection.text).length
-      if( option.writeIn.maxSize < textByteSize ){
-        throw new CorruptSelectionError('Max size exceeded for write in text')
+      const textByteSize = new Blob([optionSelection.text]).size;
+      if (option.writeIn.maxSize < textByteSize) {
+        throw new CorruptSelectionError('Max size exceeded for write in text');
+      }
+
+      if (optionSelection.text) {
+        /**
+         * \p{L} - All letters from any language
+         * \p{N} - Numbers
+         * \p{Z} - Whitespace separators
+         * ,.?!  - Any extra symbols we want to accept
+         */
+        const regexp = /[^\p{L}\p{N}\p{Z},.'()?!@€£¥\n]/gu
+        if (regexp.test(optionSelection.text)) throw new CorruptSelectionError('Invalid characters on write-in');
       }
     }
   })
