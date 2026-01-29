@@ -1,6 +1,6 @@
 {
   "name": "@assemblyvoting/js-client",
-  "version": "5.1.2",
+  "version": "5.1.3",
   "license": "MIT",
   "description": "Assembly Voting JS client",
   "main": "dist/lib/av_client.js",
