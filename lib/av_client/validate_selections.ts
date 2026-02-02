@@ -86,6 +86,7 @@ function validateSelectionPile(pile: SelectionPile, markingType: MarkingType, op
          */
         const regexp = /[^\p{L}\p{N}\p{Z},.'()?!@€£¥\n]/gu
         if (regexp.test(optionSelection.text)) throw new CorruptSelectionError('Invalid characters on write-in');
+        if (!optionSelection.text.trim().length) throw new CorruptSelectionError('Write-in cannot be empty');
       }
     }
   })

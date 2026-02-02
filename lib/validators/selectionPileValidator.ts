@@ -32,6 +32,7 @@ class SelectionPileValidator {
                */
               const regexp = /[^\p{L}\p{N}\p{Z},.'()?!@€£¥\n]/gu
               if (regexp.test(selection.text)) errors.push({ message: 'write_in_not_supported'});
+              if (!selection.text.trim().length) errors.push({ message: 'write_in_empty'})
             }
           });
         }
