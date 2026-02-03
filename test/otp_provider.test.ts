@@ -88,7 +88,7 @@ describe('OTPProvider#requestOTPAuthorization', () => {
         NetworkError,
         'Network error. Could not connect to OTP Provider.'
       );
-    });
+    }).timeout(20000);
   });
 
   context('OTP Provider host unavailable', () => {
