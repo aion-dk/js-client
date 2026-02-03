@@ -8,7 +8,7 @@ class SelectionPileValidator {
 
   validate(selectionPile: SelectionPile, includeLazyErrors = false): Error[] {
     const errors: Error[] = [];
-    const writeIns = this.contest.options.filter(option => option.writeIn !== undefined);
+    const writeIns = this.recursiveFlattener(this.contest.options).filter(option => option.writeIn !== undefined);
 
     if (this.referenceMissing(selectionPile.optionSelections)) errors.push({ message: 'invalid_reference'});
     if (this.tooManySelections(selectionPile.optionSelections)) errors.push({ message: 'too_many'});
@@ -30,7 +30,7 @@ class SelectionPileValidator {
                * \p{Z} - Whitespace separators
                * ,.?!  - Any extra symbols we want to accept
                */
-              const regexp = /[^\p{L}\p{N}\p{Z},.'()?!@€£¥\n]/gu
+              const regexp = /[^\p{L}\p{N}\p{Z},.'‘()?!@€£¥\n]/gu
               if (regexp.test(selection.text)) errors.push({ message: 'write_in_not_supported'});
               if (!selection.text.trim().length) errors.push({ message: 'write_in_empty'})
             }
