@@ -12,7 +12,7 @@ import {
   UnsupportedServerReplyError
 } from '../lib/av_client/errors';
 
-describe.only('OTPProvider#requestOTPAuthorization', () => {
+describe('OTPProvider#requestOTPAuthorization', () => {
   let provider: OTPProvider;
   const correctOTP = '1234';
   const correctEmail = 'us-voter-123@aion.dk';
