@@ -29,7 +29,7 @@ describe('OTPProvider#requestOTPAuthorization', () => {
   context('wrong OTP', () => {
     it('returns an error message', async () => {
       nock(OTPProviderHost).post('/authorize')
-        .reply(403, { errorCode: 'OTP_DOES_NOT_MATCH' });
+        .reply(403, { errorCode: 'OTP_DOES_NOT_MATCH' }).done();
 
       await expectError(
         provider.requestOTPAuthorization(incorrectOTP, correctEmail),
@@ -42,7 +42,7 @@ describe('OTPProvider#requestOTPAuthorization', () => {
   context('OTP Provider returns an unsupported error message', () => {
     it('returns an error message', async () => {
       nock(OTPProviderHost).post('/authorize')
-        .reply(403, { garbage: 'nonsense' });
+        .reply(403, { garbage: 'nonsense' }).done();
 
       await expectError(
         provider.requestOTPAuthorization(correctOTP, correctEmail),
@@ -55,7 +55,7 @@ describe('OTPProvider#requestOTPAuthorization', () => {
   context('OTP Provider returns an unsupported error code', () => {
     it('returns an error message', async () => {
       nock(OTPProviderHost).post('/authorize')
-        .reply(403, { errorCode: 'UNKNOWN_ERROR_CODE', errorMessage: 'Not supported yet' });
+        .reply(403, { errorCode: 'UNKNOWN_ERROR_CODE', errorMessage: 'Not supported yet' }).done();
 
       await expectError(
         provider.requestOTPAuthorization(correctOTP, correctEmail),
@@ -68,7 +68,7 @@ describe('OTPProvider#requestOTPAuthorization', () => {
   context('OTP Provider routing changed', () => {
     it('returns an error message', async () => {
       nock(OTPProviderHost).post('/authorize')
-        .reply(404);
+        .reply(404).done();
 
       await expectError(
         provider.requestOTPAuthorization(correctOTP, correctEmail),
@@ -81,7 +81,7 @@ describe('OTPProvider#requestOTPAuthorization', () => {
   context('OTP Provider connection timeout', () => {
     it('returns network error', async () => {
       nock(OTPProviderHost).post('/authorize')
-        .replyWithError({code: 'ETIMEDOUT'});
+        .replyWithError({code: 'ETIMEDOUT'}).done();
 
       await expectError(
         provider.requestOTPAuthorization(correctOTP, correctEmail),
