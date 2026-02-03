@@ -30,7 +30,7 @@ class SelectionPileValidator {
                * \p{Z} - Whitespace separators
                * ,.?!  - Any extra symbols we want to accept
                */
-              const regexp = /[^\p{L}\p{N}\p{Z},.'()?!@€£¥\n]/gu
+              const regexp = /[^\p{L}\p{N}\p{Z},.'‘()?!@€£¥\n]/gu
               if (regexp.test(selection.text)) errors.push({ message: 'write_in_not_supported'});
               if (!selection.text.trim().length) errors.push({ message: 'write_in_empty'})
             }
