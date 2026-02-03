@@ -8,7 +8,7 @@ class SelectionPileValidator {
 
   validate(selectionPile: SelectionPile, includeLazyErrors = false): Error[] {
     const errors: Error[] = [];
-    const writeIns = this.contest.options.filter(option => option.writeIn !== undefined);
+    const writeIns = this.recursiveFlattener(this.contest.options).filter(option => option.writeIn !== undefined);
 
     if (this.referenceMissing(selectionPile.optionSelections)) errors.push({ message: 'invalid_reference'});
     if (this.tooManySelections(selectionPile.optionSelections)) errors.push({ message: 'too_many'});
