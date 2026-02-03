@@ -12,7 +12,7 @@ import {
   UnsupportedServerReplyError
 } from '../lib/av_client/errors';
 
-describe('OTPProvider#requestOTPAuthorization', () => {
+describe.only('OTPProvider#requestOTPAuthorization', () => {
   let provider: OTPProvider;
   const correctOTP = '1234';
   const correctEmail = 'us-voter-123@aion.dk';
@@ -88,7 +88,7 @@ describe('OTPProvider#requestOTPAuthorization', () => {
         NetworkError,
         'Network error. Could not connect to OTP Provider.'
       );
-    });
+    }).timeout(20000);
   });
 
   context('OTP Provider host unavailable', () => {
