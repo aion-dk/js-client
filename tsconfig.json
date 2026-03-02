@@ -7,9 +7,10 @@
     "isolatedModules": true,
     "declaration": true,
     "strictNullChecks": true,
+    "rootDir": ".",
     "outDir": "dist",
     "skipLibCheck": true,
   },
-  "include": ["lib/**/*", "test/**/*"],
+  "include": ["lib/**/*"],
   "exclude": ["node_modules"],
 }

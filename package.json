@@ -1,6 +1,6 @@
 {
   "name": "@assemblyvoting/js-client",
-  "version": "5.1.5",
+  "version": "5.1.6-beta.1",
   "license": "MIT",
   "description": "Assembly Voting JS client",
   "main": "dist/lib/av_client.js",
@@ -20,9 +20,8 @@
     "coverage": "tsc && nyc --reporter=json-summary --reporter=text yarn test",
     "tdd": "mocha --require ts-node/register/transpile-only --require source-map-support/register --extension ts ./test/*.test.ts ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
     "docs": "typedoc --plugin none --out docs --includes test/",
-    "build": "tsc",
     "lint": "eslint lib/ test/",
-    "webpack": "webpack --config webpack.config.js"
+    "build": "tsc && vite build"
   },
   "files": [
     "dist/lib/**/*"
@@ -44,7 +43,7 @@
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^5.0.1",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.10.7",
+    "@types/node": "^24.10.15",
     "@types/sjcl": "^1.0.34",
     "@typescript-eslint/eslint-plugin": "^8.20.0",
     "@typescript-eslint/parser": "^8.20.0",
@@ -61,7 +60,6 @@
     "ts-node": "^10.9.2",
     "typedoc": "^0.27.6",
     "typescript": "^5.7.3",
-    "webpack": "^5.97.1",
-    "webpack-cli": "^6.0.1"
+    "vite": "^6.2.0"
   }
 }

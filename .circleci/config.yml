@@ -1,14 +1,14 @@
 version: 2.1
 orbs:
-  node: circleci/node@7.0.0
+  node: circleci/node@7.2.1
 executors:
-  node22:
+  node24:
     docker:
-      - image: cimg/node:22.13
+      - image: cimg/node:24.14.0
 jobs:
   lint_test_build:
     executor:
-      name: node22
+      name: node24
     steps:
       - checkout
       - restore_cache:
@@ -16,7 +16,7 @@ jobs:
             - v1-dependencies-{{ checksum "yarn.lock" }}
             - v1-dependencies-
       - node/install-yarn
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --immutable
       - save_cache:
           paths:
             - ./node_modules
@@ -31,7 +31,7 @@ jobs:
             - ./assemblyvoting-js-client-*.tgz
   publish:
     executor:
-      name: node22
+      name: node24
     steps:
       - attach_workspace:
           at: /tmp/workspace
@@ -40,7 +40,7 @@ jobs:
           command: |
             mv /tmp/workspace/assemblyvoting-js-client-*.tgz ./
       - run:
-          name: Set npm access token 
+          name: Set npm access token
           command: |
             npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
       - run:
