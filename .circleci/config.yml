@@ -16,7 +16,7 @@ jobs:
             - v1-dependencies-{{ checksum "yarn.lock" }}
             - v1-dependencies-
       - node/install-yarn
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --immutable
       - save_cache:
           paths:
             - ./node_modules
