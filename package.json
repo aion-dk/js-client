@@ -20,9 +20,8 @@
     "coverage": "tsc && nyc --reporter=json-summary --reporter=text yarn test",
     "tdd": "mocha --require ts-node/register/transpile-only --require source-map-support/register --extension ts ./test/*.test.ts ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
     "docs": "typedoc --plugin none --out docs --includes test/",
-    "build": "tsc",
     "lint": "eslint lib/ test/",
-    "webpack": "webpack --config webpack.config.js"
+    "build": "tsc && vite build"
   },
   "files": [
     "dist/lib/**/*"
@@ -62,7 +61,6 @@
     "ts-node": "^10.9.2",
     "typedoc": "^0.27.6",
     "typescript": "^5.7.3",
-    "webpack": "^5.97.1",
-    "webpack-cli": "^6.0.1"
+    "vite": "^6.2.0"
   }
 }
