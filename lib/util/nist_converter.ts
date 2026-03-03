@@ -13,8 +13,10 @@ function nistCvrToAvCvr(xml: string): ContestMap<string> {
   try {
     const content = xmlToJson(xml);
     castVoteRecordReport = (content as NistDocument).CastVoteRecordReport;
-  } catch(_error) {
-    throw new Error('Failure converting malformed NIST CVR');
+  } catch(error) {
+    const newError = new Error('Failure converting malformed NIST CVR');
+    Object.assign(newError, { cause: error });
+    throw newError;
   }
 
   if(castVoteRecordReport === undefined)
