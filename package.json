@@ -1,6 +1,6 @@
 {
   "name": "@assemblyvoting/js-client",
-  "version": "5.1.5",
+  "version": "5.2.0",
   "license": "MIT",
   "description": "Assembly Voting JS client",
   "main": "dist/lib/av_client.js",
@@ -20,48 +20,43 @@
     "coverage": "tsc && nyc --reporter=json-summary --reporter=text yarn test",
     "tdd": "mocha --require ts-node/register/transpile-only --require source-map-support/register --extension ts ./test/*.test.ts ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
     "docs": "typedoc --plugin none --out docs --includes test/",
-    "build": "tsc",
     "lint": "eslint lib/ test/",
-    "webpack": "webpack --config webpack.config.js"
+    "build": "tsc && vite build"
   },
   "files": [
     "dist/lib/**/*"
   ],
-  "engines": {
-    "node": ">=22"
-  },
   "dependencies": {
-    "@assemblyvoting/av-crypto": "~1.1.0",
-    "axios": "^1.7.9",
+    "@assemblyvoting/av-crypto": "^1.1.1",
+    "axios": "^1.13.6",
     "base-x": "^5.0.0",
     "buffer": "^6.0.3",
     "jwt-decode": "^4.0.0",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.3",
-    "@eslint/js": "^9.18.0",
+    "@eslint/eslintrc": "^3.3.4",
+    "@eslint/js": "^10.0.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
-    "@types/chai": "^5.0.1",
+    "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.10.7",
+    "@types/node": "^24.10.15",
     "@types/sjcl": "^1.0.34",
-    "@typescript-eslint/eslint-plugin": "^8.20.0",
-    "@typescript-eslint/parser": "^8.20.0",
-    "chai": "^5.1.2",
-    "dotenv": "^16.4.7",
-    "eslint": "^9.39.2",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "chai": "^6.2.2",
+    "dotenv": "^17.3.1",
+    "eslint": "^10.0.2",
     "eslint-plugin-promise": "^7.2.1",
-    "globals": "^15.14.0",
+    "globals": "^17.4.0",
     "mocha": "^11.7.5",
-    "nock": "^14.0.10",
-    "nyc": "^17.1.0",
-    "sinon": "^19.0.2",
+    "nock": "^14.0.11",
+    "nyc": "^18.0.0",
+    "sinon": "^21.0.1",
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.2",
-    "typedoc": "^0.27.6",
-    "typescript": "^5.7.3",
-    "webpack": "^5.97.1",
-    "webpack-cli": "^6.0.1"
+    "typedoc": "^0.28.17",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
   }
 }
