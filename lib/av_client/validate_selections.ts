@@ -12,7 +12,7 @@ import {
 } from './types';
 import { flattenOptions } from './flatten_options'
 import { CorruptSelectionError as CorruptSelectionError } from './errors';
-import { withinBounds } from "../av_client/validation_helpers";
+import { withinBounds, writeInValidation } from "../av_client/validation_helpers";
 
 export function validateBallotSelection(ballotConfig: BallotConfig, contestConfigs: ContestConfigMap, ballotSelection: BallotSelection, votingRoundConfig: VotingRoundConfig, weight: number) {
   if( ballotConfig.content.reference !== ballotSelection.reference ){
@@ -68,28 +68,19 @@ function validateSelectionPile(pile: SelectionPile, markingType: MarkingType, op
     }
 
     if (option.writeIn) {
-      if(!optionSelection.text){
-        throw new CorruptSelectionError('Expected write in text missing for option selection');
-      }
-
-      const textByteSize = new Blob([optionSelection.text]).size;
-      if (option.writeIn.maxSize < textByteSize) {
-        throw new CorruptSelectionError('Max size exceeded for write in text');
-      }
-
-      if (optionSelection.text) {
-        /**
-         * \p{L} - All letters from any language
-         * \p{N} - Numbers
-         * \p{Z} - Whitespace separators
-         * ,.?!  - Any extra symbols we want to accept
-         */
-        const regexp = /[^\p{L}\p{N}\p{Z},.'‘()?!@€£¥\n]/gu
-        if (regexp.test(optionSelection.text)) throw new CorruptSelectionError('Invalid characters on write-in');
-        if (!optionSelection.text.trim().length) throw new CorruptSelectionError('Write-in cannot be empty');
+      const error = writeInValidation(optionSelection, option);
+      switch (error) {
+        case "write_in_required":
+          throw new CorruptSelectionError("Expected write in text missing for option selection");
+        case "write_in_too_long":
+          throw new CorruptSelectionError("Max size exceeded for write in text");
+        case "write_in_not_supported":
+          throw new CorruptSelectionError("Invalid characters on write-in");
+        case "write_in_empty":
+          throw new CorruptSelectionError("Write-in cannot be empty");
       }
     }
-  })
+  });
 }
 
 function getContestConfig( contestConfigs: ContestConfigMap, contestSelection: ContestSelection ){
