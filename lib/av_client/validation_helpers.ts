@@ -36,7 +36,7 @@ function writeInTooLong(optionSelection: OptionSelection, optionContent: OptionC
   return Number(optionContent.writeIn?.maxSize || 0) < textByteSize;
 }
 
-function writeInContentNotSupported(optionSelection: OptionSelection, optionContent: OptionContent): boolean {
+function writeInContentNotSupported(optionSelection: OptionSelection): boolean {
     /**
      * \p{L} - All letters from any language
      * \p{N} - Numbers
