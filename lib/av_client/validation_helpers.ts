@@ -1,4 +1,4 @@
-import { ContestContent, OptionSelection, OptionContent, SelectionPile, Error } from "../av_client/types";
+import { ContestContent, OptionSelection } from "../av_client/types";
 
 function choicesExceedCredits(optionSelections: Array<OptionSelection>, credits: number) {
   const counts = new Map<string, number>();
