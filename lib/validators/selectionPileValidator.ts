@@ -30,7 +30,7 @@ class SelectionPileValidator {
           writeInOptionsInSelection.forEach(selectedOption => {
             if (writeInNotPresent(selection)) errors.push({ message: "write_in_required" });
             if (writeInTooLong(selection, selectedOption)) errors.push({ message: "write_in_too_long" });
-            if (writeInContentNotSupported(selection, selectedOption)) errors.push({ message: "write_in_not_supported" });
+            if (writeInContentNotSupported(selection)) errors.push({ message: "write_in_not_supported" });
             if (writeInEmpty(selection)) errors.push({ message: "write_in_empty" });
           });
         }

@@ -78,7 +78,7 @@ function validateSelectionPile(pile: SelectionPile, markingType: MarkingType, op
         throw new CorruptSelectionError("Expected write in text missing for option selection");
       if (writeInTooLong(optionSelection, option))
         throw new CorruptSelectionError("Max size exceeded for write in text");
-      if (!writeInContentNotSupported(optionSelection, option))
+      if (!writeInContentNotSupported(optionSelection))
         throw new CorruptSelectionError("Invalid characters on write-in");
       if (writeInEmpty(optionSelection))
         throw new CorruptSelectionError("Write-in cannot be empty");
