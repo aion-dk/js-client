@@ -255,6 +255,7 @@ export type SelectionPile = {
 export type OptionSelection = {
   reference: string
   text?: string
+  exclusive?: boolean
 }
 
 export type ContestEnvelope = {

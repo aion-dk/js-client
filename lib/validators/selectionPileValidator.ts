@@ -1,4 +1,5 @@
 import { ContestContent, OptionSelection, OptionContent, SelectionPile, Error } from '../av_client/types';
+import { tooManySelections } from "../av_client/validation_helpers";
 
 class SelectionPileValidator {
   private contest: ContestContent;
@@ -11,7 +12,7 @@ class SelectionPileValidator {
     const writeIns = this.recursiveFlattener(this.contest.options).filter(option => option.writeIn !== undefined);
 
     if (this.referenceMissing(selectionPile.optionSelections)) errors.push({ message: 'invalid_reference'});
-    if (this.tooManySelections(selectionPile.optionSelections)) errors.push({ message: 'too_many'});
+    if (tooManySelections(selectionPile.optionSelections, this.contest)) errors.push({ message: "too_many"});
     if (this.blankNotAlone(selectionPile.optionSelections, selectionPile.explicitBlank)) errors.push({message: 'blank'});
     if (this.exclusiveNotAlone(selectionPile.optionSelections)) errors.push({ message: 'exclusive' });
     if (writeIns.length) {
@@ -85,10 +86,6 @@ class SelectionPileValidator {
 
   private tooFewSelections(choices: OptionSelection[]) {
     return choices.length < this.contest.markingType.minMarks;
-  }
-
-  private tooManySelections(choices: OptionSelection[]) {
-    return choices.length > this.contest.markingType.maxMarks;
   }
 
   private belowMinListVotes(choices: OptionSelection[]) {
