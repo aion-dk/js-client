@@ -27,13 +27,16 @@ function withinBounds(optionSelections: Array<OptionSelection>, contest: Contest
   return calculatedMinMarks <= optionSelections.length && !tooManySelections(optionSelections, contest);
 }
 
-function writeInValidation(optionSelection: OptionSelection, optionContent: OptionContent): string | void {
-  if (!optionSelection.text || new Blob([optionSelection.text]).size < 0) return "write_in_required";
+function writeInNotPresent(optionSelection: OptionSelection): boolean {
+  return !optionSelection.text || new Blob([optionSelection.text]).size === 0;
+}
 
-  const textByteSize = new Blob([optionSelection.text]).size;
-  if (optionContent.writeIn?.maxSize || 0 < textByteSize) return "write_in_too_long";
+function writeInTooLong(optionSelection: OptionSelection, optionContent: OptionContent): boolean {
+  const textByteSize = new Blob([optionSelection.text as string]).size;
+  return Number(optionContent.writeIn?.maxSize || 0) < textByteSize;
+}
 
-  if (optionSelection.text) {
+function writeInContentNotSupported(optionSelection: OptionSelection, optionContent: OptionContent): boolean {
     /**
      * \p{L} - All letters from any language
      * \p{N} - Numbers
@@ -41,9 +44,19 @@ function writeInValidation(optionSelection: OptionSelection, optionContent: Opti
      * ,.?!  - Any extra symbols we want to accept
      */
     const regexp = /[^\p{L}\p{N}\p{Z},.'‘()?!@€£¥\n]/gu;
-    if (regexp.test(optionSelection.text)) return "write_in_not_supported";
-    if (!optionSelection.text.trim().length) return "write_in_empty";
-  }
+    return !regexp.test(optionSelection.text as string);
 }
 
-export { choicesExceedCredits, tooManySelections, withinBounds, writeInValidation };
+function writeInEmpty(optionSelection: OptionSelection): boolean {
+  return !(optionSelection.text as string).trim().length;
+}
+
+export {
+  choicesExceedCredits,
+  tooManySelections,
+  withinBounds,
+  writeInNotPresent,
+  writeInTooLong,
+  writeInContentNotSupported,
+  writeInEmpty
+};

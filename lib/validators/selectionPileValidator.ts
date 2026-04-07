@@ -1,5 +1,11 @@
 import { ContestContent, OptionSelection, OptionContent, SelectionPile, Error } from '../av_client/types';
-import { tooManySelections, writeInValidation } from "../av_client/validation_helpers";
+import {
+  tooManySelections,
+  writeInNotPresent,
+  writeInTooLong,
+  writeInContentNotSupported,
+  writeInEmpty
+} from "../av_client/validation_helpers";
 
 class SelectionPileValidator {
   private contest: ContestContent;
@@ -22,8 +28,10 @@ class SelectionPileValidator {
         const writeInOptionsInSelection = writeIns.filter(option => option.reference === selection.reference);
         if (writeInOptionsInSelection.length) {
           writeInOptionsInSelection.forEach(selectedOption => {
-            const error = writeInValidation(selection, selectedOption);
-            if (error) errors.push({ message: error });
+            if (writeInNotPresent(selection)) errors.push({ message: "write_in_required" });
+            if (writeInTooLong(selection, selectedOption)) errors.push({ message: "write_in_too_long" });
+            if (writeInContentNotSupported(selection, selectedOption)) errors.push({ message: "write_in_not_supported" });
+            if (writeInEmpty(selection)) errors.push({ message: "write_in_empty" });
           });
         }
       }
