@@ -44,7 +44,7 @@ function writeInContentNotSupported(optionSelection: OptionSelection): boolean {
      * ,.?!  - Any extra symbols we want to accept
      */
     const regexp = /[^\p{L}\p{N}\p{Z},.'‘()?!@€£¥\n]/gu;
-    return !regexp.test(optionSelection.text as string);
+    return regexp.test(optionSelection.text as string);
 }
 
 function writeInEmpty(optionSelection: OptionSelection): boolean {
