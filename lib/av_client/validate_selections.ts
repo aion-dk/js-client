@@ -7,12 +7,20 @@ import {
   ContestConfigMap,
   OptionContent,
   VotingRoundConfig,
-  SelectionPile, MarkingType
+  SelectionPile,
+  MarkingType,
 } from './types';
+import {
+  withinBounds,
+  writeInNotPresent,
+  writeInEmpty,
+  writeInTooLong,
+  writeInContentNotSupported
+} from "../av_client/validation_helpers";
 import { flattenOptions } from './flatten_options'
 import { CorruptSelectionError as CorruptSelectionError } from './errors';
 
-export function validateBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap, ballotSelection: BallotSelection, votingRoundConfig: VotingRoundConfig, weight: number ){
+export function validateBallotSelection(ballotConfig: BallotConfig, contestConfigs: ContestConfigMap, ballotSelection: BallotSelection, votingRoundConfig: VotingRoundConfig, weight: number) {
   if( ballotConfig.content.reference !== ballotSelection.reference ){
     throw new CorruptSelectionError('Ballot selection does not match ballot config')
   }
@@ -42,54 +50,40 @@ export function validateContestSelection( contestConfig: ContestConfig, contestS
     throw new CorruptSelectionError('Selection sum is larger than voting weight.')
   }
 
-  contestSelection.piles.forEach(pile => validateSelectionPile(pile, markingType, options))
+  contestSelection.piles.forEach(pile => validateSelectionPile(pile, markingType, options, contestConfig));
 }
 
-function validateSelectionPile(pile: SelectionPile, markingType: MarkingType, options: OptionContent[]) {
-  const isBlank = pile.optionSelections.length === 0
+function validateSelectionPile(pile: SelectionPile, markingType: MarkingType, options: OptionContent[], contestConfig: ContestConfig) {
+  const isBlank = pile.optionSelections.length === 0;
 
-  const getOption = makeGetOption(options)
+  const getOption = makeGetOption(options);
 
   // Validate blankSubmission
-  if( isBlank && markingType.blankSubmission === 'disabled'){
-    throw new CorruptSelectionError('Blank submissions are not allowed in this contest')
+  if (isBlank && markingType.blankSubmission === "disabled") {
+    throw new CorruptSelectionError("Blank submissions are not allowed in this contest");
   }
 
   pile.optionSelections.forEach(optionSelection => {
-    const option = getOption(optionSelection)
+    const option = getOption(optionSelection);
 
     // Validate that mark count is within bounds
+    const isExlusive = Boolean(pile.optionSelections?.length && option?.exclusive);
 
-    const isExlusive = pile.optionSelections?.length && option?.exclusive
-    const calculatedMinMarks = !isBlank && isExlusive ? 1 : markingType.minMarks;
-
-    if( !isBlank && !withinBounds(calculatedMinMarks, pile.optionSelections.length, markingType.maxMarks) ){
-      throw new CorruptSelectionError('Contest selection does not contain a valid amount of option selections')
+    if(!isBlank && !withinBounds(pile.optionSelections, contestConfig.content, isBlank, isExlusive)) {
+      throw new CorruptSelectionError("Contest selection does not contain a valid amount of option selections");
     }
 
     if (option.writeIn) {
-      if(!optionSelection.text){
-        throw new CorruptSelectionError('Expected write in text missing for option selection');
-      }
-
-      const textByteSize = new Blob([optionSelection.text]).size;
-      if (option.writeIn.maxSize < textByteSize) {
-        throw new CorruptSelectionError('Max size exceeded for write in text');
-      }
-
-      if (optionSelection.text) {
-        /**
-         * \p{L} - All letters from any language
-         * \p{N} - Numbers
-         * \p{Z} - Whitespace separators
-         * ,.?!  - Any extra symbols we want to accept
-         */
-        const regexp = /[^\p{L}\p{N}\p{Z},.'‘()?!@€£¥\n]/gu
-        if (regexp.test(optionSelection.text)) throw new CorruptSelectionError('Invalid characters on write-in');
-        if (!optionSelection.text.trim().length) throw new CorruptSelectionError('Write-in cannot be empty');
-      }
+      if (writeInNotPresent(optionSelection))
+        throw new CorruptSelectionError("Expected write in text missing for option selection");
+      if (writeInTooLong(optionSelection, option))
+        throw new CorruptSelectionError("Max size exceeded for write in text");
+      if (!writeInContentNotSupported(optionSelection))
+        throw new CorruptSelectionError("Invalid characters on write-in");
+      if (writeInEmpty(optionSelection))
+        throw new CorruptSelectionError("Write-in cannot be empty");
     }
-  })
+  });
 }
 
 function getContestConfig( contestConfigs: ContestConfigMap, contestSelection: ContestSelection ){
@@ -116,10 +110,6 @@ function makeGetOption(options: OptionContent[]){
     if( option ) return option
     throw new CorruptSelectionError('Option config not found')
   }
-}
-
-function withinBounds(min: number, n: number, max: number){
-  return min <= n && n <= max
 }
 
 function containsSameStrings( array1: string[], array2: string[] ){
