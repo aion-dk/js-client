@@ -219,6 +219,8 @@ export interface MarkingType {
   voteVariation?: string
   blankSubmission: "disabled" | "active_choice" | "implicit"
   votesAllowedPerOption?: number
+  quadraticVoting?: boolean
+  quadraticVotingVoiceCredits?: number
   encoding: {
     codeSize: number
     maxSize: number
@@ -253,6 +255,7 @@ export type SelectionPile = {
 export type OptionSelection = {
   reference: string
   text?: string
+  exclusive?: boolean
 }
 
 export type ContestEnvelope = {
@@ -385,7 +388,11 @@ export interface ContestConfig extends BaseBoardItem {
   type: 'ContestConfigItem'
 }
 
-export type availableCustomRulesets = 'belgian_ballot_rules';
+export type AvailableCustomRulesets = 'belgian_ballot_rules';
+
+export type ContestModes = "list" | "gallery";
+
+export type MultipleVotingInterface = "crosses" | "counter";
 
 export interface ContestContent {
   reference: string
@@ -405,11 +412,12 @@ export interface ContestContent {
   identifiable?: boolean
   contestPositions?: ContestPositionMap
   blankOptionColor?: string
-  customRulesets?: availableCustomRulesets[]
+  customRulesets?: AvailableCustomRulesets[]
   attachments?: Attachment[]
   displayScrollToBottomBtn?: boolean
   displayDescriptionOnSummary?: boolean
-  mode?: "list" | "gallery"
+  mode?: ContestModes
+  multipleVotingInterface?: MultipleVotingInterface
 }
 
 export interface Error {

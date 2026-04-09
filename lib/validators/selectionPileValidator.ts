@@ -1,4 +1,11 @@
 import { ContestContent, OptionSelection, OptionContent, SelectionPile, Error } from '../av_client/types';
+import {
+  tooManySelections,
+  writeInNotPresent,
+  writeInTooLong,
+  writeInContentNotSupported,
+  writeInEmpty
+} from "../av_client/validation_helpers";
 
 class SelectionPileValidator {
   private contest: ContestContent;
@@ -11,7 +18,9 @@ class SelectionPileValidator {
     const writeIns = this.recursiveFlattener(this.contest.options).filter(option => option.writeIn !== undefined);
 
     if (this.referenceMissing(selectionPile.optionSelections)) errors.push({ message: 'invalid_reference'});
-    if (this.tooManySelections(selectionPile.optionSelections)) errors.push({ message: 'too_many'});
+    if (tooManySelections(selectionPile.optionSelections, this.contest)) {
+      this.contest.markingType.quadraticVoting ? errors.push({ message: "too_many_credits"}) : errors.push({ message: "too_many"});
+    };
     if (this.blankNotAlone(selectionPile.optionSelections, selectionPile.explicitBlank)) errors.push({message: 'blank'});
     if (this.exclusiveNotAlone(selectionPile.optionSelections)) errors.push({ message: 'exclusive' });
     if (writeIns.length) {
@@ -19,32 +28,21 @@ class SelectionPileValidator {
         const writeInOptionsInSelection = writeIns.filter(option => option.reference === selection.reference);
         if (writeInOptionsInSelection.length) {
           writeInOptionsInSelection.forEach(selectedOption => {
-            if (!selection.text || new Blob([selection.text]).size < 0) errors.push({ message: 'write_in_required'});
-            if (selectedOption.writeIn?.maxSize) {
-              if (selection.text && new Blob([selection.text]).size > selectedOption.writeIn?.maxSize) errors.push({ message: 'write_in_too_long'});
-            }
-            if (selection.text) {
-              /**
-               * \p{L} - All letters from any language
-               * \p{N} - Numbers
-               * \p{Z} - Whitespace separators
-               * ,.?!  - Any extra symbols we want to accept
-               */
-              const regexp = /[^\p{L}\p{N}\p{Z},.'‘()?!@€£¥\n]/gu
-              if (regexp.test(selection.text)) errors.push({ message: 'write_in_not_supported'});
-              if (!selection.text.trim().length) errors.push({ message: 'write_in_empty'})
-            }
+            if (writeInNotPresent(selection)) errors.push({ message: "write_in_required" });
+            if (writeInTooLong(selection, selectedOption)) errors.push({ message: "write_in_too_long" });
+            if (writeInContentNotSupported(selection)) errors.push({ message: "write_in_not_supported" });
+            if (writeInEmpty(selection)) errors.push({ message: "write_in_empty" });
           });
         }
       }
     )}
 
-    errors.push(...this.exceededListVotes(selectionPile.optionSelections))
+    errors.push(...this.exceededListVotes(selectionPile.optionSelections));
 
-    if (selectionPile.explicitBlank || this.implicitlyBlank(selectionPile.optionSelections)) return errors
+    if (selectionPile.explicitBlank || this.implicitlyBlank(selectionPile.optionSelections)) return errors;
 
     if (includeLazyErrors) {
-      errors.push(...this.belowMinListVotes(selectionPile.optionSelections))
+      errors.push(...this.belowMinListVotes(selectionPile.optionSelections));
     }
 
     return errors;
@@ -85,10 +83,6 @@ class SelectionPileValidator {
 
   private tooFewSelections(choices: OptionSelection[]) {
     return choices.length < this.contest.markingType.minMarks;
-  }
-
-  private tooManySelections(choices: OptionSelection[]) {
-    return choices.length > this.contest.markingType.maxMarks;
   }
 
   private belowMinListVotes(choices: OptionSelection[]) {
