@@ -418,6 +418,7 @@ export interface ContestContent {
   displayDescriptionOnSummary?: boolean
   mode?: ContestModes
   multipleVotingInterface?: MultipleVotingInterface
+  optionsCount?: number
 }
 
 export interface Error {
