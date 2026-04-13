@@ -9,9 +9,7 @@ function choicesExceedCredits(optionSelections: Array<OptionSelection>, credits:
   }
 
   for (const count of counts.values()) {
-    for (let n = 1; n <= count; n++) {
-      usedCredits += n * n;
-    }
+    usedCredits += count * count;
   }
 
   return usedCredits > credits;
