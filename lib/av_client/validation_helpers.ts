@@ -58,4 +58,3 @@ export {
   writeInContentNotSupported,
   writeInEmpty
 };
-
