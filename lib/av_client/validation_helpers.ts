@@ -16,7 +16,6 @@ function choicesExceedCredits(optionSelections: Array<OptionSelection>, credits:
 };
 
 function tooManySelections(optionSelections: Array<OptionSelection>, contest: ContestContent): boolean {
-  console.log(optionSelections.length, contest.markingType.maxMarks, optionSelections.length > contest.markingType.maxMarks);
   return optionSelections.length > contest.markingType.maxMarks;
 }
 
