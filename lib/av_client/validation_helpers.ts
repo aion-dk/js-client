@@ -1,6 +1,6 @@
 import { ContestContent, OptionSelection, OptionContent } from "../av_client/types";
 
-function choicesExceedCredits(optionSelections: Array<OptionSelection>, credits: number): boolean {
+function choicesExceedCredits(optionSelections: Array<OptionSelection>, credits: number = 0): boolean {
   const counts = new Map<string, number>();
   let usedCredits: number = 0;
 
@@ -16,8 +16,7 @@ function choicesExceedCredits(optionSelections: Array<OptionSelection>, credits:
 };
 
 function tooManySelections(optionSelections: Array<OptionSelection>, contest: ContestContent): boolean {
-  if (!contest.markingType.quadraticVoting) return optionSelections.length > contest.markingType.maxMarks;
-  return choicesExceedCredits(optionSelections, contest.markingType.quadraticVotingVoiceCredits || 0);
+  return optionSelections.length > contest.markingType.maxMarks;
 }
 
 function withinBounds(optionSelections: Array<OptionSelection>, contest: ContestContent, isBlank?: boolean, isExclusive?: boolean): boolean {
