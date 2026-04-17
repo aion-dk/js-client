@@ -16,8 +16,9 @@ function choicesExceedCredits(optionSelections: Array<OptionSelection>, credits:
 };
 
 function tooManySelections(optionSelections: Array<OptionSelection>, contest: ContestContent): boolean {
-  if (!contest.markingType.quadraticVoting) return optionSelections.length > contest.markingType.maxMarks;
-  return choicesExceedCredits(optionSelections, contest.markingType.quadraticVotingVoiceCredits || 0);
+  const maxVotesValidation = optionSelections.length > contest.markingType.maxMarks;
+  if (!contest.markingType.quadraticVoting) return maxVotesValidation;
+  return maxVotesValidation && choicesExceedCredits(optionSelections, contest.markingType.quadraticVotingVoiceCredits || 0);
 }
 
 function withinBounds(optionSelections: Array<OptionSelection>, contest: ContestContent, isBlank?: boolean, isExclusive?: boolean): boolean {
