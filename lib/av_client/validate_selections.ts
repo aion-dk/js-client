@@ -15,7 +15,8 @@ import {
   writeInNotPresent,
   writeInEmpty,
   writeInTooLong,
-  writeInContentNotSupported
+  writeInContentNotSupported,
+  choicesExceedCredits,
 } from "../av_client/validation_helpers";
 import { flattenOptions } from './flatten_options'
 import { CorruptSelectionError as CorruptSelectionError } from './errors';
@@ -71,6 +72,10 @@ function validateSelectionPile(pile: SelectionPile, markingType: MarkingType, op
 
     if(!isBlank && !withinBounds(pile.optionSelections, contestConfig.content, isBlank, isExlusive)) {
       throw new CorruptSelectionError("Contest selection does not contain a valid amount of option selections");
+    }
+
+    if(contestConfig.content.markingType.quadraticVoting && choicesExceedCredits(pile.optionSelections, contestConfig.content.markingType.quadraticVotingVoiceCredits)) {
+      throw new CorruptSelectionError("Contest selection exceeds the quadratic voting credits limit");
     }
 
     if (option.writeIn) {

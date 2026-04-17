@@ -4,7 +4,8 @@ import {
   writeInNotPresent,
   writeInTooLong,
   writeInContentNotSupported,
-  writeInEmpty
+  writeInEmpty,
+  choicesExceedCredits,
 } from "../av_client/validation_helpers";
 
 class SelectionPileValidator {
@@ -18,9 +19,8 @@ class SelectionPileValidator {
     const writeIns = this.recursiveFlattener(this.contest.options).filter(option => option.writeIn !== undefined);
 
     if (this.referenceMissing(selectionPile.optionSelections)) errors.push({ message: 'invalid_reference'});
-    if (tooManySelections(selectionPile.optionSelections, this.contest)) {
-      this.contest.markingType.quadraticVoting ? errors.push({ message: "too_many_credits"}) : errors.push({ message: "too_many"});
-    };
+    if (tooManySelections(selectionPile.optionSelections, this.contest)) errors.push({ message: "too_many"});
+    if (this.contest.markingType.quadraticVoting && choicesExceedCredits(selectionPile.optionSelections, this.contest.markingType.quadraticVotingVoiceCredits)) errors.push({ message: "too_many_credits"});
     if (this.blankNotAlone(selectionPile.optionSelections, selectionPile.explicitBlank)) errors.push({message: 'blank'});
     if (this.exclusiveNotAlone(selectionPile.optionSelections)) errors.push({ message: 'exclusive' });
     if (writeIns.length) {
