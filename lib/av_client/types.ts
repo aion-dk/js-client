@@ -378,6 +378,21 @@ export interface BallotContent {
   attachment?: string
 }
 
+
+// Information page config item
+export interface InformationPageConfig extends BaseBoardItem {
+  content: InformationPageContent
+  type: 'InformationPageConfigItem'
+}
+
+export interface InformationPageContent {
+  id?: number
+  reference?: string
+  title: LocalString
+  name?: LocalString
+  content?: string
+  published?: boolean
+}
 // Contest Config Item
 export interface ContestConfigMap {
   [contestReference: string]: ContestConfig
