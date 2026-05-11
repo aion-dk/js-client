@@ -23,6 +23,11 @@
     "@noble/hashes" "^1.8.0"
     sjcl-with-all "^1.0.8"
 
+"@assemblyvoting/types@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@assemblyvoting/types/-/types-1.0.0.tgz#e62cead4802122329cb86085b22dbcfbe6340917"
+  integrity sha512-NlevEP/feI/LzAywywfoe0E2cJ0JKlF9Sii9X42T06R5DqTbdPFyqM2RqCoixmkCWc+JIk5psU+2XkfnHT5wgw==
+
 "@babel/code-frame@^7.25.9", "@babel/code-frame@^7.26.0", "@babel/code-frame@^7.26.2":
   version "7.26.2"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.26.2.tgz#4b5fab97d33338eff916235055f0ebc21e573a85"
