@@ -1,6 +1,6 @@
 {
   "name": "@assemblyvoting/js-client",
-  "version": "5.3.3",
+  "version": "6.0.0",
   "license": "MIT",
   "description": "Assembly Voting JS client",
   "main": "dist/lib/av_client.js",
@@ -21,7 +21,8 @@
     "tdd": "mocha --require ts-node/register/transpile-only --require source-map-support/register --extension ts ./test/*.test.ts ./test/**/*.test.ts --watch --watch-files test/**/*.ts,lib/**/*.ts",
     "docs": "typedoc --plugin none --out docs --includes test/",
     "lint": "eslint lib/ test/",
-    "build": "tsc && vite build"
+    "build": "tsc && vite build",
+    "type-check": "tsc --noEmit"
   },
   "files": [
     "dist/lib/**/*"
@@ -35,6 +36,7 @@
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
+    "@assemblyvoting/types": "^1.0.0",
     "@eslint/eslintrc": "^3.3.4",
     "@eslint/js": "^10.0.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
@@ -58,5 +60,6 @@
     "typedoc": "^0.28.17",
     "typescript": "^5.9.3",
     "vite": "^7.3.1"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
