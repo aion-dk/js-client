@@ -25,6 +25,7 @@ import {decryptContestSelections} from './av_client/new_crypto/decrypt_contest_s
 import {makeOptionFinder} from './av_client/option_finder';
 import {validateCommitment} from "./av_client/new_crypto/commitments";
 import {AVCrypto} from "@assemblyvoting/av-crypto";
+import {BallotStatus} from "@assemblyvoting/types";
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -126,7 +127,7 @@ export class AVVerifier {
     )
   }
 
-  public async pollForSpoilRequest(): Promise<string> {
+  public async pollForBallotDecision(): Promise<["cast" | "spoiled", string]> {
     let attempts = 0;
 
     const executePoll = async (resolve, reject) => {
@@ -136,9 +137,9 @@ export class AVVerifier {
       attempts++;
 
       if (result?.data?.item?.type === SPOIL_REQUEST_ITEM) {
-        return resolve(result.data.item.address);
+        return resolve(["spoiled", result.data.item.address]);
       } else if (result?.data?.item?.type === CAST_REQUEST_ITEM) {
-        return reject(new Error('Ballot has been cast and cannot be spoiled'))
+        return resolve(["cast", hexToShortCode(result.data.item.address.slice(0, 10))]);
       } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
         return reject(new Error('Exceeded max attempts'));
       } else {
