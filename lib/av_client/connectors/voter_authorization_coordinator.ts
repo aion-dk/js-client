@@ -115,10 +115,11 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
-  disableVoter(identification: string, signature: string) {
+  disableVoter(identification: string, signature: string, votingRoundReference: string) {
     return this.backend.post("disable_voter", {
       identification: identification,
       signature: signature,
+      votingRoundReference: votingRoundReference,
     });
   }
 

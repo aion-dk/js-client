@@ -691,10 +691,11 @@ export class AVClient implements IAVClient {
       this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url,
       this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid
     )
-
+    
     return await coordinator.disableVoter(
       this.authorizationSessionId,
-      signature
+      signature,
+      this.voterSession.content.votingRoundReference
     );
   }
 }
