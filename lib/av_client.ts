@@ -680,6 +680,24 @@ export class AVClient implements IAVClient {
 
     return ballotStatus
   }
+
+  /**
+   * Disables the voter in the VA, so that they can no longer vote or sign in.
+   */
+  public async disableVoter(): Promise<AxiosResponse> {
+    const signature = this.generateSignature(this.authorizationSessionId)
+
+    const coordinator = new VoterAuthorizationCoordinator(
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url,
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid
+    )
+    
+    return await coordinator.disableVoter(
+      this.authorizationSessionId,
+      signature,
+      this.voterSession.content.votingRoundReference
+    );
+  }
 }
 
 type BigNum = string;

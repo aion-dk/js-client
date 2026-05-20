@@ -115,6 +115,14 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
+  disableVoter(identification: string, signature: string, votingRoundReference: string) {
+    return this.backend.post("disable_voter", {
+      identification: identification,
+      signature: signature,
+      votingRoundReference: votingRoundReference,
+    });
+  }
+
   private createBackendClient(baseURL: string, timeout: number) {
     this.backend = axios.create({
       baseURL: baseURL,
