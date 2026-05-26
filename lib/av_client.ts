@@ -86,6 +86,7 @@ export class AVClient implements IAVClient {
   private votingRoundReference: string;
   private identityConfirmationToken: IdentityConfirmationToken;
   private dbbPublicKey: string | undefined;
+  private registrationChannel: string | undefined;
 
   private bulletinBoard: BulletinBoard;
   private latestConfig?: LatestConfig;
@@ -204,6 +205,14 @@ export class AVClient implements IAVClient {
     this.identityConfirmationToken = token
   }
 
+  /**
+   * Internal method to set the registration channel from trusted session source
+   * @internal
+   */
+  setRegistrationChannel(channel: string | undefined): void {
+    this.registrationChannel = channel
+  }
+
   public async getCoordinatorVoterInfo(): Promise<AxiosResponse> {
     const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
     const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
@@ -271,11 +280,12 @@ export class AVClient implements IAVClient {
         votingRoundReference: decoded['voting_round_reference']
       }
     }
-
-    const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, latestConfigAddress);
+    console.log(`Using channel ${this.registrationChannel}`);
+    
+    const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, latestConfigAddress, this.registrationChannel);
     const voterSessionItem = voterSessionItemResponse.data.voterSession;
     const receipt = voterSessionItemResponse.data.receipt;
-
+ 
     validatePayload(this.crypto, voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
     validateReceipt(this.crypto, [voterSessionItem], receipt, this.getDbbPublicKey());
 

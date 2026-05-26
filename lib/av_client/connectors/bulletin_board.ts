@@ -25,10 +25,11 @@ export class BulletinBoard {
   }
 
   // Voting
-  async createVoterRegistration(authToken: string, parentAddress: string): Promise<AxiosResponse> {
+  async createVoterRegistration(authToken: string, parentAddress: string, channel?: string): Promise<AxiosResponse> {
     const response = await this.backend.post('voting/registrations', {
       authToken,
-      parentAddress
+      parentAddress,
+      channel
     }).catch(error => {
       const response = error.response as AxiosResponse<BulletinBoardData>;
       if (error.request && !response) {
