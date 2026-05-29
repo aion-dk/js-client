@@ -662,24 +662,6 @@ export class AVClient implements IAVClient {
 
     return new Promise(executePoll);
   }
-
-  /**
-   * Finds the ballot status corresponding to the given trackingcode.
-   * Also returns the activities associated with the ballot
-   *
-   * @param trackingCode base58-encoded trackingcode
-  */
-  public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
-    const shortAddres = shortCodeToHex(trackingCode)
-    const { status, activities } = (await this.bulletinBoard.getBallotStatus(shortAddres)).data
-
-    const ballotStatus = {
-      activities: activities,
-      status: status
-    }
-
-    return ballotStatus
-  }
 }
 
 type BigNum = string;
