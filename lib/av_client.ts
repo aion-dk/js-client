@@ -664,24 +664,6 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Finds the ballot status corresponding to the given trackingcode.
-   * Also returns the activities associated with the ballot
-   *
-   * @param trackingCode base58-encoded trackingcode
-  */
-  public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
-    const shortAddres = shortCodeToHex(trackingCode)
-    const { status, activities } = (await this.bulletinBoard.getBallotStatus(shortAddres)).data
-
-    const ballotStatus = {
-      activities: activities,
-      status: status
-    }
-
-    return ballotStatus
-  }
-
-  /**
    * Disables the voter in the VA, so that they can no longer vote or sign in.
    */
   public async disableVoter(): Promise<AxiosResponse> {
