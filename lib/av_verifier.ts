@@ -25,6 +25,7 @@ import {decryptContestSelections} from './av_client/new_crypto/decrypt_contest_s
 import {makeOptionFinder} from './av_client/option_finder';
 import {validateCommitment} from "./av_client/new_crypto/commitments";
 import {AVCrypto} from "@assemblyvoting/av-crypto";
+import {BallotStatus} from "@assemblyvoting/types";
 
 export class AVVerifier {
   private dbbPublicKey: string | undefined;
@@ -126,7 +127,7 @@ export class AVVerifier {
     )
   }
 
-  public async pollForSpoilRequest(): Promise<string> {
+  public async pollForBallotDecision(): Promise<["cast" | "spoiled", string]> {
     let attempts = 0;
 
     const executePoll = async (resolve, reject) => {
@@ -136,9 +137,9 @@ export class AVVerifier {
       attempts++;
 
       if (result?.data?.item?.type === SPOIL_REQUEST_ITEM) {
-        return resolve(result.data.item.address);
+        return resolve(["spoiled", result.data.item.address]);
       } else if (result?.data?.item?.type === CAST_REQUEST_ITEM) {
-        return reject(new Error('Ballot has been cast and cannot be spoiled'))
+        return resolve(["cast", hexToShortCode(result.data.item.address.slice(0, 10))]);
       } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
         return reject(new Error('Exceeded max attempts'));
       } else {
@@ -147,6 +148,24 @@ export class AVVerifier {
     };
 
     return new Promise(executePoll);
+  }
+
+  /**
+   * Finds the ballot status corresponding to the given trackingcode (the base58 encoding of the short address of the Cast request item).
+   * Also returns the activities associated with the ballot
+   *
+   * @param trackingCode base58-encoded trackingcode
+   */
+  public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
+    const shortAddres = shortCodeToHex(trackingCode)
+    const { status, activities } = (await this.bulletinBoard.getBallotStatus(shortAddres)).data
+
+    const ballotStatus = {
+      activities: activities,
+      status: status
+    }
+
+    return ballotStatus
   }
 
   public getReadableContestSelections(contestSelections: ContestSelection[], locale: string): ReadableContestSelection[] {
@@ -205,9 +224,8 @@ export class AVVerifier {
     return new Promise(executePoll);
   }
 
-  public validateReceipt(encodedReceipt: string, trackingCode: string) {
+  public validateReceipt(encodedReceipt: string) {
     const [castRequestItem, receipt] = this.parseReceipt(encodedReceipt)
-    this.validateTrackingCode(trackingCode, castRequestItem)
 
     try {
       verifyAddress(castRequestItem)
@@ -224,6 +242,11 @@ export class AVVerifier {
         throw err
       }
     }
+  }
+
+  public validateReceiptTrackingCode(encodedReceipt: string, trackingCode: string) {
+    const [castRequestItem, _receipt] = this.parseReceipt(encodedReceipt)
+    this.validateTrackingCode(trackingCode, castRequestItem)
   }
 
   private validateTrackingCode(trackingCode: string, castRequestItem: CastRequestItem) {
