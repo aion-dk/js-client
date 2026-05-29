@@ -337,7 +337,7 @@ export class AVClient implements IAVClient {
       }
     };
     const signedPayload = signPayload(this.crypto, sessionExtensionItem, this.privateKey());
-    return await this.bulletinBoard.extendVoterSessions(signedPayload);
+    await this.bulletinBoard.extendVoterSessions(signedPayload);
   }
   /**
    * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
