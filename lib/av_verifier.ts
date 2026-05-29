@@ -224,9 +224,8 @@ export class AVVerifier {
     return new Promise(executePoll);
   }
 
-  public validateReceipt(encodedReceipt: string, trackingCode: string) {
+  public validateReceipt(encodedReceipt: string) {
     const [castRequestItem, receipt] = this.parseReceipt(encodedReceipt)
-    this.validateTrackingCode(trackingCode, castRequestItem)
 
     try {
       verifyAddress(castRequestItem)
@@ -243,6 +242,11 @@ export class AVVerifier {
         throw err
       }
     }
+  }
+
+  public validateReceiptTrackingCode(encodedReceipt: string, trackingCode: string) {
+    const [castRequestItem, _receipt] = this.parseReceipt(encodedReceipt)
+    this.validateTrackingCode(trackingCode, castRequestItem)
   }
 
   private validateTrackingCode(trackingCode: string, castRequestItem: CastRequestItem) {
