@@ -4,7 +4,7 @@ import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/o
 import { extractContestSelections } from './util/nist_cvr_extractor';
 import { AVVerifier } from './av_verifier';
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
-import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig, ProofOfElectionCodes } from './av_client/types';
+import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, ContestConfig, ProofOfElectionCodes } from './av_client/types';
 import { randomKeyPair } from './av_client/new_crypto/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import { JwtPayload, jwtDecode } from "jwt-decode";
@@ -44,7 +44,7 @@ import { signPayload, validatePayload, validateReceipt } from './av_client/new_c
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
-import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
+import { hexToShortCode } from './av_client/short_codes';
 import { encryptCommitmentOpening } from './av_client/new_crypto/commitment_opening_encryption';
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
 import {AxiosResponse} from "axios";
