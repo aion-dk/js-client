@@ -32,8 +32,10 @@
     "axios": "^1.13.6",
     "base-x": "^5.0.0",
     "buffer": "^6.0.3",
-    "jsonwebtoken": "^9.0.3",
+    "jose": "^6.2.3",
     "jwt-decode": "^4.0.0",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
@@ -42,7 +44,6 @@
     "@eslint/js": "^10.0.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^5.2.3",
-    "@types/jsonwebtoken": "^9.0.10",
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.10.15",
     "@types/sjcl": "^1.0.34",

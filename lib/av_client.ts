@@ -1,4 +1,4 @@
-import { sign as jwtSign } from 'jsonwebtoken';
+import { SignJWT } from 'jose';
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
@@ -210,13 +210,16 @@ export class AVClient implements IAVClient {
    * Internal method to set the registration channel from trusted session source
    * @internal
    */
-  setRegistrationChannel(channelPrivateKey: string | undefined): void {
+  async setRegistrationChannel(channelPrivateKey: string | undefined): Promise<void> {
     if (channelPrivateKey === undefined) {
       this.registrationChannel = undefined;
       return;
     }
 
-    this.registrationChannel = jwtSign({}, channelPrivateKey, { algorithm: 'HS256' });
+    const secret = new TextEncoder().encode(channelPrivateKey);
+    this.registrationChannel = await new SignJWT({})
+      .setProtectedHeader({ alg: 'HS256' })
+      .sign(secret);
   }
 
   public async getCoordinatorVoterInfo(): Promise<AxiosResponse> {
