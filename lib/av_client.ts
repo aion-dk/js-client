@@ -712,6 +712,21 @@ export class AVClient implements IAVClient {
       this.voterSession.content.votingRoundReference
     );
   }
+
+  public async getInformationPages(): Promise<AxiosResponse> {
+    const coordinator = new VoterAuthorizationCoordinator(
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url,
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid
+    )
+
+    const signature = this.generateSignature(this.authorizationSessionId)
+    
+    return await coordinator.getInformationPages(
+      this.authorizationSessionId,
+      signature,
+      this.voterSession.content.votingRoundReference
+    );
+  }
 }
 
 type BigNum = string;

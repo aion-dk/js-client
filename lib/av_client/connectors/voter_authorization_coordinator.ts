@@ -123,6 +123,14 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
+  getInformationPages(identification: string, signature: string, votingRoundReference: string) {
+    return this.backend.post("information_pages", {
+      identification: identification,
+      signature: signature,
+      votingRoundReference: votingRoundReference,
+    });
+  }
+
   private createBackendClient(baseURL: string, timeout: number) {
     this.backend = axios.create({
       baseURL: baseURL,
