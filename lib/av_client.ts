@@ -713,7 +713,7 @@ export class AVClient implements IAVClient {
     );
   }
 
-  public async getInformationPages(): Promise<AxiosResponse> {
+  public async getVotingRoundItems(): Promise<AxiosResponse> {
     const latestConfig = this.getLatestConfig();
     const voterSession = this.getVoterSession();
 
@@ -724,7 +724,7 @@ export class AVClient implements IAVClient {
 
     const signature = this.generateSignature(this.authorizationSessionId)
 
-    return coordinator.getInformationPages(
+    return coordinator.getVotingRoundItems(
       this.authorizationSessionId,
       signature,
       voterSession.content.votingRoundReference
