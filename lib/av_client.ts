@@ -714,17 +714,20 @@ export class AVClient implements IAVClient {
   }
 
   public async getInformationPages(): Promise<AxiosResponse> {
+    const latestConfig = this.getLatestConfig();
+    const voterSession = this.getVoterSession();
+
     const coordinator = new VoterAuthorizationCoordinator(
-      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url,
-      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid
+      latestConfig.items.voterAuthorizerConfig.content.voterAuthorizer.url,
+      latestConfig.items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid
     )
 
     const signature = this.generateSignature(this.authorizationSessionId)
-    
-    return await coordinator.getInformationPages(
+
+    return coordinator.getInformationPages(
       this.authorizationSessionId,
       signature,
-      this.voterSession.content.votingRoundReference
+      voterSession.content.votingRoundReference
     );
   }
 }
