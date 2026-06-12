@@ -123,7 +123,7 @@ export default class VoterAuthorizationCoordinator {
     });
   }
 
-  getInformationPages(identification: string, signature: string, votingRoundReference: string) {
+  getInformationPages(identification: string, signature: string, votingRoundReference: string): Promise<AxiosResponse> {
     return this.backend.post("information_pages", {
       identification: identification,
       signature: signature,
