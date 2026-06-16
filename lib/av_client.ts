@@ -1,4 +1,6 @@
-import { SignJWT } from 'jose';
+import { JWTPayload, SignJWT, importJWK } from 'jose';
+import { Buffer } from 'buffer';
+import {createECDH} from 'crypto';
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
@@ -9,6 +11,14 @@ import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, 
 import { randomKeyPair } from './av_client/new_crypto/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import { JwtPayload, jwtDecode } from "jwt-decode";
+
+interface AuthTokenPayload extends JwtPayload {
+  identifier: string;
+  public_key: string;
+  weight?: number;
+  voter_group_key: string;
+  voting_round_reference: string;
+}
 
 import {
   fetchLatestConfig,
@@ -215,11 +225,33 @@ export class AVClient implements IAVClient {
       this.registrationChannel = undefined;
       return;
     }
+    
+    // Sign a JWT
+    this.registrationChannel = await this.generateJwt({ sub: 'channel' }, channelPrivateKey);
+  }
 
-    const secret = new TextEncoder().encode(channelPrivateKey);
-    this.registrationChannel = await new SignJWT({})
-      .setProtectedHeader({ alg: 'HS256' })
-      .sign(secret);
+  private async generateJwt(payload: JWTPayload, privateKeyHex: string) {
+  // Derive public key point from raw private scalar
+  const ecdh = createECDH('prime256v1');
+  ecdh.setPrivateKey(Buffer.from(privateKeyHex, 'hex'));
+  const publicKey = ecdh.getPublicKey();
+
+  // Build JWK from raw components
+  const jwk = {
+    kty: 'EC',
+    crv: 'P-256',
+    d: Buffer.from(privateKeyHex, 'hex').toString('base64url'),
+    x: publicKey.subarray(1, 33).toString('base64url'),   // skip 0x04 prefix
+    y: publicKey.subarray(33, 65).toString('base64url'),
+  };
+
+  const key = await importJWK(jwk, 'ES256');
+  const now = Math.floor(Date.now() / 1000);
+
+  return new SignJWT(payload)
+    .setProtectedHeader({ alg: 'ES256' })
+    .setIssuedAt(now)
+    .sign(key);
   }
 
   public async getCoordinatorVoterInfo(): Promise<AxiosResponse> {
@@ -272,7 +304,7 @@ export class AVClient implements IAVClient {
     const { authToken, authorizationUuid } = authorizationResponse.data;
     this.authorizationSessionId = this.authorizationSessionId ? this.authorizationSessionId : authorizationUuid
 
-    const decoded = jwtDecode<JwtPayload>(authToken); // TODO: Verify against dbb pubkey: this.getLatestConfig().services.voterAuthorizer.public_key);
+    const decoded = jwtDecode<AuthTokenPayload>(authToken); // TODO: Verify against dbb pubkey: this.getLatestConfig().services.voterAuthorizer.public_key);
 
     if(decoded === null)
       throw new InvalidTokenError('Auth token could not be decoded');
@@ -282,11 +314,11 @@ export class AVClient implements IAVClient {
       parentAddress: latestConfigAddress,
       content: {
         authToken: authToken,
-        identifier: decoded['identifier'],
-        publicKey: decoded['public_key'],
-        weight: decoded['weight'] || 1,
-        voterGroup: decoded['voter_group_key'],
-        votingRoundReference: decoded['voting_round_reference']
+        identifier: decoded.identifier,
+        publicKey: decoded.public_key,
+        weight: decoded.weight || 1,
+        voterGroup: decoded.voter_group_key,
+        votingRoundReference: decoded.voting_round_reference
       }
     }
     console.log(`Using channel ${this.registrationChannel}`);
@@ -336,7 +368,7 @@ export class AVClient implements IAVClient {
     }
 
     const { authToken } = authorizationResponse.data;
-    const decodedAuthToken = jwtDecode<JwtPayload>(authToken);
+    const decodedAuthToken = jwtDecode<AuthTokenPayload>(authToken);
 
     if(decodedAuthToken === null)
       throw new InvalidTokenError('Auth token could not be decoded');
