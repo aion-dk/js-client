@@ -13,10 +13,6 @@ describe('setRegistrationChannel', () => {
   });
 
   it('sets registrationChannel to undefined when given undefined', async () => {
-    // First set a channel, then clear it
-    const validPrivateKey = 'a]0b4cef5f4e3e1f0a9d8c7b6a594837261504f3e2d1c0b9a8f7e6d5c4b3a291';
-    // We can't easily read the private field, so we test via createVoterRegistration behavior
-    // Instead, just verify it doesn't throw
     await client.setRegistrationChannel(undefined);
     // No error means it set to undefined successfully
   });
@@ -28,7 +24,7 @@ describe('setRegistrationChannel', () => {
     await client.setRegistrationChannel(privateKeyHex);
 
     // Access the private field via any cast to verify it was set
-    const registrationChannel = (client as any).registrationChannel;
+    const registrationChannel = (client as AVClient).registrationChannel;
     expect(registrationChannel).to.be.a('string');
     expect(registrationChannel).to.not.be.undefined;
 
@@ -47,6 +43,7 @@ describe('setRegistrationChannel', () => {
 
     await client.setRegistrationChannel(privateKeyHex);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const registrationChannel = (client as any).registrationChannel;
     // Decode the header
     const header = JSON.parse(Buffer.from(registrationChannel.split('.')[0], 'base64url').toString());
@@ -58,9 +55,11 @@ describe('setRegistrationChannel', () => {
     const privateKey2 = '1c5def6f5f4e3e1f0a9d8c7b6a594837261504f3e2d1c0b9a8f7e6d5c4b3a292';
 
     await client.setRegistrationChannel(privateKey1);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const channel1 = (client as any).registrationChannel;
 
     await client.setRegistrationChannel(privateKey2);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const channel2 = (client as any).registrationChannel;
 
     expect(channel1).to.not.equal(channel2);
@@ -70,9 +69,11 @@ describe('setRegistrationChannel', () => {
     const privateKeyHex = '0b4cef5f4e3e1f0a9d8c7b6a594837261504f3e2d1c0b9a8f7e6d5c4b3a29100';
 
     await client.setRegistrationChannel(privateKeyHex);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((client as any).registrationChannel).to.be.a('string');
 
     await client.setRegistrationChannel(undefined);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((client as any).registrationChannel).to.be.undefined;
   });
 });
