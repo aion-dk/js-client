@@ -321,8 +321,7 @@ export class AVClient implements IAVClient {
         votingRoundReference: decoded.voting_round_reference
       }
     }
-    console.log(`Using channel ${this.registrationChannel}`);
-    
+
     const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, latestConfigAddress, this.registrationChannel);
     const voterSessionItem = voterSessionItemResponse.data.voterSession;
     const receipt = voterSessionItemResponse.data.receipt;
