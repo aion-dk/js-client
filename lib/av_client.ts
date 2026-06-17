@@ -54,7 +54,7 @@ import {
 import { signPayload, validatePayload, validateReceipt } from './av_client/new_crypto/signing';
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
-import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM } from './av_client/constants';
+import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM, SESSION_EXTENSION_ITEM} from './av_client/constants';
 import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
 import { encryptCommitmentOpening } from './av_client/new_crypto/commitment_opening_encryption';
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
@@ -375,6 +375,20 @@ export class AVClient implements IAVClient {
     return await this.bulletinBoard.expireVoterSessions(authToken, latestConfigAddress);
   }
 
+  public async extendVoterSessions(extendedBy: number): Promise<void> {
+    if (!this.voterSession.address) return
+    const parentAddress = this.voterSession.address;
+
+    const sessionExtensionItem = {
+      parentAddress: parentAddress,
+      type: SESSION_EXTENSION_ITEM,
+      content: {
+        extendedBy: extendedBy
+      }
+    };
+    const signedPayload = signPayload(this.crypto, sessionExtensionItem, this.privateKey());
+    await this.bulletinBoard.extendVoterSessions(signedPayload);
+  }
   /**
    * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
    *
@@ -741,11 +755,29 @@ export class AVClient implements IAVClient {
       this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url,
       this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid
     )
-    
+
     return await coordinator.disableVoter(
       this.authorizationSessionId,
       signature,
       this.voterSession.content.votingRoundReference
+    );
+  }
+
+  public async getVotingRoundItems(): Promise<AxiosResponse> {
+    const latestConfig = this.getLatestConfig();
+    const voterSession = this.getVoterSession();
+
+    const coordinator = new VoterAuthorizationCoordinator(
+      latestConfig.items.voterAuthorizerConfig.content.voterAuthorizer.url,
+      latestConfig.items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid
+    )
+
+    const signature = this.generateSignature(this.authorizationSessionId)
+
+    return coordinator.getVotingRoundItems(
+      this.authorizationSessionId,
+      signature,
+      voterSession.content.votingRoundReference
     );
   }
 }

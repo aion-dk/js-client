@@ -152,4 +152,25 @@ export class BulletinBoard {
       }
     });
   }
+  async extendVoterSessions(signedSessionExtensionItem): Promise<AxiosResponse> {
+    const response = await this.backend.post('voting/extensions', { sessionExtension: signedSessionExtensionItem}).catch(error => {
+      const response = error.response as AxiosResponse<BulletinBoardData>;
+      if (error.request && !response) {
+        throw new NetworkError('Network error. Could not connect to Bulletin Board.');
+      }
+
+      if ([403, 500].includes(response.status) && response.data) {
+        if (!response.data.error || !response.data.error.code || !response.data.error.description) {
+          throw new UnsupportedServerReplyError(`Unsupported Bulletin Board server error message: ${JSON.stringify(error.response.data)}`)
+        }
+
+        const errorMessage = response.data.error.description;
+        throw new BulletinBoardError(errorMessage);
+      }
+
+      throw error;
+    });
+
+    return response;
+  }
 }
