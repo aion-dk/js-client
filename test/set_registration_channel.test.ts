@@ -27,5 +27,14 @@ describe('setRegistrationChannel', () => {
     const registrationChannel = (client as AVClient).registrationChannel;
     expect(registrationChannel).to.be.a('string');
     expect(registrationChannel).to.not.be.undefined;
+
+    // Verify it's a valid JWT with three parts
+    const parts = registrationChannel.split('.');
+    expect(parts).to.have.lengthOf(3);
+
+    // Decode and verify the payload contains the expected claims
+    const decoded = jwtDecode(registrationChannel);
+    expect(decoded.sub).to.equal('channel');
+    expect(decoded.iat).to.be.a('number');
   });
 });
