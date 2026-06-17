@@ -1,6 +1,6 @@
 import { JWTPayload, SignJWT, importJWK } from 'jose';
 import { Buffer } from 'buffer';
-import { createECDH } from 'crypto';
+import { p256 } from '@noble/curves/nist.js';
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
@@ -231,28 +231,30 @@ export class AVClient implements IAVClient {
   }
 
   private async generateJwt(payload: JWTPayload, privateKeyHex: string) {
-  // Derive public key point from raw private scalar
-  const ecdh = createECDH('prime256v1');
-  ecdh.setPrivateKey(Buffer.from(privateKeyHex, 'hex'));
-  const publicKey = ecdh.getPublicKey();
+    // Derive uncompressed public key from private scalar using @noble/curves
+    const privateKeyBytes = Buffer.from(privateKeyHex, 'hex');
+    const publicKey = p256.getPublicKey(privateKeyBytes, false);
 
-  // Build JWK from raw components
-  const jwk = {
-    kty: 'EC',
-    crv: 'P-256',
-    d: Buffer.from(privateKeyHex, 'hex').toString('base64url'),
-    x: publicKey.subarray(1, 33).toString('base64url'),   // skip 0x04 prefix
-    y: publicKey.subarray(33, 65).toString('base64url'),
-  };
+    const toBase64Url = (buf: Uint8Array) =>
+      Buffer.from(buf).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
-  const key = await importJWK(jwk, 'ES256');
-  const now = Math.floor(Date.now() / 1000);
+    // Build JWK from raw components
+    const jwk = {
+      kty: 'EC',
+      crv: 'P-256',
+      d: toBase64Url(privateKeyBytes),
+      x: toBase64Url(publicKey.slice(1, 33)),   // skip 0x04 prefix
+      y: toBase64Url(publicKey.slice(33, 65)),
+    };
 
-  return new SignJWT(payload)
-    .setProtectedHeader({ alg: 'ES256' })
-    .setIssuedAt(now)
-    .setExpirationTime("2h")
-    .sign(key);
+    const key = await importJWK(jwk, 'ES256');
+    const now = Math.floor(Date.now() / 1000);
+
+    return new SignJWT(payload)
+      .setProtectedHeader({ alg: 'ES256' })
+      .setIssuedAt(now)
+      .setExpirationTime("2h")
+      .sign(key);
   }
 
   public async getCoordinatorVoterInfo(): Promise<AxiosResponse> {
