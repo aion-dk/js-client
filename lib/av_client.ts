@@ -1,6 +1,6 @@
 import { JWTPayload, SignJWT, importJWK } from 'jose';
 import { Buffer } from 'buffer';
-import {createECDH} from 'crypto';
+import { createECDH } from 'crypto';
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
@@ -251,6 +251,7 @@ export class AVClient implements IAVClient {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: 'ES256' })
     .setIssuedAt(now)
+    .setExpirationTime("2h")
     .sign(key);
   }
 
