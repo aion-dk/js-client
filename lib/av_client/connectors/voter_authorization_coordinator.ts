@@ -4,7 +4,7 @@ import { BallotBoxReceipt, VoterAuthorizationIdentification, ProofOfElectionCode
 
 export default class VoterAuthorizationCoordinator {
   private backend: AxiosInstance;
-  private electionContextUuid: string;
+  private readonly electionContextUuid: string;
 
   constructor(baseURL: string, electionContextUuid: string, timeout = 10000) {
     this.createBackendClient(baseURL, timeout);
