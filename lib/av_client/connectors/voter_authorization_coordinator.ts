@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
-import { IdentityConfirmationToken } from "./otp_provider";
 import { EmailDoesNotMatchVoterRecordError, NetworkError, UnsupportedServerReplyError, VoterRecordNotFoundError, DBBError, BallotReferenceNotOnVoterRecord } from "../errors";
 import { BallotBoxReceipt, VoterAuthorizationIdentification, ProofOfElectionCodes } from '../types';
 
@@ -80,7 +79,7 @@ export default class VoterAuthorizationCoordinator {
 
   requestPublicKeyAuthorization(
     sessionId: string,
-    identityConfirmationToken: IdentityConfirmationToken,
+    identityConfirmationToken: string,
     publicKey: string,
     votingRoundReference: string
   ): Promise<AxiosResponse> {

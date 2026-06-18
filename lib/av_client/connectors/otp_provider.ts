@@ -1,18 +1,17 @@
 import axios, { AxiosInstance } from 'axios'
 import { AccessCodeInvalid, AccessCodeExpired, NetworkError, UnsupportedServerReplyError } from "../errors";
 
-export type IdentityConfirmationToken = string;
 
 export class OTPProvider {
   private backend: AxiosInstance;
-  private electionContextUuid: string;
+  private readonly electionContextUuid: string;
 
   constructor(baseURL: string, electionContextUuid: string, timeout = 10000) {
     this.createBackendClient(baseURL, timeout);
     this.electionContextUuid = electionContextUuid;
   }
 
-  requestOTPAuthorization(otpCode: string, email: string): Promise<IdentityConfirmationToken> {
+  requestOTPAuthorization(otpCode: string, email: string): Promise<string> {
     return this.backend.post('authorize', {
       electionContextUuid: this.electionContextUuid,
       otpCode: otpCode,
@@ -28,7 +27,7 @@ export class OTPProvider {
         }
 
         // If we get errors from the provider, we wrap in custom errors
-        if (response && response.status === 403 && response.data) {
+        if (response?.status === 403 && response?.data) {
           if (!response.data.errorCode) {
             throw new UnsupportedServerReplyError(`Unsupported OTP Provider error message: ${JSON.stringify(error.response.data)}`)
           }

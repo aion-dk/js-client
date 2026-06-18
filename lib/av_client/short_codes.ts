@@ -18,7 +18,7 @@ const HEX_PAD = '0'
  * @returns a base58 string of 7 chars
  */
 export function hexToShortCode(input: string): string {
-  if( ! input.match(/^[0-9a-f]*$/i) ){
+  if( ! /^[0-9a-f]*$/i.test(input) ){
     throw new Error('Non-hex character')
   }
   const byteArray = leftTrim(bsHEX.decode(input.toLowerCase()))

@@ -1,10 +1,8 @@
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
-import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
-import { extractContestSelections } from './util/nist_cvr_extractor';
-import { AVVerifier } from './av_verifier';
+import { OTPProvider } from "./av_client/connectors/otp_provider";
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
-import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig, ProofOfElectionCodes } from './av_client/types';
+import { KeyPair, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig, ProofOfElectionCodes, IAVClient, ContestMap, BallotBoxReceipt, VoterSessionItem, BoardCommitmentItem, BallotCryptogramItem } from './av_client/types';
 import { randomKeyPair } from './av_client/new_crypto/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import { JwtPayload, jwtDecode } from "jwt-decode";
@@ -15,29 +13,10 @@ import {
 } from './av_client/election_config';
 
 import {
-  IAVClient,
-  ContestMap,
-  BallotBoxReceipt,
-  VoterSessionItem,
-  BoardCommitmentItem,
-  BallotCryptogramItem,
-  HashValue,
-  Signature,
-} from './av_client/types';
-
-import {
-  AvClientError,
-  AccessCodeExpired,
-  AccessCodeInvalid,
-  BulletinBoardError,
-  CorruptCvrError,
   TimeoutError,
-  EmailDoesNotMatchVoterRecordError,
   InvalidConfigError,
   InvalidStateError,
-  NetworkError,
   InvalidTokenError,
-  DBBError
 } from './av_client/errors';
 
 import { signPayload, validatePayload, validateReceipt } from './av_client/new_crypto/signing';
@@ -84,10 +63,10 @@ export class AVClient implements IAVClient {
   private authorizationSessionId: string;
   private email: string;
   private votingRoundReference: string;
-  private identityConfirmationToken: IdentityConfirmationToken;
-  private dbbPublicKey: string | undefined;
+  private identityConfirmationToken: string;
+  private readonly dbbPublicKey: string | undefined;
 
-  private bulletinBoard: BulletinBoard;
+  private readonly bulletinBoard: BulletinBoard;
   private latestConfig?: LatestConfig;
   private crypto: AVCrypto;
   private keyPair: KeyPair;
@@ -619,7 +598,7 @@ export class AVClient implements IAVClient {
     }
   }
 
-  private privateKey(): BigNum {
+  private privateKey(): string {
     return this.keyPair.privateKey
   }
 
@@ -732,31 +711,26 @@ export class AVClient implements IAVClient {
   }
 }
 
-type BigNum = string;
-
 export type {
   IAVClient,
   ContestMap,
   BallotSelection,
-  Affidavit,
   BallotBoxReceipt,
-  HashValue,
-  Signature,
   LatestConfig
 }
 
+export type { Affidavit, HashValue, Signature } from './av_client/types';
+export { extractContestSelections } from './util/nist_cvr_extractor';
+export { AVVerifier } from './av_verifier';
+export { BulletinBoardError, EmailDoesNotMatchVoterRecordError, DBBError } from './av_client/errors';
+
 export {
-  extractContestSelections,
-  AVVerifier,
   AvClientError,
   AccessCodeExpired,
   AccessCodeInvalid,
-  BulletinBoardError,
   CorruptCvrError,
   TimeoutError,
-  EmailDoesNotMatchVoterRecordError,
   InvalidConfigError,
   InvalidStateError,
   NetworkError,
-  DBBError
-}
+} from './av_client/errors';

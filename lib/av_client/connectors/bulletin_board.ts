@@ -36,7 +36,7 @@ export class BulletinBoard {
       }
 
       if ([403, 500].includes(response.status) && response.data) {
-        if (!response.data.error || !response.data.error.code || !response.data.error.description) {
+        if (!response.data.error?.code || !response.data.error?.description) {
           throw new UnsupportedServerReplyError(`Unsupported Bulletin Board server error message: ${JSON.stringify(error.response.data)}`)
         }
 
@@ -61,7 +61,7 @@ export class BulletinBoard {
       }
 
       if ([403, 500].includes(response.status) && response.data) {
-        if (!response.data.error || !response.data.error.code || !response.data.error.description) {
+        if (!response.data.error?.code || !response.data.error?.description) {
           throw new UnsupportedServerReplyError(`Unsupported Bulletin Board server error message: ${JSON.stringify(error.response.data)}`)
         }
 
@@ -159,7 +159,7 @@ export class BulletinBoard {
       }
 
       if ([403, 500].includes(response.status) && response.data) {
-        if (!response.data.error || !response.data.error.code || !response.data.error.description) {
+        if (!response.data.error?.code || !response.data.error?.description) {
           throw new UnsupportedServerReplyError(`Unsupported Bulletin Board server error message: ${JSON.stringify(error.response.data)}`)
         }
 

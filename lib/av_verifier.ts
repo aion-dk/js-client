@@ -27,7 +27,7 @@ import {validateCommitment} from "./av_client/new_crypto/commitments";
 import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 export class AVVerifier {
-  private dbbPublicKey: string | undefined;
+  private readonly dbbPublicKey: string | undefined;
   private verifierPrivateKey: string | undefined
   private cryptogramAddress: string
   private verifierItem: VerifierItem
@@ -37,7 +37,7 @@ export class AVVerifier {
   private boardCommitmentOpening: VoterCommitmentOpeningItem
   private voterCommitmentOpening: BoardCommitmentOpeningItem
   private latestConfig: LatestConfig
-  private bulletinBoard: BulletinBoard;
+  private readonly bulletinBoard: BulletinBoard;
   private crypto: AVCrypto;
 
   /**
@@ -211,12 +211,12 @@ export class AVVerifier {
 
     try {
       verifyAddress(castRequestItem)
-      validateReceipt(this.crypto, [castRequestItem], receipt, this.latestConfig.items.genesisConfig.content.publicKey)
+      validateReceipt(this.crypto, [castRequestItem], receipt, this.getDbbPublicKey())
     } catch (err) {
       // This checks for the specific error messages that invalidate a receipt. Other different errors would bubble up.
       if (
-        /^Unknown parameter type /.test(err.message) ||                             // if the unifier encounters unsupported data types
-        /^BoardItem address does not match expected address /.test(err.message) ||  // if crypto fails on validating the address
+        err.message.startsWith('Unknown parameter type ') ||                             // if the unifier encounters unsupported data types
+        err.message.startsWith('BoardItem address does not match expected address ') ||  // if crypto fails on validating the address
         err.message == "Board receipt verification failed"                          // if crypto fails on validating the dbb signature
       ) {
         throw new InvalidReceiptError(err.message)
@@ -224,6 +224,10 @@ export class AVVerifier {
         throw err
       }
     }
+  }
+
+  private getDbbPublicKey(): string {
+    return this.dbbPublicKey || this.latestConfig.items.genesisConfig.content.publicKey;
   }
 
   private validateTrackingCode(trackingCode: string, castRequestItem: CastRequestItem) {
@@ -237,8 +241,8 @@ export class AVVerifier {
     let receiptData
     try {
       receiptData = JSON.parse(atob(encodedReceipt))
-    } catch (_err) {
-      throw new InvalidReceiptError("Receipt string is invalid")
+    } catch (err) {
+      throw new InvalidReceiptError(`Receipt string is invalid: ${err instanceof Error ? err.message : err}`)
     }
 
     const castRequestItem: CastRequestItem = {
