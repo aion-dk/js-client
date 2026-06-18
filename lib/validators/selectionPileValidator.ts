@@ -9,7 +9,7 @@ import {
 } from "../av_client/validation_helpers";
 
 class SelectionPileValidator {
-  private contest: ContestContent;
+  private readonly contest: ContestContent;
   constructor(contest: ContestContent) {
     this.contest = contest;
   }
@@ -58,7 +58,7 @@ class SelectionPileValidator {
   }
 
   private get optionReferences() {
-    return this.recursiveFlattener(this.contest.options as OptionContent[]).map((option) => option.reference);
+    return this.recursiveFlattener(this.contest.options).map((option) => option.reference);
   }
 
   private recursiveFlattener(options: OptionContent[] | null): OptionContent[] {
@@ -86,7 +86,7 @@ class SelectionPileValidator {
   }
 
   private belowMinListVotes(choices: OptionSelection[]) {
-    const options = this.recursiveFlattener(this.contest.options as OptionContent[]);
+    const options = this.recursiveFlattener(this.contest.options);
 
     const optionsWithListLimit = options.map((op) => op?.minChooseableSuboptions ? op : null)
 
@@ -102,7 +102,7 @@ class SelectionPileValidator {
   }
 
   private exceededListVotes(choices: OptionSelection[]) {
-    const options = this.recursiveFlattener(this.contest.options as OptionContent[]);
+    const options = this.recursiveFlattener(this.contest.options);
 
     const optionsWithListLimit = options.map((op) => op?.maxChooseableSuboptions ? op : null)
 
@@ -136,7 +136,7 @@ class SelectionPileValidator {
   private exclusiveNotAlone(choices: OptionSelection[]) {
     if (this.selectedReferences(choices).length < 2) return false;
 
-    const options = this.recursiveFlattener(this.contest.options as OptionContent[]);
+    const options = this.recursiveFlattener(this.contest.options);
     return this.selectedReferences(choices)
       .map((ref) => options.find((option) => option.reference === ref))
       .some((option) => option?.exclusive === true);

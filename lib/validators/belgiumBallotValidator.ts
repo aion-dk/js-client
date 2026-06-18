@@ -1,8 +1,7 @@
-import { ContestContent, OptionSelection, SelectionPile } from '../av_client/types';
-import { Error } from "../av_client/types"
+import { ContestContent, OptionSelection, SelectionPile, Error } from '../av_client/types';
 
 class BelgiumBallotValidator {
-  private contest: ContestContent;
+  private readonly contest: ContestContent;
   constructor(contest: ContestContent) {
     this.contest = contest;
   }
