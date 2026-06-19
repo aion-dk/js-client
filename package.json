@@ -1,6 +1,6 @@
 {
   "name": "@assemblyvoting/js-client",
-  "version": "6.3.0",
+  "version": "6.4.0",
   "license": "MIT",
   "description": "Assembly Voting JS client",
   "main": "dist/lib/av_client.js",
@@ -33,7 +33,10 @@
     "axios": "^1.18.0",
     "base-x": "^5.0.0",
     "buffer": "^6.0.3",
+    "jose": "^6.2.3",
     "jwt-decode": "^4.0.0",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {

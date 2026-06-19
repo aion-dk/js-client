@@ -1,3 +1,6 @@
+import { JWTPayload, SignJWT, importJWK } from 'jose';
+import { Buffer } from 'buffer';
+import { p256 } from '@noble/curves/nist.js';
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider, IdentityConfirmationToken } from "./av_client/connectors/otp_provider";
@@ -8,6 +11,14 @@ import { KeyPair, Affidavit, VerifierItem, CommitmentOpening, SpoilRequestItem, 
 import { randomKeyPair } from './av_client/new_crypto/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import { JwtPayload, jwtDecode } from "jwt-decode";
+
+interface AuthTokenPayload extends JwtPayload {
+  identifier: string;
+  public_key: string;
+  weight?: number;
+  voter_group_key: string;
+  voting_round_reference: string;
+}
 
 import {
   fetchLatestConfig,
@@ -86,6 +97,7 @@ export class AVClient implements IAVClient {
   private votingRoundReference: string;
   private identityConfirmationToken: IdentityConfirmationToken;
   private dbbPublicKey: string | undefined;
+  private registrationChannel: string | undefined;
 
   private bulletinBoard: BulletinBoard;
   private latestConfig?: LatestConfig;
@@ -204,6 +216,47 @@ export class AVClient implements IAVClient {
     this.identityConfirmationToken = token
   }
 
+  /**
+   * Internal method to set the registration channel from trusted session source
+   * @internal
+   */
+  async setRegistrationChannel(channelPrivateKey: string | undefined): Promise<void> {
+    if (channelPrivateKey === undefined) {
+      this.registrationChannel = undefined;
+      return;
+    }
+    
+    // Sign a JWT
+    this.registrationChannel = await this.generateJwt({ sub: 'channel' }, channelPrivateKey);
+  }
+
+  private async generateJwt(payload: JWTPayload, privateKeyHex: string) {
+    // Derive uncompressed public key from private scalar using @noble/curves
+    const privateKeyBytes = Buffer.from(privateKeyHex, 'hex');
+    const publicKey = p256.getPublicKey(privateKeyBytes, false);
+
+    const toBase64Url = (buf: Uint8Array) =>
+      Buffer.from(buf).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+    // Build JWK from raw components
+    const jwk = {
+      kty: 'EC',
+      crv: 'P-256',
+      d: toBase64Url(privateKeyBytes),
+      x: toBase64Url(publicKey.slice(1, 33)),   // skip 0x04 prefix
+      y: toBase64Url(publicKey.slice(33, 65)),
+    };
+
+    const key = await importJWK(jwk, 'ES256');
+    const now = Math.floor(Date.now() / 1000);
+
+    return new SignJWT(payload)
+      .setProtectedHeader({ alg: 'ES256' })
+      .setIssuedAt(now)
+      .setExpirationTime("2h")
+      .sign(key);
+  }
+
   public async getCoordinatorVoterInfo(): Promise<AxiosResponse> {
     const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
     const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
@@ -254,7 +307,7 @@ export class AVClient implements IAVClient {
     const { authToken, authorizationUuid } = authorizationResponse.data;
     this.authorizationSessionId = this.authorizationSessionId ? this.authorizationSessionId : authorizationUuid
 
-    const decoded = jwtDecode<JwtPayload>(authToken); // TODO: Verify against dbb pubkey: this.getLatestConfig().services.voterAuthorizer.public_key);
+    const decoded = jwtDecode<AuthTokenPayload>(authToken); // TODO: Verify against dbb pubkey: this.getLatestConfig().services.voterAuthorizer.public_key);
 
     if(decoded === null)
       throw new InvalidTokenError('Auth token could not be decoded');
@@ -264,18 +317,18 @@ export class AVClient implements IAVClient {
       parentAddress: latestConfigAddress,
       content: {
         authToken: authToken,
-        identifier: decoded['identifier'],
-        publicKey: decoded['public_key'],
-        weight: decoded['weight'] || 1,
-        voterGroup: decoded['voter_group_key'],
-        votingRoundReference: decoded['voting_round_reference']
+        identifier: decoded.identifier,
+        publicKey: decoded.public_key,
+        weight: decoded.weight || 1,
+        voterGroup: decoded.voter_group_key,
+        votingRoundReference: decoded.voting_round_reference
       }
     }
 
-    const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, latestConfigAddress);
+    const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, latestConfigAddress, this.registrationChannel);
     const voterSessionItem = voterSessionItemResponse.data.voterSession;
     const receipt = voterSessionItemResponse.data.receipt;
-
+ 
     validatePayload(this.crypto, voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
     validateReceipt(this.crypto, [voterSessionItem], receipt, this.getDbbPublicKey());
 
@@ -317,7 +370,7 @@ export class AVClient implements IAVClient {
     }
 
     const { authToken } = authorizationResponse.data;
-    const decodedAuthToken = jwtDecode<JwtPayload>(authToken);
+    const decodedAuthToken = jwtDecode<AuthTokenPayload>(authToken);
 
     if(decodedAuthToken === null)
       throw new InvalidTokenError('Auth token could not be decoded');
