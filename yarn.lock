@@ -15,10 +15,10 @@
     "@jridgewell/gen-mapping" "^0.3.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@assemblyvoting/av-crypto@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@assemblyvoting/av-crypto/-/av-crypto-1.1.1.tgz#fe53e5f41e2e88fbd3b5bc0d53a6c17db574268e"
-  integrity sha512-bJB4StgyQX+h1P2edAt2U1lqAl84UH/lQ4L6H1Gj5gJIdXgNwca5+hFvjgIK+umU0d3rmfUXXrkH+z0wwj63kQ==
+"@assemblyvoting/av-crypto@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@assemblyvoting/av-crypto/-/av-crypto-1.2.1.tgz#8c934189fd3a3233154915ffff2ddbc64449be26"
+  integrity sha512-pMSxohewacGDWWq4JyDUQ02MOH77Y1QaaVqltgn1DV3F5s0qQbqXUynPRlEoyEpdLXVs8A9MgjiijjNVE4jQew==
   dependencies:
     "@noble/hashes" "^1.8.0"
     sjcl-with-all "^1.0.8"
