@@ -61,7 +61,6 @@ import {AVCrypto} from "@assemblyvoting/av-crypto";
  * |{@link AVClient.constructBallotCryptograms | constructBallotCryptograms } | Constructs voter ballot cryptograms. |
  * |{@link AVClient.spoilBallot | spoilBallot }                               | Optional. Initiates process of testing the ballot encryption. |
  * |{@link AVClient.castBallot | castBallot }                                 | Finalizes the voting process. |
- * |{@link AVClient.purgeData | purgeData }                                   | Optional. Explicitly purges internal data. |
  *
  * ## Example walkthrough test
  *
@@ -759,13 +758,6 @@ export class AVClient implements IAVClient {
     this.bulletinBoard.submitCommitmentOpenings(
       signedVoterCommitmentOpeningItem,
     );
-  }
-
-  /**
-   * Purges internal data.
-   */
-  public purgeData(): void {
-    return;
   }
 
   public getLatestConfig(): LatestConfig {
