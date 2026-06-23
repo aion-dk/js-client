@@ -765,7 +765,6 @@ export class AVClient implements IAVClient {
    * Purges internal data.
    */
   public purgeData(): void {
-    // TODO: implement me
     return;
   }
 
