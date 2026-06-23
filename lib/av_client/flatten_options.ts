@@ -10,5 +10,5 @@ function flattenOption(option: OptionContent){
 
 export function flattenOptions(options: OptionContent[]): OptionContent[] {
   const reducer = (list: OptionContent[], option: OptionContent) => list.concat(flattenOption(option))
-  return options.reduce((list, option) => reducer(list, option), [])
+  return options.reduce<OptionContent[]>((list, option) => reducer(list, option), [])
 }

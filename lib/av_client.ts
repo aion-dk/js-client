@@ -1,5 +1,5 @@
 import { JWTPayload, SignJWT, importJWK } from 'jose';
-import { Buffer } from 'node:buffer';
+import { Buffer } from 'buffer';
 import { p256 } from '@noble/curves/nist.js';
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';

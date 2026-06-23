@@ -64,7 +64,7 @@ describe.skip('entire voter flow using OTP authorization', () => {
     const messages = await axios.get(`${mailcatcherHost}messages`)
       .then((response) => response.data);
     if (messages.length == 0) {
-      throw 'Email message with an OTP was not found';
+      throw new Error('Email message with an OTP was not found');
     }
     const lastMessageId = messages[messages.length - 1].id;
     const message = await axios.get(`${mailcatcherHost}messages/${lastMessageId}.plain`)
@@ -73,15 +73,12 @@ describe.skip('entire voter flow using OTP authorization', () => {
 
     const patternMatches = otpPattern.exec(message);
     if (!patternMatches) {
-      throw 'OTP code pattern not found in the email';
+      throw new Error('OTP code pattern not found in the email');
     }
     const code = patternMatches[0];
     return code;
   }
 
-  async function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
 });
 
 describe.skip('entire voter flow using PoEC authorization', () => {
@@ -123,6 +120,10 @@ describe.skip('entire voter flow using PoEC authorization', () => {
 
   }).timeout(10000);
 })
+
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 function dummyBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap ): BallotSelection {
   return {
