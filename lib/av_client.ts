@@ -1,5 +1,5 @@
 import { JWTPayload, SignJWT, importJWK } from 'jose';
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 import { p256 } from '@noble/curves/nist.js';
 import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
@@ -87,10 +87,10 @@ export class AVClient implements IAVClient {
   private serverEnvelopes: ContestMap<string[][]>;
   private voterSession: VoterSessionItem;
   private boardCommitment: BoardCommitmentItem;
-  private verifierItem: VerifierItem
+  private verifierItem: VerifierItem;
   private ballotCryptogramItem: BallotCryptogramItem;
   private voterCommitmentOpening: CommitmentOpening;
-  private spoilRequest: SpoilRequestItem
+  private spoilRequest: SpoilRequestItem;
   private proofOfElectionCodes: ProofOfElectionCodes;
 
   /**
@@ -110,7 +110,10 @@ export class AVClient implements IAVClient {
    * @returns Returns undefined if succeeded or throws an error
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async initialize(latestConfig?: LatestConfig, keyPair?: KeyPair): Promise<void> {
+  public async initialize(
+    latestConfig?: LatestConfig,
+    keyPair?: KeyPair,
+  ): Promise<void> {
     if (latestConfig) {
       validateLatestConfig(latestConfig);
       this.latestConfig = latestConfig;
@@ -118,7 +121,9 @@ export class AVClient implements IAVClient {
       this.latestConfig = await fetchLatestConfig(this.bulletinBoard);
     }
 
-    this.crypto = new AVCrypto(this.latestConfig.items.genesisConfig.content.eaCurveName)
+    this.crypto = new AVCrypto(
+      this.latestConfig.items.genesisConfig.content.eaCurveName,
+    );
 
     if (keyPair) {
       this.keyPair = keyPair;
@@ -142,19 +147,31 @@ export class AVClient implements IAVClient {
    * @throws VoterRecordNotFound if no voter was found
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async requestAccessCode(opaqueVoterId: string, email: string, ballotReference?: string): Promise<void> {
-    const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
-    const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
-    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
+  public async requestAccessCode(
+    opaqueVoterId: string,
+    email: string,
+    ballotReference?: string,
+  ): Promise<void> {
+    const coordinatorURL =
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer
+        .url;
+    const voterAuthorizerContextUuid =
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer
+        .contextUuid;
+    const coordinator = new VoterAuthorizationCoordinator(
+      coordinatorURL,
+      voterAuthorizerContextUuid,
+    );
 
-    return coordinator.createSession(opaqueVoterId, email, ballotReference)
+    return coordinator
+      .createSession(opaqueVoterId, email, ballotReference)
       .then(({ data: { sessionId } }) => {
         // In the US voters are allowed to chose their ballot
-        return sessionId as string
+        return sessionId as string;
       })
-      .then(async sessionId => {
-        this.authorizationSessionId = sessionId
-        this.email = email
+      .then(async (sessionId) => {
+        this.authorizationSessionId = sessionId;
+        this.email = email;
       });
   }
 
@@ -177,119 +194,179 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   async validateAccessCode(code: string): Promise<void> {
-    if(!this.email)
-      throw new InvalidStateError('Cannot validate access code. Access code was not requested.');
+    if (!this.email)
+      throw new InvalidStateError(
+        "Cannot validate access code. Access code was not requested.",
+      );
 
-    const otpProviderUrl = this.getLatestConfig().items.voterAuthorizerConfig.content.identityProvider.url;
-    const otpProviderElectionContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.identityProvider.contextUuid;
-    const provider = new OTPProvider(otpProviderUrl, otpProviderElectionContextUuid)
+    const otpProviderUrl =
+      this.getLatestConfig().items.voterAuthorizerConfig.content
+        .identityProvider.url;
+    const otpProviderElectionContextUuid =
+      this.getLatestConfig().items.voterAuthorizerConfig.content
+        .identityProvider.contextUuid;
+    const provider = new OTPProvider(
+      otpProviderUrl,
+      otpProviderElectionContextUuid,
+    );
 
-    this.identityConfirmationToken = await provider.requestOTPAuthorization(code, this.email);
+    this.identityConfirmationToken = await provider.requestOTPAuthorization(
+      code,
+      this.email,
+    );
   }
 
-  generateProofOfElectionCodes(electionCodes : Array<string>) {
-    this.proofOfElectionCodes = proofOfElectionCodes(this.crypto, electionCodes);
+  generateProofOfElectionCodes(electionCodes: Array<string>) {
+    this.proofOfElectionCodes = proofOfElectionCodes(
+      this.crypto,
+      electionCodes,
+    );
   }
 
   setIdentityToken(token: string) {
-    this.identityConfirmationToken = token
+    this.identityConfirmationToken = token;
   }
 
   /**
    * Internal method to set the registration channel from trusted session source
    * @internal
    */
-  async setRegistrationChannel(channelPrivateKey: string | undefined): Promise<void> {
+  async setRegistrationChannel(
+    channelPrivateKey: string | undefined,
+  ): Promise<void> {
     if (channelPrivateKey === undefined) {
       this.registrationChannel = undefined;
       return;
     }
 
     // Sign a JWT
-    this.registrationChannel = await this.generateJwt({ sub: 'channel' }, channelPrivateKey);
+    this.registrationChannel = await this.generateJwt(
+      { sub: "channel" },
+      channelPrivateKey,
+    );
   }
 
   private async generateJwt(payload: JWTPayload, privateKeyHex: string) {
     // Derive uncompressed public key from private scalar using @noble/curves
-    const privateKeyBytes = Buffer.from(privateKeyHex, 'hex');
+    const privateKeyBytes = Buffer.from(privateKeyHex, "hex");
     const publicKey = p256.getPublicKey(privateKeyBytes, false);
 
     const toBase64Url = (buf: Uint8Array) =>
-      Buffer.from(buf).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      Buffer.from(buf)
+        .toString("base64")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
 
     // Build JWK from raw components
     const jwk = {
-      kty: 'EC',
-      crv: 'P-256',
+      kty: "EC",
+      crv: "P-256",
       d: toBase64Url(privateKeyBytes),
-      x: toBase64Url(publicKey.slice(1, 33)),   // skip 0x04 prefix
+      x: toBase64Url(publicKey.slice(1, 33)), // skip 0x04 prefix
       y: toBase64Url(publicKey.slice(33, 65)),
     };
 
-    const key = await importJWK(jwk, 'ES256');
+    const key = await importJWK(jwk, "ES256");
     const now = Math.floor(Date.now() / 1000);
 
     return new SignJWT(payload)
-      .setProtectedHeader({ alg: 'ES256' })
+      .setProtectedHeader({ alg: "ES256" })
       .setIssuedAt(now)
       .setExpirationTime("2h")
       .sign(key);
   }
 
   public async getCoordinatorVoterInfo(): Promise<AxiosResponse> {
-    const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
-    const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
-    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
+    const coordinatorURL =
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer
+        .url;
+    const voterAuthorizerContextUuid =
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer
+        .contextUuid;
+    const coordinator = new VoterAuthorizationCoordinator(
+      coordinatorURL,
+      voterAuthorizerContextUuid,
+    );
 
     let identity;
 
     if (this.proofOfElectionCodes) {
-      identity = { publicKey: this.proofOfElectionCodes.mainKeyPair.publicKey }
-    } else if (this.identityConfirmationToken)  {
+      identity = { publicKey: this.proofOfElectionCodes.mainKeyPair.publicKey };
+    } else if (this.identityConfirmationToken) {
       identity = { identitiyConfirmationToken: this.identityConfirmationToken };
     } else {
-      throw new InvalidStateError("No way of identifying voter. Please generate a public key or supply an identityToken")
+      throw new InvalidStateError(
+        "No way of identifying voter. Please generate a public key or supply an identityToken",
+      );
     }
 
-    return await coordinator.getVoterInfo(identity)
+    return await coordinator.getVoterInfo(identity);
   }
 
   /**
    * Registers a voter based on the authorization mode of the Voter Authorizer
    * Authorization is done by 'proof-of-identity' or 'proof-of-election-codes'
    */
-  public async createVoterRegistration(votingRoundReference = "voting-round-1"): Promise<void> {
-    const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
-    const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
-    const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
-    const latestConfigAddress = this.getLatestConfig().items.latestConfigItem.address;
-    const authorizationMode = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.authorizationMode;
-    this.votingRoundReference = votingRoundReference
+  public async createVoterRegistration(
+    votingRoundReference = "voting-round-1",
+  ): Promise<void> {
+    const coordinatorURL =
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer
+        .url;
+    const voterAuthorizerContextUuid =
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer
+        .contextUuid;
+    const coordinator = new VoterAuthorizationCoordinator(
+      coordinatorURL,
+      voterAuthorizerContextUuid,
+    );
+    const latestConfigAddress =
+      this.getLatestConfig().items.latestConfigItem.address;
+    const authorizationMode =
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer
+        .authorizationMode;
+    this.votingRoundReference = votingRoundReference;
 
-    let authorizationResponse: AxiosResponse
+    let authorizationResponse: AxiosResponse;
 
     // This should be refactored when the DBB allows several authorization modes
-    if(authorizationMode === 'proof-of-identity' || this.identityConfirmationToken) {
-      if(!this.identityConfirmationToken)
-        throw new InvalidStateError('Cannot register voter without identity confirmation. User has not validated access code.')
+    if (
+      authorizationMode === "proof-of-identity" ||
+      this.identityConfirmationToken
+    ) {
+      if (!this.identityConfirmationToken)
+        throw new InvalidStateError(
+          "Cannot register voter without identity confirmation. User has not validated access code.",
+        );
 
-      authorizationResponse = await this.authorizeIdentity(coordinator)
-    } else if(authorizationMode === 'proof-of-election-codes') {
-      if(this.proofOfElectionCodes == null)
-        throw new InvalidStateError('Cannot register voter without proof of election codes. User has not generated an election codes proof.')
+      authorizationResponse = await this.authorizeIdentity(coordinator);
+    } else if (authorizationMode === "proof-of-election-codes") {
+      if (this.proofOfElectionCodes == null)
+        throw new InvalidStateError(
+          "Cannot register voter without proof of election codes. User has not generated an election codes proof.",
+        );
 
-      authorizationResponse = await coordinator.authorizeProofOfElectionCodes(this.keyPair.publicKey, this.proofOfElectionCodes, this.votingRoundReference)
+      authorizationResponse = await coordinator.authorizeProofOfElectionCodes(
+        this.keyPair.publicKey,
+        this.proofOfElectionCodes,
+        this.votingRoundReference,
+      );
     } else {
-      throw new InvalidConfigError(`Unknown authorization mode of voter authorizer: '${authorizationMode}'`)
+      throw new InvalidConfigError(
+        `Unknown authorization mode of voter authorizer: '${authorizationMode}'`,
+      );
     }
 
     const { authToken, authorizationUuid } = authorizationResponse.data;
-    this.authorizationSessionId = this.authorizationSessionId ? this.authorizationSessionId : authorizationUuid
+    this.authorizationSessionId = this.authorizationSessionId
+      ? this.authorizationSessionId
+      : authorizationUuid;
 
     const decoded = jwtDecode<AuthTokenPayload>(authToken); // TODO: Verify against dbb pubkey: this.getLatestConfig().services.voterAuthorizer.public_key);
 
-    if(decoded === null)
-      throw new InvalidTokenError('Auth token could not be decoded');
+    if (decoded === null)
+      throw new InvalidTokenError("Auth token could not be decoded");
 
     const voterSessionItemExpectation = {
       type: VOTER_SESSION_ITEM,
@@ -300,16 +377,31 @@ export class AVClient implements IAVClient {
         publicKey: decoded.public_key,
         weight: decoded.weight || 1,
         voterGroup: decoded.voter_group_key,
-        votingRoundReference: decoded.voting_round_reference
-      }
-    }
+        votingRoundReference: decoded.voting_round_reference,
+      },
+    };
 
-    const voterSessionItemResponse = await this.bulletinBoard.createVoterRegistration(authToken, latestConfigAddress, this.registrationChannel);
+    const voterSessionItemResponse =
+      await this.bulletinBoard.createVoterRegistration(
+        authToken,
+        latestConfigAddress,
+        this.registrationChannel,
+      );
     const voterSessionItem = voterSessionItemResponse.data.voterSession;
     const receipt = voterSessionItemResponse.data.receipt;
 
-    validatePayload(this.crypto, voterSessionItem, voterSessionItemExpectation, this.getDbbPublicKey());
-    validateReceipt(this.crypto, [voterSessionItem], receipt, this.getDbbPublicKey());
+    validatePayload(
+      this.crypto,
+      voterSessionItem,
+      voterSessionItemExpectation,
+      this.getDbbPublicKey(),
+    );
+    validateReceipt(
+      this.crypto,
+      [voterSessionItem],
+      receipt,
+      this.getDbbPublicKey(),
+    );
 
     this.voterSession = voterSessionItem;
     this.bulletinBoard.setVoterSessionUuid(voterSessionItem.content.identifier);
@@ -323,16 +415,20 @@ export class AVClient implements IAVClient {
     return this.createVoterRegistration();
   }
 
-  public async expireVoterSessions(votingRoundReference: string): Promise<AxiosResponse> {
+  public async expireVoterSessions(
+    votingRoundReference: string,
+  ): Promise<AxiosResponse> {
     const {
       url: vaUrl,
       contextUuid: vaUuid,
       authorizationMode,
-    } = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer;
-    const latestConfigAddress = this.getLatestConfig().items.latestConfigItem.address;
+    } = this.getLatestConfig().items.voterAuthorizerConfig.content
+      .voterAuthorizer;
+    const latestConfigAddress =
+      this.getLatestConfig().items.latestConfigItem.address;
     const coordinator = new VoterAuthorizationCoordinator(vaUrl, vaUuid);
 
-    let authorizationResponse: AxiosResponse
+    let authorizationResponse: AxiosResponse;
 
     switch (authorizationMode) {
       case "proof-of-election-codes":
@@ -340,35 +436,47 @@ export class AVClient implements IAVClient {
           this.keyPair.publicKey,
           this.proofOfElectionCodes,
           votingRoundReference,
-          "expire");
+          "expire",
+        );
         break;
       case "proof-of-identity":
-        throw new InvalidStateError("voter_authorizer.expire_voter.proof_of_identity_not_supported");
+        throw new InvalidStateError(
+          "voter_authorizer.expire_voter.proof_of_identity_not_supported",
+        );
       default:
-        throw new InvalidConfigError(`Unknown authorization mode of voter authorizer: '${authorizationMode}'`);
+        throw new InvalidConfigError(
+          `Unknown authorization mode of voter authorizer: '${authorizationMode}'`,
+        );
     }
 
     const { authToken } = authorizationResponse.data;
     const decodedAuthToken = jwtDecode<AuthTokenPayload>(authToken);
 
-    if(decodedAuthToken === null)
-      throw new InvalidTokenError('Auth token could not be decoded');
+    if (decodedAuthToken === null)
+      throw new InvalidTokenError("Auth token could not be decoded");
 
-    return await this.bulletinBoard.expireVoterSessions(authToken, latestConfigAddress);
+    return await this.bulletinBoard.expireVoterSessions(
+      authToken,
+      latestConfigAddress,
+    );
   }
 
   public async extendVoterSessions(extendedBy: number): Promise<void> {
-    if (!this.voterSession.address) return
+    if (!this.voterSession.address) return;
     const parentAddress = this.voterSession.address;
 
     const sessionExtensionItem = {
       parentAddress: parentAddress,
       type: SESSION_EXTENSION_ITEM,
       content: {
-        extendedBy: extendedBy
-      }
+        extendedBy: extendedBy,
+      },
     };
-    const signedPayload = signPayload(this.crypto, sessionExtensionItem, this.privateKey());
+    const signedPayload = signPayload(
+      this.crypto,
+      sessionExtensionItem,
+      this.privateKey(),
+    );
     await this.bulletinBoard.extendVoterSessions(signedPayload);
   }
   /**
@@ -418,67 +526,76 @@ export class AVClient implements IAVClient {
    * @throws {@link CorruptCvrError | CorruptCvrError } if the cast vote record is invalid
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-  public async constructBallot(ballotSelection: BallotSelection): Promise<string> {
-    if(!(this.voterSession)) {
-      throw new InvalidStateError('Cannot construct cryptograms. Voter identity unknown')
+  public async constructBallot(
+    ballotSelection: BallotSelection,
+  ): Promise<string> {
+    if (!this.voterSession) {
+      throw new InvalidStateError(
+        "Cannot construct cryptograms. Voter identity unknown",
+      );
     }
 
     const state = {
       voterSession: this.voterSession,
       latestConfig: this.getLatestConfig(),
-      votingRoundReference: this.votingRoundReference
+      votingRoundReference: this.votingRoundReference,
     };
 
-    const transparent = state.latestConfig.items.votingRoundConfigs[this.votingRoundReference].content.handRaise || false;
+    const transparent =
+      state.latestConfig.items.votingRoundConfigs[this.votingRoundReference]
+        .content.handRaise || false;
 
-    const {
-      pedersenCommitment,
-      envelopeRandomizers,
-      contestEnvelopes,
-    } = constructContestEnvelopes(this.crypto, state, ballotSelection, transparent);
+    const { pedersenCommitment, envelopeRandomizers, contestEnvelopes } =
+      constructContestEnvelopes(
+        this.crypto,
+        state,
+        ballotSelection,
+        transparent,
+      );
 
     this.clientEnvelopes = contestEnvelopes;
 
     this.voterCommitmentOpening = {
       commitmentRandomness: pedersenCommitment.randomizer,
-      randomizers: envelopeRandomizers
-    }
+      randomizers: envelopeRandomizers,
+    };
 
-    const contestPilesMap = contestEnvelopes.map(ce => [ce.reference, ce.piles.length])
+    const contestPilesMap = contestEnvelopes.map((ce) => [
+      ce.reference,
+      ce.piles.length,
+    ]);
 
-    const {
-      boardCommitment,
-      serverEnvelopes
-    } = await submitVoterCommitment(
+    const { boardCommitment, serverEnvelopes } = await submitVoterCommitment(
       this.crypto,
       this.bulletinBoard,
       this.voterSession.address,
       pedersenCommitment.commitment,
       this.privateKey(),
       Object.fromEntries(contestPilesMap),
-      this.getDbbPublicKey()
+      this.getDbbPublicKey(),
     );
     this.boardCommitment = boardCommitment;
     this.serverEnvelopes = serverEnvelopes;
 
-    const [ ballotCryptogramItem, verificationStartItem ]  = await submitBallotCryptograms(
-      this.crypto,
-      this.bulletinBoard,
-      this.clientEnvelopes,
-      this.serverEnvelopes,
-      boardCommitment.address,
-      this.privateKey(),
-      this.getDbbPublicKey()
-    );
+    const [ballotCryptogramItem, verificationStartItem] =
+      await submitBallotCryptograms(
+        this.crypto,
+        this.bulletinBoard,
+        this.clientEnvelopes,
+        this.serverEnvelopes,
+        boardCommitment.address,
+        this.privateKey(),
+        this.getDbbPublicKey(),
+      );
 
     this.ballotCryptogramItem = ballotCryptogramItem;
 
-    const trackingCode = hexToShortCode(verificationStartItem.shortAddress)
+    const trackingCode = hexToShortCode(verificationStartItem.shortAddress);
 
-    return trackingCode
+    return trackingCode;
   }
 
-    /**
+  /**
    * Should be the last call in the entire voting process.
    *
    * Requests that the previously constructed ballot is cast.
@@ -497,39 +614,65 @@ export class AVClient implements IAVClient {
    * ```
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
-    public async castBallot(locale = "en"): Promise<BallotBoxReceipt> {
-      if(!(this.voterSession)) {
-        throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
-      }
-
-      const castRequestItem = {
-          parentAddress: this.ballotCryptogramItem.address,
-          type: CAST_REQUEST_ITEM,
-          content: {}
-      };
-      const signedPayload = signPayload(this.crypto, castRequestItem, this.privateKey());
-
-      const response = (await this.bulletinBoard.submitCastRequest(signedPayload));
-      const { castRequest, receipt } = response.data;
-
-      validatePayload(this.crypto, castRequest, castRequestItem);
-      validateReceipt(this.crypto, [castRequest], receipt, this.getDbbPublicKey());
-
-      const clientReceipt = generateReceipt(receipt, castRequest);
-
-      if (this.getLatestConfig().items.electionConfig.content.sendTrackingCodeByEmail) {
-        const coordinatorURL = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url;
-        const voterAuthorizerContextUuid = this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid;
-        const coordinator = new VoterAuthorizationCoordinator(coordinatorURL, voterAuthorizerContextUuid);
-        try {
-          coordinator.sendReceipt(clientReceipt, this.authorizationSessionId, this.getLatestConfig().items.electionConfig.content.dbasUrl, locale);
-        } catch(e) {
-          console.error(e)
-        }
-      }
-
-      return clientReceipt
+  public async castBallot(locale = "en"): Promise<BallotBoxReceipt> {
+    if (!this.voterSession) {
+      throw new InvalidStateError(
+        "Cannot create cast request cryptograms. Ballot cryptograms not present",
+      );
     }
+
+    const castRequestItem = {
+      parentAddress: this.ballotCryptogramItem.address,
+      type: CAST_REQUEST_ITEM,
+      content: {},
+    };
+    const signedPayload = signPayload(
+      this.crypto,
+      castRequestItem,
+      this.privateKey(),
+    );
+
+    const response = await this.bulletinBoard.submitCastRequest(signedPayload);
+    const { castRequest, receipt } = response.data;
+
+    validatePayload(this.crypto, castRequest, castRequestItem);
+    validateReceipt(
+      this.crypto,
+      [castRequest],
+      receipt,
+      this.getDbbPublicKey(),
+    );
+
+    const clientReceipt = generateReceipt(receipt, castRequest);
+
+    if (
+      this.getLatestConfig().items.electionConfig.content
+        .sendTrackingCodeByEmail
+    ) {
+      const coordinatorURL =
+        this.getLatestConfig().items.voterAuthorizerConfig.content
+          .voterAuthorizer.url;
+      const voterAuthorizerContextUuid =
+        this.getLatestConfig().items.voterAuthorizerConfig.content
+          .voterAuthorizer.contextUuid;
+      const coordinator = new VoterAuthorizationCoordinator(
+        coordinatorURL,
+        voterAuthorizerContextUuid,
+      );
+      try {
+        coordinator.sendReceipt(
+          clientReceipt,
+          this.authorizationSessionId,
+          this.getLatestConfig().items.electionConfig.content.dbasUrl,
+          locale,
+        );
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    return clientReceipt;
+  }
 
   /**
    * Should be called when voter chooses to test the encryption of their ballot.
@@ -541,31 +684,46 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async spoilBallot(): Promise<string> {
-    if(!(this.voterSession)) {
-      throw new InvalidStateError('Cannot create cast request cryptograms. Ballot cryptograms not present')
+    if (!this.voterSession) {
+      throw new InvalidStateError(
+        "Cannot create cast request cryptograms. Ballot cryptograms not present",
+      );
     }
 
     const spoilRequestItem = {
-        parentAddress: this.ballotCryptogramItem.address,
-        type: SPOIL_REQUEST_ITEM,
-        content: {}
-    }
+      parentAddress: this.ballotCryptogramItem.address,
+      type: SPOIL_REQUEST_ITEM,
+      content: {},
+    };
 
-    const signedPayload = signPayload(this.crypto, spoilRequestItem, this.privateKey());
+    const signedPayload = signPayload(
+      this.crypto,
+      spoilRequestItem,
+      this.privateKey(),
+    );
 
-    const response = (await this.bulletinBoard.submitSpoilRequest(signedPayload))
+    const response = await this.bulletinBoard.submitSpoilRequest(signedPayload);
 
     const { spoilRequest, receipt, boardCommitmentOpening } = response.data;
 
-    this.spoilRequest = spoilRequest
+    this.spoilRequest = spoilRequest;
 
     validatePayload(this.crypto, spoilRequest, spoilRequestItem);
-    validateReceipt(this.crypto, [spoilRequest], receipt, this.getDbbPublicKey());
-    validateCommitment(this.crypto, boardCommitmentOpening, this.boardCommitment.content.commitment, 'Board commitment is not valid')
+    validateReceipt(
+      this.crypto,
+      [spoilRequest],
+      receipt,
+      this.getDbbPublicKey(),
+    );
+    validateCommitment(
+      this.crypto,
+      boardCommitmentOpening,
+      this.boardCommitment.content.commitment,
+      "Board commitment is not valid",
+    );
 
-    return spoilRequest.address
+    return spoilRequest.address;
   }
-
 
   /**
    * Should be called when the voter has 'paired' the verifier and the voting app.
@@ -576,21 +734,31 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async challengeBallot(): Promise<void> {
-    if(!(this.voterSession)) {
-      throw new InvalidStateError('Cannot challenge ballot, no user session')
+    if (!this.voterSession) {
+      throw new InvalidStateError("Cannot challenge ballot, no user session");
     }
 
     const voterCommitmentOpeningItem = {
       parentAddress: this.verifierItem.address,
       type: VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM,
       content: {
-        package: encryptCommitmentOpening(this.crypto, this.verifierItem.content.publicKey, this.voterCommitmentOpening)
-      }
-    }
+        package: encryptCommitmentOpening(
+          this.crypto,
+          this.verifierItem.content.publicKey,
+          this.voterCommitmentOpening,
+        ),
+      },
+    };
 
-    const signedVoterCommitmentOpeningItem = signPayload(this.crypto, voterCommitmentOpeningItem, this.privateKey())
+    const signedVoterCommitmentOpeningItem = signPayload(
+      this.crypto,
+      voterCommitmentOpeningItem,
+      this.privateKey(),
+    );
 
-    this.bulletinBoard.submitCommitmentOpenings(signedVoterCommitmentOpeningItem)
+    this.bulletinBoard.submitCommitmentOpenings(
+      signedVoterCommitmentOpeningItem,
+    );
   }
 
   /**
@@ -598,65 +766,75 @@ export class AVClient implements IAVClient {
    */
   public purgeData(): void {
     // TODO: implement me
-    return
+    return;
   }
 
   public getLatestConfig(): LatestConfig {
-    if(!this.latestConfig){
-      throw new InvalidStateError('No configuration loaded. Did you call initialize()?')
+    if (!this.latestConfig) {
+      throw new InvalidStateError(
+        "No configuration loaded. Did you call initialize()?",
+      );
     }
 
-    return this.latestConfig
+    return this.latestConfig;
   }
 
   public getVoterSession(): VoterSessionItem {
-    if(!this.voterSession){
-      throw new InvalidStateError('No voter session loaded')
+    if (!this.voterSession) {
+      throw new InvalidStateError("No voter session loaded");
     }
 
-    return this.voterSession
+    return this.voterSession;
   }
 
   public getSessionUuid(): string {
-    return this.authorizationSessionId
+    return this.authorizationSessionId;
   }
 
   public getVoterBallotConfig(): BallotConfig {
-    const voterSession = this.getVoterSession()
-    const { items: { ballotConfigs } } = this.getLatestConfig()
-    return ballotConfigs[voterSession.content.voterGroup]
+    const voterSession = this.getVoterSession();
+    const {
+      items: { ballotConfigs },
+    } = this.getLatestConfig();
+    return ballotConfigs[voterSession.content.voterGroup];
   }
 
   public getVoterContestConfigs(): ContestConfig[] {
-    const voterSession = this.getVoterSession()
-    const { items: { ballotConfigs, votingRoundConfigs, contestConfigs }} = this.getLatestConfig()
+    const voterSession = this.getVoterSession();
+    const {
+      items: { ballotConfigs, votingRoundConfigs, contestConfigs },
+    } = this.getLatestConfig();
 
-    const myBallotConfig = ballotConfigs[voterSession.content.voterGroup]
-    const myVotingRoundConfig = votingRoundConfigs[voterSession.content.votingRoundReference]
-    const contestsICanVoteOn = myBallotConfig.content.contestReferences.filter(value => myVotingRoundConfig.content.contestReferences.includes(value));
-    return contestsICanVoteOn.map(contestReference => {
-      return contestConfigs[contestReference]
-    })
+    const myBallotConfig = ballotConfigs[voterSession.content.voterGroup];
+    const myVotingRoundConfig =
+      votingRoundConfigs[voterSession.content.votingRoundReference];
+    const contestsICanVoteOn = myBallotConfig.content.contestReferences.filter(
+      (value) => myVotingRoundConfig.content.contestReferences.includes(value),
+    );
+    return contestsICanVoteOn.map((contestReference) => {
+      return contestConfigs[contestReference];
+    });
   }
 
   public getDbbPublicKey(): string {
-    const dbbPublicKeyFromConfig = this.getLatestConfig().items.genesisConfig.content.publicKey;
+    const dbbPublicKeyFromConfig =
+      this.getLatestConfig().items.genesisConfig.content.publicKey;
 
-    if(this.dbbPublicKey) {
+    if (this.dbbPublicKey) {
       return this.dbbPublicKey;
     } else if (dbbPublicKeyFromConfig) {
       return dbbPublicKeyFromConfig;
     } else {
-      throw new InvalidStateError('No DBB public key available')
+      throw new InvalidStateError("No DBB public key available");
     }
   }
 
   private privateKey(): string {
-    return this.keyPair.privateKey
+    return this.keyPair.privateKey;
   }
 
   public generateSignature(payload: string): string {
-    return this.crypto.sign(payload, this.privateKey())
+    return this.crypto.sign(payload, this.privateKey());
   }
 
   /**
@@ -666,10 +844,10 @@ export class AVClient implements IAVClient {
    */
   private async authorizeIdentity(coordinator): Promise<AxiosResponse> {
     return await coordinator.requestPublicKeyAuthorization(
-        this.authorizationSessionId,
-        this.identityConfirmationToken,
-        this.keyPair.publicKey,
-        this.votingRoundReference
+      this.authorizationSessionId,
+      this.identityConfirmationToken,
+      this.keyPair.publicKey,
+      this.votingRoundReference,
     );
   }
 
@@ -683,25 +861,27 @@ export class AVClient implements IAVClient {
    * @throws {@link NetworkError | NetworkError } if any request failed to get a response
    */
   public async waitForVerifierRegistration(): Promise<string> {
-    if(!(this.voterSession)) {
-      throw new InvalidStateError('Cannot challenge ballot, no user session')
+    if (!this.voterSession) {
+      throw new InvalidStateError("Cannot challenge ballot, no user session");
     }
 
     let attempts = 0;
 
     const executePoll = async (resolve, reject) => {
-      const result = await this.bulletinBoard.getVerifierItem(this.spoilRequest.address).catch(error => {
-        console.error(error.response.data.error_message)
-      });
+      const result = await this.bulletinBoard
+        .getVerifierItem(this.spoilRequest.address)
+        .catch((error) => {
+          console.error(error.response.data.error_message);
+        });
 
       attempts++;
       if (result?.data?.verifier?.type === VERIFIER_ITEM) {
-        this.verifierItem = result.data.verifier
-        const pairingCode = hexToShortCode(result.data.verifier.shortAddress)
+        this.verifierItem = result.data.verifier;
+        const pairingCode = hexToShortCode(result.data.verifier.shortAddress);
         return resolve(pairingCode);
       } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
-        return reject(new TimeoutError('Exceeded max attempts'));
-      } else  {
+        return reject(new TimeoutError("Exceeded max attempts"));
+      } else {
         setTimeout(executePoll, POLLING_INTERVAL_MS, resolve, reject);
       }
     };
@@ -714,34 +894,38 @@ export class AVClient implements IAVClient {
    * Also returns the activities associated with the ballot
    *
    * @param trackingCode base58-encoded trackingcode
-  */
+   */
   public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
-    const shortAddres = shortCodeToHex(trackingCode)
-    const { status, activities } = (await this.bulletinBoard.getBallotStatus(shortAddres)).data
+    const shortAddres = shortCodeToHex(trackingCode);
+    const { status, activities } = (
+      await this.bulletinBoard.getBallotStatus(shortAddres)
+    ).data;
 
     const ballotStatus = {
       activities: activities,
-      status: status
-    }
+      status: status,
+    };
 
-    return ballotStatus
+    return ballotStatus;
   }
 
   /**
    * Disables the voter in the VA, so that they can no longer vote or sign in.
    */
   public async disableVoter(): Promise<AxiosResponse> {
-    const signature = this.generateSignature(this.authorizationSessionId)
+    const signature = this.generateSignature(this.authorizationSessionId);
 
     const coordinator = new VoterAuthorizationCoordinator(
-      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.url,
-      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid
-    )
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer
+        .url,
+      this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer
+        .contextUuid,
+    );
 
     return await coordinator.disableVoter(
       this.authorizationSessionId,
       signature,
-      this.voterSession.content.votingRoundReference
+      this.voterSession.content.votingRoundReference,
     );
   }
 
@@ -751,15 +935,16 @@ export class AVClient implements IAVClient {
 
     const coordinator = new VoterAuthorizationCoordinator(
       latestConfig.items.voterAuthorizerConfig.content.voterAuthorizer.url,
-      latestConfig.items.voterAuthorizerConfig.content.voterAuthorizer.contextUuid
-    )
+      latestConfig.items.voterAuthorizerConfig.content.voterAuthorizer
+        .contextUuid,
+    );
 
-    const signature = this.generateSignature(this.authorizationSessionId)
+    const signature = this.generateSignature(this.authorizationSessionId);
 
     return coordinator.getVotingRoundItems(
       this.authorizationSessionId,
       signature,
-      voterSession.content.votingRoundReference
+      voterSession.content.votingRoundReference,
     );
   }
 }
