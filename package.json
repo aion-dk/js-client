@@ -28,7 +28,7 @@
     "dist/lib/**/*"
   ],
   "dependencies": {
-    "@assemblyvoting/av-crypto": "^1.2.1",
+    "@assemblyvoting/av-crypto": "^1.2.2",
     "@noble/curves": "^2.2.0",
     "axios": "^1.18.0",
     "base-x": "^5.0.0",
