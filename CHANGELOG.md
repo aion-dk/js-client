@@ -8,7 +8,7 @@
 ## 1.1.5
 - Move authorizationMode under voterAuthorizer and rename values:
   - proof-of-identity and proof-of-private-key
-- Allow registering as a voter by proof of identity or proof of private key 
+- Allow registering as a voter by proof of identity or proof of private key
 - Allow submitting blank if dbb config allows.
 
 ## 1.1.4
@@ -109,7 +109,6 @@ Adding the two new methods means the call sequence should now follow this patter
 5. constructBallotCryptograms
 6. spoilBallotCryptograms (optional)
 7. submitBallotCryptograms
-8. purgeData
 ```
 
 ### Changed
