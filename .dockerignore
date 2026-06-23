@@ -1,9 +1,51 @@
+# Version control
 .git
 .gitignore
 
+# Dependencies (installed inside the image)
 node_modules/
 
-tags
+# Sensitive files
+.env
+.env.*
 
+# Build artifacts
+dist/
+public/
+coverage/
+.nyc_output/
+
+# Documentation
+docs/
+README.md
+CHANGELOG.md
+LICENSE*
+*.md
+
+# Tests and tooling
+test/
+.eslintrc.json
+eslint.config.mjs
+.nycrc
+typedoc.json
+
+# CI/CD and project meta
+.circleci/
+.github/
+
+# AI/tooling config
+.claude/
+.opencode/
+.windsurf/
+.codegraph/
+openspec/
+
+# Misc
+tags
 Dockerfile
 docker-compose.yml
+.tool-versions
+.editorconfig
+.npmignore
+bin/
+update-sjcl.sh

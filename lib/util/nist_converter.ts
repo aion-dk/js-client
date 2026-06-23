@@ -23,7 +23,7 @@ function nistCvrToAvCvr(xml: string): ContestMap<string> {
   const snapshot = getCurrentSnapshot(castVoteRecordReport.CVR);
   const contests = getContests(snapshot);
 
-  const result = contests.reduce(combineSelectionsToMap, {});
+  const result = contests.reduce((acc, current) => combineSelectionsToMap(acc, current), {});
   return result;
 }
 
@@ -66,7 +66,7 @@ function getContests(snapshot: CVRSnapshot): CVRContest[] {
 
 function combineSelectionsToMap(acc: ContestMap<string>, current: CVRContest): ContestMap<string> {
   if(Array.isArray(current.CVRContestSelection)) {
-    throw new Error('No support for multiple selections for a single contest (multiple or ranked)');
+    throw new TypeError('No support for multiple selections for a single contest (multiple or ranked)');
   }
 
   if(current.CVRContestSelection === undefined) {

@@ -83,7 +83,7 @@ export function validateReceipt(crypto: AVCrypto, items: BoardItem[], receipt: s
 
   const content = {
     signature: items[0].signature,
-    address: items[items.length-1].address
+    address: items.at(-1)!.address
   }
 
   const message = uniformer.formString(content);

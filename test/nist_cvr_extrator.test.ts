@@ -1,5 +1,5 @@
 import { extractContestSelections } from '../lib/util/nist_cvr_extractor';
-import * as fs from 'fs'
+import * as fs from 'node:fs'
 import { expect } from 'chai';
 
 describe('Util#extractContestSelections', () => {

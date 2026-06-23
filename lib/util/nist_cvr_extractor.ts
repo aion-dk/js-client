@@ -20,7 +20,7 @@ export function extractContestSelections(cvrJson): ContestSelection[] {
 function extractOptionSelections(nistContestSelection: CVRContestSelection[]): OptionSelection[] {
   const nistSelected = nistContestSelection.filter(nistOptionSelection => {
     const nistSelectionPositions = nistOptionSelection.SelectionPosition
-    if (nistSelectionPositions.length != 1) throw Error('Unexpected CVR structure. Expected exactly one SelectionPosition')
+    if (nistSelectionPositions.length != 1) throw new Error('Unexpected CVR structure. Expected exactly one SelectionPosition')
 
     return nistSelectionPositions[0].NumberVotes > 0
   })
@@ -30,19 +30,19 @@ function extractOptionSelections(nistContestSelection: CVRContestSelection[]): O
     const optionReference = nistOptionSelection.ContestSelectionId
     const writeIn = nistSelectionPosition.CVRWriteIn
     if (writeIn) {
-      return {reference: optionReference, text: writeIn.Text as string} as OptionSelection
+      return {reference: optionReference, text: writeIn.Text}
     } else {
-      return {reference: optionReference} as OptionSelection
+      return {reference: optionReference}
     }
   })
 }
 
 function extractContestsJson(cvrJson: CVRRoot): CVRContest[] {
   const cvrs = cvrJson.CVR
-  if (cvrs.length != 1) throw Error('Unexpected CVR structure. Expected exactly one CVR')
+  if (cvrs.length != 1) throw new Error('Unexpected CVR structure. Expected exactly one CVR')
 
   const snapshots = cvrs[0].CVRSnapshot
-  if (snapshots.length != 1) throw Error('Unexpected CVR structure. Expected exactly one CVRSnapshot')
+  if (snapshots.length != 1) throw new Error('Unexpected CVR structure. Expected exactly one CVRSnapshot')
 
   return snapshots[0].CVRContest
 }
