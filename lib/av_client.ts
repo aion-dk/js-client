@@ -707,7 +707,6 @@ export class AVClient implements IAVClient {
     const { spoilRequest, receipt, boardCommitmentOpening } = response.data;
 
     this.spoilRequest = spoilRequest;
-    console.log("Testing ");
     
     validatePayload(this.crypto, spoilRequest, spoilRequestItem);
     validateReceipt(
