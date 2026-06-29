@@ -725,7 +725,8 @@ export class AVClient implements IAVClient {
     validateServerEnvelopes(
       this.crypto,
       this.serverEnvelopes,
-      boardCommitmentOpening
+      boardCommitmentOpening.randomizers,
+      this.getLatestConfig().items.thresholdConfig.content.encryptionKey
     );
 
     return spoilRequest.address;
