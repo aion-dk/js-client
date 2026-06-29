@@ -5,6 +5,7 @@ import { BulletinBoard } from './av_client/connectors/bulletin_board';
 import VoterAuthorizationCoordinator from './av_client/connectors/voter_authorization_coordinator';
 import { OTPProvider } from "./av_client/connectors/otp_provider";
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
+import { validateServerEnvelopes } from './av_client/new_crypto/validate_server_envelopes';
 import { KeyPair, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig, ProofOfElectionCodes, IAVClient, ContestMap, BallotBoxReceipt, VoterSessionItem, BoardCommitmentItem, BallotCryptogramItem } from './av_client/types';
 import { randomKeyPair } from './av_client/new_crypto/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
@@ -706,7 +707,7 @@ export class AVClient implements IAVClient {
     const { spoilRequest, receipt, boardCommitmentOpening } = response.data;
 
     this.spoilRequest = spoilRequest;
-
+    
     validatePayload(this.crypto, spoilRequest, spoilRequestItem);
     validateReceipt(
       this.crypto,
@@ -719,6 +720,12 @@ export class AVClient implements IAVClient {
       boardCommitmentOpening,
       this.boardCommitment.content.commitment,
       "Board commitment is not valid",
+    );
+    validateServerEnvelopes(
+      this.crypto,
+      this.serverEnvelopes,
+      boardCommitmentOpening.randomizers,
+      this.getLatestConfig().items.thresholdConfig.content.encryptionKey
     );
 
     return spoilRequest.address;
