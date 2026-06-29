@@ -1,51 +1,24 @@
 
 import {AVCrypto} from "@assemblyvoting/av-crypto";
-import { CommitmentOpening, ContestMap } from "@assemblyvoting/types";
-import { fromString } from "@assemblyvoting/av-crypto/dist/lib/av_crypto/el_gamal/cryptogram";
-import { hexToScalar, generateKeyPair, pointEquals } from "@assemblyvoting/av-crypto/dist/lib/av_crypto/utils";
+import {ContestMap} from "@assemblyvoting/types";
 
-export function validateServerEnvelopes(crypto: AVCrypto, serverEnvelopes: ContestMap<string[][]>, commitmentOpeninigs: CommitmentOpening): void {
-  const randomizers = commitmentOpeninigs.randomizers;
+export function validateServerEnvelopes(crypto: AVCrypto, serverEnvelopes: ContestMap<string[][]>, serverRandomizers: ContestMap<string[][]>, encryptionKey: string): void {
+  const randomizers = flattenRandomizers(serverRandomizers)
+  const cryptograms = flattenRandomizers(serverEnvelopes)
 
-  const envelopeContests = Object.keys(serverEnvelopes).sort();
-  const randomizerContests = Object.keys(randomizers).sort();
-
-  if (envelopeContests.length !== randomizerContests.length ||
-      !envelopeContests.every((key, i) => key === randomizerContests[i])) {
+  if (randomizers.length !== cryptograms.length) {
     throw new Error('Server envelope contests do not match commitment opening contests');
   }
 
-  for (const contestId of envelopeContests) {
-    const envelopePiles = serverEnvelopes[contestId];
-    const randomizerPiles = randomizers[contestId];
-
-    if (envelopePiles.length !== randomizerPiles.length) {
-      throw new Error(`Pile count mismatch for contest '${contestId}'`);
-    }
-
-    for (let pileIndex = 0; pileIndex < envelopePiles.length; pileIndex++) {
-      const cryptograms = envelopePiles[pileIndex];
-      const pileRandomizers = randomizerPiles[pileIndex];
-
-      if (cryptograms.length !== pileRandomizers.length) {
-        throw new Error(`Cryptogram count mismatch for contest '${contestId}', pile ${pileIndex}`);
-      }
-
-      for (let i = 0; i < cryptograms.length; i++) {
-        const cryptogram = fromString(cryptograms[i], crypto.curve);
-        const scalar = hexToScalar(pileRandomizers[i], crypto.curve);
-        const expectedR = generateKeyPair(crypto.curve, scalar).pub.H;
-
-        if (!pointEquals(cryptogram.r, expectedR)) {
-          throw new Error(`Server envelope cryptogram does not match randomizer for contest '${contestId}', pile ${pileIndex}, index ${i}`);
-        }
-      }
+  for (let i = 0; i < cryptograms.length; i++) {
+    if (!crypto.isEmptyCryptogram(cryptograms[i], randomizers[i], encryptionKey)) {
+      throw new Error('Server envelope not empty');
     }
   }
 }
 
-function flattenRandomizers(randomizersMap: ContestMap<string[][]>): string[] {
-  const iterator = Object.entries(randomizersMap)
+function flattenRandomizers(map: ContestMap<string[][]>): string[] {
+  const iterator = Object.entries(map)
 
   return iterator.map(([_, matrix]) => matrix).flat(2)
 }
