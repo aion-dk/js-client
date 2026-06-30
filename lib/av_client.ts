@@ -176,6 +176,7 @@ export class AVClient implements IAVClient {
    * @returns Returns undefined on success or throws an error.
    * @throws {@link VoterRecordNotFoundError | VoterRecordNotFoundError} if no voter record matches the given ID.
    * @throws {@link EmailDoesNotMatchVoterRecordError | EmailDoesNotMatchVoterRecordError} if the email address does not match the voter's record.
+   * @throws {@link BallotReferenceNotOnVoterRecord | BallotReferenceNotOnVoterRecord} if the provided `ballotReference` is not on the voter's record.
    * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   public async requestAccessCode(
@@ -1126,7 +1127,6 @@ export class AVClient implements IAVClient {
    * @returns The 7-character Base58 pairing code derived from the verifier item's DBB address.
    * @throws {@link InvalidStateError | InvalidStateError} if called before voter registration or before {@link AVClient.spoilBallot | spoilBallot}.
    * @throws {@link TimeoutError | TimeoutError} if the verifier does not register within 600 poll attempts.
-   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   public async waitForVerifierRegistration(): Promise<string> {
     if (!this.voterSession) {
@@ -1272,7 +1272,7 @@ export type {
 export type { Affidavit, HashValue, Signature } from './av_client/types';
 export { extractContestSelections } from './util/nist_cvr_extractor';
 export { AVVerifier } from './av_verifier';
-export { BulletinBoardError, EmailDoesNotMatchVoterRecordError, DBBError } from './av_client/errors';
+export { BulletinBoardError, EmailDoesNotMatchVoterRecordError, DBBError, BallotReferenceNotOnVoterRecord } from './av_client/errors';
 
 export {
   AvClientError,

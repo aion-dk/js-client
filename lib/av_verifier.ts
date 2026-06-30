@@ -23,7 +23,7 @@ import {decryptCommitmentOpening} from './av_client/new_crypto/commitment_openin
 import {InvalidContestError, InvalidOptionError, InvalidReceiptError, InvalidTrackingCodeError, NetworkError} from './av_client/errors';
 import {decryptContestSelections} from './av_client/new_crypto/decrypt_contest_selections';
 import {makeOptionFinder} from './av_client/option_finder';
-import {validateCommitment} from "./av_client/new_crypto/commitments";
+import {validateCommitment} from './av_client/new_crypto/commitments';
 import {AVCrypto} from "@assemblyvoting/av-crypto";
 
 export class AVVerifier {
@@ -203,7 +203,6 @@ export class AVVerifier {
    * @returns The `spoilRequest.address` string once the voter has initiated the spoil flow.
    * @throws An error if the ballot is cast rather than spoiled.
    * @throws An error if 600 poll attempts are exceeded without a result.
-   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   public async pollForSpoilRequest(): Promise<string> {
     let attempts = 0;
@@ -306,9 +305,8 @@ export class AVVerifier {
    *
    * @returns The full commitment openings response data once both openings are available.
    * @throws An error if 600 poll attempts are exceeded without both openings being present.
-   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
-  public async pollForCommitmentOpening(): Promise<unknown> {
+  public async pollForCommitmentOpening() {
     let attempts = 0;
 
     const executePoll = async (resolve, reject) => {
