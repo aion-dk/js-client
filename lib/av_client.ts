@@ -51,17 +51,32 @@ import {AVCrypto} from "@assemblyvoting/av-crypto";
  * * the Voter Authorization Coordinator service
  * * the OTP provider(s)
  *
- * ## Expected sequence of methods being executed
+ * Two authorization modes are supported, depending on the election configuration:
+ * * **`proof-of-identity`**: the voter receives a one-time password by email (OTP flow).
+ * * **`proof-of-election-codes`**: the voter derives a cryptographic proof from printed election codes.
  *
- * |Method                                                                    | Description |
- * -------------------------------------------------------------------------- | ---
- * |{@link AVClient.initialize | initialize }                                 | Initializes the library by fetching election configuration |
- * |{@link AVClient.requestAccessCode | requestAccessCode }                   | Initiates the authorization process, in case voter has not authorized yet. Requests access code to be sent to voter email |
- * |{@link AVClient.validateAccessCode | validateAccessCode }                 | Gets voter authorized to vote. |
- * |{@link AVClient.registerVoter | registerVoter }                           | Registers the voter on the bulletin board |
- * |{@link AVClient.constructBallotCryptograms | constructBallotCryptograms } | Constructs voter ballot cryptograms. |
- * |{@link AVClient.spoilBallot | spoilBallot }                               | Optional. Initiates process of testing the ballot encryption. |
- * |{@link AVClient.castBallot | castBallot }                                 | Finalizes the voting process. |
+ * ## Expected sequence of methods — proof-of-identity flow
+ *
+ * |Method                                                          | Description |
+ * ---------------------------------------------------------------- | ---
+ * |{@link AVClient.initialize | initialize }                       | Initializes the library by fetching election configuration |
+ * |{@link AVClient.requestAccessCode | requestAccessCode }         | Requests a one-time password sent to the voter's email |
+ * |{@link AVClient.validateAccessCode | validateAccessCode }       | Validates the OTP code and obtains the identity token |
+ * |{@link AVClient.registerVoter | registerVoter }                 | Registers the voter on the bulletin board |
+ * |{@link AVClient.constructBallot | constructBallot }             | Encrypts the ballot selections and submits cryptograms |
+ * |{@link AVClient.spoilBallot | spoilBallot }                     | Optional. Initiates ballot encryption testing (challenge flow). |
+ * |{@link AVClient.castBallot | castBallot }                       | Finalizes the voting process |
+ *
+ * ## Expected sequence of methods — proof-of-election-codes flow
+ *
+ * |Method                                                                            | Description |
+ * ---------------------------------------------------------------------------------- | ---
+ * |{@link AVClient.initialize | initialize }                                         | Initializes the library by fetching election configuration |
+ * |{@link AVClient.generateProofOfElectionCodes | generateProofOfElectionCodes }     | Derives a cryptographic proof from the voter's election codes |
+ * |{@link AVClient.createVoterRegistration | createVoterRegistration }               | Registers the voter on the bulletin board |
+ * |{@link AVClient.constructBallot | constructBallot }                               | Encrypts the ballot selections and submits cryptograms |
+ * |{@link AVClient.spoilBallot | spoilBallot }                                       | Optional. Initiates ballot encryption testing (challenge flow). |
+ * |{@link AVClient.castBallot | castBallot }                                         | Finalizes the voting process |
  *
  * ## Example walkthrough test
  *
@@ -94,7 +109,11 @@ export class AVClient implements IAVClient {
   private proofOfElectionCodes: ProofOfElectionCodes;
 
   /**
-   * @param bulletinBoardURL URL to the Assembly Voting backend server, specific for election.
+   * Creates a new AVClient instance pointed at a specific Digital Ballot Box.
+   *
+   * @param bulletinBoardURL Base URL of the Digital Ballot Box for this election.
+   * @param dbbPublicKey Optional DBB public key to pin at construction time. If omitted, the key
+   *   is read from the genesis config once {@link AVClient.initialize | initialize} is called.
    */
   constructor(bulletinBoardURL: string, dbbPublicKey?: string) {
     this.bulletinBoard = new BulletinBoard(bulletinBoardURL);
@@ -102,13 +121,19 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Initializes the client with an election config.
-   * If no config is provided, it fetches one from the backend.
+   * Loads the election configuration and generates a fresh EC key pair for the voter.
    *
-   * @param latestConfig Allows injection of an election configuration for testing purposes
-   * @param keyPair Allows injection of a keypair to support automatic testing
-   * @returns Returns undefined if succeeded or throws an error
-   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
+   * If `latestConfig` is provided it is validated and used directly; otherwise the config is
+   * fetched from the DBB (`GET /configuration/latest_config`). After loading the config,
+   * `AVCrypto` is initialised with the elliptic curve from `genesisConfig.eaCurveName` and a
+   * fresh EC key pair is generated. Must be the first method called on a new `AVClient`.
+   *
+   * @param latestConfig Optional election configuration to inject. If provided it is validated
+   *   before use; if omitted the config is fetched from the DBB.
+   * @param keyPair Optional key pair to inject instead of generating a fresh one. For testing only.
+   * @returns Returns undefined on success or throws an error.
+   * @throws {@link InvalidConfigError | InvalidConfigError} if the injected `latestConfig` fails validation.
+   * @throws An error if the DBB is unreachable and no config was injected (raw Axios error — not wrapped in `NetworkError`).
    */
   public async initialize(
     latestConfig?: LatestConfig,
@@ -134,18 +159,25 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Should be called when a voter chooses digital vote submission (instead of mail-in).
+   * Starts the OTP (one-time password) authorization flow by requesting an access code sent to
+   * the voter's email address.
    *
-   * Will attempt to get backend services to send an access code (one time password, OTP) to voter's email address.
+   * Calls the Voter Authorizer coordinator to create a session and trigger an OTP email. Stores
+   * the returned `sessionId` as `authorizationSessionId` and the email address internally.
    *
-   * Should be followed by {@link AVClient.validateAccessCode | validateAccessCode} to submit access code for validation.
+   * Only used when `authorizationMode === 'proof-of-identity'`. For the election-codes flow,
+   * use {@link AVClient.generateProofOfElectionCodes | generateProofOfElectionCodes} instead.
+   *
+   * Should be followed by {@link AVClient.validateAccessCode | validateAccessCode}.
    *
    * @param opaqueVoterId Voter ID that preserves voter anonymity.
-   * @param email where the voter expects to receive otp code.
-   * @param ballotReference The ballot which which voter voter intends to vote on
-   * @returns Returns undefined or throws an error.
-   * @throws VoterRecordNotFound if no voter was found
-   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
+   * @param email The voter's email address where the OTP will be sent.
+   * @param ballotReference Optional ballot reference identifying which ballot the voter intends to vote on.
+   * @returns Returns undefined on success or throws an error.
+   * @throws {@link VoterRecordNotFoundError | VoterRecordNotFoundError} if no voter record matches the given ID.
+   * @throws {@link EmailDoesNotMatchVoterRecordError | EmailDoesNotMatchVoterRecordError} if the email address does not match the voter's record.
+   * @throws {@link BallotReferenceNotOnVoterRecord | BallotReferenceNotOnVoterRecord} if the provided `ballotReference` is not on the voter's record.
+   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   public async requestAccessCode(
     opaqueVoterId: string,
@@ -178,20 +210,18 @@ export class AVClient implements IAVClient {
   /**
    * Should be called after {@link AVClient.requestAccessCode | requestAccessCode}.
    *
-   * Takes an access code (OTP) that voter received, uses it to authorize to submit votes.
+   * Validates the one-time password (OTP) the voter received by email. On success,
+   * stores the identity confirmation token internally so that
+   * {@link AVClient.registerVoter | registerVoter} can authorize the voter with the DBB.
    *
-   * Internally, generates a private/public key pair, then attempts to authorize the public
-   * key with each OTP provider.
+   * Should be followed by {@link AVClient.registerVoter | registerVoter}.
    *
-   * Should be followed by {@link AVClient.constructBallotCryptograms | constructBallotCryptograms}.
-   *
-   * @param   code An access code string.
-   * @param   email Voter email.
-   * @returns Returns undefined if authorization succeeded or throws an error
-   * @throws {@link InvalidStateError | InvalidStateError } if called before required data is available
-   * @throws {@link AccessCodeExpired | AccessCodeExpired } if an OTP code has expired
-   * @throws {@link AccessCodeInvalid | AccessCodeInvalid } if an OTP code is invalid
-   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
+   * @param code The one-time password string received by the voter via email.
+   * @returns Returns undefined if authorization succeeded or throws an error.
+   * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.requestAccessCode | requestAccessCode}.
+   * @throws {@link AccessCodeExpired | AccessCodeExpired} if the OTP code has expired.
+   * @throws {@link AccessCodeInvalid | AccessCodeInvalid} if the OTP code is invalid.
+   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   async validateAccessCode(code: string): Promise<void> {
     if (!this.email)
@@ -216,6 +246,18 @@ export class AVClient implements IAVClient {
     );
   }
 
+  /**
+   * Derives a cryptographic proof from the voter's printed election codes.
+   *
+   * Required when the election uses `authorizationMode === 'proof-of-election-codes'` as an
+   * alternative to the OTP email flow. The derived proof is stored internally and consumed by
+   * {@link AVClient.createVoterRegistration | createVoterRegistration}.
+   *
+   * Must be called after {@link AVClient.initialize | initialize} and before
+   * {@link AVClient.createVoterRegistration | createVoterRegistration}.
+   *
+   * @param electionCodes Array of election code strings provided to the voter (e.g. on a printed card).
+   */
   generateProofOfElectionCodes(electionCodes: Array<string>) {
     this.proofOfElectionCodes = proofOfElectionCodes(
       this.crypto,
@@ -223,13 +265,37 @@ export class AVClient implements IAVClient {
     );
   }
 
+  /**
+   * Directly sets the identity confirmation token without going through the standard OTP flow.
+   *
+   * Use this when the consuming application obtains an identity token through an external
+   * authentication mechanism and needs to inject it before calling
+   * {@link AVClient.registerVoter | registerVoter}. This is an alternative to calling
+   * {@link AVClient.requestAccessCode | requestAccessCode} →
+   * {@link AVClient.validateAccessCode | validateAccessCode}.
+   *
+   * @param token The identity confirmation token string obtained from the external identity provider.
+   */
   setIdentityToken(token: string) {
     this.identityConfirmationToken = token;
   }
 
   /**
-   * Internal method to set the registration channel from trusted session source
-   * @internal
+   * Sets the registration channel before calling {@link AVClient.createVoterRegistration | createVoterRegistration}.
+   *
+   * When the election configuration includes `segmentsConfig.content.channels`, the consuming
+   * application should call this method with a channel private key (typically stored in
+   * `localStorage` by a channel-provisioning flow) before registering the voter. Internally,
+   * the key is used to sign a JWT (`{ sub: "channel" }`) that is sent alongside the voter
+   * registration request, allowing the DBB to associate the vote with a specific channel.
+   *
+   * Passing `undefined` clears any previously set channel, which means no channel JWT is
+   * included in the registration request.
+   *
+   * Must be called after {@link AVClient.initialize | initialize} and before
+   * {@link AVClient.createVoterRegistration | createVoterRegistration}.
+   *
+   * @param channelPrivateKey Hex-encoded P-256 private key for the channel, or `undefined` to clear.
    */
   async setRegistrationChannel(
     channelPrivateKey: string | undefined,
@@ -277,6 +343,30 @@ export class AVClient implements IAVClient {
       .sign(key);
   }
 
+  /**
+   * Retrieves voter information from the Voter Authorizer coordinator.
+   *
+   * Requires that the voter has already been identified — either via the OTP flow
+   * ({@link AVClient.validateAccessCode | validateAccessCode}) or via election codes
+   * ({@link AVClient.generateProofOfElectionCodes | generateProofOfElectionCodes}).
+   *
+   * The returned `AxiosResponse.data` contains voter metadata as returned by the Voter Authorizer.
+   * Commonly accessed fields include:
+   * - `ballotReference` — identifies which ballot config applies to this voter.
+   * - `demo` — whether this voter is a demo voter (used to filter voting rounds).
+   *
+   * Typical usage: call this method after identification and use `data.ballotReference` to look up
+   * the voter's ballot config from `getLatestConfig().items.ballotConfigs`, then determine which
+   * voting rounds are active and applicable before calling
+   * {@link AVClient.createVoterRegistration | createVoterRegistration}.
+   *
+   * @returns The raw `AxiosResponse` from the Voter Authorizer. Relevant shape:
+   * ```javascript
+   * { data: { ballotReference: string, demo: boolean, ...voterMetadata } }
+   * ```
+   * @throws {@link InvalidStateError | InvalidStateError} if neither an identity token nor an election code proof is available.
+   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
+   */
   public async getCoordinatorVoterInfo(): Promise<AxiosResponse> {
     const coordinatorURL =
       this.getLatestConfig().items.voterAuthorizerConfig.content.voterAuthorizer
@@ -305,8 +395,34 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Registers a voter based on the authorization mode of the Voter Authorizer
-   * Authorization is done by 'proof-of-identity' or 'proof-of-election-codes'
+   * Registers the voter on the Digital Ballot Box, branching on the election's `authorizationMode`.
+   *
+   * - **`proof-of-identity`**: uses the identity confirmation token obtained via
+   *   {@link AVClient.validateAccessCode | validateAccessCode} (or
+   *   {@link AVClient.setIdentityToken | setIdentityToken}) to request a JWT from the Voter
+   *   Authorizer, then posts a voter session to the DBB.
+   * - **`proof-of-election-codes`**: uses the proof generated by
+   *   {@link AVClient.generateProofOfElectionCodes | generateProofOfElectionCodes} to request a
+   *   JWT from the Voter Authorizer, then posts a voter session to the DBB.
+   *
+   * **Note:** if an identity confirmation token is present (set via
+   * {@link AVClient.setIdentityToken | setIdentityToken}), the identity path is used regardless
+   * of `authorizationMode`. This allows SSO-integrated consumers to inject a token even in
+   * elections configured as `proof-of-election-codes`.
+   *
+   * The DBB response is validated against the DBB public key. On success, the voter session is
+   * stored internally and used in all subsequent calls.
+   *
+   * Prefer {@link AVClient.registerVoter | registerVoter} for the standard single-round case.
+   * Use this method when you need to specify a non-default `votingRoundReference`.
+   *
+   * @param votingRoundReference Identifies which voting round to register for. Defaults to `"voting-round-1"`.
+   * @returns Returns undefined on success or throws an error.
+   * @throws {@link InvalidStateError | InvalidStateError} if the required token or proof is missing.
+   * @throws {@link InvalidTokenError | InvalidTokenError} if the JWT from the Voter Authorizer cannot be decoded.
+   * @throws {@link InvalidConfigError | InvalidConfigError} if the election has an unknown `authorizationMode`.
+   * @throws {@link BulletinBoardError | BulletinBoardError} if the DBB rejects the registration.
+   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   public async createVoterRegistration(
     votingRoundReference = "voting-round-1",
@@ -408,13 +524,44 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Registers a voter based on the authorization mode of the Voter Authorizer
-   * @returns undefined or throws an error
+   * Registers the voter on the Digital Ballot Box for voting round 1.
+   *
+   * Convenience wrapper around {@link AVClient.createVoterRegistration | createVoterRegistration}
+   * using the default `votingRoundReference = "voting-round-1"`. This is the method defined in
+   * the `IAVClient` interface and is sufficient for most single-round elections.
+   *
+   * Must be preceded by voter identification:
+   * - OTP flow: {@link AVClient.validateAccessCode | validateAccessCode}
+   * - Election codes flow: {@link AVClient.generateProofOfElectionCodes | generateProofOfElectionCodes}
+   *
+   * @returns Returns undefined on success or throws an error.
+   * @throws {@link InvalidStateError | InvalidStateError} if the required token or proof is missing.
+   * @throws {@link InvalidTokenError | InvalidTokenError} if the JWT from the Voter Authorizer cannot be decoded.
+   * @throws {@link BulletinBoardError | BulletinBoardError} if the DBB rejects the registration.
+   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   public async registerVoter(): Promise<void> {
     return this.createVoterRegistration();
   }
 
+  /**
+   * Expires all active voter sessions for the given voting round on the Digital Ballot Box.
+   *
+   * Only supported when `authorizationMode === 'proof-of-election-codes'`. Uses the stored
+   * election code proof (set by {@link AVClient.generateProofOfElectionCodes | generateProofOfElectionCodes})
+   * to obtain an expiration JWT from the Voter Authorizer (action `"expire"`), then posts to
+   * `POST /voting/expirations` on the DBB.
+   *
+   * Primarily used by IVR telephony consumers to end a voting session programmatically.
+   *
+   * @param votingRoundReference Identifies which voting round's sessions to expire.
+   * @returns The raw `AxiosResponse` from the DBB expiration endpoint.
+   * @throws {@link InvalidStateError | InvalidStateError} if called when `authorizationMode === 'proof-of-identity'` (not supported).
+   * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.generateProofOfElectionCodes | generateProofOfElectionCodes}.
+   * @throws {@link InvalidTokenError | InvalidTokenError} if the expiration JWT from the Voter Authorizer cannot be decoded.
+   * @throws {@link InvalidConfigError | InvalidConfigError} if the election has an unknown `authorizationMode`.
+   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
+   */
   public async expireVoterSessions(
     votingRoundReference: string,
   ): Promise<AxiosResponse> {
@@ -461,6 +608,23 @@ export class AVClient implements IAVClient {
     );
   }
 
+  /**
+   * Extends the active voter session on the Digital Ballot Box.
+   *
+   * Signs a `SessionExtensionItem` containing `{ extendedBy }` with the voter's private key and
+   * posts it to `POST /voting/extensions`. Requires that voter registration has completed (so that
+   * `voterSession` is set). No-ops silently if the voter session has an empty `address`.
+   *
+   * Used by consuming applications to refresh the session timeout when the voter is still active
+   * (e.g. after a "Extend session" prompt in the UI, or while the voter is on the phone in an
+   * IVR flow). The number of seconds to extend by is typically read from
+   * `electionStatus.sessionCountdown.extendSeconds`.
+   *
+   * @param extendedBy Number of **seconds** to extend the session by.
+   * @returns Returns undefined on success or throws an error.
+   * @throws TypeError if called before voter registration (`this.voterSession` is undefined — the guard on line 628 dereferences it directly).
+   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
+   */
   public async extendVoterSessions(extendedBy: number): Promise<void> {
     if (!this.voterSession.address) return;
     const parentAddress = this.voterSession.address;
@@ -480,21 +644,35 @@ export class AVClient implements IAVClient {
     await this.bulletinBoard.extendVoterSessions(signedPayload);
   }
   /**
-   * Should be called after {@link AVClient.validateAccessCode | validateAccessCode}.
+   * Encrypts the voter's ballot selections and submits them to the Digital Ballot Box.
    *
-   * Encrypts a {@link BallotSelection | ballot-selection} (CVR) and generates vote cryptograms.
+   * Must be called after {@link AVClient.registerVoter | registerVoter} (or
+   * {@link AVClient.createVoterRegistration | createVoterRegistration}).
+   *
+   * Internally performs the following steps:
+   * 1. Validates `ballotSelection` against the voter's contest configs and marking rules.
+   * 2. Encodes selections to byte arrays.
+   * 3. Encrypts each contest pile with the threshold key and voter randomizers; generates a
+   *    Pedersen commitment of the voter randomizers.
+   * 4. `POST /voting/commitments` — submits the voter commitment to the DBB. Receives the
+   *    board commitment (server's Pedersen commitment) and server envelopes.
+   * 5. Finalises cryptograms by combining voter and server envelopes.
+   * 6. `POST /voting/votes` — submits ballot cryptograms and ZK proofs to the DBB.
+   * 7. Derives a 7-character Base58 tracking code from the verification start item.
+   *
+   * Should be followed by either {@link AVClient.spoilBallot | spoilBallot}
+   * or {@link AVClient.castBallot | castBallot}.
    *
    * Example:
    * ```javascript
    * const client = new AVClient(url);
-   * const cvr = { '1': 'option1', '2': 'optiona' };
-   * const trackingCode = await client.constructBallotCryptograms(cvr);
+   * const trackingCode = await client.constructBallot(ballotSelection);
    * ```
    *
    * Example of handling errors:
-   * ```
+   * ```javascript
    * try {
-   *   await client.constructBallotCryptograms({});
+   *   await client.constructBallot(ballotSelection);
    * } catch(error) {
    *   if(error instanceof AvClientError) {
    *     switch(error.name) {
@@ -511,20 +689,11 @@ export class AVClient implements IAVClient {
    * }
    * ```
    *
-   * Where `'1'` and `'2'` are contest ids, and `'option1'` and `'optiona'` are
-   * values internal to the AV election config.
-   *
-   * Should be followed by either {@link AVClient.spoilBallot | spoilBallot}
-   * or {@link AVClient.castBallot | castBallot}.
-   *
-   * @param   ballotSelection BallotSelection containing the selections for each contest.
-   * @returns Returns the ballot tracking code. Example:
-   * ```javascript
-   * '5e4d8fe41fa3819cc064e2ace0eda8a847fe322594a6fd5a9a51c699e63804b7'
-   * ```
-   * @throws {@link InvalidStateError | InvalidStateError } if called before required data is available
-   * @throws {@link CorruptCvrError | CorruptCvrError } if the cast vote record is invalid
-   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
+   * @param ballotSelection BallotSelection containing the voter's selections for each contest.
+   * @returns The 7-character Base58 ballot tracking code (e.g. `'A3K9mNP'`).
+   * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.registerVoter | registerVoter}.
+   * @throws {@link CorruptCvrError | CorruptCvrError} if the ballot selection is structurally invalid.
+   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   public async constructBallot(
     ballotSelection: BallotSelection,
@@ -596,23 +765,29 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Should be the last call in the entire voting process.
+   * Finalises the voting process by casting the previously constructed ballot.
    *
-   * Requests that the previously constructed ballot is cast.
+   * Must be called after {@link AVClient.constructBallot | constructBallot}. Signs a
+   * `CastRequestItem` with the voter's private key and posts it to `POST /voting/cast` on the
+   * DBB. The DBB response payload and receipt are validated against the DBB public key.
    *
+   * If `sendTrackingCodeByEmail` is enabled in the election configuration, an attempt is made to
+   * send the receipt to the voter by email via the Voter Authorizer. Email delivery failures are
+   * logged but not propagated as errors.
    *
-   * @param locale The locale which the email with the vote receipt should be sent in
-   * @return Returns the vote receipt. Example of a receipt:
+   * @param locale BCP 47 locale tag for the receipt email (e.g. `"en"`, `"es"`, `"fr"`). Defaults to `"en"`.
+   * @returns The `BallotBoxReceipt` confirming the ballot was recorded. Shape:
    * ```javascript
    * {
-   *    previousBoardHash: 'd8d9742271592d1b212bbd4cbvobbe357aef8e00cdbdf312df95e9cf9a1a921465',
-   *    boardHash: '5a9175c2b3617298d78be7d0244a68f34bc8b2a37061bb4d3fdf97edc1424098',
-   *    registeredAt: '2020-03-01T10:00:00.000+01:00',
-   *    serverSignature: 'dbcce518142b8740a5c911f727f3c02829211a8ddfccabeb89297877e4198bc1,46826ddfccaac9ca105e39c8a2d015098479624c411b4783ca1a3600daf4e8fa',
-   *    voteSubmissionId: 6
-      }
+   *   previousBoardHash: string,
+   *   boardHash: string,
+   *   registeredAt: string,       // ISO 8601
+   *   serverSignature: string,    // EC signature from the DBB
+   *   voteSubmissionId: number
+   * }
    * ```
-   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
+   * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.constructBallot | constructBallot}.
+   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   public async castBallot(locale = "en"): Promise<BallotBoxReceipt> {
     if (!this.voterSession) {
@@ -675,13 +850,23 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Should be called when voter chooses to test the encryption of their ballot.
-   * Gets commitment opening of the digital ballot box and validates it.
+   * Initiates the ballot challenge (spoil) flow to test the ballot encryption.
    *
-   * @returns Returns undefined if the validation succeeds or throws an error
-   * @throws {@link InvalidStateError | InvalidStateError } if called before required data is available
-   * @throws ServerCommitmentError if the server commitment is invalid
-   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
+   * Must be called after {@link AVClient.constructBallot | constructBallot}, as an alternative to
+   * {@link AVClient.castBallot | castBallot}. Signs a `SpoilRequestItem` and posts it to
+   * `POST /voting/spoil`. Retrieves the server commitment opening and validates it against the
+   * previously stored board commitment and server envelopes.
+   *
+   * The returned address is passed to
+   * {@link AVVerifier.submitVerifierKey | AVVerifier.submitVerifierKey} on the second (verifier)
+   * device to link the two devices.
+   *
+   * Should be followed by {@link AVClient.waitForVerifierRegistration | waitForVerifierRegistration}.
+   *
+   * @returns The `spoilRequest.address` string — the DBB chain address of the spoil request item.
+   * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.constructBallot | constructBallot}.
+   * @throws An error if the server commitment opening is invalid.
+   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   public async spoilBallot(): Promise<string> {
     if (!this.voterSession) {
@@ -732,12 +917,21 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Should be called when the voter has 'paired' the verifier and the voting app.
-   * Computes and encrypts the clientEncryptionCommitment and posts it to the DBB
+   * Sends the voter's commitment opening (ballot randomizers) to the verifier device via the DBB.
    *
-   * @returns Returns void if the computation was succesful
-   * @throws {@link InvalidStateError | InvalidStateError } if called before required data is available
-   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
+   * Must be called after {@link AVClient.constructBallot | constructBallot} (which generates the
+   * commitment opening) and after
+   * {@link AVClient.waitForVerifierRegistration | waitForVerifierRegistration} (which provides the
+   * verifier's public key). Encrypts the voter's `CommitmentOpening` (ballot randomizers and
+   * commitment randomness) under the verifier's public key and fires a
+   * `POST /verification/commitment_openings` request to the DBB.
+   *
+   * **Note:** The HTTP request is fire-and-forget — it is not awaited. The method returns
+   * immediately regardless of network success.
+   *
+   * @returns Returns undefined immediately (HTTP request is not awaited).
+   * @throws {@link InvalidStateError | InvalidStateError} if called before voter registration (`this.voterSession` not set).
+   * @throws TypeError if called before {@link AVClient.waitForVerifierRegistration | waitForVerifierRegistration} — `this.verifierItem` and `this.voterCommitmentOpening` are not explicitly guarded and will be undefined.
    */
   public async challengeBallot(): Promise<void> {
     if (!this.voterSession) {
@@ -767,6 +961,13 @@ export class AVClient implements IAVClient {
     );
   }
 
+  /**
+   * Returns the full election configuration loaded during {@link AVClient.initialize | initialize}.
+   *
+   * @returns The `LatestConfig` object containing genesis config, election config, contest configs,
+   *   ballot configs, voting round configs, and threshold key.
+   * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.initialize | initialize}.
+   */
   public getLatestConfig(): LatestConfig {
     if (!this.latestConfig) {
       throw new InvalidStateError(
@@ -777,6 +978,15 @@ export class AVClient implements IAVClient {
     return this.latestConfig;
   }
 
+  /**
+   * Returns the voter session item received from the DBB after registration.
+   *
+   * The voter session item contains the voter's identifier, public key, weight, voter group, and
+   * voting round reference as stored on the DBB chain.
+   *
+   * @returns The `VoterSessionItem` from the DBB.
+   * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.registerVoter | registerVoter}.
+   */
   public getVoterSession(): VoterSessionItem {
     if (!this.voterSession) {
       throw new InvalidStateError("No voter session loaded");
@@ -785,10 +995,33 @@ export class AVClient implements IAVClient {
     return this.voterSession;
   }
 
+  /**
+   * Returns the Voter Authorizer session ID for the current authorization session.
+   *
+   * Set during {@link AVClient.requestAccessCode | requestAccessCode} (OTP flow) or during
+   * {@link AVClient.createVoterRegistration | createVoterRegistration} (election codes flow).
+   *
+   * Common uses by consumers:
+   * - Signing the UUID with {@link AVClient.generateSignature | generateSignature} to authenticate
+   *   requests to external services (e.g. a conference/candidate-info API).
+   * - Passing to the Voter Authorizer to send the vote receipt by email.
+   *
+   * @returns The authorization session ID string.
+   */
   public getSessionUuid(): string {
     return this.authorizationSessionId;
   }
 
+  /**
+   * Returns the ballot configuration for the voter's voter group.
+   *
+   * The ballot config defines which contests appear on the voter's ballot (i.e. the set of contest
+   * references for this voter group). Use {@link AVClient.getVoterContestConfigs | getVoterContestConfigs}
+   * to get the full contest configs filtered to the active voting round.
+   *
+   * @returns The `BallotConfig` for the voter's group.
+   * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.registerVoter | registerVoter}.
+   */
   public getVoterBallotConfig(): BallotConfig {
     const voterSession = this.getVoterSession();
     const {
@@ -797,6 +1030,16 @@ export class AVClient implements IAVClient {
     return ballotConfigs[voterSession.content.voterGroup];
   }
 
+  /**
+   * Returns the contest configurations accessible to this voter in the current voting round.
+   *
+   * Computes the intersection of contests on the voter's ballot (from their voter group) and
+   * contests active in the current voting round. Each `ContestConfig` includes the contest title,
+   * marking rules (min/max selections, weights), available options, and encoding parameters.
+   *
+   * @returns Array of `ContestConfig` objects for the contests this voter can vote on.
+   * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.registerVoter | registerVoter}.
+   */
   public getVoterContestConfigs(): ContestConfig[] {
     const voterSession = this.getVoterSession();
     const {
@@ -814,6 +1057,15 @@ export class AVClient implements IAVClient {
     });
   }
 
+  /**
+   * Returns the DBB public key used to verify DBB-signed payloads and receipts.
+   *
+   * Returns the key pinned at construction time (if provided), otherwise falls back to the key
+   * from the genesis config loaded during {@link AVClient.initialize | initialize}.
+   *
+   * @returns The hex-encoded DBB public key string.
+   * @throws {@link InvalidStateError | InvalidStateError} if no DBB public key is available (neither pinned nor loaded).
+   */
   public getDbbPublicKey(): string {
     const dbbPublicKeyFromConfig =
       this.getLatestConfig().items.genesisConfig.content.publicKey;
@@ -831,9 +1083,20 @@ export class AVClient implements IAVClient {
     return this.keyPair.privateKey;
   }
 
+  /**
+   * Signs an arbitrary string payload with the voter's EC private key.
+   *
+   * Useful when the consuming application needs to produce a signature on behalf of the voter
+   * (e.g. for authenticating requests to external services). Requires
+   * {@link AVClient.initialize | initialize} to have been called so the key pair is available.
+   *
+   * @param payload The string to sign.
+   * @returns The EC signature as a hex string.
+   */
   public generateSignature(payload: string): string {
     return this.crypto.sign(payload, this.privateKey());
   }
+
 
   /**
    * Registers a voter by proof of identity
@@ -850,13 +1113,22 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Should be called after spoilBallot.
-   * Gets the verifier public key from the DBB
+   * Polls the Digital Ballot Box until the verifier device registers its public key.
    *
-   * @returns Returns the pairing code based on the address of the verifier item in the DBB
-   * @throws {@link InvalidStateError | InvalidStateError } if called before required data is available
-   * @throws {@link TimeoutError | TimeoutError} if the verifier doesn't register itself to the DBB in time
-   * @throws {@link NetworkError | NetworkError } if any request failed to get a response
+   * Must be called after {@link AVClient.spoilBallot | spoilBallot}. Queries
+   * `GET /verification/verifiers/{address}` every `1000ms` for up to 600 attempts (10 minutes). Resolves
+   * once a `VerifierItem` is detected on the DBB chain for this spoil request, stores the verifier
+   * item internally (used by {@link AVClient.challengeBallot | challengeBallot}), and returns the
+   * 7-character Base58 pairing code derived from the verifier item's short address.
+   *
+   * Both the voter's app and the verifier device should display the pairing code so the voter can
+   * confirm they are connected to the correct second device.
+   *
+   * Should be followed by {@link AVClient.challengeBallot | challengeBallot}.
+   *
+   * @returns The 7-character Base58 pairing code derived from the verifier item's DBB address.
+   * @throws {@link InvalidStateError | InvalidStateError} if called before voter registration or before {@link AVClient.spoilBallot | spoilBallot}.
+   * @throws {@link TimeoutError | TimeoutError} if the verifier does not register within 600 poll attempts.
    */
   public async waitForVerifierRegistration(): Promise<string> {
     if (!this.voterSession) {
@@ -888,10 +1160,22 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Finds the ballot status corresponding to the given trackingcode.
-   * Also returns the activities associated with the ballot
+   * Retrieves the current status and audit log for a ballot identified by its tracking code.
    *
-   * @param trackingCode base58-encoded trackingcode
+   * Decodes the Base58 tracking code to its hex short address and queries
+   * `GET /ballot_status` on the DBB. This method does not require an active voter session and
+   * can be called unauthenticated — useful for voters checking their ballot after the fact or
+   * for external verification tools.
+   *
+   * @param trackingCode The 7-character Base58 tracking code returned by {@link AVClient.constructBallot | constructBallot}.
+   * @returns A `BallotStatus` object:
+   * ```javascript
+   * {
+   *   status: string,       // e.g. "cast", "spoiled", "pending"
+   *   activities: Activity[] // audit log entries for this ballot
+   * }
+   * ```
+   * @throws An error if the DBB request fails (raw Axios error — not wrapped in `NetworkError`).
    */
   public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
     const shortAddres = shortCodeToHex(trackingCode);
@@ -908,7 +1192,21 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Disables the voter in the VA, so that they can no longer vote or sign in.
+   * Disables the voter in the Voter Authorizer so they can no longer sign in or vote.
+   *
+   * Signs the current `authorizationSessionId` with the voter's private key and calls the VA
+   * disable endpoint. Used in two contexts:
+   * - **Decline to vote**: when the voter explicitly chooses not to vote via a UI action.
+   * - **IVR management**: to programmatically end a voter's eligibility after a phone vote or
+   *   an administrative decision.
+   *
+   * Requires that voter registration has been completed
+   * ({@link AVClient.registerVoter | registerVoter} or
+   * {@link AVClient.createVoterRegistration | createVoterRegistration}) so that both
+   * `authorizationSessionId` and `voterSession.content.votingRoundReference` are available.
+   *
+   * @returns The raw `AxiosResponse` from the Voter Authorizer disable endpoint.
+   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   public async disableVoter(): Promise<AxiosResponse> {
     const signature = this.generateSignature(this.authorizationSessionId);
@@ -927,6 +1225,24 @@ export class AVClient implements IAVClient {
     );
   }
 
+  /**
+   * Retrieves the voting round items for the voter's current voting round from the Voter Authorizer.
+   *
+   * Signs the `authorizationSessionId` with the voter's private key to authenticate the request.
+   * The returned `AxiosResponse.data.items` is an array of voting round items (e.g. information
+   * pages to display before the ballot). Consumers should handle the case where `data.items` is
+   * missing or not an array, as the shape depends on the Voter Authorizer configuration.
+   *
+   * Requires that voter registration has been completed so that `authorizationSessionId` and the
+   * voter session's `votingRoundReference` are available.
+   *
+   * @returns The raw `AxiosResponse` from the Voter Authorizer. Relevant shape:
+   * ```javascript
+   * { data: { items: RawVotingRoundItem[] } }
+   * ```
+   * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.registerVoter | registerVoter}.
+   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
+   */
   public async getVotingRoundItems(): Promise<AxiosResponse> {
     const latestConfig = this.getLatestConfig();
     const voterSession = this.getVoterSession();
@@ -958,7 +1274,7 @@ export type {
 export type { Affidavit, HashValue, Signature } from './av_client/types';
 export { extractContestSelections } from './util/nist_cvr_extractor';
 export { AVVerifier } from './av_verifier';
-export { BulletinBoardError, EmailDoesNotMatchVoterRecordError, DBBError } from './av_client/errors';
+export { BulletinBoardError, EmailDoesNotMatchVoterRecordError, DBBError, BallotReferenceNotOnVoterRecord } from './av_client/errors';
 
 export {
   AvClientError,
@@ -968,5 +1284,7 @@ export {
   TimeoutError,
   InvalidConfigError,
   InvalidStateError,
+  InvalidTokenError,
   NetworkError,
+  VoterRecordNotFoundError,
 } from './av_client/errors';
