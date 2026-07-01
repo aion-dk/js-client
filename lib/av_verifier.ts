@@ -62,7 +62,7 @@ export class AVVerifier {
    * @param latestConfig Optional election configuration to inject (useful for testing).
    *   If omitted, the config is fetched from the DBB.
    * @returns Returns undefined on success or throws an error.
-   * @throws {@link NetworkError | NetworkError} if the DBB is unreachable.
+   * @throws An error if the DBB is unreachable (raw Axios error — not wrapped in `NetworkError`).
    */
   public async initialize(latestConfig?: LatestConfig): Promise<void> {
     if (latestConfig) {
@@ -89,7 +89,7 @@ export class AVVerifier {
    * @param trackingCode The 7-character Base58 tracking code shown on the voter's device.
    * @returns The DBB address of the ballot cryptograms item (`cryptogramAddress`).
    * @throws {@link InvalidTrackingCodeError | InvalidTrackingCodeError} if the tracking code does not match the DBB response.
-   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
+   * @throws An error if the DBB request fails (raw Axios error — not wrapped in `NetworkError`).
    */
   public async findBallot(trackingCode: string): Promise<string> {
     const shortAddress = shortCodeToHex(trackingCode)

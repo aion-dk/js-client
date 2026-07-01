@@ -133,7 +133,7 @@ export class AVClient implements IAVClient {
    * @param keyPair Optional key pair to inject instead of generating a fresh one. For testing only.
    * @returns Returns undefined on success or throws an error.
    * @throws {@link InvalidConfigError | InvalidConfigError} if the injected `latestConfig` fails validation.
-   * @throws {@link NetworkError | NetworkError} if the DBB is unreachable and no config was injected.
+   * @throws An error if the DBB is unreachable and no config was injected (raw Axios error — not wrapped in `NetworkError`).
    */
   public async initialize(
     latestConfig?: LatestConfig,
@@ -622,6 +622,7 @@ export class AVClient implements IAVClient {
    *
    * @param extendedBy Number of **seconds** to extend the session by.
    * @returns Returns undefined on success or throws an error.
+   * @throws TypeError if called before voter registration (`this.voterSession` is undefined — the guard on line 628 dereferences it directly).
    * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   public async extendVoterSessions(extendedBy: number): Promise<void> {
@@ -1174,7 +1175,7 @@ export class AVClient implements IAVClient {
    *   activities: Activity[] // audit log entries for this ballot
    * }
    * ```
-   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
+   * @throws An error if the DBB request fails (raw Axios error — not wrapped in `NetworkError`).
    */
   public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
     const shortAddres = shortCodeToHex(trackingCode);
