@@ -929,7 +929,8 @@ export class AVClient implements IAVClient {
    * immediately regardless of network success.
    *
    * @returns Returns undefined immediately (HTTP request is not awaited).
-   * @throws {@link InvalidStateError | InvalidStateError} if called before voter registration or before {@link AVClient.waitForVerifierRegistration | waitForVerifierRegistration}.
+   * @throws {@link InvalidStateError | InvalidStateError} if called before voter registration (`this.voterSession` not set).
+   * @throws TypeError if called before {@link AVClient.waitForVerifierRegistration | waitForVerifierRegistration} — `this.verifierItem` and `this.voterCommitmentOpening` are not explicitly guarded and will be undefined.
    */
   public async challengeBallot(): Promise<void> {
     if (!this.voterSession) {
