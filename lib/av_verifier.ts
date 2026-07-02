@@ -125,7 +125,7 @@ export class AVVerifier {
    * @returns The 7-character Base58 pairing code derived from the verifier item's short address.
    *   Both the voter's app and this verifier should display this code so the voter can confirm
    *   they are paired with the correct device.
-   * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
+   * @throws An error if the DBB request fails (raw Axios error — not wrapped in `NetworkError`).
    */
   public async submitVerifierKey(spoilRequestAddress: string): Promise<string> {
     const keyPair = randomKeyPair(this.crypto)
