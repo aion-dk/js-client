@@ -622,7 +622,7 @@ export class AVClient implements IAVClient {
    *
    * @param extendedBy Number of **seconds** to extend the session by.
    * @returns Returns undefined on success or throws an error.
-   * @throws TypeError if called before voter registration (`this.voterSession` is undefined — the guard on line 628 dereferences it directly).
+   * @throws TypeError if called before voter registration (`this.voterSession` is undefined — the method dereferences it directly without a null check).
    * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
    */
   public async extendVoterSessions(extendedBy: number): Promise<void> {
