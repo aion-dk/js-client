@@ -8,10 +8,18 @@ import {
   choicesExceedCredits,
 } from "../av_client/validation_helpers";
 
+type SelectionPileValidatorOptions = {
+  selfVotePrevention?: boolean;
+  voterIdentifier?: string;
+};
+
 class SelectionPileValidator {
   private readonly contest: ContestContent;
-  constructor(contest: ContestContent) {
+  private readonly options: SelectionPileValidatorOptions;
+
+  constructor(contest: ContestContent, options: SelectionPileValidatorOptions = {}) {
     this.contest = contest;
+    this.options = options;
   }
 
   validate(selectionPile: SelectionPile, includeLazyErrors = false): Error[] {
@@ -21,6 +29,7 @@ class SelectionPileValidator {
     if (this.referenceMissing(selectionPile.optionSelections)) errors.push({ message: 'invalid_reference'});
     if (tooManySelections(selectionPile.optionSelections, this.contest)) errors.push({ message: "too_many"});
     if (this.contest.markingType.quadraticVoting && choicesExceedCredits(selectionPile.optionSelections, this.contest.markingType.quadraticVotingVoiceCredits)) errors.push({ message: "too_many_credits"});
+    if (this.selfVote(selectionPile.optionSelections)) errors.push({ message: "self_vote" });
     if (this.blankNotAlone(selectionPile.optionSelections, selectionPile.explicitBlank)) errors.push({message: 'blank'});
     if (this.exclusiveNotAlone(selectionPile.optionSelections)) errors.push({ message: 'exclusive' });
     if (writeIns.length) {
@@ -79,6 +88,12 @@ class SelectionPileValidator {
 
   private implicitlyBlank(choices: OptionSelection[]) {
     return this.contest.markingType.blankSubmission === 'implicit' && choices.length === 0;
+  }
+
+  private selfVote(choices: OptionSelection[]) {
+    return !!this.options.selfVotePrevention &&
+      !!this.options.voterIdentifier &&
+      this.selectedReferences(choices).includes(this.options.voterIdentifier);
   }
 
   private tooFewSelections(choices: OptionSelection[]) {

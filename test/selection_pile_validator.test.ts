@@ -178,6 +178,18 @@ describe("validate", () => {
     });
   })
 
+  context("with self vote prevention", () => {
+    const validator = new SelectionPileValidator(contestOne.content, {
+      selfVotePrevention: true,
+      voterIdentifier: "parent-1",
+    })
+
+    it("returns self_vote error", () => {
+      expect(validator.validate(selectionPile)).to.have.lengthOf(1)
+      expect(validator.validate(selectionPile)[0].message).to.equal("self_vote")
+    });
+  })
+
   context("with lazy errors", ()=> {
     context("with below list limit", () => {
       const optionSelections = [ { reference: "child-1" } ]
