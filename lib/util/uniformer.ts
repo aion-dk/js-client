@@ -3,7 +3,7 @@ type Primitive = Array<unknown> | string | number | symbol | boolean | null;
 
 export class Uniformer {
 
-  public formString(obj: unknown | Primitive ): string {
+  public formString(obj: unknown): string {
     const sortedEntries = this.walk(obj);
     return JSON.stringify(sortedEntries);
   }
@@ -23,7 +23,7 @@ export class Uniformer {
     return symbol.slice("Symbol(".length, -1);    // Extracts 'foo' from 'Symbol(foo)'
   }
 
-  private walk(obj: unknown | Primitive ): KeyValuePair[] | Primitive {
+  private walk(obj: unknown): KeyValuePair[] | Primitive {
     switch(typeof obj) {
       case "string":
       case "number":
@@ -33,7 +33,7 @@ export class Uniformer {
         if(obj === null)
           return null;
 
-        if(obj instanceof Array)
+        if(Array.isArray(obj))
           return obj.map(e => this.walk(e));
 
         if(obj instanceof Date)

@@ -19,7 +19,7 @@ import {
   choicesExceedCredits,
 } from "../av_client/validation_helpers";
 import { flattenOptions } from './flatten_options'
-import { CorruptSelectionError as CorruptSelectionError } from './errors';
+import { CorruptSelectionError } from './errors';
 
 export function validateBallotSelection(ballotConfig: BallotConfig, contestConfigs: ContestConfigMap, ballotSelection: BallotSelection, votingRoundConfig: VotingRoundConfig, weight: number) {
   if( ballotConfig.content.reference !== ballotSelection.reference ){
@@ -121,8 +121,8 @@ function containsSameStrings( array1: string[], array2: string[] ){
   const cloned1 = [...array1]
   const cloned2 = [...array2]
 
-  cloned1.sort()
-  cloned2.sort()
+  cloned1.sort((a, b) => a.localeCompare(b))
+  cloned2.sort((a, b) => a.localeCompare(b))
 
   return JSON.stringify(cloned1) === JSON.stringify(cloned2)
 }

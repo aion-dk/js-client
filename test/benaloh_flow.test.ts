@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { resetDeterminism } from './test_helpers';
-import { bulletinBoardHost, mailcatcherHost } from './test_helpers'
+import { resetDeterminism, bulletinBoardHost, mailcatcherHost } from './test_helpers';
 import { AVVerifier } from '../lib/av_verifier';
 import { AVClient } from '../lib/av_client';
 import { expect } from 'chai';
@@ -38,7 +37,7 @@ describe.skip('entire benaloh flow', () => {
 
     await client.spoilBallot();
 
-    const [verfierPairingCode] = await Promise.all([pollForSpoilPromise]);
+    const verfierPairingCode = await pollForSpoilPromise;
 
     // The verifier found a spoil request and now submits it's public key in a VerifierItem
     const clientPairingCode = await client.waitForVerifierRegistration()
@@ -123,7 +122,7 @@ describe.skip('entire benaloh flow', () => {
     const messages = await axios.get(`${mailcatcherHost}messages`)
       .then((response) => response.data);
     if (messages.length == 0) {
-      throw 'Email message with an OTP was not found';
+      throw new Error('Email message with an OTP was not found');
     }
     const lastMessageId = messages[messages.length - 1].id;
     const message = await axios.get(`${mailcatcherHost}messages/${lastMessageId}.plain`)
@@ -132,17 +131,18 @@ describe.skip('entire benaloh flow', () => {
 
     const patternMatches = otpPattern.exec(message);
     if (!patternMatches) {
-      throw 'OTP code pattern not found in the email';
+      throw new Error('OTP code pattern not found in the email');
     }
     const code = patternMatches[0];
     return code;
   }
 
-  async function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
 });
 
+
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 function dummyBallotSelection( ballotConfig: BallotConfig, contestConfigs: ContestConfigMap ): BallotSelection {
   return {

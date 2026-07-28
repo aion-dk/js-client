@@ -18,7 +18,6 @@ export interface IAVClient {
   waitForVerifierRegistration(): Promise<string>
   spoilBallot(): Promise<string>
   castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
-  purgeData(): void
   challengeBallot(): Promise<void>
 }
 

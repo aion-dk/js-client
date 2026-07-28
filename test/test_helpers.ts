@@ -29,11 +29,11 @@ export function deterministicRandomWords(nwords, _paranoia) {
   const lowestValidNumber = -2147483648;
   const highestValidNumber = 2147483647;
 
-  if (typeof global.deterministicOffset == 'undefined') {
+  if (globalThis.deterministicOffset === undefined) {
     resetDeterministicOffset();
   }
 
-  let nextRandomInt = global.deterministicOffset;
+  let nextRandomInt = globalThis.deterministicOffset;
   const output : number[] = []
   for (let i = 0; i < nwords; i++) {
     if (nextRandomInt > highestValidNumber) {
@@ -41,13 +41,13 @@ export function deterministicRandomWords(nwords, _paranoia) {
     }
     output.push(nextRandomInt++)
   }
-  global.deterministicOffset++;
+  globalThis.deterministicOffset++;
 
   return output
 }
 
 export function resetDeterministicOffset() {
-  global.deterministicOffset = 0;
+  globalThis.deterministicOffset = 0;
 }
 
 // Make Math.random deterministic when running tests

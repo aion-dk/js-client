@@ -108,7 +108,6 @@ describe('Validation checks', () => {
   });
 
   context('validateReceipt', () => {
-    // const privateKey = 'c459c2064e36420e54c799fb8801b63e470d8e6e683b985906b4a1bac39311a4';
     const publicKey = '02049ff8df4763cd2a85bfcd3a1bfde12ec8dc863509646556d922944ef4e870dc';
 
     const item: BoardItem = {

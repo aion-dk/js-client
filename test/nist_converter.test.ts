@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import * as fs from 'fs'
+import * as fs from 'node:fs'
 import { expectError } from './test_helpers';
 import NistConverter from '../lib/util/nist_converter';
 

@@ -39,5 +39,21 @@ describe("ByteArrayReader", () => {
         expect(reader.readString(3)).to.equal('\ufffd')
       })
     })
+    context('with trailing null padding', () => {
+      it('strips trailing null bytes', () => {
+        // 'hi' followed by two null padding bytes
+        const reader = new ByteArrayReader(Uint8Array.of(104, 105, 0, 0))
+        expect(reader.readString(4)).to.equal('hi')
+      })
+      it('returns empty string when all bytes are null', () => {
+        const reader = new ByteArrayReader(Uint8Array.of(0, 0, 0))
+        expect(reader.readString(3)).to.equal('')
+      })
+      it('preserves interior null bytes', () => {
+        // null byte is only stripped at the end
+        const reader = new ByteArrayReader(Uint8Array.of(65, 0, 66, 0, 0))
+        expect(reader.readString(5)).to.equal('A\x00B')
+      })
+    })
   })
 })
