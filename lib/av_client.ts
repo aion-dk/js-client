@@ -6,7 +6,7 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider } from "./av_client/connectors/otp_provider";
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
 import { validateServerEnvelopes } from './av_client/new_crypto/validate_server_envelopes';
-import { KeyPair, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig, ProofOfElectionCodes, IAVClient, ContestMap, BallotBoxReceipt, VoterSessionItem, BoardCommitmentItem, BallotCryptogramItem } from './av_client/types';
+import { KeyPair, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, ContestConfig, ProofOfElectionCodes, IAVClient, ContestMap, BallotBoxReceipt, VoterSessionItem, BoardCommitmentItem, BallotCryptogramItem } from './av_client/types';
 import { randomKeyPair } from './av_client/new_crypto/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import { JwtPayload, jwtDecode } from "jwt-decode";
@@ -35,7 +35,7 @@ import { signPayload, validatePayload, validateReceipt } from './av_client/new_c
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM, SESSION_EXTENSION_ITEM} from './av_client/constants';
-import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
+import { hexToShortCode } from './av_client/short_codes';
 import { encryptCommitmentOpening } from './av_client/new_crypto/commitment_opening_encryption';
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
 import {AxiosResponse} from "axios";
