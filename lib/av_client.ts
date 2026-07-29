@@ -1160,38 +1160,6 @@ export class AVClient implements IAVClient {
   }
 
   /**
-   * Retrieves the current status and audit log for a ballot identified by its tracking code.
-   *
-   * Decodes the Base58 tracking code to its hex short address and queries
-   * `GET /ballot_status` on the DBB. This method does not require an active voter session and
-   * can be called unauthenticated — useful for voters checking their ballot after the fact or
-   * for external verification tools.
-   *
-   * @param trackingCode The 7-character Base58 tracking code returned by {@link AVClient.constructBallot | constructBallot}.
-   * @returns A `BallotStatus` object:
-   * ```javascript
-   * {
-   *   status: string,       // e.g. "cast", "spoiled", "pending"
-   *   activities: Activity[] // audit log entries for this ballot
-   * }
-   * ```
-   * @throws An error if the DBB request fails (raw Axios error — not wrapped in `NetworkError`).
-   */
-  public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
-    const shortAddres = shortCodeToHex(trackingCode);
-    const { status, activities } = (
-      await this.bulletinBoard.getBallotStatus(shortAddres)
-    ).data;
-
-    const ballotStatus = {
-      activities: activities,
-      status: status,
-    };
-
-    return ballotStatus;
-  }
-
-  /**
    * Disables the voter in the Voter Authorizer so they can no longer sign in or vote.
    *
    * Signs the current `authorizationSessionId` with the voter's private key and calls the VA
