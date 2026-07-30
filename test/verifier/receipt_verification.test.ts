@@ -125,4 +125,13 @@ describe('#validateReceiptTrackingCode', () => {
       });
     });
   });
+
+  context('given invalid receipt', () => {
+    const receipt = "invalid"
+    const trackingCode = "1D6vybS"
+
+    it('returns throws error', async () => {
+      expect(() => verifier.validateReceiptTrackingCode(receipt, trackingCode)).to.throw(InvalidReceiptError, "Receipt string is invalid");
+    });
+  });
 });

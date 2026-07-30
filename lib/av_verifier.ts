@@ -196,7 +196,7 @@ export class AVVerifier {
      *
      * Must be called after {@link AVVerifier.findBallot | findBallot}.
      *
-     * @eturns A tuple [<decision>, <address>].
+     * @returns A tuple [<decision>, <address>].
      * The `decision` can be "cast" or "spoiled", depending on what item has been appended.
      * The `address` is:
      *   - the address of the `SpoilRequestItem` in case of spoiled,
@@ -233,8 +233,8 @@ export class AVVerifier {
    * @param trackingCode base58-encoded trackingcode
    */
   public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
-    const shortAddres = shortCodeToHex(trackingCode)
-    const { status, activities } = (await this.bulletinBoard.getBallotStatus(shortAddres)).data
+    const shortAddress = shortCodeToHex(trackingCode)
+    const { status, activities } = (await this.bulletinBoard.getBallotStatus(shortAddress)).data
 
     const ballotStatus = {
       activities: activities,
