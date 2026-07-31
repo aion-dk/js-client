@@ -1,4 +1,3 @@
-import { hexToShortCode } from "./short_codes";
 import { BallotBoxReceipt, CastRequestItem } from "./types"
 
 export function generateReceipt(serverReceipt: string, castRequest: CastRequestItem, ballotCode: string): BallotBoxReceipt {
