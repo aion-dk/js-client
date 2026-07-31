@@ -104,6 +104,7 @@ export class AVClient implements IAVClient {
   private boardCommitment: BoardCommitmentItem;
   private verifierItem: VerifierItem;
   private ballotCryptogramItem: BallotCryptogramItem;
+  private ballotCode: string;
   private voterCommitmentOpening: CommitmentOpening;
   private spoilRequest: SpoilRequestItem;
   private proofOfElectionCodes: ProofOfElectionCodes;
@@ -758,10 +759,9 @@ export class AVClient implements IAVClient {
       );
 
     this.ballotCryptogramItem = ballotCryptogramItem;
+    this.ballotCode = hexToShortCode(verificationStartItem.shortAddress);
 
-    const trackingCode = hexToShortCode(verificationStartItem.shortAddress);
-
-    return trackingCode;
+    return this.ballotCode;
   }
 
   /**
@@ -818,7 +818,7 @@ export class AVClient implements IAVClient {
       this.getDbbPublicKey(),
     );
 
-    const clientReceipt = generateReceipt(receipt, castRequest);
+    const clientReceipt = generateReceipt(receipt, castRequest, this.ballotCode);
 
     if (
       this.getLatestConfig().items.electionConfig.content

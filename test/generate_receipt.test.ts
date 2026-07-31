@@ -10,11 +10,12 @@ const castRequest: CastRequestItem = {
 }
 
 const serverReceipt = "dummy signature string"
+const ballotCode = "ballot code"
 
 describe('generateReceipt', () => {
   context('when given a valid arguments', () => {
     it('constructs a vote receipt', async () => {
-      const voteReceipt = generateReceipt(serverReceipt, castRequest)
+      const voteReceipt = generateReceipt(serverReceipt, castRequest, ballotCode)
       expect(voteReceipt).to.have.keys('trackingCode', 'receipt')
       expect(voteReceipt.trackingCode).to.be.a("string")
       expect(voteReceipt.receipt).to.be.a("string")

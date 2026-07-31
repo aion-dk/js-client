@@ -1,7 +1,7 @@
 import { hexToShortCode } from "./short_codes";
 import { BallotBoxReceipt, CastRequestItem } from "./types"
 
-export function generateReceipt(serverReceipt: string, castRequest: CastRequestItem): BallotBoxReceipt {
+export function generateReceipt(serverReceipt: string, castRequest: CastRequestItem, ballotCode: string): BallotBoxReceipt {
   const receiptData = {
     address: castRequest.address,
     parentAddress: castRequest.parentAddress,
@@ -11,7 +11,7 @@ export function generateReceipt(serverReceipt: string, castRequest: CastRequestI
     voterSignature: castRequest.signature
   }
   return {
-    trackingCode: hexToShortCode(castRequest.address.substring(0,10)),
+    trackingCode: ballotCode,
     receipt: btoa(JSON.stringify(receiptData))
   }
 }
