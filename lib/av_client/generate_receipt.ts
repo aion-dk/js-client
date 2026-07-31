@@ -10,7 +10,7 @@ export function generateReceipt(serverReceipt: string, castRequest: CastRequestI
     voterSignature: castRequest.signature
   }
   return {
-    trackingCode: ballotCode,
+    ballotCode: ballotCode,
     receipt: btoa(JSON.stringify(receiptData))
   }
 }

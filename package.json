@@ -43,7 +43,7 @@
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
-    "@assemblyvoting/types": "^1.0.6",
+    "@assemblyvoting/types": "^1.2.0-alpha.0",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^10.0.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",

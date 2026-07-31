@@ -779,11 +779,8 @@ export class AVClient implements IAVClient {
    * @returns The `BallotBoxReceipt` confirming the ballot was recorded. Shape:
    * ```javascript
    * {
-   *   previousBoardHash: string,
-   *   boardHash: string,
-   *   registeredAt: string,       // ISO 8601
-   *   serverSignature: string,    // EC signature from the DBB
-   *   voteSubmissionId: number
+   *   ballotCode: string,         // Base58 ballot code
+   *   receipt: string             // base64-encoded JSON receipt
    * }
    * ```
    * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.constructBallot | constructBallot}.

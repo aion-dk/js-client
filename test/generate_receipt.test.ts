@@ -16,8 +16,8 @@ describe('generateReceipt', () => {
   context('when given a valid arguments', () => {
     it('constructs a vote receipt', async () => {
       const voteReceipt = generateReceipt(serverReceipt, castRequest, ballotCode)
-      expect(voteReceipt).to.have.keys('trackingCode', 'receipt')
-      expect(voteReceipt.trackingCode).to.be.a("string")
+      expect(voteReceipt).to.have.keys('ballotCode', 'receipt')
+      expect(voteReceipt.ballotCode).to.be.a("string")
       expect(voteReceipt.receipt).to.be.a("string")
     })
   })
