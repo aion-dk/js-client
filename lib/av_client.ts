@@ -6,7 +6,7 @@ import VoterAuthorizationCoordinator from './av_client/connectors/voter_authoriz
 import { OTPProvider } from "./av_client/connectors/otp_provider";
 import { constructContestEnvelopes } from './av_client/construct_contest_envelopes';
 import { validateServerEnvelopes } from './av_client/new_crypto/validate_server_envelopes';
-import { KeyPair, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, BallotStatus, ContestConfig, ProofOfElectionCodes, IAVClient, ContestMap, BallotBoxReceipt, VoterSessionItem, BoardCommitmentItem, BallotCryptogramItem } from './av_client/types';
+import { KeyPair, VerifierItem, CommitmentOpening, SpoilRequestItem, LatestConfig, BallotSelection, ContestEnvelope, BallotConfig, ContestConfig, ProofOfElectionCodes, IAVClient, ContestMap, BallotBoxReceipt, VoterSessionItem, BoardCommitmentItem, BallotCryptogramItem } from './av_client/types';
 import { randomKeyPair } from './av_client/new_crypto/generate_key_pair';
 import { generateReceipt } from './av_client/generate_receipt';
 import { JwtPayload, jwtDecode } from "jwt-decode";
@@ -35,7 +35,7 @@ import { signPayload, validatePayload, validateReceipt } from './av_client/new_c
 
 import submitVoterCommitment from './av_client/actions/submit_voter_commitment';
 import { CAST_REQUEST_ITEM, MAX_POLL_ATTEMPTS, POLLING_INTERVAL_MS, SPOIL_REQUEST_ITEM, VERIFIER_ITEM, VOTER_ENCRYPTION_COMMITMENT_OPENING_ITEM, VOTER_SESSION_ITEM, SESSION_EXTENSION_ITEM} from './av_client/constants';
-import { hexToShortCode, shortCodeToHex } from './av_client/short_codes';
+import { hexToShortCode } from './av_client/short_codes';
 import { encryptCommitmentOpening } from './av_client/new_crypto/commitment_opening_encryption';
 import { submitBallotCryptograms } from './av_client/actions/submit_ballot_cryptograms';
 import {AxiosResponse} from "axios";
@@ -104,6 +104,7 @@ export class AVClient implements IAVClient {
   private boardCommitment: BoardCommitmentItem;
   private verifierItem: VerifierItem;
   private ballotCryptogramItem: BallotCryptogramItem;
+  private ballotCode: string;
   private voterCommitmentOpening: CommitmentOpening;
   private spoilRequest: SpoilRequestItem;
   private proofOfElectionCodes: ProofOfElectionCodes;
@@ -658,7 +659,7 @@ export class AVClient implements IAVClient {
    *    board commitment (server's Pedersen commitment) and server envelopes.
    * 5. Finalises cryptograms by combining voter and server envelopes.
    * 6. `POST /voting/votes` — submits ballot cryptograms and ZK proofs to the DBB.
-   * 7. Derives a 7-character Base58 tracking code from the verification start item.
+   * 7. Derives a 7-character Base58 ballot code from the verification start item.
    *
    * Should be followed by either {@link AVClient.spoilBallot | spoilBallot}
    * or {@link AVClient.castBallot | castBallot}.
@@ -666,7 +667,7 @@ export class AVClient implements IAVClient {
    * Example:
    * ```javascript
    * const client = new AVClient(url);
-   * const trackingCode = await client.constructBallot(ballotSelection);
+   * const ballotCode = await client.constructBallot(ballotSelection);
    * ```
    *
    * Example of handling errors:
@@ -690,7 +691,7 @@ export class AVClient implements IAVClient {
    * ```
    *
    * @param ballotSelection BallotSelection containing the voter's selections for each contest.
-   * @returns The 7-character Base58 ballot tracking code (e.g. `'A3K9mNP'`).
+   * @returns The 7-character Base58 ballot code (e.g. `'A3K9mNP'`).
    * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.registerVoter | registerVoter}.
    * @throws {@link CorruptCvrError | CorruptCvrError} if the ballot selection is structurally invalid.
    * @throws {@link NetworkError | NetworkError} if any request failed to get a response.
@@ -758,10 +759,9 @@ export class AVClient implements IAVClient {
       );
 
     this.ballotCryptogramItem = ballotCryptogramItem;
+    this.ballotCode = hexToShortCode(verificationStartItem.shortAddress);
 
-    const trackingCode = hexToShortCode(verificationStartItem.shortAddress);
-
-    return trackingCode;
+    return this.ballotCode;
   }
 
   /**
@@ -779,11 +779,8 @@ export class AVClient implements IAVClient {
    * @returns The `BallotBoxReceipt` confirming the ballot was recorded. Shape:
    * ```javascript
    * {
-   *   previousBoardHash: string,
-   *   boardHash: string,
-   *   registeredAt: string,       // ISO 8601
-   *   serverSignature: string,    // EC signature from the DBB
-   *   voteSubmissionId: number
+   *   ballotCode: string,         // Base58 ballot code
+   *   receipt: string             // base64-encoded JSON receipt
    * }
    * ```
    * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.constructBallot | constructBallot}.
@@ -818,7 +815,7 @@ export class AVClient implements IAVClient {
       this.getDbbPublicKey(),
     );
 
-    const clientReceipt = generateReceipt(receipt, castRequest);
+    const clientReceipt = generateReceipt(receipt, castRequest, this.ballotCode);
 
     if (
       this.getLatestConfig().items.electionConfig.content
@@ -1157,38 +1154,6 @@ export class AVClient implements IAVClient {
     };
 
     return new Promise(executePoll);
-  }
-
-  /**
-   * Retrieves the current status and audit log for a ballot identified by its tracking code.
-   *
-   * Decodes the Base58 tracking code to its hex short address and queries
-   * `GET /ballot_status` on the DBB. This method does not require an active voter session and
-   * can be called unauthenticated — useful for voters checking their ballot after the fact or
-   * for external verification tools.
-   *
-   * @param trackingCode The 7-character Base58 tracking code returned by {@link AVClient.constructBallot | constructBallot}.
-   * @returns A `BallotStatus` object:
-   * ```javascript
-   * {
-   *   status: string,       // e.g. "cast", "spoiled", "pending"
-   *   activities: Activity[] // audit log entries for this ballot
-   * }
-   * ```
-   * @throws An error if the DBB request fails (raw Axios error — not wrapped in `NetworkError`).
-   */
-  public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
-    const shortAddres = shortCodeToHex(trackingCode);
-    const { status, activities } = (
-      await this.bulletinBoard.getBallotStatus(shortAddres)
-    ).data;
-
-    const ballotStatus = {
-      activities: activities,
-      status: status,
-    };
-
-    return ballotStatus;
   }
 
   /**

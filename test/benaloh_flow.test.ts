@@ -30,8 +30,12 @@ describe.skip('entire benaloh flow', () => {
     await verifier.findBallot(trackingCode)
 
     // The verifier starts polling for spoil request
-    const pollForSpoilPromise = verifier.pollForSpoilRequest()
-      .then(verifierSpoilRequestAddress => {
+    const pollForSpoilPromise = verifier.pollForBallotDecision()
+      .then(([decision, verifierSpoilRequestAddress]) => {
+        if (decision !== "spoiled") {
+          throw new Error("Expected ballot to be spoiled")
+        }
+
         return verifier.submitVerifierKey(verifierSpoilRequestAddress)
       })
 

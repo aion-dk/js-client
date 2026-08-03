@@ -69,7 +69,7 @@ export default class VoterAuthorizationCoordinator {
     locale = "en"
   ): Promise<AxiosResponse> {
     return this.backend.post(`${locale}/send_receipt`, {
-      trackingCode: receipt.trackingCode,
+      ballotCode: receipt.ballotCode,
       electionContextUuid: this.electionContextUuid,
       authorizationSessionId: authorizationSessionId,
       receipt: receipt.receipt,
