@@ -659,7 +659,7 @@ export class AVClient implements IAVClient {
    *    board commitment (server's Pedersen commitment) and server envelopes.
    * 5. Finalises cryptograms by combining voter and server envelopes.
    * 6. `POST /voting/votes` — submits ballot cryptograms and ZK proofs to the DBB.
-   * 7. Derives a 7-character Base58 tracking code from the verification start item.
+   * 7. Derives a 7-character Base58 ballot code from the verification start item.
    *
    * Should be followed by either {@link AVClient.spoilBallot | spoilBallot}
    * or {@link AVClient.castBallot | castBallot}.
@@ -667,7 +667,7 @@ export class AVClient implements IAVClient {
    * Example:
    * ```javascript
    * const client = new AVClient(url);
-   * const trackingCode = await client.constructBallot(ballotSelection);
+   * const ballotCode = await client.constructBallot(ballotSelection);
    * ```
    *
    * Example of handling errors:
@@ -691,7 +691,7 @@ export class AVClient implements IAVClient {
    * ```
    *
    * @param ballotSelection BallotSelection containing the voter's selections for each contest.
-   * @returns The 7-character Base58 ballot tracking code (e.g. `'A3K9mNP'`).
+   * @returns The 7-character Base58 ballot code (e.g. `'A3K9mNP'`).
    * @throws {@link InvalidStateError | InvalidStateError} if called before {@link AVClient.registerVoter | registerVoter}.
    * @throws {@link CorruptCvrError | CorruptCvrError} if the ballot selection is structurally invalid.
    * @throws {@link NetworkError | NetworkError} if any request failed to get a response.

@@ -76,24 +76,24 @@ export class AVVerifier {
   }
 
   /**
-   * Locates a ballot on the Digital Ballot Box by its tracking code and loads the data needed
+   * Locates a ballot on the Digital Ballot Box by its ballot code and loads the data needed
    * to decrypt and verify it.
    *
-   * Decodes the Base58 tracking code to its hex short address, queries
+   * Decodes the Base58 ballot code to its hex short address, queries
    * `GET /verification/vote_track`, and validates that the returned short address matches the
-   * tracking code. On success, stores the voter commitment, board commitment, ballot cryptograms,
+   * ballot code. On success, stores the voter commitment, board commitment, ballot cryptograms,
    * and cryptogram address internally.
    *
    * Must be called after {@link AVVerifier.initialize | initialize} and before
    * {@link AVVerifier.pollForSpoilRequest | pollForSpoilRequest}.
    *
-   * @param trackingCode The 7-character Base58 tracking code shown on the voter's device.
+   * @param ballotCode The 7-character Base58 ballot code shown on the voter's device.
    * @returns The DBB address of the ballot cryptograms item (`cryptogramAddress`).
-   * @throws {@link InvalidTrackingCodeError | InvalidTrackingCodeError} if the tracking code does not match the DBB response.
+   * @throws {@link InvalidTrackingCodeError | InvalidTrackingCodeError} if the ballot code does not match the DBB response.
    * @throws An error if the DBB request fails (raw Axios error — not wrapped in `NetworkError`).
    */
-  public async findBallot(trackingCode: string): Promise<string> {
-    const shortAddress = shortCodeToHex(trackingCode)
+  public async findBallot(ballotCode: string): Promise<string> {
+    const shortAddress = shortCodeToHex(ballotCode)
     await this.bulletinBoard.getVotingTrack(shortAddress).then(response => {
       if (shortAddress !== response.data.verificationTrackStart.shortAddress) {
         throw new InvalidTrackingCodeError("Tracking code and short address from response doesn't match")
