@@ -15,10 +15,10 @@
     "@noble/hashes" "^1.8.0"
     sjcl-with-all "^1.0.8"
 
-"@assemblyvoting/types@^1.2.0-alpha.0":
-  version "1.2.0-alpha.0"
-  resolved "https://registry.yarnpkg.com/@assemblyvoting/types/-/types-1.2.0-alpha.0.tgz#0e2077b0733f7f2512542eb53a47dd593f2909df"
-  integrity sha512-zrQJKlV9Pk6TMIb751ke1eddbRtPNmavX/LIJfj0+nRMuYXr2ICtBFQ+N5nsTTJ7BNKyBUBwQEl4fIAsSIEeqw==
+"@assemblyvoting/types@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@assemblyvoting/types/-/types-1.2.0.tgz#7857f9ec394420a4ad9d1dad1b0afbbf89be0d71"
+  integrity sha512-9Bv/3yiwEluuRF6JRfRcmsV2HdRh21RnG+tvmhBK7H1E3VaGz4SlW2aCcy16RGkXGX88obM7tN6Rc0wv+3c6Qw==
 
 "@babel/code-frame@^7.29.7":
   version "7.29.7"
