@@ -383,7 +383,12 @@ export class AVClient implements IAVClient {
     let identity;
 
     if (this.proofOfElectionCodes) {
-      identity = { publicKey: this.proofOfElectionCodes.mainKeyPair.publicKey };
+      const publicKey = this.proofOfElectionCodes.mainKeyPair.publicKey;
+      identity = {
+        publicKey: publicKey, // Duplicated for backwards compatibility
+        voterPublicKey: publicKey,
+        proof: this.proofOfElectionCodes.proof
+      };
     } else if (this.identityConfirmationToken) {
       identity = { identitiyConfirmationToken: this.identityConfirmationToken };
     } else {
@@ -889,7 +894,7 @@ export class AVClient implements IAVClient {
     const { spoilRequest, receipt, boardCommitmentOpening } = response.data;
 
     this.spoilRequest = spoilRequest;
-    
+
     validatePayload(this.crypto, spoilRequest, spoilRequestItem);
     validateReceipt(
       this.crypto,
