@@ -24,7 +24,7 @@ describe('AVClient#getCoordinatorVoterInfo', () => {
   context('with a proof of election codes', () => {
     it('sends the voter public key and the proof', async () => {
       client.generateProofOfElectionCodes(['1']);
-      const { mainKeyPair, proof } = (client as any).proofOfElectionCodes;
+      const { mainKeyPair, proof } = client.getProofOfElectionCodes();
 
       let query;
       nock(voterAuthorizerHost)
