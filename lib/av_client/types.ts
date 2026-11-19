@@ -5,7 +5,6 @@ import type {
   BallotSelection,
   Affidavit,
   BallotBoxReceipt,
-  BallotStatus,
   VoterSessionItem,
 } from "@assemblyvoting/types";
 
@@ -20,7 +19,6 @@ export interface IAVClient {
   spoilBallot(): Promise<string>
   castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
   challengeBallot(): Promise<void>
-  checkBallotStatus(trackingCode: string): Promise<BallotStatus>
 }
 
 // We define the client state to only require a subset of the electionConfig and voterSession

@@ -1,13 +1,20 @@
 import { ContestContent, ContestSelection, Error } from '../av_client/types';
 import SelectionPileValidator from './selectionPileValidator';
 
+type ContestSelectionValidatorOptions = {
+  selfVotePrevention?: boolean;
+  voterIdentifier?: string;
+};
+
 export default class ContestSelectionValidator {
   private readonly contest: ContestContent;
   private readonly voterWeight: number;
+  private readonly options: ContestSelectionValidatorOptions;
 
-  constructor({ contest, voterWeight }: { contest: ContestContent; voterWeight: number }) {
+  constructor({ contest, voterWeight, ...options }: { contest: ContestContent; voterWeight: number } & ContestSelectionValidatorOptions) {
     this.contest = contest;
     this.voterWeight = voterWeight;
+    this.options = options;
   }
 
   isComplete(contestSelection: ContestSelection) {
@@ -16,7 +23,7 @@ export default class ContestSelectionValidator {
 
   validate(contestSelection: ContestSelection): Error[] {
     let errors: Error[] = [];
-    const selectionPileValidator = new SelectionPileValidator(this.contest);
+    const selectionPileValidator = new SelectionPileValidator(this.contest, this.options);
 
     contestSelection.piles.forEach((pile) => {
       errors = [...errors, ...selectionPileValidator.validate(pile)];

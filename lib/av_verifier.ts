@@ -25,6 +25,7 @@ import {decryptContestSelections} from './av_client/new_crypto/decrypt_contest_s
 import {makeOptionFinder} from './av_client/option_finder';
 import {validateCommitment} from './av_client/new_crypto/commitments';
 import {AVCrypto} from "@assemblyvoting/av-crypto";
+import {BallotStatus} from "@assemblyvoting/types";
 
 export class AVVerifier {
   private readonly dbbPublicKey: string | undefined;
@@ -75,24 +76,24 @@ export class AVVerifier {
   }
 
   /**
-   * Locates a ballot on the Digital Ballot Box by its tracking code and loads the data needed
+   * Locates a ballot on the Digital Ballot Box by its ballot code and loads the data needed
    * to decrypt and verify it.
    *
-   * Decodes the Base58 tracking code to its hex short address, queries
+   * Decodes the Base58 ballot code to its hex short address, queries
    * `GET /verification/vote_track`, and validates that the returned short address matches the
-   * tracking code. On success, stores the voter commitment, board commitment, ballot cryptograms,
+   * ballot code. On success, stores the voter commitment, board commitment, ballot cryptograms,
    * and cryptogram address internally.
    *
    * Must be called after {@link AVVerifier.initialize | initialize} and before
    * {@link AVVerifier.pollForSpoilRequest | pollForSpoilRequest}.
    *
-   * @param trackingCode The 7-character Base58 tracking code shown on the voter's device.
+   * @param ballotCode The 7-character Base58 ballot code shown on the voter's device.
    * @returns The DBB address of the ballot cryptograms item (`cryptogramAddress`).
-   * @throws {@link InvalidTrackingCodeError | InvalidTrackingCodeError} if the tracking code does not match the DBB response.
+   * @throws {@link InvalidTrackingCodeError | InvalidTrackingCodeError} if the ballot code does not match the DBB response.
    * @throws An error if the DBB request fails (raw Axios error — not wrapped in `NetworkError`).
    */
-  public async findBallot(trackingCode: string): Promise<string> {
-    const shortAddress = shortCodeToHex(trackingCode)
+  public async findBallot(ballotCode: string): Promise<string> {
+    const shortAddress = shortCodeToHex(ballotCode)
     await this.bulletinBoard.getVotingTrack(shortAddress).then(response => {
       if (shortAddress !== response.data.verificationTrackStart.shortAddress) {
         throw new InvalidTrackingCodeError("Tracking code and short address from response doesn't match")
@@ -187,24 +188,22 @@ export class AVVerifier {
     )
   }
 
-  /**
-   * Polls the Digital Ballot Box until the voter submits a spoil (or cast) request.
-   *
-   * Queries `GET /verification/spoil_status` every `1000ms` for up to 600 attempts (10 minutes).
-   * Resolves as soon as a `SpoilRequestItem` is detected on the DBB chain for this ballot.
-   * Rejects immediately if a `CastRequestItem` is detected instead (ballot was cast, not spoiled).
-   *
-   * The returned address is passed to
-   * {@link AVVerifier.submitVerifierKey | submitVerifierKey} to link the verifier to the spoil
-   * request.
-   *
-   * Must be called after {@link AVVerifier.findBallot | findBallot}.
-   *
-   * @returns The `spoilRequest.address` string once the voter has initiated the spoil flow.
-   * @throws An error if the ballot is cast rather than spoiled.
-   * @throws An error if 600 poll attempts are exceeded without a result.
-   */
-  public async pollForSpoilRequest(): Promise<string> {
+    /**
+     * Polls the Digital Ballot Box until the voter submits a spoil (or cast) request.
+     *
+     * Queries `GET /verification/spoil_status` every `1000ms` for up to 600 attempts (10 minutes).
+     * Resolves as soon as a `SpoilRequestItem` or a `CastRequestItem` is detected on the DBB chain for this ballot.
+     *
+     * Must be called after {@link AVVerifier.findBallot | findBallot}.
+     *
+     * @returns A tuple [<decision>, <address>].
+     * The `decision` can be "cast" or "spoiled", depending on what item has been appended.
+     * The `address` is:
+     *   - the address of the `SpoilRequestItem` in case of spoiled,
+     *   - the short address of the `CastRequestItem` in case of cast.
+     * @throws An error if 600 poll attempts are exceeded without a result.
+     */
+  public async pollForBallotDecision(): Promise<["cast" | "spoiled", string]> {
     let attempts = 0;
 
     const executePoll = async (resolve, reject) => {
@@ -214,9 +213,9 @@ export class AVVerifier {
       attempts++;
 
       if (result?.data?.item?.type === SPOIL_REQUEST_ITEM) {
-        return resolve(result.data.item.address);
+        return resolve(["spoiled", result.data.item.address]);
       } else if (result?.data?.item?.type === CAST_REQUEST_ITEM) {
-        return reject(new Error('Ballot has been cast and cannot be spoiled'))
+        return resolve(["cast", hexToShortCode(result.data.item.address.slice(0, 10))]);
       } else if (MAX_POLL_ATTEMPTS && attempts === MAX_POLL_ATTEMPTS) {
         return reject(new Error('Exceeded max attempts'));
       } else {
@@ -225,6 +224,24 @@ export class AVVerifier {
     };
 
     return new Promise(executePoll);
+  }
+
+  /**
+   * Finds the ballot status corresponding to the given trackingcode (the base58 encoding of the short address of the Cast request item).
+   * Also returns the activities associated with the ballot
+   *
+   * @param trackingCode base58-encoded trackingcode
+   */
+  public async checkBallotStatus(trackingCode: string): Promise<BallotStatus> {
+    const shortAddress = shortCodeToHex(trackingCode)
+    const { status, activities } = (await this.bulletinBoard.getBallotStatus(shortAddress)).data
+
+    const ballotStatus = {
+      activities: activities,
+      status: status
+    }
+
+    return ballotStatus
   }
 
   /**
@@ -331,25 +348,21 @@ export class AVVerifier {
   }
 
   /**
-   * Validates a `BallotBoxReceipt` against the DBB public key and the ballot's tracking code.
+   * Validates a `BallotBoxReceipt` against the DBB public key.
    *
    * `encodedReceipt` is a base64-encoded JSON string containing the cast request item fields
    * (address, parentAddress, previousAddress, registeredAt, voterSignature) and the DBB
    * signature (`dbbSignature`). This method:
    * 1. Parses and decodes the base64 receipt string.
-   * 2. Confirms the tracking code matches the receipt address.
-   * 3. Verifies the item's address matches its content (integrity check).
-   * 4. Verifies the DBB signature against the DBB public key.
+   * 2. Verifies the item's address matches its content (integrity check).
+   * 3. Verifies the DBB signature against the DBB public key.
    *
    * @param encodedReceipt Base64-encoded JSON receipt string as returned by
    *   `AVClient.castBallot` (after further encoding by the consuming app).
-   * @param trackingCode The 7-character Base58 tracking code for the ballot.
    * @throws {@link InvalidReceiptError | InvalidReceiptError} if the receipt string is malformed or fails the cryptographic check.
-   * @throws {@link InvalidTrackingCodeError | InvalidTrackingCodeError} if the tracking code does not match the receipt address.
    */
-  public validateReceipt(encodedReceipt: string, trackingCode: string): void {
+  public validateReceipt(encodedReceipt: string) {
     const [castRequestItem, receipt] = this.parseReceipt(encodedReceipt)
-    this.validateTrackingCode(trackingCode, castRequestItem)
 
     try {
       verifyAddress(castRequestItem)
@@ -366,6 +379,24 @@ export class AVVerifier {
         throw err
       }
     }
+  }
+
+  /**
+   * Validates a `BallotBoxReceipt` against the ballot's tracking code.
+   *
+   * `encodedReceipt` is a base64-encoded JSON string containing the address of the cast request item.
+   * This method parses and decodes the base64 receipt string.
+   * Then it confirms the tracking code matches the receipt address.
+   *
+   * @param encodedReceipt Base64-encoded JSON receipt string as returned by
+   *   `AVClient.castBallot` (after further encoding by the consuming app).
+   * @param trackingCode The 7-character Base58 tracking code for the ballot.
+   * @throws {@link InvalidReceiptError | InvalidReceiptError} if the receipt string is malformed.
+   * @throws {@link InvalidTrackingCodeError | InvalidTrackingCodeError} if the tracking code does not match the receipt address.
+   */
+  public validateReceiptTrackingCode(encodedReceipt: string, trackingCode: string) {
+    const [castRequestItem, _receipt] = this.parseReceipt(encodedReceipt)
+    this.validateTrackingCode(trackingCode, castRequestItem)
   }
 
   private getDbbPublicKey(): string {
