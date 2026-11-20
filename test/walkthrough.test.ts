@@ -55,7 +55,7 @@ describe.skip('entire voter flow using OTP authorization', () => {
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       const receipt = await client.castBallot(affidavit);
-      expect(receipt.trackingCode.length).to.eql(7);
+      expect(receipt.ballotCode.length).to.eql(7);
 
   }).timeout(10000);
 
@@ -116,7 +116,7 @@ describe.skip('entire voter flow using PoEC authorization', () => {
 
       const affidavit = Buffer.from('some bytes, most likely as binary PDF').toString('base64');
       const receipt = await client.castBallot(affidavit);
-      expect(receipt.trackingCode.length).to.eql(7)
+      expect(receipt.ballotCode.length).to.eql(7)
 
   }).timeout(10000);
 })

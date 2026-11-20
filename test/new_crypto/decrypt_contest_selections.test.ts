@@ -4,6 +4,7 @@ import {CommitmentOpening, ContestConfig, ContestConfigMap, ContestEnvelope, Con
 import {finalizeCryptograms} from "../../lib/av_client/new_crypto/finalize_cryptograms";
 import {baseItemAttributes} from "../fixtures/itemHelper";
 import {AVCrypto} from "@assemblyvoting/av-crypto";
+import {WriteInMaxSize} from "@assemblyvoting/types";
 
 const encryptionKey = '021edaa87d7626dbd2faa99c4dc080f443c150ab70b24da411b13aa56249b5242e'
 
@@ -36,7 +37,7 @@ const bigContest: ContestConfig = {
         subtitle: {en: 'Option 1'},
         description: {en: 'Option 1'},
         writeIn: {
-          maxSize: 40,
+          maxSize: 40 as WriteInMaxSize, // fixtures were generated with this size
           encoding: 'utf8'
         }
       }
