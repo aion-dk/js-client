@@ -1,6 +1,7 @@
 import { selectionPileToByteArray, byteArrayToSelectionPile } from '../../lib/av_client/encoding/byte_encoding'
 import { expect } from 'chai'
 import {ContestConfig, SelectionPile} from '../../lib/av_client/types'
+import { WriteInMaxSize } from '@assemblyvoting/types'
 
 const contestConfig: ContestConfig = {
     address: '',
@@ -50,7 +51,7 @@ const contestConfig: ContestConfig = {
           subtitle: { en: '' },
           description: { en: '' },
           writeIn: {
-            maxSize: 10,
+            maxSize: 10 as WriteInMaxSize, // deliberately small to keep expected byte arrays short
             encoding: 'utf8'
           }
         }

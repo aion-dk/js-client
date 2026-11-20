@@ -1,4 +1,4 @@
-import nock = require('nock');
+import nock from 'nock';
 
 import { AVClient, LatestConfig } from '../lib/av_client';
 import { InvalidStateError } from '../lib/av_client/errors';

@@ -2,19 +2,19 @@ name: Documentation
 on: workflow_dispatch
 jobs:
   generate-documentation:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v5
         with:
-          node-version: '22.13.0'
-          cache: 'npm'
-      - name: Install NPM packages
-        run: npm ci
+          node-version-file: '.tool-versions'
+          cache: 'yarn'
+      - name: Install packages
+        run: yarn install --frozen-lockfile
       - name: Generate documentation
-        run: npm run docs
+        run: yarn docs
       - name: Commit files
         run: |
           git config --local user.email "action@github.com"

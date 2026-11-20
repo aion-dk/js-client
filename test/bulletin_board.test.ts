@@ -1,4 +1,4 @@
-import nock = require('nock');
+import nock from 'nock';
 
 import { BulletinBoard } from '../lib/av_client/connectors/bulletin_board';
 import {

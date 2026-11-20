@@ -23,8 +23,8 @@ describe('setRegistrationChannel', () => {
 
     await client.setRegistrationChannel(privateKeyHex);
 
-    // Access the private field via any cast to verify it was set
-    const registrationChannel = (client as AVClient).registrationChannel;
+    // Access the private field via bracket notation to verify it was set
+    const registrationChannel = client['registrationChannel'] as string;
     expect(registrationChannel).to.be.a('string');
     expect(registrationChannel).to.not.be.undefined;
 
