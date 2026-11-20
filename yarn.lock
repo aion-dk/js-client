@@ -7,18 +7,18 @@
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
-"@assemblyvoting/av-crypto@^1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@assemblyvoting/av-crypto/-/av-crypto-1.4.0.tgz#81fcb2f794ab88e0e8a7867175644490fe9418f6"
-  integrity sha512-2RJTm2M2aGZVcY+Q00ZDF20A9ZZM/8hyszG/xsTiKY8rYCiCvVqHAmWcbXvct6d0jC+4WkX35kCxycMmDAwNlg==
+"@assemblyvoting/av-crypto@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@assemblyvoting/av-crypto/-/av-crypto-2.0.0.tgz#0ac9ceb6bcb2ca9288ced5e22c759460d0c9e1b7"
+  integrity sha512-GfAVIpHIqVTRu60rUrFOKA/Y79tgtKHAsv4/OtGXmHiGZcxFNdv4acJMd9C+2JD1F1ThglJH1AehWAWlAGF97Q==
   dependencies:
-    "@noble/hashes" "^1.8.0"
+    "@noble/hashes" "^2.4.0"
     sjcl-with-all "^1.0.8"
 
-"@assemblyvoting/types@^1.3.2":
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/@assemblyvoting/types/-/types-1.3.2.tgz#5556d3664f2741c11489383e927d547c447e71f6"
-  integrity sha512-zxUIrxksYZfTAKUt5kzJy3eNKIZgKJU6MH+yQfWYTcaxUS5kds+vEmzavJsBh13ni70d2rM6iwTL74AiEZ+yuw==
+"@assemblyvoting/types@^1.3.3":
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/@assemblyvoting/types/-/types-1.3.3.tgz#3a3b118d81f6d3c562a8750689565a389f03732f"
+  integrity sha512-7Dc5WUtjBseVyPuGHsKz4DnlXSEDWQjJonJdaTGM4XU50ZipGMkWUR/oZz3Wu1rl0MQBzmdwbN8qPKFz7fkf6Q==
 
 "@babel/code-frame@^8.0.6":
   version "8.0.6"
@@ -456,15 +456,10 @@
   dependencies:
     "@noble/hashes" "2.4.0"
 
-"@noble/hashes@2.4.0":
+"@noble/hashes@2.4.0", "@noble/hashes@^2.4.0":
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-2.4.0.tgz#e6a3e98edbed3c8659b28bb8f9b18ca02ec8ea4b"
   integrity sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA==
-
-"@noble/hashes@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.8.0.tgz#cee43d801fcef9644b11b8194857695acd5f815a"
-  integrity sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==
 
 "@open-draft/until@^3.0.1":
   version "3.0.1"
