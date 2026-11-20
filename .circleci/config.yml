@@ -40,12 +40,14 @@ jobs:
           command: |
             mv /tmp/workspace/assemblyvoting-js-client-*.tgz ./
       - run:
-          name: Set npm access token
+          # Trusted publishing (OIDC): npm exchanges this short-lived CircleCI
+          # token for publish rights; no NPM_TOKEN involved. The job must keep
+          # the npm-publishing context — the npm trusted-publisher config is
+          # pinned to its context ID. Needs npm >= 11.5.1 (Node 26.13 ships 11.20).
+          name: Publish to NPM (trusted publishing)
           command: |
-            npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
-      - run:
-          name: Publish to NPM
-          command: |
+            echo "npm $(npm --version)"
+            export NPM_ID_TOKEN=$(circleci run oidc get --claims '{"aud": "npm:registry.npmjs.org"}')
             package_file=$(ls assemblyvoting-js-client-*.tgz)
             if echo "${package_file}" | grep -E "alpha|beta" > /dev/null; then
               prerelease=$(echo "${package_file}" | grep -E -o "alpha|beta")
