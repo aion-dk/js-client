@@ -2,13 +2,13 @@ version: 2.1
 orbs:
   node: circleci/node@7.2.1
 executors:
-  node24:
+  node26:
     docker:
-      - image: cimg/node:24.14.0
+      - image: cimg/node:26.13
 jobs:
   lint_test_build:
     executor:
-      name: node24
+      name: node26
     steps:
       - checkout
       - restore_cache:
@@ -31,7 +31,7 @@ jobs:
             - ./assemblyvoting-js-client-*.tgz
   publish:
     executor:
-      name: node24
+      name: node26
     steps:
       - attach_workspace:
           at: /tmp/workspace
