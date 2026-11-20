@@ -3,7 +3,6 @@ export type * from "@assemblyvoting/types";
 import type {
   LatestConfig,
   BallotSelection,
-  Affidavit,
   BallotBoxReceipt,
   VoterSessionItem,
 } from "@assemblyvoting/types";
@@ -17,7 +16,7 @@ export interface IAVClient {
   constructBallot(ballotSelection: BallotSelection): Promise<string>
   waitForVerifierRegistration(): Promise<string>
   spoilBallot(): Promise<string>
-  castBallot (affidavit: Affidavit): Promise<BallotBoxReceipt>
+  castBallot(locale?: string): Promise<BallotBoxReceipt>
   challengeBallot(): Promise<void>
 }
 

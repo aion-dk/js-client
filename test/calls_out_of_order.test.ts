@@ -27,7 +27,7 @@ describe('AVClient functions call order', () => {
 
   it('throws an error when castBallot is called first', async () => {
     await expectError(
-      client.castBallot('affidavit bytes'),
+      client.castBallot(),
       InvalidStateError,
       'Cannot create cast request cryptograms. Ballot cryptograms not present'
     );
